@@ -1,4 +1,5 @@
 import { env } from "@/server/lib/env";
+import { getJiraBaseUrl } from "@/server/lib/settings/jira";
 import { prisma } from "@/server/lib/db";
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
@@ -76,7 +77,7 @@ export const externalLinksRouter = createRouter()
                     issueId: comment.issueId,
                 });
 
-                const jiraBaseURL = env.JIRA_BASE_URL;
+                const jiraBaseURL = await getJiraBaseUrl();
                 console.debug("[external-links] jiraBaseURL", { jiraBaseURL });
 
                 if (jiraBaseURL) {

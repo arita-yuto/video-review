@@ -8,6 +8,9 @@ const prismaMock = vi.hoisted(() => ({
         findUnique: vi.fn(),
         update: vi.fn(),
     },
+    // Nothing saved from the admin screen, so the Jira values come from env.
+    systemSetting: { findUnique: vi.fn().mockResolvedValue(null) },
+    systemSecret: { findUnique: vi.fn().mockResolvedValue(null) },
 }));
 
 const envMock = vi.hoisted(() => ({

@@ -25,3 +25,8 @@ export async function saveSetting(key: string, value: Prisma.InputJsonValue) {
     });
     cache.delete(key);
 }
+
+export async function deleteSetting(key: string) {
+    await prisma.systemSetting.deleteMany({ where: { key } });
+    cache.delete(key);
+}
