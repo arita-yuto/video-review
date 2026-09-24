@@ -17,6 +17,8 @@ services:
 
     volumes:
       - ${DOCKER_HOST_STORAGE:-videoreview-storage}:/storage
+      # Holds the key that encrypts integration tokens; back it up apart from the database.
+      - videoreview-secrets:/app/secrets
 
     depends_on:
       - db
@@ -59,3 +61,4 @@ services:
 volumes:
   videoreview-storage:
   videoreview-db:
+  videoreview-secrets:
