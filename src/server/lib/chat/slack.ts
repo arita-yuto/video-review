@@ -1,14 +1,20 @@
 import { ChatType } from "@/server/lib/chat/chat-type";
-import { SlackClient } from "@/server/lib/integration-clients/slack-client";
+import { getSlackClient, getSlackConfig } from "@/server/lib/integrations/slack";
 import { prisma } from "@/server/lib/db";
-import { env } from "@/server/lib/env";
 
 export async function chatSlack(ctx: ChatType): Promise<boolean> {
+    let SlackClient: Awaited<ReturnType<typeof getSlackClient>>;
+    try {
+        SlackClient = await getSlackClient();
+    } catch {
+        // A saved token that cannot be decrypted must not stop the webhook and email posts after this one.
+        return false;
+    }
     if (!SlackClient){
         return false;
     }
     
-    const channel = env.SLACK_POST_CH;
+    const { channel } = await getSlackConfig();
     if (!channel) {
         console.warn("slack channel missing");
         return false;

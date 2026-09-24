@@ -1,4 +1,4 @@
-import { getJiraConfig } from "@/server/lib/settings/jira";
+import { getJiraConfig } from "@/server/lib/integrations/jira";
 
 export async function avatar(email: string): Promise<Buffer<ArrayBuffer> | undefined> {
     const { baseUrl: base, token } = await getJiraConfig();

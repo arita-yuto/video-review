@@ -54,7 +54,7 @@ const TOKEN = "jira-token-abc123";
 
 let app: OpenAPIHono;
 let workDir: string;
-let getJiraConfig: typeof import("@/server/lib/settings/jira").getJiraConfig;
+let getJiraConfig: typeof import("@/server/lib/integrations/jira").getJiraConfig;
 
 function put(body: object) {
     return app.request("/settings/jira", {
@@ -64,7 +64,8 @@ function put(body: object) {
     });
 }
 
-describe("admin Jira settings", () => {
+// Jira stands in for every integration: the rules live in the shared store and router.
+describe("admin integration settings (via Jira)", () => {
     beforeEach(async () => {
         db.settings.clear();
         db.secrets.clear();
@@ -77,7 +78,7 @@ describe("admin Jira settings", () => {
         // Re-imported per test so the settings caches and the key file path start fresh.
         vi.resetModules();
         const { settingsRouter } = await import("@/server/routes/admin/settings");
-        ({ getJiraConfig } = await import("@/server/lib/settings/jira"));
+        ({ getJiraConfig } = await import("@/server/lib/integrations/jira"));
         app = new OpenAPIHono().route("/settings", settingsRouter);
         app.onError(handleServerError);
     });
@@ -101,8 +102,8 @@ describe("admin Jira settings", () => {
     it("stores the token encrypted", async () => {
         await put({ token: TOKEN });
 
-        expect(db.secrets.get("JIRA_API_TOKEN")).toBeDefined();
-        expect(db.secrets.get("JIRA_API_TOKEN")).not.toContain(TOKEN);
+        expect(db.secrets.get("jira.token")).toBeDefined();
+        expect(db.secrets.get("jira.token")).not.toContain(TOKEN);
         expect((await getJiraConfig()).token).toBe(TOKEN);
     });
 

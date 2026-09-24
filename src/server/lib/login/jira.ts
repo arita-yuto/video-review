@@ -3,7 +3,7 @@ import { prisma } from "@/server/lib/db";
 import { Role } from "@/lib/role";
 import { LoginRequest, LoginResponse } from "@/lib/auth-types"
 import { ServerError } from "@/server/lib/server-error";
-import { getJiraConfig } from "@/server/lib/settings/jira";
+import { getJiraConfig } from "@/server/lib/integrations/jira";
 
 export async function loginWithJira(c: LoginRequest): Promise<LoginResponse> {
     let jiraInfo;

@@ -1,4 +1,4 @@
-import { getJiraConfig } from "@/server/lib/settings/jira";
+import { getJiraConfig } from "@/server/lib/integrations/jira";
 import { ServerError } from "@/server/lib/server-error";
 
 import "server-only";

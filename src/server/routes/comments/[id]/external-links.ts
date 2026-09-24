@@ -1,5 +1,6 @@
 import { env } from "@/server/lib/env";
-import { getJiraBaseUrl } from "@/server/lib/settings/jira";
+import { getJiraBaseUrl } from "@/server/lib/integrations/jira";
+import { getSlackTeam } from "@/server/lib/integrations/slack";
 import { prisma } from "@/server/lib/db";
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
@@ -61,7 +62,7 @@ export const externalLinksRouter = createRouter()
                 });
 
                 if (slack) {
-                    const slackTeam = env.SLACK_TEAM;
+                    const slackTeam = await getSlackTeam();
                     console.debug("[external-links] slackTeam", { slackTeam });
 
                     if (slackTeam) {

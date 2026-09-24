@@ -1,6 +1,7 @@
-import { SlackClient } from "@/server/lib/integration-clients/slack-client";
+import { getSlackClient } from "@/server/lib/integrations/slack";
 
 export async function avatar(email: string): Promise<Buffer<ArrayBuffer> | undefined> {
+    const SlackClient = await getSlackClient();
     if (!SlackClient){
         return undefined;
     }
