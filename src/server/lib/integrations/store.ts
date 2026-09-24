@@ -1,6 +1,6 @@
 import "server-only";
 import { ServerError } from "@/server/lib/server-error";
-import { deleteSetting, getSetting, saveSetting } from "@/server/lib/settings";
+import { getSetting, saveSetting } from "@/server/lib/settings";
 import { deleteSecretSetting, getSecretSetting, hasSavedSecret, saveSecretSetting } from "@/server/lib/settings/secret";
 import type { ConfigOf, Fields, IntegrationDef, TestResultSchema } from "@/server/lib/integrations/define";
 
@@ -21,17 +21,30 @@ function entries<F extends Fields>(def: AnyDef<F>) {
     return Object.entries(def.fields) as [keyof F & string, F[keyof F]][];
 }
 
-export async function getConfig<F extends Fields>(def: AnyDef<F>): Promise<ConfigOf<F>> {
+// A destination that is saved or sent never goes with an env secret, whose value its author may not know.
+async function envSecretAllowed<F extends Fields>(def: AnyDef<F>, update: Partial<Record<keyof F, string>>) {
+    for (const [field, spec] of entries(def)) {
+        if (spec.kind !== "destination") continue;
+        if (update[field] !== undefined || await getSetting(keyOf(def, field), undefined) !== undefined) return false;
+    }
+    return true;
+}
+
+// A supplied value wins.
+async function readConfig<F extends Fields>(def: AnyDef<F>, update: Partial<Record<keyof F, string>> = {}) {
+    const envSecret = await envSecretAllowed(def, update);
     const config = {} as ConfigOf<F>;
     for (const [field, spec] of entries(def)) {
-        config[field] = spec.kind === "secret"
-            ? await getSecretSetting(keyOf(def, field), envOf(def, field))
-            : await getSetting<string>(keyOf(def, field), envOf(def, field));
+        config[field] = update[field] ?? (spec.kind === "secret"
+            ? await getSecretSetting(keyOf(def, field), envSecret ? envOf(def, field) : undefined)
+            : await getSetting<string>(keyOf(def, field), envOf(def, field)));
     }
     return config;
 }
 
-// Reads one non-secret value without decrypting anything, so it keeps working when the key file is gone.
+export const getConfig = <F extends Fields>(def: AnyDef<F>) => readConfig(def);
+
+// No decryption, so this works even without the key file.
 export async function getPlainField<F extends Fields>(def: AnyDef<F>, field: keyof F & string) {
     if (def.fields[field].kind === "secret") {
         throw new ServerError(`${def.name}.${field} is a secret`, 500);
@@ -41,8 +54,9 @@ export async function getPlainField<F extends Fields>(def: AnyDef<F>, field: key
 
 export async function describeConfig<F extends Fields>(def: AnyDef<F>): Promise<Record<keyof F, FieldState>> {
     const state = {} as Record<keyof F, FieldState>;
+    const envSecret = await envSecretAllowed(def, {});
     for (const [field, spec] of entries(def)) {
-        const fromEnv = envOf(def, field);
+        const fromEnv = spec.kind === "secret" && !envSecret ? undefined : envOf(def, field);
         if (spec.kind === "secret") {
             const saved = await hasSavedSecret(keyOf(def, field));
             const source: Source = saved ? "saved" : fromEnv !== undefined ? "env" : null;
@@ -56,37 +70,64 @@ export async function describeConfig<F extends Fields>(def: AnyDef<F>): Promise<
     return state;
 }
 
-// A field left out stays as it is.
-export async function updateConfig<F extends Fields>(def: AnyDef<F>, update: Partial<Record<keyof F, string>>) {
-    const fields = entries(def);
-    const secrets = fields.filter(([, spec]) => spec.kind === "secret").map(([field]) => field);
-    const movesDestination = fields.some(([field, spec]) => spec.kind === "destination" && update[field] !== undefined);
+// While a secret is saved the connection (destination and secrets) is locked; Reset unlocks it.
+async function assertUnlocked<F extends Fields>(def: AnyDef<F>, update: Partial<Record<keyof F, string>>) {
+    const touchesConnection = entries(def).some(([field, spec]) => spec.kind !== "plain" && update[field] !== undefined);
+    if (!touchesConnection) return;
 
-    // Someone who does not know the saved secrets must not be able to point them at a new address.
-    if (movesDestination && secrets.some(field => update[field] === undefined)) {
-        throw new ServerError(`enter ${secrets.join(", ")} again when changing where ${def.name} connects`, 400);
-    }
-
-    // Secrets go first: if one fails to save, no new destination is left holding the old secret.
-    for (const field of secrets) {
-        const value = update[field];
-        if (value !== undefined) await saveSecretSetting(keyOf(def, field), value);
-    }
-    for (const [field, spec] of fields) {
-        const value = update[field];
-        if (spec.kind !== "secret" && value !== undefined) await saveSetting(keyOf(def, field), value);
+    for (const [field, spec] of entries(def)) {
+        if (spec.kind === "secret" && await hasSavedSecret(keyOf(def, field))) {
+            throw new ServerError(`reset the ${def.name} connection before changing it`, 400);
+        }
     }
 }
 
-// Drops every saved value of the integration at once, so env applies again.
-// Secrets go last: a half-done reset may leave a saved secret with the env destination, which the operator chose,
-// but never a saved destination with the env secret, which the person who saved that destination may not know.
-export async function resetConfig<F extends Fields>(def: AnyDef<F>) {
-    const fields = entries(def);
-    for (const [field, spec] of fields) {
-        if (spec.kind !== "secret") await deleteSetting(keyOf(def, field));
+export async function updateConfig<F extends Fields>(def: AnyDef<F>, update: Partial<Record<keyof F, string>>) {
+    await assertUnlocked(def, update);
+
+    for (const [field, spec] of entries(def)) {
+        const value = update[field];
+        if (value === undefined) continue;
+        if (spec.kind === "secret") {
+            await saveSecretSetting(keyOf(def, field), value);
+        } else {
+            await saveSetting(keyOf(def, field), value);
+        }
     }
-    for (const [field, spec] of fields) {
+}
+
+export async function testAndSave<F extends Fields, R extends typeof TestResultSchema>(
+    def: IntegrationDef<F, R>,
+    update: Partial<Record<keyof F, string>>,
+) {
+    await assertUnlocked(def, update);
+
+    const result = await def.test(await readConfig(def, update));
+    if (result.ok) {
+        await updateConfig(def, update);
+    }
+    return result;
+}
+
+// For the admin menu; uses the saved or env values, never request input.
+export async function checkConnection<F extends Fields>(def: AnyDef<F>) {
+    let config: ConfigOf<F>;
+    try {
+        config = await getConfig(def);
+    } catch {
+        return { configured: true, ok: false };
+    }
+
+    const secrets = entries(def).filter(([, spec]) => spec.kind === "secret").map(([field]) => field);
+    if (secrets.every(field => config[field] === undefined)) {
+        return { configured: false, ok: false };
+    }
+    return { configured: true, ok: (await def.test(config)).ok };
+}
+
+// Unlocks the connection: drops the saved secrets and keeps everything else, the destination included.
+export async function resetConnection<F extends Fields>(def: AnyDef<F>) {
+    for (const [field, spec] of entries(def)) {
         if (spec.kind === "secret") await deleteSecretSetting(keyOf(def, field));
     }
 }

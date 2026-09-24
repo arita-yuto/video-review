@@ -200,7 +200,6 @@
             "integrations": "Integrations",
             "videos": "Videos"
         },
-        "empty": "Nothing to configure here yet.",
         "users": {
             "columns": {
                 "displayName": "Display name",
@@ -261,6 +260,36 @@
                 "failed": "Failed to delete the files",
                 "filesLeft": "Some files could not be removed and are still in storage."
             }
+        },
+        "integrations": {
+            "loadFailed": "Failed to load the settings",
+            "testFailed": "Failed to test",
+            "resetFailed": "Failed to reset",
+            "reset": "Reset",
+            "cancel": "Cancel",
+            "cannotClear": "A value can't be emptied here.",
+            "jira": {
+                "title": "Jira",
+                "baseUrl": "URL",
+                "token": "Token",
+                "project": "Project",
+                "assignee": "Assignee",
+                "resetConfirm": "Clear the saved Jira token so you can change the URL and token?",
+                "issueTypeTask": "Task issue type",
+                "issueTypeBug": "Bug issue type"
+            },
+            "slack": {
+                "title": "Slack",
+                "token": "Token",
+                "channel": "Channel",
+                "team": "Team",
+                "resetConfirm": "Clear the saved Slack token so you can change it?"
+            },
+            "testAndSave": "Test & save",
+            "saved": "Connected. Saved.",
+            "notSaved": "Could not connect, so nothing was saved: {error}",
+            "connected": "Connected",
+            "disconnected": "Test failed"
         }
     }
 }

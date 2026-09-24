@@ -21,6 +21,9 @@ export const env = {
     JIRA_API_TOKEN: resolveEnv(process.env.VIDEO_REVIEW_JIRA_API_TOKEN, process.env.JIRA_API_TOKEN),
     JIRA_PROJECT: resolveEnv(process.env.VIDEO_REVIEW_JIRA_PROJECT, process.env.JIRA_PROJECT),
     JIRA_ASSIGNEE_USER: resolveEnv(process.env.VIDEO_REVIEW_JIRA_ASSIGNEE_USER, process.env.JIRA_ASSIGNEE_USER),
+    // Defaults for the admin screen's issue types. NEXT_PUBLIC_ values are fixed at build time.
+    JIRA_ISSUE_TYPE_TASK: resolveEnv(process.env.NEXT_PUBLIC_VIDEO_REVIEW_JIRA_ISSUE_TYPE_TASK, process.env.NEXT_PUBLIC_JIRA_ISSUE_TYPE_TASK),
+    JIRA_ISSUE_TYPE_BUG: resolveEnv(process.env.NEXT_PUBLIC_VIDEO_REVIEW_JIRA_ISSUE_TYPE_BUG, process.env.NEXT_PUBLIC_JIRA_ISSUE_TYPE_BUG),
     WEBHOOK_TARGET: process.env.VIDEO_REVIEW_WEBHOOK_TARGET,
     WEBHOOK_URL: process.env.VIDEO_REVIEW_WEBHOOK_URL,
     SMTP_TLS_STRICT: booleanEnv(process.env.VIDEO_REVIEW_SMTP_TLS_STRICT),

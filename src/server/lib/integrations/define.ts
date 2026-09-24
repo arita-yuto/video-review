@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "@hono/zod-openapi";
 
 // plain: read and written freely.
-// destination: decides where the secrets are sent, so changing it needs every secret entered again.
+// destination: decides where the secrets are sent; it never goes with an env secret once saved.
 // secret: encrypted at rest and never returned, not even its length.
 export type FieldKind = "plain" | "destination" | "secret";
 
@@ -26,7 +26,7 @@ export type IntegrationDef<F extends Fields, R extends typeof TestResultSchema> 
     name: string;
     fields: F;
     testSchema: R;
-    // Receives the saved values only, never values from the request, so a caller cannot redirect a secret.
+    // Saved values, overlaid with the request's in Test & save.
     test: (config: ConfigOf<F>) => Promise<z.infer<R>>;
 };
 

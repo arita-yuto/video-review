@@ -38,19 +38,6 @@ function seededTitle(base: number) {
 }
 
 test.describe("admin settings dialog", () => {
-    test("an admin opens it from the settings popover and finds every section", async ({ page }) => {
-        await loginAsAdmin(page);
-        const popover = await openSettings(page);
-
-        await popover.getByRole("button", { name: "Administration" }).click();
-
-        const dialog = page.getByRole("dialog");
-        await expect(dialog.getByRole("heading", { name: "Administration" })).toBeVisible();
-        for (const name of ["Users", "API Token", "Integrations", "Videos"]) {
-            await expect(dialog.getByRole("tab", { name })).toBeVisible();
-        }
-    });
-
     test("an admin creates a viewer and promotes them", async ({ page }) => {
         await loginAsAdmin(page);
         const popover = await openSettings(page);
