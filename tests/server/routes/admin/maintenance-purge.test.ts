@@ -62,15 +62,17 @@ describe("POST /video/purge", () => {
     });
 
     it("repoints a video that still has an older revision, instead of hiding it", async () => {
-        prismaMock.tx.videoRevision.findFirst.mockResolvedValue({ revision: 1 });
+        const uploadedAt = new Date("2026-01-02T03:04:05.000Z");
+        prismaMock.tx.videoRevision.findFirst.mockResolvedValue({ revision: 1, uploadedAt });
 
         const res = await purgeRequest();
 
         expect(res.status).toBe(200);
         // Players follow latestRevisionNum, so leaving it on the purged revision breaks playback.
+        // latestUpdatedAt denormalises the same revision, so it has to rewind with it.
         expect(prismaMock.tx.video.update).toHaveBeenCalledWith({
             where: { id: "video-1" },
-            data: { latestRevisionNum: 1 },
+            data: { latestRevisionNum: 1, latestUpdatedAt: uploadedAt },
         });
     });
 });

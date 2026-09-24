@@ -189,14 +189,20 @@ describe("videos upload finishRouter (DB)", () => {
         expect(body.revision).toBe(1);
         expect(body.filePath).toBe(storageKey);
 
+        const revision = await prisma.videoRevision.findUnique({
+            where: { id: sessionId },
+            select: { uploadedAt: true },
+        });
+
         const updatedVideo = await prisma.video.findUnique({
             where: { id: video.id },
-            select: { latestRevisionNum: true, deleted: true, scenePath: true },
+            select: { latestRevisionNum: true, deleted: true, scenePath: true, latestUpdatedAt: true },
         });
         expect(updatedVideo).toEqual({
             latestRevisionNum: 1,
             deleted: false,
             scenePath,
+            latestUpdatedAt: revision!.uploadedAt,
         });
 
         const session = await prisma.uploadSession.findUnique({

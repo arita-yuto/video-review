@@ -144,14 +144,14 @@ export const maintenanceRouter = createRouter()
             const newest = await tx.videoRevision.findFirst({
                 where: { videoId, deleted: false },
                 orderBy: { revision: "desc" },
-                select: { revision: true },
+                select: { revision: true, uploadedAt: true },
             });
 
             // Players and thumbnails follow latestRevisionNum, so it must never name a purged revision.
             await tx.video.update({
                 where: { id: videoId },
                 data: newest
-                    ? { latestRevisionNum: newest.revision }
+                    ? { latestRevisionNum: newest.revision, latestUpdatedAt: newest.uploadedAt }
                     // The record stays: a re-upload of the same title picks its comments back up.
                     : { latestRevisionNum: null, deleted: true },
             });

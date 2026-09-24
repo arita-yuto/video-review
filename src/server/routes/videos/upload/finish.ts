@@ -74,7 +74,13 @@ export const finishRouter = createRouter()
 
                 await tx.video.update({
                     where: { id: video.id },
-                    data: { scenePath, vcsWatchPaths, latestRevisionNum: newRevision.revision, deleted: false },
+                    data: {
+                        scenePath,
+                        vcsWatchPaths,
+                        latestRevisionNum: newRevision.revision,
+                        latestUpdatedAt: newRevision.uploadedAt,
+                        deleted: false,
+                    },
                 });
                 return newRevision;
             }
