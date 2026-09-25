@@ -36,6 +36,9 @@ yarn-error.log*
 .env*
 .env.demo*
 
+# encryption key created by the server
+/secrets/
+
 # vercel
 .vercel
 

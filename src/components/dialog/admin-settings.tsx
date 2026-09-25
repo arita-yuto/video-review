@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
@@ -8,16 +8,26 @@ import { useAuthStore } from "@/stores/auth-store";
 import { isAdmin } from "@/lib/role";
 import { UsersSection } from "@/components/admin/users-section";
 import { ApiTokenSection } from "@/components/admin/api-token-section";
-import { IntegrationsSection } from "@/components/admin/integrations-section";
+import { JiraSection } from "@/components/admin/integration-section/jira-section";
+import { SlackSection } from "@/components/admin/integration-section/slack-section";
+import { WebhookSection } from "@/components/admin/integration-section/webhook-section";
+import { EmailSection } from "@/components/admin/integration-section/email-section";
+import { AiSection } from "@/components/admin/integration-section/ai-section";
+import { VcsSection } from "@/components/admin/integration-section/vcs-section";
 import { VideosSection } from "@/components/admin/videos-section";
 
-// Add a section by appending here.
-const SECTIONS = [
+// Add a section by appending here. Integrations are listed under one heading.
+const SECTIONS: { key: string; label: string; integration?: boolean; Component: () => React.JSX.Element | null }[] = [
     { key: "users", label: "sections.users", Component: UsersSection },
     { key: "videos", label: "sections.videos", Component: VideosSection },
-    { key: "integrations", label: "sections.integrations", Component: IntegrationsSection },
+    { key: "integrations.jira", label: "integrations.jira.title", integration: true, Component: JiraSection },
+    { key: "integrations.slack", label: "integrations.slack.title", integration: true, Component: SlackSection },
+    { key: "integrations.webhook", label: "integrations.webhook.title", integration: true, Component: WebhookSection },
+    { key: "integrations.email", label: "integrations.email.title", integration: true, Component: EmailSection },
+    { key: "integrations.ai", label: "integrations.llm.title", integration: true, Component: AiSection },
+    { key: "integrations.vcs", label: "integrations.vcs.title", integration: true, Component: VcsSection },
     { key: "apiToken", label: "sections.apiToken", Component: ApiTokenSection },
-] as const;
+];
 
 export default function AdminSettingsDialog({
     open,
@@ -43,10 +53,15 @@ export default function AdminSettingsDialog({
                 {/* min-w-0: without it this grid item grows to its content and the sections overflow the dialog. */}
                 <Tabs orientation="vertical" value={section} onValueChange={setSection} className="flex-row min-w-0">
                     <TabsList className="flex-col h-auto w-44 mr-4 shrink-0 self-start items-stretch">
-                        {SECTIONS.map(({ key, label }) => (
-                            <TabsTrigger key={key} value={key} className="justify-start">
-                                {t(label)}
-                            </TabsTrigger>
+                        {SECTIONS.map(({ key, label, integration }, i) => (
+                            <Fragment key={key}>
+                                {integration && !SECTIONS[i - 1]?.integration && (
+                                    <span className="px-2 pt-2 text-xs text-muted-foreground">{t("sections.integrations")}</span>
+                                )}
+                                <TabsTrigger value={key} className={integration ? "justify-start ml-3" : "justify-start"}>
+                                    {t(label)}
+                                </TabsTrigger>
+                            </Fragment>
                         ))}
                     </TabsList>
 

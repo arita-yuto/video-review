@@ -3,7 +3,7 @@ import { prisma } from "@/server/lib/db";
 import { Role } from "@/lib/role";
 import { LoginRequest, LoginResponse } from "@/lib/auth-types"
 import { ServerError } from "@/server/lib/server-error";
-import { env } from "@/server/lib/env";
+import { getJiraConfig } from "@/server/lib/integrations/jira";
 
 export async function loginWithJira(c: LoginRequest): Promise<LoginResponse> {
     let jiraInfo;
@@ -46,10 +46,9 @@ export async function loginWithJira(c: LoginRequest): Promise<LoginResponse> {
 }
 
 async function authenticateWithJira(email: string) {
-    const base = env.JIRA_BASE_URL;
-    const token = env.JIRA_API_TOKEN;
+    const { baseUrl: base, token } = await getJiraConfig();
     if(!base || !token) {
-        throw new ServerError("not set JIRA env", 401);
+        throw new ServerError("jira is not configured", 401);
     }
 
     const res = await fetch(`${base}/rest/api/2/user/search?username=${email}`, {

@@ -5,6 +5,7 @@ import { createRouter } from "@/server/lib/openapi/router";
 import { byIdRouter } from "@/server/routes/comments/[id]";
 import { lastUpdatedRouter } from "@/server/routes/comments/last-updated";
 import { usersRouter } from "@/server/routes/comments/users";
+import { issueTypesRouter } from "@/server/routes/comments/issue-types";
 import { z } from "zod";
 import { toDateRange } from "@/lib/utils/date-helper";
 import { VideoCommentSchema } from "@/schema/zod";
@@ -249,4 +250,5 @@ export const commentsRouter = createRouter()
     })
     .route("/last-updated", lastUpdatedRouter)
     .route("/users", usersRouter)
+    .route("/issue-types", issueTypesRouter)
     .route("/:id", byIdRouter);

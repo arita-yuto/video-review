@@ -1,4 +1,4 @@
-import { env } from "@/server/lib/env";
+import { getJiraConfig } from "@/server/lib/integrations/jira";
 import { ServerError } from "@/server/lib/server-error";
 
 import "server-only";
@@ -13,10 +13,7 @@ export type CreateIssueInput = {
 
 // The attachment is uploaded in a second request because the issue API has no multipart form.
 export async function createJiraIssue(input: CreateIssueInput): Promise<string> {
-    const base = env.JIRA_BASE_URL;
-    const token = env.JIRA_API_TOKEN;
-    const project = env.JIRA_PROJECT;
-    const assigneeEmail = env.JIRA_ASSIGNEE_USER;
+    const { baseUrl: base, token, project, assignee: assigneeEmail } = await getJiraConfig();
 
     if (!base || !token || !project) {
         throw new ServerError("jira configuration is missing", 500);

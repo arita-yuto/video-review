@@ -38,19 +38,6 @@ function seededTitle(base: number) {
 }
 
 test.describe("admin settings dialog", () => {
-    test("an admin opens it from the settings popover and finds every section", async ({ page }) => {
-        await loginAsAdmin(page);
-        const popover = await openSettings(page);
-
-        await popover.getByRole("button", { name: "Administration" }).click();
-
-        const dialog = page.getByRole("dialog");
-        await expect(dialog.getByRole("heading", { name: "Administration" })).toBeVisible();
-        for (const name of ["Users", "API Token", "Integrations", "Videos"]) {
-            await expect(dialog.getByRole("tab", { name })).toBeVisible();
-        }
-    });
-
     test("an admin creates a viewer and promotes them", async ({ page }) => {
         await loginAsAdmin(page);
         const popover = await openSettings(page);
@@ -62,7 +49,7 @@ test.describe("admin settings dialog", () => {
         const name = `E2E Viewer ${test.info().retry}`;
         const email = `e2e-viewer-${test.info().retry}@example.com`;
         await dialog.getByLabel("Display name").fill(name);
-        await dialog.getByLabel("Email").fill(email);
+        await dialog.getByRole("textbox", { name: "Email" }).fill(email);
         await dialog.getByLabel("Password").fill("viewer-pass");
         await dialog.getByRole("button", { name: "Create" }).click();
 

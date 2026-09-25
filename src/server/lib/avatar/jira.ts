@@ -1,8 +1,7 @@
-import { env } from "@/server/lib/env";
+import { getJiraConfig } from "@/server/lib/integrations/jira";
 
 export async function avatar(email: string): Promise<Buffer<ArrayBuffer> | undefined> {
-    const base = env.JIRA_BASE_URL;
-    const token = env.JIRA_API_TOKEN;
+    const { baseUrl: base, token } = await getJiraConfig();
 
     if (!base || !token) {
         return undefined;

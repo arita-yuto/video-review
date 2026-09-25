@@ -29,9 +29,9 @@ import { useEffect, useMemo, useState } from "react";
 import { TimelineCardHeader } from "@/components/video-side-panel/timeline-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { useTranslations } from "next-intl";
+import { api } from "@/lib/api-client";
 import { isViewer } from "@/lib/role";
 import { useAvatarStore } from "@/stores/avatar-store";
-import { env } from "@/lib/env";
 
 // Dropdown menu item for copying a shareable link to the selected comment.
 function DropdownMenu_SharedLink() {
@@ -64,6 +64,24 @@ function DropdownMenu_SharedLink() {
     );
 }
 
+type IssueTypes = { task: string | null; bug: string | null };
+
+// Fetched once per page load; the admin screen changes these rarely, and a reload picks a change up.
+let issueTypesRequest: Promise<IssueTypes> | null = null;
+
+function useJiraIssueTypes() {
+    const [types, setTypes] = useState<IssueTypes | null>(null);
+
+    useEffect(() => {
+        issueTypesRequest ??= api.comments["issue-types"].$get()
+            .then(res => (res.status === 200 ? res.json() : { task: null, bug: null }))
+            .catch(() => ({ task: null, bug: null }));
+        void issueTypesRequest.then(setTypes);
+    }, []);
+
+    return types;
+}
+
 // Dropdown menu item for creating a Jira issue from a comment.
 function DropdownMenu_CreateIssue(props: { disabled: boolean, comment: VideoComment, translateID: string }) {
     const t = useTranslations("video-comment-panel");
@@ -75,11 +93,12 @@ function DropdownMenu_CreateIssue(props: { disabled: boolean, comment: VideoComm
     // Issue type and icon are currently derived from translation IDs.
     // This couples UI text with logic, but keeps the menu definition simple for now.
     // Intended to be refactored to an explicit enum or prop-based issue type in the future.
-    const issueType = props.translateID === "commentItemTask" ? env.PUBLIC_JIRA_ISSUE_TYPE_TASK : env.PUBLIC_JIRA_ISSUE_TYPE_BUG
+    const issueTypes = useJiraIssueTypes();
+    const issueType = (props.translateID === "commentItemTask" ? issueTypes?.task : issueTypes?.bug) ?? undefined;
     const icon = props.translateID === "commentItemTask" ? faListCheck : faBug;
 
     return (
-        <DropdownMenuItem disabled={props.disabled} onClick={async () => {
+        <DropdownMenuItem disabled={props.disabled || issueType === undefined} onClick={async () => {
             if (issueType === undefined || email === null) return;
             const screenshot = await captureFrame(videoRefElement)
             await issueLinkedComment(props.comment.id, email, issueType, screenshot);

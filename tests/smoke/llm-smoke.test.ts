@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Client as McpClient } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { createLLMClient } from "@/server/lib/integration-clients/llm-client";
+import { buildLLMClient } from "@/server/lib/integration-clients/llm-client";
 import { env } from "@/server/lib/env";
 
 // Talks to the real LLM provider and MCP server configured in the environment.
@@ -10,7 +10,7 @@ const enabled = process.env.LLM_SMOKE === "1";
 
 describe.skipIf(!enabled)(`LLM smoke check (${env.LLM_PROVIDER ?? "no provider"})`, () => {
     it("answers a plain completion", async () => {
-        const client = createLLMClient();
+        const client = buildLLMClient({ provider: env.LLM_PROVIDER, apiKey: env.LLM_API_KEY, baseUrl: env.LLM_BASE_URL, model: env.LLM_MODEL });
         expect(client, "VIDEO_REVIEW_LLM_PROVIDER must be set").not.toBeNull();
 
         const reply = await client!.complete("Reply with the single word OK.");
@@ -19,7 +19,7 @@ describe.skipIf(!enabled)(`LLM smoke check (${env.LLM_PROVIDER ?? "no provider"}
     }, 60_000);
 
     it("calls an MCP tool and answers from its result", async () => {
-        const client = createLLMClient();
+        const client = buildLLMClient({ provider: env.LLM_PROVIDER, apiKey: env.LLM_API_KEY, baseUrl: env.LLM_BASE_URL, model: env.LLM_MODEL });
         expect(client).not.toBeNull();
         expect(env.MCP_URL, "VIDEO_REVIEW_MCP_URL must be set").toBeTruthy();
 

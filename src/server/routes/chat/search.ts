@@ -102,7 +102,7 @@ export const chatSearchRouter = createRouter()
             return c.json({ error: "unauthorized" }, 401);
         }
 
-        const llm = createLLMClient();
+        const llm = await createLLMClient();
         if (!llm) {
             return c.json({ error: "LLM is not configured" }, 503);
         }

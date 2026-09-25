@@ -4,6 +4,7 @@ import { Client as McpClient } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { createLLMClient } from "@/server/lib/integration-clients/llm-client";
+import { getLLMConfig } from "@/server/lib/integrations/llm";
 import { authorize } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
 import { env } from "@/server/lib/env";
@@ -66,11 +67,14 @@ export const llmStatusRouter = createRouter()
             return c.json({ error: "unauthorized" }, 401);
         }
 
-        const llm = {
-            configured: createLLMClient() !== null,
-            provider: env.LLM_PROVIDER ?? null,
-            model: env.LLM_MODEL ?? null,
-        };
+        let llm = { configured: false, provider: null as string | null, model: null as string | null };
+        try {
+            const config = await getLLMConfig();
+            llm = { configured: (await createLLMClient()) !== null, provider: config.provider ?? null, model: config.model ?? null };
+        } catch (e) {
+            // A broken setting reads as "off" here; the admin screen shows what is wrong.
+            console.error("[llm/status] could not build the LLM client", e);
+        }
 
         // The MCP URL stays server-side; the client only needs to know whether search works.
         const mcp = {

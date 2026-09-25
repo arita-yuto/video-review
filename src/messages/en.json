@@ -200,7 +200,6 @@
             "integrations": "Integrations",
             "videos": "Videos"
         },
-        "empty": "Nothing to configure here yet.",
         "users": {
             "columns": {
                 "displayName": "Display name",
@@ -260,6 +259,70 @@
                 "cancel": "Cancel",
                 "failed": "Failed to delete the files",
                 "filesLeft": "Some files could not be removed and are still in storage."
+            }
+        },
+        "integrations": {
+            "loadFailed": "Failed to load the settings",
+            "testFailed": "Failed to test",
+            "resetFailed": "Failed to reset",
+            "reset": "Reset",
+            "resetConfirm": "This resets the connection.",
+            "cancel": "Cancel",
+            "jira": {
+                "title": "Jira",
+                "baseUrl": "URL",
+                "token": "Token",
+                "project": "Project",
+                "assignee": "Assignee",
+                "issueTypeTask": "Task issue type",
+                "issueTypeBug": "Bug issue type"
+            },
+            "slack": {
+                "title": "Slack",
+                "token": "Token",
+                "channel": "Channel",
+                "team": "Team"
+            },
+            "testAndSave": "Test & save",
+            "saved": "Connected. Saved.",
+            "notSaved": "Could not connect, so nothing was saved: {error}",
+            "connected": "Connected",
+            "disconnected": "Test failed",
+            "llm": {
+                "title": "AI",
+                "provider": "Provider",
+                "inUse": "in use",
+                "apiKey": "API key",
+                "baseUrl": "Base URL",
+                "model": "Model",
+                "switchFailed": "Switching the provider in use failed.",
+                "use": "Use this provider"
+            },
+            "webhook": {
+                "title": "Webhook",
+                "target": "Target",
+                "targetPlaceholder": "Slack / Teams",
+                "url": "URL",
+                "testNote": "Test & save posts one test message to the channel."
+            },
+            "email": {
+                "title": "Email",
+                "enable": "Send email",
+                "host": "SMTP host",
+                "port": "SMTP port",
+                "from": "From",
+                "tlsStrict": "Strict TLS"
+            },
+            "vcs": {
+                "title": "VCS",
+                "provider": "Provider",
+                "inUse": "in use",
+                "owner": "Owner",
+                "repo": "Repository",
+                "token": "Token",
+                "branch": "Branch",
+                "switchFailed": "Switching the provider in use failed.",
+                "use": "Use this provider"
             }
         }
     }

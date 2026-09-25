@@ -200,7 +200,6 @@
             "integrations": "連携",
             "videos": "動画管理"
         },
-        "empty": "まだ設定項目はありません",
         "users": {
             "columns": {
                 "displayName": "表示名",
@@ -260,6 +259,70 @@
                 "cancel": "キャンセル",
                 "failed": "ファイルの削除に失敗しました",
                 "filesLeft": "一部のファイルを消せず、ストレージに残りました"
+            }
+        },
+        "integrations": {
+            "loadFailed": "設定の取得に失敗しました",
+            "testFailed": "テストに失敗しました",
+            "resetFailed": "Reset に失敗しました",
+            "reset": "Reset",
+            "resetConfirm": "接続情報をリセットします",
+            "cancel": "キャンセル",
+            "jira": {
+                "title": "Jira",
+                "baseUrl": "URL",
+                "token": "Token",
+                "project": "Project",
+                "assignee": "担当者",
+                "issueTypeTask": "Task の issue type",
+                "issueTypeBug": "Bug の issue type"
+            },
+            "slack": {
+                "title": "Slack",
+                "token": "Token",
+                "channel": "Channel",
+                "team": "Team"
+            },
+            "testAndSave": "Test & save",
+            "saved": "接続できました。保存しました",
+            "notSaved": "接続できなかったため保存していません: {error}",
+            "connected": "接続できます",
+            "disconnected": "テストに失敗しています",
+            "llm": {
+                "title": "AI",
+                "provider": "Provider",
+                "inUse": "使用中",
+                "apiKey": "API key",
+                "baseUrl": "Base URL",
+                "model": "Model",
+                "switchFailed": "使用中の Provider の切り替えに失敗しました",
+                "use": "この Provider を使う"
+            },
+            "webhook": {
+                "title": "Webhook",
+                "target": "Target",
+                "targetPlaceholder": "Slack / Teams",
+                "url": "URL",
+                "testNote": "Test & save は、チャンネルにテストのメッセージを 1 件送ります"
+            },
+            "email": {
+                "title": "メール",
+                "enable": "メールを送る",
+                "host": "SMTP host",
+                "port": "SMTP port",
+                "from": "送信元",
+                "tlsStrict": "TLS 証明書を厳密に検証"
+            },
+            "vcs": {
+                "title": "VCS",
+                "provider": "Provider",
+                "inUse": "使用中",
+                "owner": "Owner",
+                "repo": "Repository",
+                "token": "Token",
+                "branch": "Branch",
+                "switchFailed": "使用中の Provider の切り替えに失敗しました",
+                "use": "この Provider を使う"
             }
         }
     }

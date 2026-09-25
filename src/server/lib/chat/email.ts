@@ -1,6 +1,5 @@
 import { ChatType } from "@/server/lib/chat/chat-type";
-import nodemailer from "nodemailer";
-import { env } from "@/server/lib/env";
+import { createTransport, getEmailConfig } from "@/server/lib/integrations/email";
 
 function toEmailMessage(ctx: ChatType) {
     return {
@@ -20,10 +19,11 @@ function toEmailMessage(ctx: ChatType) {
 }
 
 export async function chatEmail(ctx: ChatType): Promise<boolean> {
-    const enable = env.EMAIL_ENABLE;
-    const smtpHost = env.SMTP_HOST;
-    const smtpPort = env.SMTP_PORT;
-    const from = env.EMAIL_FROM;
+    const config = await getEmailConfig();
+    const enable = config.enable === "true";
+    const smtpHost = config.host;
+    const smtpPort = config.port;
+    const from = config.from;
     const to = ctx.email;
 
     console.info("[email] called", {
@@ -63,14 +63,7 @@ export async function chatEmail(ctx: ChatType): Promise<boolean> {
         lines: msg.lines.length,
     });
 
-    const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: Number(smtpPort),
-        secure: false,
-        tls: {
-            rejectUnauthorized: env.SMTP_TLS_STRICT,
-        },
-    });
+    const transporter = createTransport(config);
 
     try {
         console.info("[email] sending...", {

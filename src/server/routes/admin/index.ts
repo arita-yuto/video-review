@@ -2,7 +2,8 @@ import { prisma } from "@/server/lib/db";
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { maintenanceRouter } from "@/server/routes/admin/maintenance";
-import { createVCSProviderFromEnv } from "@/server/lib/vcs/from-env";
+import { settingsRouter } from "@/server/routes/admin/settings";
+import { getVCSProvider } from "@/server/lib/integrations/vcs";
 import { listUTCDays, upsertMerge, upsertCommit } from "@/server/lib/vcs/cache";
 import { authorize } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
@@ -319,12 +320,7 @@ export const adminRouter = createRouter()
             return c.json({ error: "from must be before to" }, { status: 400 });
         }
 
-        let provider;
-        try {
-            provider = createVCSProviderFromEnv();
-        } catch (err) {
-            return c.json({ error: String(err) }, { status: 503 });
-        }
+        const provider = await getVCSProvider();
         if (!provider) {
             return c.json({ error: "VCS provider is not configured" }, { status: 503 });
         }
@@ -402,4 +398,5 @@ export const adminRouter = createRouter()
             range: { from: from.toISOString(), to: to.toISOString() },
         });
     })
-    .route("/maintenance", maintenanceRouter);
+    .route("/maintenance", maintenanceRouter)
+    .route("/settings", settingsRouter);

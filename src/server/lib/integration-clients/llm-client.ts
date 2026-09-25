@@ -1,6 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Client as McpClient } from "@modelcontextprotocol/sdk/client/index.js";
-import { env } from "@/server/lib/env";
 
 export type ChatTurn = {
     role: "user" | "assistant";
@@ -204,39 +203,42 @@ class OpenAICompatibleClient implements LLMClient {
     }
 }
 
-function buildClient(): LLMClient | null {
-    const provider = env.LLM_PROVIDER;
+export type LLMConfig = {
+    provider: string | undefined;
+    apiKey: string | undefined;
+    baseUrl: string | undefined;
+    model: string | undefined;
+};
+
+export function buildLLMClient({ provider, apiKey, baseUrl: configuredBaseUrl, model }: LLMConfig): LLMClient | null {
     if (!provider) return null;
 
-    const requireApiKey = (name: string): string => {
-        const apiKey = env.LLM_API_KEY;
-        if (!apiKey) throw new Error(`VIDEO_REVIEW_LLM_API_KEY is required for the ${name} provider`);
-        return apiKey;
-    };
+    // Without its key a hosted provider counts as not configured, so the AI routes answer 503 rather than 500.
+    if (provider !== "ollama" && !apiKey) return null;
 
     switch (provider) {
         case "claude":
-            return new ClaudeClient(requireApiKey("Claude"), env.LLM_MODEL ?? "claude-haiku-4-5-20251001");
+            return new ClaudeClient(apiKey!, model ?? "claude-haiku-4-5-20251001");
         case "openai":
             // Fixed endpoint: LLM_BASE_URL belongs to Ollama and must not redirect OpenAI calls.
             return new OpenAICompatibleClient({
                 endpoint: "https://api.openai.com/v1/chat/completions",
-                apiKey: requireApiKey("OpenAI"),
-                model: env.LLM_MODEL ?? "gpt-5-mini",
+                apiKey: apiKey!,
+                model: model ?? "gpt-5-mini",
                 label: "OpenAI",
             });
         case "gemini":
             return new OpenAICompatibleClient({
                 endpoint: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-                apiKey: requireApiKey("Gemini"),
-                model: env.LLM_MODEL ?? "gemini-3.6-flash",
+                apiKey: apiKey!,
+                model: model ?? "gemini-3.6-flash",
                 label: "Gemini",
             });
         case "ollama": {
-            const baseUrl = (env.LLM_BASE_URL ?? "http://localhost:11434").replace(/\/$/, "");
+            const baseUrl = (configuredBaseUrl ?? "http://localhost:11434").replace(/\/$/, "");
             return new OpenAICompatibleClient({
                 endpoint: `${baseUrl}/v1/chat/completions`,
-                model: env.LLM_MODEL ?? "llama3.1:8b",
+                model: model ?? "llama3.1:8b",
                 label: "Ollama",
                 // Ollama's JSON mode keeps single-shot completions (summaries, annotations) parseable.
                 completionExtras: { format: "json", stream: false },
@@ -247,8 +249,15 @@ function buildClient(): LLMClient | null {
     }
 }
 
-const _client = buildClient();
+let cached: { key: string; client: LLMClient | null } | undefined;
 
-export function createLLMClient(): LLMClient | null {
-    return _client;
+// Rebuilt when the saved settings change, so a change from the admin screen applies at once.
+export async function createLLMClient(): Promise<LLMClient | null> {
+    const { getLLMConfig } = await import("@/server/lib/integrations/llm");
+    const config = await getLLMConfig();
+    const key = JSON.stringify(config);
+    if (cached?.key !== key) {
+        cached = { key, client: buildLLMClient(config) };
+    }
+    return cached.client;
 }
