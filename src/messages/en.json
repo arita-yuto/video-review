@@ -273,7 +273,7 @@
                 "token": "Token",
                 "project": "Project",
                 "assignee": "Assignee",
-                "resetConfirm": "Clear the saved Jira token so you can change the URL and token?",
+                "resetConfirm": "This resets the token.",
                 "issueTypeTask": "Task issue type",
                 "issueTypeBug": "Bug issue type"
             },
@@ -282,7 +282,7 @@
                 "token": "Token",
                 "channel": "Channel",
                 "team": "Team",
-                "resetConfirm": "Clear the saved Slack token so you can change it?"
+                "resetConfirm": "This resets the token."
             },
             "testAndSave": "Test & save",
             "saved": "Connected. Saved.",
@@ -296,7 +296,7 @@
                 "apiKey": "API key",
                 "baseUrl": "Base URL",
                 "model": "Model",
-                "resetConfirm": "Clear the saved API key so you can change it?",
+                "resetConfirm": "This resets the API key.",
                 "switchFailed": "Switching the provider in use failed.",
                 "use": "Use this provider"
             },
@@ -306,7 +306,7 @@
                 "targetPlaceholder": "Slack / Teams",
                 "url": "URL",
                 "testNote": "Test & save posts one test message to the channel.",
-                "resetConfirm": "Clear the saved URL so you can change it?"
+                "resetConfirm": "This resets the URL."
             },
             "email": {
                 "title": "Email",
