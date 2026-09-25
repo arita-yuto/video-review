@@ -1,57 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { AdminSection } from "@/components/admin/admin-section";
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Spinner } from "@/ui/spinner";
-import type { IntegrationName } from "@/components/admin/integration-section/integrations";
-import { useIntegrationSettings } from "@/components/admin/integration-section/use-integration-settings";
+import type { useIntegrationSettings } from "@/components/admin/integration-section/use-integration-settings";
 
-// The same fixed mask for every set secret, so it never hints at the secret's length.
-const SECRET_MASK = "********";
+export function FieldRow({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
+    return (
+        <div className="flex items-center gap-3">
+            <Label htmlFor={htmlFor} className="w-32 shrink-0">{label}</Label>
+            {children}
+        </div>
+    );
+}
 
-export function IntegrationSection({ name, onChanged }: { name: IntegrationName; onChanged: () => void }) {
+// The frame every integration screen shares: its fields scroll, and the buttons stay at the bottom.
+export function IntegrationForm({ title, resetConfirm, settings, children }: {
+    title: string;
+    resetConfirm: string;
+    settings: ReturnType<typeof useIntegrationSettings>;
+    children: ReactNode;
+}) {
     const t = useTranslations("admin-settings");
-    const { loaded, locked, fields, setValue, blocked, busy, status, testAndSave, reset } = useIntegrationSettings(name, onChanged);
+    const { loaded, locked, connection, blocked, busy, status, testAndSave, reset } = settings;
     const [confirmReset, setConfirmReset] = useState(false);
+    const connectionLabel = connection && t(connection.ok ? "integrations.connected" : "integrations.disconnected");
+
+    const heading = (
+        <span className="flex items-center gap-2">
+            {title}
+            {connection?.configured && (
+                <span
+                    role="img"
+                    aria-label={connectionLabel ?? undefined}
+                    title={connectionLabel ?? undefined}
+                    className={`size-2 rounded-full ${connection.ok ? "bg-success" : "bg-destructive"}`}
+                />
+            )}
+        </span>
+    );
 
     return (
-        <AdminSection title={t(`integrations.${name}.title`)}>
-            {/* The fields scroll on their own, so the buttons below always stay at the bottom. */}
+        <AdminSection title={heading}>
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2">
                 {!loaded && !status && <Spinner />}
-
-                {fields.map(field => {
-                    const id = `integration-${name}-${field.name}`;
-                    const placeholder = field.secret && field.configured ? SECRET_MASK : undefined;
-
-                    return (
-                        <div key={field.name} className="flex items-center gap-3">
-                            <Label htmlFor={id} className="w-32 shrink-0">{t(`integrations.${name}.${field.name}`)}</Label>
-                            <Input
-                                id={id}
-                                type={field.secret ? "password" : "text"}
-                                // "off" is ignored for passwords; without this the browser fills the admin's own login password in.
-                                autoComplete={field.secret ? "new-password" : "off"}
-                                disabled={busy || field.locked}
-                                value={field.value}
-                                placeholder={placeholder}
-                                onChange={(e) => setValue(field.name, e.target.value)}
-                            />
-                        </div>
-                    );
-                })}
-
+                {loaded && children}
                 {blocked && <p className="text-sm text-warning">{blocked}</p>}
             </div>
 
             <div className="shrink-0 flex items-center gap-2 border-t pt-3">
                 <div className="flex-1 min-w-0">
                     {busy && <Spinner />}
-                    {!busy && confirmReset && <span className="text-sm">{t(`integrations.${name}.resetConfirm`)}</span>}
+                    {!busy && confirmReset && <span className="text-sm">{resetConfirm}</span>}
                     {!busy && !confirmReset && status && (
                         <span className={`block text-sm truncate ${status.ok ? "text-success" : "text-destructive"}`} title={status.message}>
                             {status.message}

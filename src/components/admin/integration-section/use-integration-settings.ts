@@ -3,59 +3,50 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
-import { INTEGRATIONS, type IntegrationName } from "@/components/admin/integration-section/integrations";
+
+export type IntegrationName = "jira" | "slack";
 
 type Source = "saved" | "env" | null;
-type FieldState = { value: string | null; source: Source } | { configured: boolean; source: Source };
+type FieldState =
+    | { kind: "plain" | "destination"; value: string | null; source: Source }
+    | { kind: "secret"; configured: boolean; source: Source };
 type Settings = Record<string, FieldState>;
 
 export type Status = { ok: boolean; message: string };
+export type Connection = { configured: boolean; ok: boolean };
 
-export type Field = {
-    name: string;
-    secret: boolean;
-    locked: boolean;
-    value: string;
-    // For a secret: whether one is set (saved or in env), since its value never comes back.
-    configured: boolean;
-};
+// The same fixed mask for every set secret, so it never hints at the secret's length.
+const SECRET_MASK = "********";
 
-function plainValue(settings: Settings, field: string) {
-    const state = settings[field];
-    return state && "value" in state ? state.value ?? "" : "";
-}
+const valueOf = (state: FieldState | undefined) => (state && "value" in state ? state.value ?? "" : "");
 
-function isConfigured(settings: Settings, field: string) {
-    const state = settings[field];
-    return !!state && "configured" in state && state.configured;
-}
-
-// The form starts from the plain values (saved or from env); secret inputs always start empty.
-function formFrom(settings: Settings, fields: readonly string[]) {
-    return Object.fromEntries(fields.map(field => [field, plainValue(settings, field)]));
-}
-
-function isSaved(settings: Settings, field: string) {
-    return settings[field]?.source === "saved";
-}
-
-export function useIntegrationSettings(name: IntegrationName, onChanged: () => void) {
+export function useIntegrationSettings(name: IntegrationName) {
     const t = useTranslations("admin-settings");
-    const { fields, secrets, destinations } = INTEGRATIONS[name];
     const endpoint = api.admin.settings[name];
 
     const [settings, setSettings] = useState<Settings | null>(null);
     const [form, setForm] = useState<Record<string, string>>({});
     const [busy, setBusy] = useState(false);
     const [status, setStatus] = useState<Status | null>(null);
+    const [connection, setConnection] = useState<Connection | null>(null);
 
     function load(next: Settings) {
         setSettings(next);
-        setForm(formFrom(next, fields));
+        setForm(Object.fromEntries(Object.entries(next).map(([field, state]) => [field, valueOf(state)])));
+    }
+
+    async function checkConnection() {
+        try {
+            const res = await endpoint.status.$get();
+            setConnection(res.status === 200 ? (await res.json()) as Connection : null);
+        } catch {
+            setConnection(null);
+        }
     }
 
     useEffect(() => {
         let cancelled = false;
+        void checkConnection();
 
         void (async () => {
             try {
@@ -71,13 +62,11 @@ export function useIntegrationSettings(name: IntegrationName, onChanged: () => v
         return () => { cancelled = true; };
     }, [name]);
 
-    const isSecret = (field: string) => (secrets as readonly string[]).includes(field);
-    const isConnection = (field: string) => isSecret(field) || (destinations as readonly string[]).includes(field);
-    const locked = !!settings && secrets.some(field => isSaved(settings, field));
-    const changed = settings ? fields.filter(field => form[field] !== plainValue(settings, field)) : [];
-
-    // A plain value can't be emptied here.
-    const blocked = changed.some(field => !isSecret(field) && form[field] === "") ? t("integrations.cannotClear") : null;
+    const fields = settings ? Object.keys(settings) : [];
+    const changed = fields.filter(field => form[field] !== valueOf(settings?.[field]));
+    const locked = fields.some(field => settings?.[field].kind === "secret" && settings[field].source === "saved");
+    const destinationEdited = changed.some(field => settings?.[field].kind === "destination");
+    const blocked = changed.some(field => settings?.[field].kind !== "secret" && form[field] === "") ? t("integrations.cannotClear") : null;
 
     async function run(action: () => Promise<void>, failure: string) {
         setBusy(true);
@@ -100,7 +89,7 @@ export function useIntegrationSettings(name: IntegrationName, onChanged: () => v
         if (result.ok) {
             load(state);
             setStatus({ ok: true, message: t("integrations.saved") });
-            onChanged();
+            setConnection({ configured: true, ok: true });
         } else {
             setStatus({ ok: false, message: t("integrations.notSaved", { error: result.error ?? "" }) });
         }
@@ -110,33 +99,31 @@ export function useIntegrationSettings(name: IntegrationName, onChanged: () => v
         const res = await endpoint.$delete();
         if (res.status !== 200) throw new Error(await readError(res));
         load((await res.json()) as Settings);
-        onChanged();
+        void checkConnection();
     }, "integrations.resetFailed");
 
-    const formFields: Field[] = settings
-        ? fields.map(field => ({
-            name: field,
-            secret: isSecret(field),
-            locked: locked && isConnection(field),
-            value: form[field] ?? "",
-            // Once the destination is edited, an env secret no longer applies, so don't show it as set.
-            configured: isConfigured(settings, field) && !destinations.some(d => changed.includes(d)),
-        }))
-        : [];
+    function input(field: string) {
+        const state = settings?.[field];
+        const secret = state?.kind === "secret";
+        // Once the destination is edited an env secret no longer applies, so don't show it as set.
+        const masked = secret && state.configured && !destinationEdited;
 
-    return {
-        loaded: settings !== null,
-        locked,
-        fields: formFields,
-        setValue: (field: string, value: string) => {
-            // A result shown for the previous values would read as if it applied to the edited ones.
-            setStatus(null);
-            setForm(prev => ({ ...prev, [field]: value }));
-        },
-        blocked,
-        busy,
-        status,
-        testAndSave,
-        reset,
-    };
+        return {
+            id: `integration-${name}-${field}`,
+            type: secret ? "password" : "text",
+            // "off" is ignored for passwords; without this the browser fills the admin's own login password in.
+            autoComplete: secret ? "new-password" : "off",
+            value: form[field] ?? "",
+            placeholder: masked ? SECRET_MASK : undefined,
+            disabled: busy || (locked && state?.kind !== "plain"),
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                // A result shown for the previous values would read as if it applied to the edited ones.
+                setStatus(null);
+                const value = e.target.value;
+                setForm(prev => ({ ...prev, [field]: value }));
+            },
+        };
+    }
+
+    return { loaded: settings !== null, locked, connection, input, blocked, busy, status, testAndSave, reset };
 }

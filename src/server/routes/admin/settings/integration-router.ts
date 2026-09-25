@@ -6,8 +6,8 @@ import { type Fields, type IntegrationDef, TestResultSchema } from "@/server/lib
 import { checkConnection, describeConfig, resetConnection, testAndSave, updateConfig, type FieldState } from "@/server/lib/integrations/store";
 
 const SourceSchema = z.enum(["saved", "env"]).nullable();
-const PlainStateSchema = z.object({ value: z.string().nullable(), source: SourceSchema });
-const SecretStateSchema = z.object({ configured: z.boolean(), source: SourceSchema });
+const PlainStateSchema = z.object({ kind: z.enum(["plain", "destination"]), value: z.string().nullable(), source: SourceSchema });
+const SecretStateSchema = z.object({ kind: z.literal("secret"), configured: z.boolean(), source: SourceSchema });
 
 export function integrationRouter<F extends Fields, R extends typeof TestResultSchema>(def: IntegrationDef<F, R>) {
     const fields = Object.entries(def.fields);

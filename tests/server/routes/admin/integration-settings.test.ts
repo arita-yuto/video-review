@@ -109,7 +109,7 @@ describe("admin integration settings (via Jira)", () => {
         expect(res.status).toBe(200);
         const body = await res.text();
         expect(body).not.toContain(TOKEN);
-        expect(JSON.parse(body).token).toEqual({ configured: true, source: "saved" });
+        expect(JSON.parse(body).token).toEqual({ kind: "secret", configured: true, source: "saved" });
     });
 
     it("stores the token encrypted", async () => {

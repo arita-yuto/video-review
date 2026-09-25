@@ -9,8 +9,8 @@ type AnyDef<F extends Fields> = IntegrationDef<F, typeof TestResultSchema>;
 export type Source = "saved" | "env" | null;
 
 export type FieldState =
-    | { value: string | null; source: Source }
-    | { configured: boolean; source: Source };
+    | { kind: "plain" | "destination"; value: string | null; source: Source }
+    | { kind: "secret"; configured: boolean; source: Source };
 
 const keyOf = (def: { name: string }, field: string) => `${def.name}.${field}`;
 
@@ -60,11 +60,11 @@ export async function describeConfig<F extends Fields>(def: AnyDef<F>): Promise<
         if (spec.kind === "secret") {
             const saved = await hasSavedSecret(keyOf(def, field));
             const source: Source = saved ? "saved" : fromEnv !== undefined ? "env" : null;
-            state[field] = { configured: source !== null, source };
+            state[field] = { kind: "secret", configured: source !== null, source };
         } else {
             const saved = await getSetting<string>(keyOf(def, field), undefined);
             const source: Source = saved !== undefined ? "saved" : fromEnv !== undefined ? "env" : null;
-            state[field] = { value: saved ?? fromEnv ?? null, source };
+            state[field] = { kind: spec.kind, value: saved ?? fromEnv ?? null, source };
         }
     }
     return state;
@@ -109,7 +109,7 @@ export async function testAndSave<F extends Fields, R extends typeof TestResultS
     return result;
 }
 
-// For the admin menu; uses the saved or env values, never request input.
+// For the connection dot; uses the saved or env values, never request input.
 export async function checkConnection<F extends Fields>(def: AnyDef<F>) {
     let config: ConfigOf<F>;
     try {
