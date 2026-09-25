@@ -13,7 +13,6 @@ services:
     environment:
       DATABASE_URL: postgres://videoreview:videoreview@db:5432/videoreview
       VIDEO_REVIEW_LOCAL_ROOTDIR: /app/uploads
-      NEXT_PUBLIC_VIDEO_REVIEW_USE_AI_SUPPORT: "true"
       VIDEO_REVIEW_MCP_URL: http://mcp:3490/mcp
     volumes:
       - .:/app
