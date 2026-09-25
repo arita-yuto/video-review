@@ -7,6 +7,7 @@ import { vcsGitHub } from "@/server/lib/integrations/vcs";
 import { llmClaude, llmGemini, llmOllama, llmOpenAI } from "@/server/lib/integrations/llm";
 import { llmProviderRouter } from "@/server/routes/admin/settings/llm-provider";
 import { vcsProviderRouter } from "@/server/routes/admin/settings/vcs-provider";
+import { mcpGuideRouter } from "@/server/routes/admin/settings/mcp-guide";
 import { integrationRouter } from "@/server/routes/admin/settings/integration-router";
 
 export const settingsRouter = createRouter()
@@ -16,6 +17,7 @@ export const settingsRouter = createRouter()
     .route("/email", integrationRouter(email))
     .route("/vcs-provider", vcsProviderRouter)
     .route("/vcs-github", integrationRouter(vcsGitHub))
+    .route("/mcp-guide", mcpGuideRouter)
     .route("/llm-provider", llmProviderRouter)
     .route("/llm-claude", integrationRouter(llmClaude))
     .route("/llm-openai", integrationRouter(llmOpenAI))

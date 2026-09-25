@@ -19,8 +19,6 @@ jobs:
             dockerfile: docker/web/Dockerfile.prod
           - name: video-processing
             dockerfile: docker/video-processing/Dockerfile
-          - name: mcp
-            dockerfile: docker/mcp/Dockerfile
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/build-images

@@ -14,6 +14,7 @@ import { WebhookSection } from "@/components/admin/integration-section/webhook-s
 import { EmailSection } from "@/components/admin/integration-section/email-section";
 import { AiSection } from "@/components/admin/integration-section/ai-section";
 import { VcsSection } from "@/components/admin/integration-section/vcs-section";
+import { McpSection } from "@/components/admin/integration-section/mcp-section";
 import { VideosSection } from "@/components/admin/videos-section";
 
 // Add a section by appending here. Integrations are listed under one heading.
@@ -26,6 +27,7 @@ const SECTIONS: { key: string; label: string; integration?: boolean; Component: 
     { key: "integrations.email", label: "integrations.email.title", integration: true, Component: EmailSection },
     { key: "integrations.ai", label: "integrations.llm.title", integration: true, Component: AiSection },
     { key: "integrations.vcs", label: "integrations.vcs.title", integration: true, Component: VcsSection },
+    { key: "integrations.mcp", label: "integrations.mcp.title", integration: true, Component: McpSection },
     { key: "apiToken", label: "sections.apiToken", Component: ApiTokenSection },
 ];
 

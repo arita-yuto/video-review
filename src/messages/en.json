@@ -318,6 +318,15 @@
                 "branch": "Branch",
                 "switchFailed": "Switching the provider in use failed.",
                 "use": "Use this provider"
+            },
+            "mcp": {
+                "title": "MCP",
+                "notes": "Search guide notes",
+                "notesHelp": "Added after the built-in search guide. Write your tags, folders and common questions.",
+                "save": "Save",
+                "saved": "Saved.",
+                "saveFailed": "Save failed",
+                "loadFailed": "Could not load the notes"
             }
         }
     }

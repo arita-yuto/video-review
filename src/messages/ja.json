@@ -318,6 +318,15 @@
                 "branch": "Branch",
                 "switchFailed": "使用中の Provider の切り替えに失敗しました",
                 "use": "この Provider を使う"
+            },
+            "mcp": {
+                "title": "MCP",
+                "notes": "検索ガイドの追記",
+                "notesHelp": "組み込みの検索ガイドの後ろに追加されます。タグ、フォルダ、よくある質問などを書きます",
+                "save": "保存",
+                "saved": "保存しました",
+                "saveFailed": "保存に失敗しました",
+                "loadFailed": "追記の取得に失敗しました"
             }
         }
     }

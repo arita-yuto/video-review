@@ -1,65 +1,72 @@
-import "dotenv/config";
-import fs from "node:fs";
-import http from "node:http";
+import "server-only";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
-import { createClient } from "./client.js";
-
-const baseUrl = process.env.VIDEO_REVIEW_SERVER_URL ?? "http://localhost:3489";
-const apiToken = process.env.VIDEO_REVIEW_API_TOKEN ?? "";
-// Links in tool results must open in a browser, so they use the address people reach
-// VideoReview at, which can differ from the API address this process calls (e.g. inside Docker).
-const publicUrl = (process.env.VIDEO_REVIEW_PUBLIC_URL ?? baseUrl).replace(/\/$/, "");
-
-if (!apiToken) {
-    process.stderr.write(
-        "Warning: VIDEO_REVIEW_API_TOKEN is not set. Requests will likely fail.\n",
-    );
-}
-
-const client = createClient({ baseUrl, apiToken });
+import { deleteSetting, getSetting, saveSetting } from "@/server/lib/settings";
+import { SEARCH_GUIDE } from "@/server/lib/mcp/search-guide";
+import { requestOrigin } from "@/server/lib/request-origin";
 
 type Json = Record<string, unknown>;
 
-function videoUrl(videoId: string): string {
-    return `${publicUrl}/video-review/review/${videoId}`;
+// Credentials the tools pass on, so each call runs with the caller's own permissions.
+const FORWARDED_HEADERS = ["authorization", "cookie", "x-api-token"];
+
+// The tools call the app's own API in process, the same routes an outside client would use.
+function apiClient(request: Request) {
+    const headers = new Headers();
+    for (const name of FORWARDED_HEADERS) {
+        const value = request.headers.get(name);
+        if (value) headers.set(name, value);
+    }
+
+    return {
+        async get<T = unknown>(path: string, params?: Record<string, string | undefined>): Promise<T> {
+            const url = new URL(`/api/v1${path}`, "http://localhost");
+            for (const [key, value] of Object.entries(params ?? {})) {
+                if (value !== undefined) url.searchParams.set(key, value);
+            }
+
+            // Imported here because the app mounts this module's route.
+            const { app } = await import("@/server");
+            const res = await app.request(url.pathname + url.search, { headers });
+            if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+            return res.json() as Promise<T>;
+        },
+    };
 }
 
-function withVideoUrl<T extends Json>(video: T): T & { url: string } {
-    return { ...video, url: videoUrl(String(video.id)) };
+const NOTES_KEY = "mcp.guideNotes";
+
+// The team's own vocabulary (tags, folders, common questions), written on the admin screen.
+export const getGuideNotes = () => getSetting<string>(NOTES_KEY, undefined);
+
+export async function saveGuideNotes(notes: string) {
+    if (notes.trim()) {
+        await saveSetting(NOTES_KEY, notes);
+    } else {
+        await deleteSetting(NOTES_KEY);
+    }
 }
 
-function withCommentUrl<T extends Json>(comment: T): T & { url: string } {
-    return { ...comment, url: `${videoUrl(String(comment.videoId))}?comment=${String(comment.id)}` };
-}
-
-function withEventUrl<T extends Json>(videoId: string, event: T): T & { url: string } {
-    return { ...event, url: `${videoUrl(videoId)}?revision=${String(event.videoRevisionId)}&event=${String(event.id)}` };
+export async function loadSearchGuide(): Promise<string> {
+    const notes = await getGuideNotes();
+    return notes?.trim() ? `${SEARCH_GUIDE.trimEnd()}\n\n# Team notes\n\n${notes.trim()}\n` : SEARCH_GUIDE;
 }
 
 function text(data: unknown) {
     return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
 }
 
-// The search guide ships with the server so every client (in-app chat, Claude Code, bots)
-// gets the same instructions. Teams append their own vocabulary through a local file.
-function loadSearchGuide(): string {
-    const bundled = fs.readFileSync(new URL("./search-guide.md", import.meta.url), "utf8");
-    const extraPath = process.env.VIDEO_REVIEW_MCP_GUIDE_PATH;
-    if (!extraPath) return bundled;
-    try {
-        return `${bundled.trimEnd()}\n\n# Team notes\n\n${fs.readFileSync(extraPath, "utf8").trim()}\n`;
-    } catch (err) {
-        process.stderr.write(`Warning: could not read VIDEO_REVIEW_MCP_GUIDE_PATH (${extraPath}): ${String(err)}\n`);
-        return bundled;
-    }
-}
+export async function createMcpServer(request: Request): Promise<McpServer> {
+    const client = apiClient(request);
+    const origin = requestOrigin(request);
+    const videoUrl = (videoId: string) => `${origin}/video-review/review/${videoId}`;
+    const withVideoUrl = <T extends Json>(video: T): T & { url: string } => ({ ...video, url: videoUrl(String(video.id)) });
+    const withCommentUrl = <T extends Json>(comment: T): T & { url: string } =>
+        ({ ...comment, url: `${videoUrl(String(comment.videoId))}?comment=${String(comment.id)}` });
+    const withEventUrl = <T extends Json>(videoId: string, event: T): T & { url: string } =>
+        ({ ...event, url: `${videoUrl(videoId)}?revision=${String(event.videoRevisionId)}&event=${String(event.id)}` });
 
-const searchGuide = loadSearchGuide();
-
-function createServer(): McpServer {
+    const searchGuide = await loadSearchGuide();
     const server = new McpServer({ name: "video-review", version: "1.0.0" }, { instructions: searchGuide });
 
     server.registerResource(
@@ -277,43 +284,4 @@ function createServer(): McpServer {
     );
 
     return server;
-}
-
-// Services start with --http [port]; AI clients like Claude Desktop spawn it bare over stdio.
-const args = process.argv.slice(2);
-
-if (args[0] === "--http" && args.length <= 2) {
-    await startHttpServer(args[1]);
-} else if (args.length > 0) {
-    // Anything else, such as --http=3491, would otherwise start on stdio and look like a healthy start.
-    throw new Error(`usage: [--http [port]], got "${args.join(" ")}"`);
-} else {
-    await createServer().connect(new StdioServerTransport());
-    process.stderr.write("MCP server ready on stdio (start with --http to listen on a port).\n");
-}
-
-async function startHttpServer(portArg: string | undefined): Promise<void> {
-    const port = portArg === undefined ? 3490 : Number(portArg);
-    if (!Number.isInteger(port) || port < 1 || port > 65535) {
-        throw new Error(`--http takes a port number, got "${portArg}"`);
-    }
-
-    const httpServer = http.createServer(async (req, res) => {
-        if (req.url === "/mcp") {
-            // Stateless mode: a fresh server per request, released once the response closes.
-            const server = createServer();
-            const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-            res.on("close", () => {
-                void transport.close();
-                void server.close();
-            });
-            await server.connect(transport);
-            await transport.handleRequest(req, res);
-        } else {
-            res.writeHead(404).end();
-        }
-    });
-
-    await new Promise<void>((resolve) => httpServer.listen(port, resolve));
-    process.stderr.write(`MCP server listening on http://0.0.0.0:${port}/mcp\n`);
 }

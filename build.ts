@@ -27,7 +27,6 @@ async function build() {
     execSync("npm run prisma:generate", { stdio: "inherit" });
     execSync("next build", { stdio: "inherit" });
     execSync("npm run video-processing:build", { stdio: "inherit" });
-    execSync("npm run mcp:build", { stdio: "inherit" });
 }
 
 async function defaultBuild() {
@@ -49,9 +48,6 @@ async function buildAndCopy(outDir: string) {
     cpSync("public", path.join(outDir, "public"), { recursive: true });
     cpSync("integrations/video-processing/dist",
         path.join(outDir, "integrations/video-processing/dist"), { recursive: true }
-    );
-    cpSync("integrations/mcp/dist",
-        path.join(outDir, "integrations/mcp/dist"), { recursive: true }
     );
 }
 

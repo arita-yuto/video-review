@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { EVAL_FOLDER_PREFIX } from "../../prisma/eval-data";
 
@@ -8,9 +7,9 @@ import { EVAL_FOLDER_PREFIX } from "../../prisma/eval-data";
 // (npm run prisma:seed:eval). Each case is the tool call an assistant is expected to make
 // for the question, plus the exact set of values that must come back.
 //
-// Usage:
-//   npm run mcp:eval                                          # spawns the stdio server (reads .env)
-//   MCP_EVAL_URL=http://localhost:3490/mcp npm run mcp:eval   # against a running HTTP server
+// Usage (against a running app, with VIDEO_REVIEW_API_TOKEN in .env):
+//   npm run mcp:eval
+//   MCP_EVAL_URL=http://videoreview.internal:3489/api/v1/mcp npm run mcp:eval
 
 type ToolArgs = Record<string, unknown>;
 type Json = Record<string, unknown>;
@@ -153,16 +152,9 @@ const CASES: EvalCase[] = [
 
 async function connect(): Promise<Client> {
     const client = new Client({ name: "video-review-eval", version: "1.0.0" });
-    const url = process.env.MCP_EVAL_URL;
-    if (url) {
-        await client.connect(new StreamableHTTPClientTransport(new URL(url)));
-    } else {
-        await client.connect(new StdioClientTransport({
-            command: "npx",
-            args: ["tsx", "integrations/mcp/index.ts"],
-            env: { ...process.env } as Record<string, string>,
-        }));
-    }
+    const url = new URL(process.env.MCP_EVAL_URL ?? "http://localhost:3489/api/v1/mcp");
+    const headers = { "x-api-token": process.env.VIDEO_REVIEW_API_TOKEN ?? "" };
+    await client.connect(new StreamableHTTPClientTransport(url, { requestInit: { headers } }));
     return client;
 }
 

@@ -12,6 +12,7 @@ import { userRouter } from "@/server/routes/user";
 import { chatRouter } from "@/server/routes/chat";
 import { chatSearchRouter } from "@/server/routes/chat/search";
 import { thumbnailRouter } from "@/server/routes/thumbnail";
+import { mcpRouter } from "@/server/routes/mcp";
 
 // One router per API version; the client in src/lib/api-client.ts mirrors these mounts.
 export const v1Router = new Hono();
@@ -28,3 +29,4 @@ v1Router.route("/user", userRouter);
 v1Router.route("/chat", chatRouter);
 v1Router.route("/chat/search", chatSearchRouter);
 v1Router.route("/thumbnail", thumbnailRouter);
+v1Router.route("/mcp", mcpRouter);
