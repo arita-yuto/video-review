@@ -190,10 +190,23 @@
     "admin-settings": {
         "title": "Administration",
         "sections": {
+            "general": "General",
             "users": "Users",
             "apiToken": "API Token",
             "integrations": "Integrations",
             "videos": "Videos"
+        },
+        "general": {
+            "title": "General",
+            "allowGuest": "Guest login",
+            "loginDefaultType": "Default login tab",
+            "urlSchema": "URL scheme",
+            "resolutionPresets": "Resolution presets",
+            "resolutionPresetsExample": "480,720,1080",
+            "uploadChunkMb": "Upload chunk (MB)",
+            "save": "Save",
+            "saveFailed": "Could not save",
+            "saved": "Saved"
         },
         "users": {
             "columns": {

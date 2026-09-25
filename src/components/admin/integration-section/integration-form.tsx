@@ -19,9 +19,11 @@ export function FieldRow({ label, htmlFor, children }: { label: string; htmlFor:
 
 // The frame every integration screen shares: its fields scroll, and the buttons stay at the bottom.
 // Reset appears only while a saved secret locks the connection, since only then is there anything to reset.
-export function IntegrationForm({ title, settings, children }: {
+// submitLabel replaces "Test & save" on a screen that has no connection to test.
+export function IntegrationForm({ title, settings, submitLabel, children }: {
     title: string;
     settings: ReturnType<typeof useIntegrationSettings>;
+    submitLabel?: string;
     children: ReactNode;
 }) {
     const t = useTranslations("admin-settings");
@@ -80,7 +82,7 @@ export function IntegrationForm({ title, settings, children }: {
                             </Button>
                         )}
                         <Button onClick={testAndSave} disabled={busy || !loaded}>
-                            {t("integrations.testAndSave")}
+                            {submitLabel ?? t("integrations.testAndSave")}
                         </Button>
                     </>
                 )}

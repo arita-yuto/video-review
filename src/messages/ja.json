@@ -190,10 +190,23 @@
     "admin-settings": {
         "title": "管理",
         "sections": {
+            "general": "General",
             "users": "ユーザー",
             "apiToken": "API Token",
             "integrations": "連携",
             "videos": "動画管理"
+        },
+        "general": {
+            "title": "General",
+            "allowGuest": "Guest ログイン",
+            "loginDefaultType": "ログイン画面の既定タブ",
+            "urlSchema": "URL scheme",
+            "resolutionPresets": "Resolution presets",
+            "resolutionPresetsExample": "480,720,1080",
+            "uploadChunkMb": "Upload chunk (MB)",
+            "save": "保存",
+            "saveFailed": "保存できませんでした",
+            "saved": "保存しました"
         },
         "users": {
             "columns": {

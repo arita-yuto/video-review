@@ -44,6 +44,7 @@ test.describe("admin settings dialog", () => {
         await popover.getByRole("button", { name: "Administration" }).click();
 
         const dialog = page.getByRole("dialog");
+        await dialog.getByRole("tab", { name: "Users" }).click();
 
         // A retry runs against the same seeded DB, so neither field may collide with the first attempt.
         const name = `E2E Viewer ${test.info().retry}`;

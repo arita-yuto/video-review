@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 import { useAuthStore } from "@/stores/auth-store";
 import { isAdmin } from "@/lib/role";
+import { GeneralSection } from "@/components/admin/general-section";
 import { UsersSection } from "@/components/admin/users-section";
 import { ApiTokenSection } from "@/components/admin/api-token-section";
 import { JiraSection } from "@/components/admin/integration-section/jira-section";
@@ -19,6 +20,7 @@ import { VideosSection } from "@/components/admin/videos-section";
 
 // Add a section by appending here. Integrations are listed under one heading.
 const SECTIONS: { key: string; label: string; integration?: boolean; Component: () => React.JSX.Element | null }[] = [
+    { key: "general", label: "sections.general", Component: GeneralSection },
     { key: "users", label: "sections.users", Component: UsersSection },
     { key: "videos", label: "sections.videos", Component: VideosSection },
     { key: "integrations.jira", label: "integrations.jira.title", integration: true, Component: JiraSection },
