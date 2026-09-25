@@ -12,8 +12,6 @@ services:
     restart: unless-stopped
 
     environment:
-      VIDEO_REVIEW_MCP_TRANSPORT: http
-      VIDEO_REVIEW_MCP_PORT: "3490"
       NEXT_PUBLIC_VIDEO_REVIEW_USE_AI_SUPPORT: "true"
       VIDEO_REVIEW_SERVER_URL: http://videoreview:3489
       VIDEO_REVIEW_LLM_PROVIDER: claude

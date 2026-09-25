@@ -44,8 +44,6 @@ services:
       dockerfile: ./docker/mcp/Dockerfile
     container_name: videoreview-mcp
     environment:
-      VIDEO_REVIEW_MCP_TRANSPORT: http
-      VIDEO_REVIEW_MCP_PORT: "3490"
       VIDEO_REVIEW_SERVER_URL: http://web:3489
       VIDEO_REVIEW_PUBLIC_URL: ${VIDEO_REVIEW_PUBLIC_URL:-http://localhost:3489}
     ports:

@@ -279,20 +279,24 @@ function createServer(): McpServer {
     return server;
 }
 
-// The bare names stay accepted so deployments that predate the VIDEO_REVIEW_ prefix keep working.
-const transport = process.env.VIDEO_REVIEW_MCP_TRANSPORT ?? process.env.MCP_TRANSPORT;
-const portValue = process.env.VIDEO_REVIEW_MCP_PORT ?? process.env.MCP_PORT;
+// Services start with --http [port]; AI clients like Claude Desktop spawn it bare over stdio.
+const args = process.argv.slice(2);
 
-if (transport === "http") {
-    await startHttpServer();
+if (args[0] === "--http" && args.length <= 2) {
+    await startHttpServer(args[1]);
+} else if (args.length > 0) {
+    // Anything else, such as --http=3491, would otherwise start on stdio and look like a healthy start.
+    throw new Error(`usage: [--http [port]], got "${args.join(" ")}"`);
 } else {
     await createServer().connect(new StdioServerTransport());
-    // Without this line a misspelled transport looks like a healthy start that never opens a port.
-    process.stderr.write("MCP server ready on stdio (set VIDEO_REVIEW_MCP_TRANSPORT=http to listen on a port).\n");
+    process.stderr.write("MCP server ready on stdio (start with --http to listen on a port).\n");
 }
 
-async function startHttpServer(): Promise<void> {
-    const port = parseInt(portValue ?? "3490", 10);
+async function startHttpServer(portArg: string | undefined): Promise<void> {
+    const port = portArg === undefined ? 3490 : Number(portArg);
+    if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        throw new Error(`--http takes a port number, got "${portArg}"`);
+    }
 
     const httpServer = http.createServer(async (req, res) => {
         if (req.url === "/mcp") {
