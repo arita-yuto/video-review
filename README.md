@@ -196,10 +196,10 @@ docker compose -f compose.prod.yml up -d videoreview -d video-processing
 
 ### First Launch
 
-VideoReview has no web-based admin console.
-On first access the Web UI asks you to register an administrator, and everything after that runs through the maintenance CLI.
+On first access the Web UI asks you to register an administrator.
+Users, videos, integrations and the API token are then managed from Administration in the Web UI.
 
-See the [Admin Guide](./documents/admin-guide.md) for the setup steps and for how to issue an API token.
+See the [Admin Screen Guide](./documents/admin/README.md) for the steps.
 
 ---
 
@@ -209,7 +209,7 @@ For detailed instructions, see:
 * [Docker Prod / Devlopment Build Guide](./documents/build.run/docker-guide.md)
 * [Local / On‑premise Build Guide](./documents/build.run/local-guide.md)
 * [AI Features Guide](./documents/build.run/ai-guide.md)
-* [Admin Guide (initial setup / API token)](./documents/admin-guide.md)
+* [Admin Screen Guide](./documents/admin/README.md)
 
 ## License
 

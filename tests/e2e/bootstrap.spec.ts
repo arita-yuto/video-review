@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-// The first-launch journey documented in documents/admin-guide.md.
+// The first-launch journey documented in documents/admin/README.md.
 // Needs an unseeded database and a fresh server process; run-e2e.ts arranges both.
 const ADMIN = { email: "admin@example.com", password: "bootstrap-pass" };
 

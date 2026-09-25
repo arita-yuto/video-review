@@ -114,7 +114,7 @@ VideoReview は、動画、コメント、コード変更を読むツールを M
 ### API トークンを発行する
 
 管理者にAPIトークンを発行してもらい、共有してもらう必要があります  
-Settings → Edit Profile から発行します（[Admin Guide](../admin-guide.jp.md)）  
+Administration → API Token から発行します（[管理画面ガイド](../admin/api-token.jp.md)）  
 エージェントはこのトークンを `x-api-token` ヘッダーに付けて VideoReview に接続します
 
 ### 登録する

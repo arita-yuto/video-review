@@ -114,7 +114,7 @@ Each user registers their own AI agent (Claude Code, Codex CLI, Gemini CLI, and 
 ### Get an API token
 
 Ask an administrator to issue an API token and share it with you.  
-Administrators issue it from Settings → Edit Profile ([Admin Guide](../admin-guide.md)).  
+Administrators issue it from Administration → API Token ([Admin Screen Guide](../admin/api-token.md)).  
 The agent sends this token in the `x-api-token` header when it connects to VideoReview.
 
 ### Register the server

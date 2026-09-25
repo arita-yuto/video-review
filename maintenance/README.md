@@ -21,7 +21,7 @@ VideoReview uses an API token for maintenance and automation.
 After initial setup, an administrator can generate an API token
 from the web UI.
 
-See the [Admin Guide](../documents/admin-guide.md) for details.
+See the [Admin Screen Guide](../documents/admin/api-token.md) for details.
 
 ## Required Environment Variables
 
