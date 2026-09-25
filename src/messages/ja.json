@@ -300,6 +300,14 @@
                 "resetConfirm": "保存した API key を消して、変更できるようにしますか？",
                 "switchFailed": "使用中の Provider の切り替えに失敗しました",
                 "use": "この Provider を使う"
+            },
+            "webhook": {
+                "title": "Webhook",
+                "target": "Target",
+                "targetPlaceholder": "Slack / Teams",
+                "url": "URL",
+                "testNote": "Test & save は、チャンネルにテストのメッセージを 1 件送ります",
+                "resetConfirm": "保存した URL を消して、変更できるようにしますか？"
             }
         }
     }

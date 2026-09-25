@@ -26,6 +26,8 @@ export type IntegrationDef<F extends Fields, R extends typeof TestResultSchema> 
     name: string;
     fields: F;
     testSchema: R;
+    // Whether opening the screen may run test for the connection dot; false when testing has an effect, such as posting.
+    check: boolean;
     // Like CanExecute: whether test has what it needs. Pure and local, so the UI may call it freely.
     canTest: (config: ConfigOf<F>) => boolean;
     // Like Execute: connects with the values; only called once canTest passes.

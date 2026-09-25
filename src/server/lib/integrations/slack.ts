@@ -14,6 +14,7 @@ export const slack = defineIntegration({
         team: { kind: "plain", env: () => env.SLACK_TEAM },
     },
     testSchema: TestResultSchema.extend({ team: z.string().optional() }),
+    check: true,
     canTest: ({ token }) => !!token,
     test: async ({ token }) => {
 

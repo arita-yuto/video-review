@@ -17,6 +17,7 @@ export const jira = defineIntegration({
         issueTypeBug: { kind: "plain", env: () => env.JIRA_ISSUE_TYPE_BUG },
     },
     testSchema: TestResultSchema,
+    check: true,
     canTest: ({ baseUrl, token, project }) => !!baseUrl && !!token && !!project,
     test: async ({ baseUrl, token, project, issueTypeTask, issueTypeBug }) => {
         let res: Response;

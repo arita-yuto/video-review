@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
 
-export type IntegrationName = "jira" | "slack" | "llm-claude" | "llm-openai" | "llm-gemini" | "llm-ollama";
+export type IntegrationName = "jira" | "slack" | "webhook" | "llm-claude" | "llm-openai" | "llm-gemini" | "llm-ollama";
 
 type Source = "saved" | "env" | null;
 type FieldState =
@@ -89,7 +89,7 @@ export function useIntegrationSettings(name: IntegrationName) {
         if (result.ok) {
             load(state);
             setStatus({ ok: true, message: t("integrations.saved") });
-            setConnection({ configured: true, ok: true });
+            void checkConnection();
         } else {
             setStatus({ ok: false, message: t("integrations.notSaved", { error: result.error ?? "" }) });
         }
@@ -101,6 +101,12 @@ export function useIntegrationSettings(name: IntegrationName) {
         load((await res.json()) as Settings);
         void checkConnection();
     }, "integrations.resetFailed");
+
+    function setValue(field: string, value: string) {
+        // A result shown for the previous values would read as if it applied to the edited ones.
+        setStatus(null);
+        setForm(prev => ({ ...prev, [field]: value }));
+    }
 
     function input(field: string) {
         const state = settings?.[field];
@@ -116,14 +122,9 @@ export function useIntegrationSettings(name: IntegrationName) {
             value: form[field] ?? "",
             placeholder: masked ? SECRET_MASK : undefined,
             disabled: busy || (locked && state?.kind !== "plain"),
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                // A result shown for the previous values would read as if it applied to the edited ones.
-                setStatus(null);
-                const value = e.target.value;
-                setForm(prev => ({ ...prev, [field]: value }));
-            },
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setValue(field, e.target.value),
         };
     }
 
-    return { loaded: settings !== null, locked, connection, input, blocked, busy, status, testAndSave, reset };
+    return { loaded: settings !== null, locked, connection, input, setValue, blocked, busy, status, testAndSave, reset };
 }

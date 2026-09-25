@@ -300,6 +300,14 @@
                 "resetConfirm": "Clear the saved API key so you can change it?",
                 "switchFailed": "Switching the provider in use failed.",
                 "use": "Use this provider"
+            },
+            "webhook": {
+                "title": "Webhook",
+                "target": "Target",
+                "targetPlaceholder": "Slack / Teams",
+                "url": "URL",
+                "testNote": "Test & save posts one test message to the channel.",
+                "resetConfirm": "Clear the saved URL so you can change it?"
             }
         }
     }
