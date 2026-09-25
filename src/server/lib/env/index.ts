@@ -8,8 +8,15 @@ export const env = {
     DATABASE_URL: process.env.DATABASE_URL,
     DB_IDLE_DISCONNECT_MS: process.env.VIDEO_REVIEW_DB_IDLE_DISCONNECT_MS,
     VIDEO_REVIEW_API_TOKEN: process.env.VIDEO_REVIEW_API_TOKEN,
-    // Default on for compatibility; only an explicit "false" disables guest login.
-    ALLOW_GUEST: process.env.VIDEO_REVIEW_ALLOW_GUEST !== "false",
+    // Deprecated: the admin screen's General section overrides these. The NEXT_PUBLIC_ names are
+    // accepted so existing .env files keep working; "false" under either name disables guest login.
+    ALLOW_GUEST: [process.env.VIDEO_REVIEW_ALLOW_GUEST, process.env.NEXT_PUBLIC_VIDEO_REVIEW_ALLOW_GUEST].includes("false")
+        ? "false"
+        : resolveEnv(process.env.VIDEO_REVIEW_ALLOW_GUEST, process.env.NEXT_PUBLIC_VIDEO_REVIEW_ALLOW_GUEST),
+    LOGIN_DEFAULT_TYPE: resolveEnv(process.env.NEXT_PUBLIC_VIDEO_REVIEW_LOGIN_DEFAULT_TYPE, process.env.NEXT_PUBLIC_LOGIN_DEFAULT_TYPE),
+    URL_SCHEMA: resolveEnv(process.env.NEXT_PUBLIC_VIDEO_REVIEW_URL_SCHEMA, process.env.NEXT_PUBLIC_URL_SCHEMA),
+    RESOLUTION_PRESETS: process.env.NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS,
+    UPLOAD_CHUNK_MB: process.env.VIDEO_REVIEW_UPLOAD_CHUNK_MB,
     EMAIL_ENABLE: booleanEnv(process.env.VIDEO_REVIEW_EMAIL_ENABLE),
     SMTP_HOST: process.env.VIDEO_REVIEW_SMTP_HOST,
     SMTP_PORT: process.env.VIDEO_REVIEW_SMTP_PORT,

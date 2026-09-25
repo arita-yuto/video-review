@@ -13,6 +13,7 @@ import type { userRouter } from "@/server/routes/user";
 import type { chatRouter } from "@/server/routes/chat";
 import type { chatSearchRouter } from "@/server/routes/chat/search";
 import type { thumbnailRouter } from "@/server/routes/thumbnail";
+import type { configRouter } from "@/server/routes/config";
 import { useAuthStore } from "@/stores/auth-store";
 
 const options = {
@@ -41,6 +42,7 @@ export const api = {
     chat: v1<typeof chatRouter>("/chat"),
     chatSearch: v1<typeof chatSearchRouter>("/chat/search"),
     thumbnail: v1<typeof thumbnailRouter>("/thumbnail"),
+    config: v1<typeof configRouter>("/config"),
 };
 
 // Takes a structural type because error routes declare no content schema, which types their

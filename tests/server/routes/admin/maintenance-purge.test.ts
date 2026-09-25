@@ -25,6 +25,7 @@ vi.mock("@/server/lib/token", () => ({
     getApiSecretHash: vi.fn(),
 }));
 vi.mock("@/server/lib/storage", () => ({ VideoReviewStorage: storageMock }));
+vi.mock("@/server/lib/integrations/general", () => ({ getResolutionPresets: vi.fn(async () => []) }));
 
 import { maintenanceRouter } from "@/server/routes/admin/maintenance";
 
