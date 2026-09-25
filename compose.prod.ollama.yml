@@ -1,0 +1,43 @@
+# One Ollama service per hardware; pick it with --profile cpu | nvidia | rocm (or COMPOSE_PROFILES in .env).
+# Every variant answers as "ollama" on the network and as the videoreview-ollama container.
+x-ollama: &ollama
+  container_name: videoreview-ollama
+  restart: unless-stopped
+  ports:
+    - "11434:11434"
+  volumes:
+    - ${DOCKER_HOST_LLM_MODELS:-videoreview-llm-models}:/root/.ollama/models
+  networks:
+    default:
+      aliases:
+        - ollama
+
+services:
+  ollama:
+    <<: *ollama
+    image: ollama/ollama:latest
+    profiles: [cpu]
+
+  # Needs the NVIDIA Container Toolkit on the host.
+  ollama-nvidia:
+    <<: *ollama
+    image: ollama/ollama:latest
+    profiles: [nvidia]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  ollama-rocm:
+    <<: *ollama
+    image: ollama/ollama:rocm
+    profiles: [rocm]
+    devices:
+      - /dev/kfd
+      - /dev/dri
+
+volumes:
+  videoreview-llm-models:

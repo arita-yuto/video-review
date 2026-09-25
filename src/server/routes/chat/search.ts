@@ -2,12 +2,12 @@ import { createRoute } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { z } from "zod";
 import { Client as McpClient } from "@modelcontextprotocol/sdk/client/index.js";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { authorize } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { createLLMClient, ChatTurn } from "@/server/lib/integration-clients/llm-client";
-import { env } from "@/server/lib/env";
+import { createMcpServer } from "@/server/lib/mcp/server";
 
 // Bounds keep a single request from pushing arbitrary amounts of text into a paid LLM call.
 const MAX_MESSAGE_LENGTH = 4000;
@@ -21,23 +21,15 @@ const BodySchema = z.object({
     })).max(MAX_HISTORY_TURNS).default([]),
 });
 
-async function createMcpClient(url: string): Promise<McpClient> {
+// The chat talks to the same MCP server agents use, in process, with the chat user's own credentials.
+async function createMcpClient(request: Request): Promise<McpClient> {
+    const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
+    await (await createMcpServer(request)).connect(serverSide);
+
     const client = new McpClient({ name: "video-review-chat", version: "1.0.0" });
-    try {
-        await client.connect(new StreamableHTTPClientTransport(new URL(url)));
-    } catch (err) {
-        console.error("[chat/search] MCP connect failed:", err);
-        throw new ServerError("MCP server is not reachable", 503);
-    }
+    await client.connect(clientSide);
     return client;
 }
-
-// Fallback when the MCP server predates the bundled guide and sends no instructions.
-const DEFAULT_GUIDE = [
-    "You are an assistant for Video Review. Help the user find videos, comments, and events using the available tools.",
-    "When filtering by date range, always specify both ends of the range.",
-    "When listing videos, link each one as [title](url) using the url field from the tool result.",
-].join("\n");
 
 async function readTextTool(mcpClient: McpClient, name: string): Promise<string[]> {
     try {
@@ -53,7 +45,7 @@ async function readTextTool(mcpClient: McpClient, name: string): Promise<string[
 // The guide comes from the MCP server so all clients share it; the live tag and folder
 // vocabulary is added per request so the model maps the user's wording to real values.
 async function buildSystemPrompt(mcpClient: McpClient): Promise<string> {
-    const guide = mcpClient.getInstructions() ?? DEFAULT_GUIDE;
+    const guide = mcpClient.getInstructions() ?? "";
     const [tags, folders] = await Promise.all([readTextTool(mcpClient, "list_tags"), readTextTool(mcpClient, "list_folders")]);
     const today = new Date().toISOString().slice(0, 10);
     const context = [
@@ -90,7 +82,7 @@ export const chatSearchRouter = createRouter()
             403: errorResponse("Forbidden"),
             500: errorResponse("Internal error"),
             502: errorResponse("LLM request failed"),
-            503: errorResponse("LLM or MCP not configured or MCP unreachable"),
+            503: errorResponse("LLM not configured"),
         },
     }), async (c) => {
         try {
@@ -106,9 +98,6 @@ export const chatSearchRouter = createRouter()
         if (!llm) {
             return c.json({ error: "LLM is not configured" }, 503);
         }
-        if (!env.MCP_URL) {
-            return c.json({ error: "MCP is not configured" }, 503);
-        }
 
         // Body validation runs before the handler (declared in request.body), so a malformed
         // body is rejected with 400 even before the auth check above.
@@ -121,7 +110,7 @@ export const chatSearchRouter = createRouter()
 
         let mcpClient: McpClient | null = null;
         try {
-            mcpClient = await createMcpClient(env.MCP_URL);
+            mcpClient = await createMcpClient(c.req.raw);
             const system = await buildSystemPrompt(mcpClient);
             const reply = await llm.completeWithMCP(messages, mcpClient, system);
             return c.json({ reply }, 200);

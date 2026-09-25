@@ -2,7 +2,8 @@
     "mcpServers": {
         "video-review": {
             "type": "http",
-            "url": "${VIDEO_REVIEW_MCP_URL:-http://localhost:3490/mcp}"
+            "url": "${VIDEO_REVIEW_MCP_URL:-http://localhost:3489/api/v1/mcp}",
+            "headers": { "x-api-token": "${VIDEO_REVIEW_API_TOKEN}" }
         }
     }
 }

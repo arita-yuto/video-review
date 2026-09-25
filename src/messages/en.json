@@ -62,10 +62,14 @@
     "chat-search": {
         "title": "Chat Search",
         "clearHistory": "Clear conversation",
-        "llmUnavailable": "LLM is not configured",
         "emptyState": "Ask natural-language questions about videos, comments, and events.",
         "loading": "Thinking...",
-        "inputPlaceholder": "Ask about the videos... (Enter to send)"
+        "inputPlaceholder": "Ask about the videos... (Enter to send)",
+        "error": {
+            "notConfigured": "AI search is not set up. Ask an administrator.",
+            "requestFailed": "No answer came back from the AI.",
+            "failed": "Search failed."
+        }
     },
     "video-control-panel": {
         "normal": "Normal",
@@ -158,16 +162,7 @@
         "logout": "Logout",
         "editProfile": "Edit Profile",
         "administration": "Administration",
-        "editPrompt": "Edit Prompt",
-        "aiSearch": "AI search (chat)",
-        "aiSearchState": {
-            "checking": "Checking",
-            "unknown": "Status unavailable",
-            "noLlm": "Off: LLM provider not configured",
-            "noMcp": "Off: MCP server URL not configured",
-            "mcpUnreachable": "Off: MCP server unreachable",
-            "ok": "On"
-        }
+        "editPrompt": "Edit Prompt"
     },
     "calendar-date-radio": {
         "today": "Today",
@@ -323,6 +318,15 @@
                 "branch": "Branch",
                 "switchFailed": "Switching the provider in use failed.",
                 "use": "Use this provider"
+            },
+            "mcp": {
+                "title": "MCP",
+                "notes": "Search guide notes",
+                "notesHelp": "Added after the built-in search guide. Write your tags, folders and common questions.",
+                "save": "Save",
+                "saved": "Saved.",
+                "saveFailed": "Save failed",
+                "loadFailed": "Could not load the notes"
             }
         }
     }

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
 
-// The settings routes, taken from the typed API client; the *-provider routes pick a provider and aren't integrations.
-export type IntegrationName = Exclude<keyof typeof api.admin.settings, "llm-provider" | "vcs-provider">;
+// The settings routes, taken from the typed API client, minus the ones that aren't connections to test.
+export type IntegrationName = Exclude<keyof typeof api.admin.settings, "llm-provider" | "vcs-provider" | "mcp-guide">;
 
 type Source = "saved" | "env" | null;
 type FieldState =

@@ -62,10 +62,14 @@
     "chat-search": {
         "title": "チャット検索",
         "clearHistory": "会話をクリア",
-        "llmUnavailable": "LLM が設定されていません",
         "emptyState": "動画・コメント・イベントについて自然言語で質問できます",
         "loading": "考え中...",
-        "inputPlaceholder": "動画について聞いてみましょう...（Enter で送信）"
+        "inputPlaceholder": "動画について聞いてみましょう...（Enter で送信）",
+        "error": {
+            "notConfigured": "AI が設定されていません。管理者に確認してください",
+            "requestFailed": "AI から応答を得られませんでした",
+            "failed": "検索に失敗しました"
+        }
     },
     "video-control-panel": {
         "normal": "通常再生",
@@ -158,16 +162,7 @@
         "logout": "ログアウト",
         "editProfile": "プロフィール編集",
         "administration": "管理",
-        "editPrompt": "プロンプト編集",
-        "aiSearch": "AI 検索（チャット）",
-        "aiSearchState": {
-            "checking": "確認中",
-            "unknown": "状態を取得できません",
-            "noLlm": "無効: LLM プロバイダーが未設定",
-            "noMcp": "無効: MCP サーバーの URL が未設定",
-            "mcpUnreachable": "無効: MCP サーバーに接続できません",
-            "ok": "On"
-        }
+        "editPrompt": "プロンプト編集"
     },
     "calendar-date-radio": {
         "today": "今日",
@@ -323,6 +318,15 @@
                 "branch": "Branch",
                 "switchFailed": "使用中の Provider の切り替えに失敗しました",
                 "use": "この Provider を使う"
+            },
+            "mcp": {
+                "title": "MCP",
+                "notes": "検索ガイドの追記",
+                "notesHelp": "組み込みの検索ガイドの後ろに追加されます。タグ、フォルダ、よくある質問などを書きます",
+                "save": "保存",
+                "saved": "保存しました",
+                "saveFailed": "保存に失敗しました",
+                "loadFailed": "追記の取得に失敗しました"
             }
         }
     }

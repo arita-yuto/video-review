@@ -4,7 +4,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { buildLLMClient } from "@/server/lib/integration-clients/llm-client";
 import { env } from "@/server/lib/env";
 
-// Talks to the real LLM provider and MCP server configured in the environment.
+// Talks to the real LLM provider and to the MCP endpoint of a running app (MCP_SMOKE_URL, default the dev server).
 // Opt in with LLM_SMOKE=1 (see `npm run llm:check`); `npm test` skips it.
 const enabled = process.env.LLM_SMOKE === "1";
 
@@ -21,10 +21,11 @@ describe.skipIf(!enabled)(`LLM smoke check (${env.LLM_PROVIDER ?? "no provider"}
     it("calls an MCP tool and answers from its result", async () => {
         const client = buildLLMClient({ provider: env.LLM_PROVIDER, apiKey: env.LLM_API_KEY, baseUrl: env.LLM_BASE_URL, model: env.LLM_MODEL });
         expect(client).not.toBeNull();
-        expect(env.MCP_URL, "VIDEO_REVIEW_MCP_URL must be set").toBeTruthy();
+        expect(env.VIDEO_REVIEW_API_TOKEN, "VIDEO_REVIEW_API_TOKEN must be set").toBeTruthy();
 
+        const url = new URL(process.env.MCP_SMOKE_URL ?? "http://localhost:3489/api/v1/mcp");
         const mcp = new McpClient({ name: "llm-smoke", version: "1.0.0" });
-        await mcp.connect(new StreamableHTTPClientTransport(new URL(env.MCP_URL!)));
+        await mcp.connect(new StreamableHTTPClientTransport(url, { requestInit: { headers: { "x-api-token": env.VIDEO_REVIEW_API_TOKEN! } } }));
         try {
             const system = [
                 mcp.getInstructions() ?? "",

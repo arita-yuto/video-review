@@ -2,7 +2,7 @@
 // returns the intended videos. Every video lives under the `eval/` folder prefix so the seed
 // script can wipe and recreate exactly this subtree next to real or seeded data.
 // Dates are relative to "now" so time-based questions ("uploaded this week") keep working.
-// integrations/mcp/eval.ts holds the questions and expected answers built on this data.
+// tests/smoke/mcp-eval.ts holds the questions and expected answers built on this data.
 
 export const EVAL_FOLDER_PREFIX = "eval/";
 export const EVAL_REPO_NAME = "eval/sample-game";
