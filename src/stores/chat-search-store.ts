@@ -8,11 +8,13 @@ export type ChatTurn = {
     content: string;
 };
 
+export type ChatSearchError = "notConfigured" | "requestFailed" | "failed";
+
 interface ChatSearchState {
     isOpen: boolean;
     history: ChatTurn[];
     isLoading: boolean;
-    error: string | null;
+    error: ChatSearchError | null;
     open: () => void;
     close: () => void;
     sendMessage: (message: string) => Promise<void>;
@@ -38,14 +40,15 @@ export const useChatSearchStore = create<ChatSearchState>()((set, get) => ({
 
         try {
             const res = await api.chatSearch.index.$post({ json: { message, history: get().history.slice(0, -1) } });
-            if (res.status === 503) throw new Error("LLM is not configured");
-            if (res.status === 502) throw new Error("LLM request failed");
-            if (res.status !== 200) throw new Error("Chat search failed");
+            if (res.status !== 200) {
+                set({ isLoading: false, error: res.status === 503 ? "notConfigured" : res.status === 502 ? "requestFailed" : "failed" });
+                return;
+            }
             const { reply } = await res.json();
             const assistantTurn: ChatTurn = { role: "assistant", content: reply };
             set((s) => ({ history: [...s.history, assistantTurn], isLoading: false }));
-        } catch (err) {
-            set({ isLoading: false, error: String(err) });
+        } catch {
+            set({ isLoading: false, error: "failed" });
         }
     },
 }));

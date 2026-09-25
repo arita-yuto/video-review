@@ -13,7 +13,6 @@ import type { userRouter } from "@/server/routes/user";
 import type { chatRouter } from "@/server/routes/chat";
 import type { chatSearchRouter } from "@/server/routes/chat/search";
 import type { thumbnailRouter } from "@/server/routes/thumbnail";
-import type { llmStatusRouter } from "@/server/routes/llm/status";
 import { useAuthStore } from "@/stores/auth-store";
 
 const options = {
@@ -40,7 +39,6 @@ export const api = {
     avatar: v1<typeof avatarRouter>("/avatar"),
     user: v1<typeof userRouter>("/user"),
     chat: v1<typeof chatRouter>("/chat"),
-    llmStatus: v1<typeof llmStatusRouter>("/llm/status"),
     chatSearch: v1<typeof chatSearchRouter>("/chat/search"),
     thumbnail: v1<typeof thumbnailRouter>("/thumbnail"),
 };

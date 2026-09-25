@@ -5,7 +5,6 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/ui/button";
 import { useTranslations } from "next-intl";
 import { useChatSearchStore } from "@/stores/chat-search-store";
-import { useLLMStatusStore } from "@/stores/llm-status-store";
 import { ChatMessage } from "@/components/chat-search/chat-message";
 import { ChatInput } from "@/components/chat-search/chat-input";
 import {
@@ -18,7 +17,6 @@ import {
 export function ChatSearchPanel() {
     const t = useTranslations("chat-search");
     const { isOpen, close, history, isLoading, error, sendMessage, clear } = useChatSearchStore();
-    const { available } = useLLMStatusStore();
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -38,38 +36,28 @@ export function ChatSearchPanel() {
                     )}
                 </SheetHeader>
 
-                {!available ? (
-                    <div className="flex-1 flex items-center justify-center p-6 text-center">
-                        <p className="text-muted-foreground text-sm">
-                            {t("llmUnavailable")}
+                <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
+                    {history.length === 0 && (
+                        <p className="text-muted-foreground text-xs text-center mt-4">
+                            {t("emptyState")}
                         </p>
-                    </div>
-                ) : (
-                    <>
-                        <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
-                            {history.length === 0 && (
-                                <p className="text-muted-foreground text-xs text-center mt-4">
-                                    {t("emptyState")}
-                                </p>
-                            )}
-                            {history.map((turn, i) => (
-                                <ChatMessage key={i} turn={turn} />
-                            ))}
-                            {isLoading && (
-                                <div className="flex items-start">
-                                    <div className="bg-accent rounded-lg px-3 py-2 text-sm text-muted-foreground">
-                                        {t("loading")}
-                                    </div>
-                                </div>
-                            )}
-                            {error && (
-                                <div className="text-xs text-destructive text-center">{error}</div>
-                            )}
-                            <div ref={bottomRef} />
+                    )}
+                    {history.map((turn, i) => (
+                        <ChatMessage key={i} turn={turn} />
+                    ))}
+                    {isLoading && (
+                        <div className="flex items-start">
+                            <div className="bg-accent rounded-lg px-3 py-2 text-sm text-muted-foreground">
+                                {t("loading")}
+                            </div>
                         </div>
-                        <ChatInput onSend={sendMessage} disabled={isLoading} />
-                    </>
-                )}
+                    )}
+                    {error && (
+                        <div className="text-xs text-destructive text-center">{t(`error.${error}`)}</div>
+                    )}
+                    <div ref={bottomRef} />
+                </div>
+                <ChatInput onSend={sendMessage} disabled={isLoading} />
             </SheetContent>
         </Sheet>
     );

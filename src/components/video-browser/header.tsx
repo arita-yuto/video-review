@@ -15,7 +15,6 @@ import { useVideoDateFilterStore } from "@/stores/date-filter-store";
 import { useVideoStore } from "@/stores/video-store";
 import CalendarDateRadio from "@/components/controls/calendar-date-radio";
 import { Separator } from "../ui/separator";
-import { useLLMStatusStore } from "@/stores/llm-status-store";
 import { useChatSearchStore } from "@/stores/chat-search-store";
 import { ChatSearchPanel } from "@/components/chat-search";
 
@@ -33,7 +32,6 @@ export default function VideoListPanelHeader(
     const { fetchVideos } = useVideoStore();
     const { filterTree, setFilterTree, isFiltering, clear } = useVideoSearchStore();
     const videoDate = useVideoDateFilterStore();
-    const { available, checked, check } = useLLMStatusStore();
     const { open: openChat } = useChatSearchStore();
 
     // Refetch when the tree text or the date filter changes.
@@ -43,10 +41,6 @@ export default function VideoListPanelHeader(
 
     // The date filter now lives in its own store, so fold it into the indicator.
     const filtering = isFiltering() || videoDate.mode !== "none";
-
-    useEffect(() => {
-        if (!checked) check();
-    }, []);
 
     const handleClear = () => {
         clear();
@@ -67,12 +61,9 @@ export default function VideoListPanelHeader(
                             <X className="size-5" />
                         </Button>
                     )}
-                    {/* Hidden rather than disabled: the reason lives in the settings popover (admins). */}
-                    {available && (
-                        <Button variant="toolbar" size="icon-sm" title={tChat("title")} onClick={() => openChat()}>
-                            <MessageSquare />
-                        </Button>
-                    )}
+                    <Button variant="toolbar" size="icon-sm" title={tChat("title")} onClick={() => openChat()}>
+                        <MessageSquare />
+                    </Button>
                 </div>
 
                 <div className="flex items-center gap-1">
