@@ -124,7 +124,7 @@ export async function checkConnection<F extends Fields>(def: AnyDef<F>) {
     }
 
     // Unchecked integrations report as not configured, so no dot is shown.
-    if (!def.check || !def.canTest(config)) {
+    if (!def.check(config) || !def.canTest(config)) {
         return { configured: false, ok: false };
     }
     return { configured: true, ok: (await def.test(config)).ok };

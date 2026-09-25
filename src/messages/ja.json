@@ -308,6 +308,14 @@
                 "url": "URL",
                 "testNote": "Test & save は、チャンネルにテストのメッセージを 1 件送ります",
                 "resetConfirm": "保存した URL を消して、変更できるようにしますか？"
+            },
+            "email": {
+                "title": "メール",
+                "enable": "メールを送る",
+                "host": "SMTP host",
+                "port": "SMTP port",
+                "from": "送信元",
+                "tlsStrict": "TLS 証明書を厳密に検証"
             }
         }
     }

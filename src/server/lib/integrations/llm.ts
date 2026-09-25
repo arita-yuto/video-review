@@ -29,7 +29,7 @@ export const llmClaude = defineIntegration({
         model: { kind: "plain", env: fromEnv("claude", () => env.LLM_MODEL) },
     },
     testSchema: TestResultSchema,
-    check: true,
+    check: () => true,
     canTest: ({ apiKey }) => !!apiKey,
     test: async ({ apiKey }) => listModels("claude", "https://api.anthropic.com/v1/models", { "x-api-key": apiKey!, "anthropic-version": "2023-06-01" }),
 });
@@ -41,7 +41,7 @@ export const llmOpenAI = defineIntegration({
         model: { kind: "plain", env: fromEnv("openai", () => env.LLM_MODEL) },
     },
     testSchema: TestResultSchema,
-    check: true,
+    check: () => true,
     canTest: ({ apiKey }) => !!apiKey,
     test: async ({ apiKey }) => listModels("openai", "https://api.openai.com/v1/models", { Authorization: `Bearer ${apiKey!}` }),
 });
@@ -53,7 +53,7 @@ export const llmGemini = defineIntegration({
         model: { kind: "plain", env: fromEnv("gemini", () => env.LLM_MODEL) },
     },
     testSchema: TestResultSchema,
-    check: true,
+    check: () => true,
     canTest: ({ apiKey }) => !!apiKey,
     test: async ({ apiKey }) => listModels("gemini", "https://generativelanguage.googleapis.com/v1beta/openai/models", { Authorization: `Bearer ${apiKey!}` }),
 });
@@ -65,7 +65,7 @@ export const llmOllama = defineIntegration({
         model: { kind: "plain", env: fromEnv("ollama", () => env.LLM_MODEL) },
     },
     testSchema: TestResultSchema,
-    check: true,
+    check: () => true,
     canTest: ({ baseUrl }) => !!baseUrl,
     test: async ({ baseUrl }) => listModels("ollama", `${baseUrl!.replace(/\/+$/, "")}/api/tags`, {}),
 });

@@ -18,9 +18,10 @@ export function FieldRow({ label, htmlFor, children }: { label: string; htmlFor:
 }
 
 // The frame every integration screen shares: its fields scroll, and the buttons stay at the bottom.
+// Without resetConfirm there is no Reset, for integrations with no secret to lock them.
 export function IntegrationForm({ title, resetConfirm, settings, children }: {
     title: string;
-    resetConfirm: string;
+    resetConfirm?: string;
     settings: ReturnType<typeof useIntegrationSettings>;
     children: ReactNode;
 }) {
@@ -73,9 +74,11 @@ export function IntegrationForm({ title, resetConfirm, settings, children }: {
                     </>
                 ) : (
                     <>
-                        <Button variant="outline" onClick={() => setConfirmReset(true)} disabled={busy || !locked}>
-                            {t("integrations.reset")}
-                        </Button>
+                        {resetConfirm && (
+                            <Button variant="outline" onClick={() => setConfirmReset(true)} disabled={busy || !locked}>
+                                {t("integrations.reset")}
+                            </Button>
+                        )}
                         <Button onClick={testAndSave} disabled={busy || !loaded || blocked !== null}>
                             {t("integrations.testAndSave")}
                         </Button>

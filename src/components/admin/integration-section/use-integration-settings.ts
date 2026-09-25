@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
 
-export type IntegrationName = "jira" | "slack" | "webhook" | "llm-claude" | "llm-openai" | "llm-gemini" | "llm-ollama";
+export type IntegrationName = "jira" | "slack" | "webhook" | "email" | "llm-claude" | "llm-openai" | "llm-gemini" | "llm-ollama";
 
 type Source = "saved" | "env" | null;
 type FieldState =

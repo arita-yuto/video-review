@@ -308,6 +308,14 @@
                 "url": "URL",
                 "testNote": "Test & save posts one test message to the channel.",
                 "resetConfirm": "Clear the saved URL so you can change it?"
+            },
+            "email": {
+                "title": "Email",
+                "enable": "Send email",
+                "host": "SMTP host",
+                "port": "SMTP port",
+                "from": "From",
+                "tlsStrict": "Strict TLS"
             }
         }
     }

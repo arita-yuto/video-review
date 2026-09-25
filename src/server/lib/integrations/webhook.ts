@@ -14,7 +14,7 @@ export const webhook = defineIntegration({
         url: { kind: "secret", env: () => env.WEBHOOK_URL },
     },
     testSchema: TestResultSchema,
-    check: false,
+    check: () => false,
     canTest: ({ target, url }) => !!target && !!url,
     // A webhook can't be checked without posting, so the test sends one message to the channel.
     test: async ({ target, url }) => {

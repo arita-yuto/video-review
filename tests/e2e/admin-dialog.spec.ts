@@ -49,7 +49,7 @@ test.describe("admin settings dialog", () => {
         const name = `E2E Viewer ${test.info().retry}`;
         const email = `e2e-viewer-${test.info().retry}@example.com`;
         await dialog.getByLabel("Display name").fill(name);
-        await dialog.getByLabel("Email").fill(email);
+        await dialog.getByRole("textbox", { name: "Email" }).fill(email);
         await dialog.getByLabel("Password").fill("viewer-pass");
         await dialog.getByRole("button", { name: "Create" }).click();
 

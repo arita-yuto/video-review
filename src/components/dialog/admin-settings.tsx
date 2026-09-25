@@ -11,6 +11,7 @@ import { ApiTokenSection } from "@/components/admin/api-token-section";
 import { JiraSection } from "@/components/admin/integration-section/jira-section";
 import { SlackSection } from "@/components/admin/integration-section/slack-section";
 import { WebhookSection } from "@/components/admin/integration-section/webhook-section";
+import { EmailSection } from "@/components/admin/integration-section/email-section";
 import { AiSection } from "@/components/admin/integration-section/ai-section";
 import { VideosSection } from "@/components/admin/videos-section";
 
@@ -21,6 +22,7 @@ const SECTIONS: { key: string; label: string; integration?: boolean; Component: 
     { key: "integrations.jira", label: "integrations.jira.title", integration: true, Component: JiraSection },
     { key: "integrations.slack", label: "integrations.slack.title", integration: true, Component: SlackSection },
     { key: "integrations.webhook", label: "integrations.webhook.title", integration: true, Component: WebhookSection },
+    { key: "integrations.email", label: "integrations.email.title", integration: true, Component: EmailSection },
     { key: "integrations.ai", label: "integrations.llm.title", integration: true, Component: AiSection },
     { key: "apiToken", label: "sections.apiToken", Component: ApiTokenSection },
 ];
