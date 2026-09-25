@@ -14,7 +14,7 @@ export function SlackSection() {
     };
 
     return (
-        <IntegrationForm title={t("title")} resetConfirm={t("resetConfirm")} settings={settings}>
+        <IntegrationForm title={t("title")} settings={settings}>
             {field("token")}
             {field("channel")}
             {field("team")}

@@ -13,7 +13,7 @@ export function WebhookSection() {
     const target = settings.field("target");
 
     return (
-        <IntegrationForm title={t("title")} resetConfirm={t("resetConfirm")} settings={settings}>
+        <IntegrationForm title={t("title")} settings={settings}>
             <FieldRow label={t("target")} htmlFor={target.id}>
                 <Select value={target.value} onValueChange={target.onChange} disabled={target.disabled}>
                     <SelectTrigger id={target.id}>

@@ -266,6 +266,7 @@
             "testFailed": "テストに失敗しました",
             "resetFailed": "Reset に失敗しました",
             "reset": "Reset",
+            "resetConfirm": "接続情報をリセットします",
             "cancel": "キャンセル",
             "jira": {
                 "title": "Jira",
@@ -273,7 +274,6 @@
                 "token": "Token",
                 "project": "Project",
                 "assignee": "担当者",
-                "resetConfirm": "Token 情報をリセットします",
                 "issueTypeTask": "Task の issue type",
                 "issueTypeBug": "Bug の issue type"
             },
@@ -281,8 +281,7 @@
                 "title": "Slack",
                 "token": "Token",
                 "channel": "Channel",
-                "team": "Team",
-                "resetConfirm": "Token 情報をリセットします"
+                "team": "Team"
             },
             "testAndSave": "Test & save",
             "saved": "接続できました。保存しました",
@@ -296,7 +295,6 @@
                 "apiKey": "API key",
                 "baseUrl": "Base URL",
                 "model": "Model",
-                "resetConfirm": "API key をリセットします",
                 "switchFailed": "使用中の Provider の切り替えに失敗しました",
                 "use": "この Provider を使う"
             },
@@ -305,8 +303,7 @@
                 "target": "Target",
                 "targetPlaceholder": "Slack / Teams",
                 "url": "URL",
-                "testNote": "Test & save は、チャンネルにテストのメッセージを 1 件送ります",
-                "resetConfirm": "URL をリセットします"
+                "testNote": "Test & save は、チャンネルにテストのメッセージを 1 件送ります"
             },
             "email": {
                 "title": "メール",
@@ -324,7 +321,6 @@
                 "repo": "Repository",
                 "token": "Token",
                 "branch": "Branch",
-                "resetConfirm": "Token 情報をリセットします",
                 "switchFailed": "使用中の Provider の切り替えに失敗しました",
                 "use": "この Provider を使う"
             }

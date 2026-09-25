@@ -18,10 +18,9 @@ export function FieldRow({ label, htmlFor, children }: { label: string; htmlFor:
 }
 
 // The frame every integration screen shares: its fields scroll, and the buttons stay at the bottom.
-// Without resetConfirm there is no Reset, for integrations with no secret to lock them.
-export function IntegrationForm({ title, resetConfirm, settings, children }: {
+// Reset appears only while a saved secret locks the connection, since only then is there anything to reset.
+export function IntegrationForm({ title, settings, children }: {
     title: string;
-    resetConfirm?: string;
     settings: ReturnType<typeof useIntegrationSettings>;
     children: ReactNode;
 }) {
@@ -56,7 +55,7 @@ export function IntegrationForm({ title, resetConfirm, settings, children }: {
             <div className="shrink-0 flex items-center gap-2 border-t pt-3">
                 <div className="flex-1 min-w-0">
                     {busy && <Spinner />}
-                    {!busy && confirmReset && <span className="text-sm">{resetConfirm}</span>}
+                    {!busy && confirmReset && <span className="text-sm">{t("integrations.resetConfirm")}</span>}
                     {!confirmReset && status && "message" in status && (
                         <span className={`block text-sm truncate ${status.state === "ok" ? "text-success" : "text-destructive"}`} title={status.message}>
                             {status.message}
@@ -75,8 +74,8 @@ export function IntegrationForm({ title, resetConfirm, settings, children }: {
                     </>
                 ) : (
                     <>
-                        {resetConfirm && (
-                            <Button variant="outline" onClick={() => setConfirmReset(true)} disabled={busy || !locked}>
+                        {locked && (
+                            <Button variant="outline" onClick={() => setConfirmReset(true)} disabled={busy}>
                                 {t("integrations.reset")}
                             </Button>
                         )}

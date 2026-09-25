@@ -62,7 +62,7 @@ function ProviderForm({ provider, inUse, switchFailed, onPick, onUse }: {
     };
 
     return (
-        <IntegrationForm title={t("title")} resetConfirm={t("resetConfirm")} settings={settings}>
+        <IntegrationForm title={t("title")} settings={settings}>
             <FieldRow label={t("provider")} htmlFor="vcs-provider">
                 <Select value={provider} onValueChange={(value) => onPick(value as Provider)}>
                     <SelectTrigger id="vcs-provider">

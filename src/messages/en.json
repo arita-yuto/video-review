@@ -266,6 +266,7 @@
             "testFailed": "Failed to test",
             "resetFailed": "Failed to reset",
             "reset": "Reset",
+            "resetConfirm": "This resets the connection.",
             "cancel": "Cancel",
             "jira": {
                 "title": "Jira",
@@ -273,7 +274,6 @@
                 "token": "Token",
                 "project": "Project",
                 "assignee": "Assignee",
-                "resetConfirm": "This resets the token.",
                 "issueTypeTask": "Task issue type",
                 "issueTypeBug": "Bug issue type"
             },
@@ -281,8 +281,7 @@
                 "title": "Slack",
                 "token": "Token",
                 "channel": "Channel",
-                "team": "Team",
-                "resetConfirm": "This resets the token."
+                "team": "Team"
             },
             "testAndSave": "Test & save",
             "saved": "Connected. Saved.",
@@ -296,7 +295,6 @@
                 "apiKey": "API key",
                 "baseUrl": "Base URL",
                 "model": "Model",
-                "resetConfirm": "This resets the API key.",
                 "switchFailed": "Switching the provider in use failed.",
                 "use": "Use this provider"
             },
@@ -305,8 +303,7 @@
                 "target": "Target",
                 "targetPlaceholder": "Slack / Teams",
                 "url": "URL",
-                "testNote": "Test & save posts one test message to the channel.",
-                "resetConfirm": "This resets the URL."
+                "testNote": "Test & save posts one test message to the channel."
             },
             "email": {
                 "title": "Email",
@@ -324,7 +321,6 @@
                 "repo": "Repository",
                 "token": "Token",
                 "branch": "Branch",
-                "resetConfirm": "This resets the token.",
                 "switchFailed": "Switching the provider in use failed.",
                 "use": "Use this provider"
             }
