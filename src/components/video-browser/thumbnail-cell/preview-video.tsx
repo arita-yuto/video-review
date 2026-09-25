@@ -1,17 +1,16 @@
 import { useEffect } from "react";
 import { resolveMediaUrl } from "@/lib/media-url";
-import { env } from "@/lib/env";
+import { useConfigStore } from "@/stores/config-store";
 import { useThumbnailGridStore } from "@/stores/thumbnail-grid-store";
 
 // The worker writes `<name>_<width>p.mp4` beside the source for each preset; the smallest is enough for a preview.
-const presetWidths = env.RESOLUTION_PRESETS.filter(w => w > 0);
-const previewWidth = presetWidths.length > 0 ? Math.min(...presetWidths) : undefined;
-const previewKey = (filePath: string) =>
-    previewWidth === undefined ? undefined : filePath.replace(/\.[^./]+$/, "") + `_${previewWidth}p.mp4`;
+const previewKey = (filePath: string, presets: number[]) =>
+    presets.length === 0 ? undefined : filePath.replace(/\.[^./]+$/, "") + `_${Math.min(...presets)}p.mp4`;
 
 // Resolves the preview variant's URL once per key; a resolver miss is remembered as undefined so it is not retried.
 function usePreviewUrl(filePath: string | undefined): { url: string | undefined; forget: () => void } {
-    const key = filePath ? previewKey(filePath) : undefined;
+    const presets = useConfigStore(s => s.resolutionPresets);
+    const key = filePath ? previewKey(filePath, presets) : undefined;
     // Subscribe to this key only.
     const url = useThumbnailGridStore(s => (key ? s.urls.get(key) : undefined));
     const cacheUrl = useThumbnailGridStore(s => s.cacheUrl);

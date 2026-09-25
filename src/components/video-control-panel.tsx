@@ -20,7 +20,8 @@ import {
 } from "@/ui/select";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import { formatTime } from "@/lib/utils";
-import { createVideoTimeLink, OpenScene } from "@/lib/url";
+import { createOpenSceneLink, createVideoTimeLink } from "@/lib/url";
+import { useConfigStore } from "@/stores/config-store";
 import { EPlayMode, useVideoPlayerStore } from "@/stores/video-player-store";
 import { useVideoStore } from "@/stores/video-store";
 import { useTranslations } from "next-intl";
@@ -183,12 +184,14 @@ function DownloadVideo({ videoId, videoRevId }: { videoId: string | null, videoR
 }
 
 function OpenSceneButton({ scenePath }: { scenePath: string | null }) {
-    if (!scenePath) {
+    const urlSchema = useConfigStore(s => s.urlSchema);
+    const link = scenePath ? createOpenSceneLink(urlSchema, scenePath) : null;
+    if (!link) {
         return <></>
     }
 
     return (
-        <Button size="icon-sm" onClick={() => OpenScene(scenePath)}>
+        <Button size="icon-sm" onClick={() => { window.location.href = link; }}>
             <FontAwesomeIcon icon={faGamepad} />
         </Button>
     );

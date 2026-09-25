@@ -1,5 +1,3 @@
-import { env } from "@/lib/env";
-
 export function createVideoCommentLink(baseURL: string, videoId: string | null, commentId: string | null): string | null {
     if (videoId === null) {
         return null;
@@ -17,8 +15,8 @@ export function createVideoTimeLink(baseURL: string, videoId: string | null, tim
     return `${baseURL}/video-review/review/${videoId}?t=${time}`
 }
 
-export function createOpenSceneLink(scenePath: string): string | null {
-    const template = env.PUBLIC_VIDEO_REVIEW_URL_SCHEMA;
+// template is the General settings' URL scheme, passed in because the server and the client read it from different places.
+export function createOpenSceneLink(template: string | null | undefined, scenePath: string): string | null {
     if (!template) {
         return null;
     }
@@ -27,14 +25,6 @@ export function createOpenSceneLink(scenePath: string): string | null {
     }
     const sep = template.endsWith("/") ? "" : "/";
     return `${template}${sep}${scenePath}`;
-}
-
-export function OpenScene(scenePath: string): void {
-    const link = createOpenSceneLink(scenePath);
-    if (!link) {
-        return;
-    }
-    window.location.href = link;
 }
 
 export function createVideoEventLink(baseURL: string, videoId: string | null, videoRevId: string | null, eventId: string | null): string | null {
