@@ -17,14 +17,11 @@ export const jira = defineIntegration({
         issueTypeBug: { kind: "plain", env: () => env.JIRA_ISSUE_TYPE_BUG },
     },
     testSchema: TestResultSchema,
+    canTest: ({ baseUrl, token, project }) => !!baseUrl && !!token && !!project,
     test: async ({ baseUrl, token, project, issueTypeTask, issueTypeBug }) => {
-        if (!baseUrl || !token || !project) {
-            return { ok: false, error: "url, token and project are required" };
-        }
-
         let res: Response;
         try {
-            res = await fetch(`${baseUrl}/rest/api/2/project/${encodeURIComponent(project)}`, {
+            res = await fetch(`${baseUrl}/rest/api/2/project/${encodeURIComponent(project!)}`, {
                 headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
                 signal: AbortSignal.timeout(10_000),
             });

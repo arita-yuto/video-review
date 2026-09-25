@@ -26,7 +26,9 @@ export type IntegrationDef<F extends Fields, R extends typeof TestResultSchema> 
     name: string;
     fields: F;
     testSchema: R;
-    // Saved values, overlaid with the request's in Test & save.
+    // Like CanExecute: whether test has what it needs. Pure and local, so the UI may call it freely.
+    canTest: (config: ConfigOf<F>) => boolean;
+    // Like Execute: connects with the values; only called once canTest passes.
     test: (config: ConfigOf<F>) => Promise<z.infer<R>>;
 };
 

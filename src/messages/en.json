@@ -289,7 +289,18 @@
             "saved": "Connected. Saved.",
             "notSaved": "Could not connect, so nothing was saved: {error}",
             "connected": "Connected",
-            "disconnected": "Test failed"
+            "disconnected": "Test failed",
+            "llm": {
+                "title": "AI",
+                "provider": "Provider",
+                "inUse": "in use",
+                "apiKey": "API key",
+                "baseUrl": "Base URL",
+                "model": "Model",
+                "resetConfirm": "Clear the saved API key so you can change it?",
+                "switchFailed": "Switching the provider in use failed.",
+                "use": "Use this provider"
+            }
         }
     }
 }

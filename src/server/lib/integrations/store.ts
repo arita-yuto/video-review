@@ -102,7 +102,12 @@ export async function testAndSave<F extends Fields, R extends typeof TestResultS
 ) {
     await assertUnlocked(def, update);
 
-    const result = await def.test(await readConfig(def, update));
+    const config = await readConfig(def, update);
+    if (!def.canTest(config)) {
+        return { ok: false, error: "required settings are missing" };
+    }
+
+    const result = await def.test(config);
     if (result.ok) {
         await updateConfig(def, update);
     }
@@ -118,8 +123,7 @@ export async function checkConnection<F extends Fields>(def: AnyDef<F>) {
         return { configured: true, ok: false };
     }
 
-    const secrets = entries(def).filter(([, spec]) => spec.kind === "secret").map(([field]) => field);
-    if (secrets.every(field => config[field] === undefined)) {
+    if (!def.canTest(config)) {
         return { configured: false, ok: false };
     }
     return { configured: true, ok: (await def.test(config)).ok };

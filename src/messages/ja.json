@@ -289,7 +289,18 @@
             "saved": "接続できました。保存しました",
             "notSaved": "接続できなかったため保存していません: {error}",
             "connected": "接続できます",
-            "disconnected": "テストに失敗しています"
+            "disconnected": "テストに失敗しています",
+            "llm": {
+                "title": "AI",
+                "provider": "Provider",
+                "inUse": "使用中",
+                "apiKey": "API key",
+                "baseUrl": "Base URL",
+                "model": "Model",
+                "resetConfirm": "保存した API key を消して、変更できるようにしますか？",
+                "switchFailed": "使用中の Provider の切り替えに失敗しました",
+                "use": "この Provider を使う"
+            }
         }
     }
 }

@@ -5,11 +5,7 @@ import { prisma } from "@/server/lib/db";
 import { videoByIdRouter } from "@/server/routes/videos/[id]";
 import { createLLMClient } from "@/server/lib/integration-clients/llm-client";
 
-/*
- * createLLMClient caches its result at module load time, so vi.stubEnv cannot
- * influence it per-test. We mock the entire module here and control the return
- * value with vi.mocked() inside each test.
- */
+// createLLMClient reads the saved settings, so the module is mocked and each test sets its result.
 vi.mock("@/server/lib/integration-clients/llm-client", () => ({
     createLLMClient: vi.fn(),
 }));
@@ -167,7 +163,7 @@ describe("GET /videos/:id/vcs-summary", () => {
             const { videoId, rev2Id } = await createTestVideo();
             await seedCachedChangeSet(rev2Id);
 
-            vi.mocked(createLLMClient).mockReturnValue(null);
+            vi.mocked(createLLMClient).mockResolvedValue(null);
 
             const res = await app.request(`http://localhost/videos/${videoId}/vcs-summary`);
             expect(res.status).toBe(503);
@@ -176,14 +172,14 @@ describe("GET /videos/:id/vcs-summary", () => {
         it("returns 404 when no cached vcs-changes exist", async () => {
             const { videoId } = await createTestVideo();
 
-            vi.mocked(createLLMClient).mockReturnValue({ complete: vi.fn(), completeWithMCP: vi.fn() });
+            vi.mocked(createLLMClient).mockResolvedValue({ complete: vi.fn(), completeWithMCP: vi.fn() });
 
             const res = await app.request(`http://localhost/videos/${videoId}/vcs-summary`);
             expect(res.status).toBe(404);
         });
 
         it("returns 404 for unknown video id", async () => {
-            vi.mocked(createLLMClient).mockReturnValue({ complete: vi.fn(), completeWithMCP: vi.fn() });
+            vi.mocked(createLLMClient).mockResolvedValue({ complete: vi.fn(), completeWithMCP: vi.fn() });
 
             const res = await app.request(`http://localhost/videos/${randomUUID()}/vcs-summary`);
             expect(res.status).toBe(404);
@@ -201,7 +197,7 @@ describe("GET /videos/:id/vcs-summary", () => {
 
             const mockSummary = "Camera shake fix and cutscene timing adjustment may affect video quality.";
             const completeSpy = vi.fn(async () => mockSummary);
-            vi.mocked(createLLMClient).mockReturnValue({ complete: completeSpy, completeWithMCP: vi.fn() });
+            vi.mocked(createLLMClient).mockResolvedValue({ complete: completeSpy, completeWithMCP: vi.fn() });
 
             const res = await app.request(`http://localhost/videos/${videoId}/vcs-summary?to=${rev2Id}`);
             expect(res.status).toBe(200);
@@ -220,7 +216,7 @@ describe("GET /videos/:id/vcs-summary", () => {
             await seedCachedChangeSet(rev2Id, { summary: "Previously cached summary." });
 
             const completeSpy = vi.fn();
-            vi.mocked(createLLMClient).mockReturnValue({ complete: completeSpy, completeWithMCP: vi.fn() });
+            vi.mocked(createLLMClient).mockResolvedValue({ complete: completeSpy, completeWithMCP: vi.fn() });
 
             const res = await app.request(`http://localhost/videos/${videoId}/vcs-summary?to=${rev2Id}`);
             expect(res.status).toBe(200);
@@ -248,7 +244,7 @@ describe("GET /videos/:id/vcs-summary", () => {
             });
 
             const completeSpy = vi.fn();
-            vi.mocked(createLLMClient).mockReturnValue({ complete: completeSpy, completeWithMCP: vi.fn() });
+            vi.mocked(createLLMClient).mockResolvedValue({ complete: completeSpy, completeWithMCP: vi.fn() });
 
             const res = await app.request(`http://localhost/videos/${videoId}/vcs-summary?to=${rev2Id}`);
             expect(res.status).toBe(200);
@@ -263,7 +259,7 @@ describe("GET /videos/:id/vcs-summary", () => {
             await seedCachedChangeSet(rev2Id);
 
             const completeSpy = vi.fn(async () => "summary text");
-            vi.mocked(createLLMClient).mockReturnValue({ complete: completeSpy, completeWithMCP: vi.fn() });
+            vi.mocked(createLLMClient).mockResolvedValue({ complete: completeSpy, completeWithMCP: vi.fn() });
 
             await app.request(`http://localhost/videos/${videoId}/vcs-summary?to=${rev2Id}`, {
                 headers: { "accept-language": "ja,en;q=0.9" },

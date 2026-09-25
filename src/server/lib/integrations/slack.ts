@@ -14,10 +14,8 @@ export const slack = defineIntegration({
         team: { kind: "plain", env: () => env.SLACK_TEAM },
     },
     testSchema: TestResultSchema.extend({ team: z.string().optional() }),
+    canTest: ({ token }) => !!token,
     test: async ({ token }) => {
-        if (!token) {
-            return { ok: false, error: "the token is not set" };
-        }
 
         // The client's defaults retry for about half an hour, which would leave the admin waiting.
         const client = new WebClient(token, { retryConfig: { retries: 0 }, timeout: 10_000 });

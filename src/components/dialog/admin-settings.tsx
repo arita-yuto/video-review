@@ -10,14 +10,16 @@ import { UsersSection } from "@/components/admin/users-section";
 import { ApiTokenSection } from "@/components/admin/api-token-section";
 import { JiraSection } from "@/components/admin/integration-section/jira-section";
 import { SlackSection } from "@/components/admin/integration-section/slack-section";
+import { AiSection } from "@/components/admin/integration-section/ai-section";
 import { VideosSection } from "@/components/admin/videos-section";
 
 // Add a section by appending here. Integrations are listed under one heading.
-const SECTIONS: { key: string; label: string; integration?: boolean; Component: () => React.JSX.Element }[] = [
+const SECTIONS: { key: string; label: string; integration?: boolean; Component: () => React.JSX.Element | null }[] = [
     { key: "users", label: "sections.users", Component: UsersSection },
     { key: "videos", label: "sections.videos", Component: VideosSection },
     { key: "integrations.jira", label: "integrations.jira.title", integration: true, Component: JiraSection },
     { key: "integrations.slack", label: "integrations.slack.title", integration: true, Component: SlackSection },
+    { key: "integrations.ai", label: "integrations.llm.title", integration: true, Component: AiSection },
     { key: "apiToken", label: "sections.apiToken", Component: ApiTokenSection },
 ];
 

@@ -192,7 +192,7 @@ export const vcsRouter = createRouter()
         await assertRoleCanSeeVideo(videoId, roleOf(auth));
         const { to: toRevisionId } = c.req.valid("query");
 
-        const llmClient = createLLMClient();
+        const llmClient = await createLLMClient();
         if (!llmClient) return c.json({ error: "LLM is not configured" }, { status: 503 });
 
         const toRevision = await prisma.videoRevision.findFirst({

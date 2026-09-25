@@ -1,8 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Client as McpClient } from "@modelcontextprotocol/sdk/client/index.js";
 
-// createLLMClient builds its client once at module load from the env module, so each
-// provider case mocks the env and re-imports the module.
 type EnvOverrides = {
     LLM_PROVIDER?: string;
     LLM_API_KEY?: string;
@@ -11,10 +9,13 @@ type EnvOverrides = {
 };
 
 async function loadClient(overrides: EnvOverrides) {
-    vi.resetModules();
-    vi.doMock("@/server/lib/env", () => ({ env: { ...overrides } }));
-    const mod = await import("@/server/lib/integration-clients/llm-client");
-    const client = mod.createLLMClient();
+    const { buildLLMClient } = await import("@/server/lib/integration-clients/llm-client");
+    const client = buildLLMClient({
+        provider: overrides.LLM_PROVIDER,
+        apiKey: overrides.LLM_API_KEY,
+        baseUrl: overrides.LLM_BASE_URL,
+        model: overrides.LLM_MODEL,
+    });
     if (!client) throw new Error("client not created");
     return client;
 }
