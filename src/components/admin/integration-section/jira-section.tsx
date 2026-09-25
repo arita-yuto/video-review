@@ -9,7 +9,7 @@ export function JiraSection() {
     const t = useTranslations("admin-settings.integrations.jira");
     const settings = useIntegrationSettings("jira");
     const field = (name: string) => {
-        const props = settings.input(name);
+        const props = settings.field(name);
         return <FieldRow label={t(name)} htmlFor={props.id}><Input {...props} /></FieldRow>;
     };
 

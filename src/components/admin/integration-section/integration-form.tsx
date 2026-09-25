@@ -26,7 +26,9 @@ export function IntegrationForm({ title, resetConfirm, settings, children }: {
     children: ReactNode;
 }) {
     const t = useTranslations("admin-settings");
-    const { loaded, locked, connection, blocked, busy, status, testAndSave, reset } = settings;
+    const { status, testAndSave, reset, locked, connection } = settings;
+    const busy = status?.state === "busy";
+    const loaded = status?.state !== "loading" && status?.state !== "loadFailed";
     const [confirmReset, setConfirmReset] = useState(false);
     const connectionLabel = connection && t(connection.ok ? "integrations.connected" : "integrations.disconnected");
 
@@ -47,17 +49,16 @@ export function IntegrationForm({ title, resetConfirm, settings, children }: {
     return (
         <AdminSection title={heading}>
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2">
-                {!loaded && !status && <Spinner />}
+                {status?.state === "loading" && <Spinner />}
                 {loaded && children}
-                {blocked && <p className="text-sm text-warning">{blocked}</p>}
             </div>
 
             <div className="shrink-0 flex items-center gap-2 border-t pt-3">
                 <div className="flex-1 min-w-0">
                     {busy && <Spinner />}
                     {!busy && confirmReset && <span className="text-sm">{resetConfirm}</span>}
-                    {!busy && !confirmReset && status && (
-                        <span className={`block text-sm truncate ${status.ok ? "text-success" : "text-destructive"}`} title={status.message}>
+                    {!confirmReset && status && "message" in status && (
+                        <span className={`block text-sm truncate ${status.state === "ok" ? "text-success" : "text-destructive"}`} title={status.message}>
                             {status.message}
                         </span>
                     )}
@@ -79,7 +80,7 @@ export function IntegrationForm({ title, resetConfirm, settings, children }: {
                                 {t("integrations.reset")}
                             </Button>
                         )}
-                        <Button onClick={testAndSave} disabled={busy || !loaded || blocked !== null}>
+                        <Button onClick={testAndSave} disabled={busy || !loaded}>
                             {t("integrations.testAndSave")}
                         </Button>
                     </>

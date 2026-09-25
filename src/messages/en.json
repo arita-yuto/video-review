@@ -267,7 +267,6 @@
             "resetFailed": "Failed to reset",
             "reset": "Reset",
             "cancel": "Cancel",
-            "cannotClear": "A value can't be emptied here.",
             "jira": {
                 "title": "Jira",
                 "baseUrl": "URL",

@@ -10,17 +10,17 @@ export function EmailSection() {
     const t = useTranslations("admin-settings.integrations.email");
     const settings = useIntegrationSettings("email");
     const field = (name: string) => {
-        const props = settings.input(name);
+        const props = settings.field(name);
         return <FieldRow label={t(name)} htmlFor={props.id}><Input {...props} /></FieldRow>;
     };
     const toggle = (name: string) => {
-        const props = settings.input(name);
+        const props = settings.field(name);
         return (
             <FieldRow label={t(name)} htmlFor={props.id}>
                 <Switch
                     id={props.id}
                     checked={props.value === "true"}
-                    onCheckedChange={(checked) => settings.setValue(name, String(checked))}
+                    onCheckedChange={(checked) => props.onChange(String(checked))}
                     disabled={props.disabled}
                 />
             </FieldRow>

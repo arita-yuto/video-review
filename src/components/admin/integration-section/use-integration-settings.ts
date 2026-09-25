@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
 
-export type IntegrationName = "jira" | "slack" | "webhook" | "email" | "llm-claude" | "llm-openai" | "llm-gemini" | "llm-ollama";
+// The settings routes, taken from the typed API client; llm-provider is the only one that isn't an integration.
+export type IntegrationName = Exclude<keyof typeof api.admin.settings, "llm-provider">;
 
 type Source = "saved" | "env" | null;
 type FieldState =
@@ -12,7 +13,12 @@ type FieldState =
     | { kind: "secret"; configured: boolean; source: Source };
 type Settings = Record<string, FieldState>;
 
-export type Status = { ok: boolean; message: string };
+// One value for what the screen is doing: loading, running an action, or showing how the last one ended.
+// null once loaded with nothing to report.
+export type Status =
+    | { state: "loading" | "busy" }
+    | { state: "ok" | "error" | "loadFailed"; message: string }
+    | null;
 export type Connection = { configured: boolean; ok: boolean };
 
 // The same fixed mask for every set secret, so it never hints at the secret's length.
@@ -26,11 +32,11 @@ export function useIntegrationSettings(name: IntegrationName) {
 
     const [settings, setSettings] = useState<Settings | null>(null);
     const [form, setForm] = useState<Record<string, string>>({});
-    const [busy, setBusy] = useState(false);
-    const [status, setStatus] = useState<Status | null>(null);
+    const [status, setStatus] = useState<Status>({ state: "loading" });
     const [connection, setConnection] = useState<Connection | null>(null);
 
     function load(next: Settings) {
+        setStatus(null);
         setSettings(next);
         setForm(Object.fromEntries(Object.entries(next).map(([field, state]) => [field, valueOf(state)])));
     }
@@ -55,7 +61,7 @@ export function useIntegrationSettings(name: IntegrationName) {
                 const next = (await res.json()) as Settings;
                 if (!cancelled) load(next);
             } catch (e) {
-                if (!cancelled) setStatus({ ok: false, message: `${t("integrations.loadFailed")}: ${e instanceof Error ? e.message : String(e)}` });
+                if (!cancelled) setStatus({ state: "loadFailed", message: `${t("integrations.loadFailed")}: ${e instanceof Error ? e.message : String(e)}` });
             }
         })();
 
@@ -66,17 +72,13 @@ export function useIntegrationSettings(name: IntegrationName) {
     const changed = fields.filter(field => form[field] !== valueOf(settings?.[field]));
     const locked = fields.some(field => settings?.[field].kind === "secret" && settings[field].source === "saved");
     const destinationEdited = changed.some(field => settings?.[field].kind === "destination");
-    const blocked = changed.some(field => settings?.[field].kind !== "secret" && form[field] === "") ? t("integrations.cannotClear") : null;
 
     async function run(action: () => Promise<void>, failure: string) {
-        setBusy(true);
-        setStatus(null);
+        setStatus({ state: "busy" });
         try {
             await action();
         } catch (e) {
-            setStatus({ ok: false, message: `${t(failure)}: ${e instanceof Error ? e.message : String(e)}` });
-        } finally {
-            setBusy(false);
+            setStatus({ state: "error", message: `${t(failure)}: ${e instanceof Error ? e.message : String(e)}` });
         }
     }
 
@@ -88,10 +90,10 @@ export function useIntegrationSettings(name: IntegrationName) {
         const { result, state } = (await res.json()) as { result: { ok: boolean; error?: string }; state: Settings };
         if (result.ok) {
             load(state);
-            setStatus({ ok: true, message: t("integrations.saved") });
+            setStatus({ state: "ok", message: t("integrations.saved") });
             void checkConnection();
         } else {
-            setStatus({ ok: false, message: t("integrations.notSaved", { error: result.error ?? "" }) });
+            setStatus({ state: "error", message: t("integrations.notSaved", { error: result.error ?? "" }) });
         }
     }, "integrations.testFailed");
 
@@ -102,13 +104,7 @@ export function useIntegrationSettings(name: IntegrationName) {
         void checkConnection();
     }, "integrations.resetFailed");
 
-    function setValue(field: string, value: string) {
-        // A result shown for the previous values would read as if it applied to the edited ones.
-        setStatus(null);
-        setForm(prev => ({ ...prev, [field]: value }));
-    }
-
-    function input(field: string) {
+    function field(field: string) {
         const state = settings?.[field];
         const secret = state?.kind === "secret";
         // Once the destination is edited an env secret no longer applies, so don't show it as set.
@@ -121,10 +117,15 @@ export function useIntegrationSettings(name: IntegrationName) {
             autoComplete: secret ? "new-password" : "off",
             value: form[field] ?? "",
             placeholder: masked ? SECRET_MASK : undefined,
-            disabled: busy || (locked && state?.kind !== "plain"),
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setValue(field, e.target.value),
+            disabled: status?.state === "busy" || (locked && state?.kind !== "plain"),
+            // Takes the event from an Input, or the value from a Select or Switch.
+            onChange: (e: React.ChangeEvent<HTMLInputElement> | string) => {
+                // A result shown for the previous values would read as if it applied to the edited ones.
+                setStatus(null);
+                setForm(prev => ({ ...prev, [field]: typeof e === "string" ? e : e.target.value }));
+            },
         };
     }
 
-    return { loaded: settings !== null, locked, connection, input, setValue, blocked, busy, status, testAndSave, reset };
+    return { field, status, testAndSave, reset, locked, connection };
 }

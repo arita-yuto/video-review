@@ -267,7 +267,6 @@
             "resetFailed": "Reset に失敗しました",
             "reset": "Reset",
             "cancel": "キャンセル",
-            "cannotClear": "ここでは空にできません",
             "jira": {
                 "title": "Jira",
                 "baseUrl": "URL",

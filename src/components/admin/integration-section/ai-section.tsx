@@ -60,7 +60,7 @@ function ProviderForm({ provider, inUse, switchFailed, onPick, onUse }: {
     const t = useTranslations("admin-settings.integrations.llm");
     const settings = useIntegrationSettings(`llm-${provider}`);
     const field = (name: string) => {
-        const props = settings.input(name);
+        const props = settings.field(name);
         return <FieldRow label={t(name)} htmlFor={props.id}><Input {...props} /></FieldRow>;
     };
 

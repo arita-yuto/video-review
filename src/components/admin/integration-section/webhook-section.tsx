@@ -9,13 +9,13 @@ import { useIntegrationSettings } from "@/components/admin/integration-section/u
 export function WebhookSection() {
     const t = useTranslations("admin-settings.integrations.webhook");
     const settings = useIntegrationSettings("webhook");
-    const url = settings.input("url");
-    const target = settings.input("target");
+    const url = settings.field("url");
+    const target = settings.field("target");
 
     return (
         <IntegrationForm title={t("title")} resetConfirm={t("resetConfirm")} settings={settings}>
             <FieldRow label={t("target")} htmlFor={target.id}>
-                <Select value={target.value} onValueChange={(value) => settings.setValue("target", value)} disabled={target.disabled}>
+                <Select value={target.value} onValueChange={target.onChange} disabled={target.disabled}>
                     <SelectTrigger id={target.id}>
                         <SelectValue placeholder={t("targetPlaceholder")} />
                     </SelectTrigger>

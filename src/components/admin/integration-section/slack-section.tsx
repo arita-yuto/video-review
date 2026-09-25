@@ -9,7 +9,7 @@ export function SlackSection() {
     const t = useTranslations("admin-settings.integrations.slack");
     const settings = useIntegrationSettings("slack");
     const field = (name: string) => {
-        const props = settings.input(name);
+        const props = settings.field(name);
         return <FieldRow label={t(name)} htmlFor={props.id}><Input {...props} /></FieldRow>;
     };
 
