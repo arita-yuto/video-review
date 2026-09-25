@@ -1,7 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { prisma } from "@/server/lib/db";
-import { createVCSProviderFromEnv } from "@/server/lib/vcs/from-env";
+import { getVCSProvider } from "@/server/lib/integrations/vcs";
 import type { Relevance, PullRequest, Commit } from "@/server/lib/vcs/types";
 import { scoreRelevance } from "@/server/lib/vcs/relevance";
 import { startOfUTCDay, ensureDaysCached, queryByDateRange } from "@/server/lib/vcs/cache";
@@ -116,10 +116,7 @@ export const vcsRouter = createRouter()
             });
         }
 
-        let provider;
-        try { provider = createVCSProviderFromEnv(); } catch (err) {
-            return c.json({ error: String(err) }, { status: 503 });
-        }
+        const provider = await getVCSProvider();
         if (!provider) return c.json({ error: "VCS provider is not configured" }, { status: 503 });
 
         let vcsConfig = await prisma.vCSConfig.findFirst();

@@ -315,6 +315,18 @@
                 "port": "SMTP port",
                 "from": "送信元",
                 "tlsStrict": "TLS 証明書を厳密に検証"
+            },
+            "vcs": {
+                "title": "VCS",
+                "provider": "Provider",
+                "inUse": "使用中",
+                "owner": "Owner",
+                "repo": "Repository",
+                "token": "Token",
+                "branch": "Branch",
+                "resetConfirm": "Token 情報をリセットします",
+                "switchFailed": "使用中の Provider の切り替えに失敗しました",
+                "use": "この Provider を使う"
             }
         }
     }

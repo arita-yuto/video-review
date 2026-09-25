@@ -315,6 +315,18 @@
                 "port": "SMTP port",
                 "from": "From",
                 "tlsStrict": "Strict TLS"
+            },
+            "vcs": {
+                "title": "VCS",
+                "provider": "Provider",
+                "inUse": "in use",
+                "owner": "Owner",
+                "repo": "Repository",
+                "token": "Token",
+                "branch": "Branch",
+                "resetConfirm": "This resets the token.",
+                "switchFailed": "Switching the provider in use failed.",
+                "use": "Use this provider"
             }
         }
     }
