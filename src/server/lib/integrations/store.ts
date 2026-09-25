@@ -110,8 +110,24 @@ export async function testAndSave<F extends Fields, R extends typeof TestResultS
     const result = await def.test(config);
     if (result.ok) {
         await updateConfig(def, update);
+        await saveEnvValues(def, config, update);
     }
     return result;
+}
+
+// Copies the values still taken from env into the DB; they are what the connection already uses, so the lock doesn't apply.
+async function saveEnvValues<F extends Fields>(def: AnyDef<F>, config: ConfigOf<F>, update: Partial<Record<keyof F, string>>) {
+    for (const [field, spec] of entries(def)) {
+        const value = config[field];
+        if (value === undefined || update[field] !== undefined) continue;
+
+        const key = keyOf(def, field);
+        if (spec.kind === "secret") {
+            if (!await hasSavedSecret(key)) await saveSecretSetting(key, value);
+        } else if (await getSetting(key, undefined) === undefined) {
+            await saveSetting(key, value);
+        }
+    }
 }
 
 // For the connection dot; uses the saved or env values, never request input.

@@ -59,6 +59,12 @@ function ProviderForm({ provider, inUse, switchFailed, onPick, onUse }: {
 }) {
     const t = useTranslations("admin-settings.integrations.llm");
     const settings = useIntegrationSettings(`llm-${provider}`);
+
+    // A provider that passes Test & save becomes the one in use, saved even when env already names it.
+    useEffect(() => {
+        if (settings.status?.state === "ok") onUse();
+    }, [settings.status]);
+
     const field = (name: string) => {
         const props = settings.field(name);
         return <FieldRow label={t(name)} htmlFor={props.id}><Input {...props} /></FieldRow>;
