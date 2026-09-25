@@ -22,8 +22,6 @@ AI features are optional. Once enabled, you get the AI summary in the VCS Code C
 Add to `.env`:
 
 ```env
-NEXT_PUBLIC_VIDEO_REVIEW_USE_AI_SUPPORT=true
-
 # "claude" / "openai" / "gemini" / "ollama"
 VIDEO_REVIEW_LLM_PROVIDER=claude
 
@@ -63,11 +61,11 @@ Get an API key at https://aistudio.google.com/
 
 #### Docker
 
-The Ollama container is defined in `compose.prod.mcp.ollama.yml`.
+The Ollama container is defined in `compose.prod.ollama.yml`.
 
 ```bash
 # 1. Start the Ollama container
-docker compose -f compose.prod.yml -f compose.prod.mcp.ollama.yml up -d ollama
+docker compose -f compose.prod.yml -f compose.prod.ollama.yml up -d ollama
 
 # 2. Download a model (once; it is kept in a Docker volume)
 docker exec videoreview-ollama ollama pull llama3.1:8b
@@ -120,10 +118,11 @@ docker compose -f compose.yml up -d --build mcp
 
 # Production (no service name: the overlay also configures the web service)
 docker build -t videoreview-mcp:latest -f docker/mcp/Dockerfile .
-docker compose -f compose.prod.yml -f compose.prod.mcp.claude.yml up -d
+docker compose -f compose.prod.yml -f compose.prod.mcp.yml up -d
 ```
 
-With Ollama, use `compose.prod.mcp.ollama.yml` instead of `compose.prod.mcp.claude.yml`.
+With Ollama, add `-f compose.prod.ollama.yml` as well:  
+`docker compose -f compose.prod.yml -f compose.prod.mcp.yml -f compose.prod.ollama.yml up -d`
 
 ### Local / On‑premise
 
@@ -144,8 +143,11 @@ Build and start it:
 
 ```bash
 npm run mcp:build
-VIDEO_REVIEW_MCP_TRANSPORT=http VIDEO_REVIEW_MCP_PORT=3490 npm run mcp:run
+npm run mcp:run -- --http
 ```
+
+The port defaults to 3490. For another port, add its number, as in `npm run mcp:run -- --http 4000`.  
+Keep the `--`: without it npm takes `--http` for itself and the server starts on stdio.
 
 ### Check
 
@@ -159,7 +161,7 @@ MCP server listening on http://0.0.0.0:3490/mcp
 
 ### Tell the web server where the MCP server is
 
-With Docker there is nothing to set: `compose.yml` and `compose.prod.mcp.*.yml` already set it on the web service.
+With Docker there is nothing to set: `compose.yml` and `compose.prod.mcp.yml` already set it on the web service.
 
 On Local / On‑premise, add to `.env`:
 

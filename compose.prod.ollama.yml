@@ -1,0 +1,14 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: videoreview-ollama
+    restart: unless-stopped
+
+    ports:
+      - "11434:11434"
+
+    volumes:
+      - ${DOCKER_HOST_LLM_MODELS:-videoreview-llm-models}:/root/.ollama/models
+
+volumes:
+  videoreview-llm-models:

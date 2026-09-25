@@ -22,8 +22,6 @@ AI 機能は任意ですが、有効にすると VCS「コード変更」パネ�
 `.env` に書きます
 
 ```env
-NEXT_PUBLIC_VIDEO_REVIEW_USE_AI_SUPPORT=true
-
 # "claude" / "openai" / "gemini" / "ollama"
 VIDEO_REVIEW_LLM_PROVIDER=claude
 
@@ -63,11 +61,11 @@ API キーの取得先: https://aistudio.google.com/
 
 #### Docker
 
-Ollama コンテナは `compose.prod.mcp.ollama.yml` に定義されています
+Ollama コンテナは `compose.prod.ollama.yml` に定義されています
 
 ```bash
 # 1. Ollama コンテナを起動
-docker compose -f compose.prod.yml -f compose.prod.mcp.ollama.yml up -d ollama
+docker compose -f compose.prod.yml -f compose.prod.ollama.yml up -d ollama
 
 # 2. モデルをダウンロード（初回のみ、Docker ボリュームに保存される）
 docker exec videoreview-ollama ollama pull llama3.1:8b
@@ -120,10 +118,11 @@ docker compose -f compose.yml up -d --build mcp
 
 # 本番用（web サービスにも MCP の設定が入るので、サービス名を付けずに起動する）
 docker build -t videoreview-mcp:latest -f docker/mcp/Dockerfile .
-docker compose -f compose.prod.yml -f compose.prod.mcp.claude.yml up -d
+docker compose -f compose.prod.yml -f compose.prod.mcp.yml up -d
 ```
 
-※ Ollama を使う場合は `compose.prod.mcp.claude.yml` の代わりに `compose.prod.mcp.ollama.yml` を指定します
+※ Ollama を使う場合は `-f compose.prod.ollama.yml` も付けます  
+`docker compose -f compose.prod.yml -f compose.prod.mcp.yml -f compose.prod.ollama.yml up -d`
 
 ### Local / On‑premise
 
@@ -144,8 +143,12 @@ VIDEO_REVIEW_SERVER_URL=http://localhost:3489
 
 ```bash
 npm run mcp:build
-VIDEO_REVIEW_MCP_TRANSPORT=http VIDEO_REVIEW_MCP_PORT=3490 npm run mcp:run
+npm run mcp:run -- --http
 ```
+
+※ ポートは既定で 3490 です  
+別のポートにするときは `npm run mcp:run -- --http 4000` のように番号を付けます  
+`--` を省くと npm が `--http` を受け取ってしまい、stdio で起動します
 
 ### 確認する
 
@@ -159,7 +162,7 @@ MCP server listening on http://0.0.0.0:3490/mcp
 
 ### web サーバーに MCP サーバーの場所を設定する
 
-Docker の場合は設定不要です（`compose.yml` と `compose.prod.mcp.*.yml` が web サービスに設定済みです）
+Docker の場合は設定不要です（`compose.yml` と `compose.prod.mcp.yml` が web サービスに設定済みです）
 
 Local / On‑premise の場合は `.env` に書きます
 
