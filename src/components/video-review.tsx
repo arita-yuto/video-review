@@ -36,7 +36,7 @@ export default function VideoReview() {
         drawings,
         loadDrawing } = useDrawingStore();
     const editing = useCommentEditStore((s) => s.editingComment !== null);
-    const brushWidth = useDrawingSettingsStore((s) => s.width);
+    const brushWidth = useDrawingSettingsStore((s) => s.widths[s.tool]);
 
     useDrawingCanvas();
 

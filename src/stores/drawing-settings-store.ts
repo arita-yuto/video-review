@@ -18,7 +18,10 @@ interface DrawingSettingsStore {
     color: string;
     /** A second slot to switch back and forth with, like a paint app's sub color. */
     subColor: string;
-    width: number;
+    /** Line width per tool: people tend to keep a thin pen and a wide eraser. */
+    widths: Record<DrawingTool, number>;
+    /** Pen pressure shapes the width. Pointers without pressure are unaffected. */
+    pressureEnabled: boolean;
     /** Colors strokes have used, newest first. */
     colorHistory: string[];
     colorMode: ColorMode;
@@ -27,8 +30,10 @@ interface DrawingSettingsStore {
     setColor: (color: string) => void;
     swapColors: () => void;
     setColorMode: (mode: ColorMode) => void;
+    setPressureEnabled: (enabled: boolean) => void;
+    /** Set the current tool's width. */
     setWidth: (width: number) => void;
-    /** Move to the next (+1) or previous (-1) width step. */
+    /** Move the current tool's width to the next (+1) or previous (-1) step. */
     stepWidth: (direction: 1 | -1) => void;
     /** Remember a color once a stroke has actually used it. */
     noteColorUsed: (color: string) => void;
@@ -44,7 +49,8 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
             tool: "pen",
             color: "#ff8800",
             subColor: "#ffffff",
-            width: 10,
+            widths: { pen: 10, eraser: 20 },
+            pressureEnabled: true,
             colorHistory: [],
             colorMode: "hsv",
 
@@ -52,13 +58,15 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
             setColor: (color) => set({ color }),
             swapColors: () => set((state) => ({ color: state.subColor, subColor: state.color })),
             setColorMode: (colorMode) => set({ colorMode }),
-            setWidth: (width) => set({ width: clampWidth(width) }),
+            setPressureEnabled: (pressureEnabled) => set({ pressureEnabled }),
+            setWidth: (width) => set((state) => ({ widths: { ...state.widths, [state.tool]: clampWidth(width) } })),
             stepWidth: (direction) =>
                 set((state) => {
+                    const current = state.widths[state.tool];
                     const next = direction > 0
-                        ? WIDTH_STEPS.find((w) => w > state.width)
-                        : [...WIDTH_STEPS].reverse().find((w) => w < state.width);
-                    return next === undefined ? state : { width: next };
+                        ? WIDTH_STEPS.find((w) => w > current)
+                        : [...WIDTH_STEPS].reverse().find((w) => w < current);
+                    return next === undefined ? state : { widths: { ...state.widths, [state.tool]: next } };
                 }),
             noteColorUsed: (color) =>
                 set((state) => {

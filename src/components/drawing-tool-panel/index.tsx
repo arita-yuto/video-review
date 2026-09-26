@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faEraser, faFile, faRotateLeft, faRotateRight, faRightLeft } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/ui/button";
 import { Slider } from "@/ui/slider";
+import { Switch } from "@/ui/switch";
 import { SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader } from "@/ui/sidebar";
 import { useDrawingStore } from "@/stores/drawing-store";
 import { MAX_WIDTH, MIN_WIDTH, useDrawingSettingsStore, type ColorMode } from "@/stores/drawing-settings-store";
@@ -52,9 +53,10 @@ function ColorModeIcon({ next }: { next: ColorMode }) {
 export default function DrawingToolPanel() {
     const t = useTranslations("drawing-tool-panel");
     const {
-        tool, color, subColor, width, colorHistory, colorMode,
-        setTool, setColor, swapColors, setWidth, setColorMode,
+        tool, color, subColor, widths, pressureEnabled, colorHistory, colorMode,
+        setTool, setColor, swapColors, setWidth, setColorMode, setPressureEnabled,
     } = useDrawingSettingsStore();
+    const width = widths[tool];
     const { history, undoStroke, redoStroke, clearDrawing } = useDrawingStore();
     const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(color));
 
@@ -108,6 +110,10 @@ export default function DrawingToolPanel() {
                         />
                         <span className="w-10 text-right text-xs text-muted-foreground">{width}px</span>
                     </div>
+                    <label className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                        <Switch checked={pressureEnabled} onCheckedChange={setPressureEnabled} />
+                        {t("pressure")}
+                    </label>
                 </SidebarGroup>
 
                 <SidebarGroup>

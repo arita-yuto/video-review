@@ -155,7 +155,8 @@
         "color": "Color",
         "swapColors": "Swap colors",
         "colorHistory": "Color history",
-        "colorMode": "Switch HSV / HLS"
+        "colorMode": "Switch HSV / HLS",
+        "pressure": "Pen pressure"
     },
     "login": {
         "loginFailedMsg": "Login failed",

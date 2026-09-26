@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { emptyHistory, pushStroke, redo, undo } from "@/lib/drawing/history";
 import type { Stroke } from "@/lib/drawing/types";
 
-const stroke = (color: string): Stroke => ({ tool: "pen", color, width: 10, points: [{ x: 0.5, y: 0.5, pressure: 0.5 }] });
+const stroke = (color: string): Stroke => ({ tool: "pen", color, width: 10, pressure: false, points: [{ x: 0.5, y: 0.5, pressure: 0.5 }] });
 
 describe("drawing history", () => {
     it("drops the redo stack when a new stroke lands", () => {

@@ -4,7 +4,7 @@ export type DrawingTool = "pen" | "eraser";
 export interface StrokePoint {
     x: number;
     y: number;
-    /** 0..1. Pens report real pressure; other pointers are recorded as 0.5. */
+    /** 0..1. Pens report real pressure; pointers without it are recorded as 1 (full width). */
     pressure: number;
 }
 
@@ -13,5 +13,7 @@ export interface Stroke {
     tool: DrawingTool;
     color: string;
     width: number;
+    /** Whether the width follows the recorded pressure along the stroke. */
+    pressure: boolean;
     points: StrokePoint[];
 }

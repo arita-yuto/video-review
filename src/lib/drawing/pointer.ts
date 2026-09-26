@@ -31,5 +31,8 @@ export const pointerSamples = (e: PointerEvent): PointerEvent[] => {
     return coalesced.length > 0 ? coalesced : [e];
 };
 
-/** Pressure to record for a sample: pens give real values, everything else a fixed mid value. */
-export const samplePressure = (e: PointerEvent) => (e.pointerType === "pen" ? e.pressure : 0.5);
+/** Pressure to record for a sample: pens give real values, everything else draws at full width. */
+export const samplePressure = (e: PointerEvent) => (e.pointerType === "pen" ? e.pressure : 1);
+
+/** The pen's eraser end (or eraser button) is down. */
+export const isEraserButton = (e: PointerEvent) => e.button === 5 || (e.buttons & 32) !== 0;
