@@ -108,10 +108,9 @@ services:
     environment:
       HOSTNAME: "videoreview.local"
       ALLOW_EMPTY_SENDER_DOMAINS: "true"
-      ALLOWED_NETWORKS: "0.0.0.0/0"
-      RELAYHOST: ""
-      RELAYHOST_USERNAME: ""
-      RELAYHOST_PASSWORD: ""
+      RELAYHOST: ${SMTP_RELAYHOST:-}
+      RELAYHOST_USERNAME: ${SMTP_RELAYHOST_USERNAME:-}
+      RELAYHOST_PASSWORD: ${SMTP_RELAYHOST_PASSWORD:-}
     ports:
       - "1025:25"
 

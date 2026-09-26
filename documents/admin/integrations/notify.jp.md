@@ -55,32 +55,37 @@ Postfix（コンテナ）
 外部メールサーバー（Gmail / ISP の SMTP など）
 ```
 
-### SMTP リレーを用意する（Docker）
+### SMTP リレーの転送先を設定する（Docker）
 
-`compose.prod.yml` に次のサービスを足します
+`compose.prod.yml` には Postfix のリレー（`smtp` サービス）が入っています  
+転送先のメールサーバーを `.env` に書きます
 
-```yml
-smtp:
-  image: boky/postfix
-  container_name: videoreview-smtp
-  environment:
-    HOSTNAME: "videoreview.local"
-    ALLOW_EMPTY_SENDER_DOMAINS: "true"
-    ALLOWED_NETWORKS: "0.0.0.0/0"
-    RELAYHOST: "[smtp.gmail.com]:587"
-    RELAYHOST_USERNAME: ""
-    RELAYHOST_PASSWORD: ""
-  ports:
-    - "1025:25"
+```env
+SMTP_RELAYHOST="[smtp.gmail.com]:587"
+SMTP_RELAYHOST_USERNAME="you@gmail.com"
+SMTP_RELAYHOST_PASSWORD="xxxx xxxx xxxx xxxx"
 ```
 
 | 変数 | 内容 |
 |---|---|
-| `RELAYHOST` | 送信先の SMTP サーバー（例 `[smtp.gmail.com]:587`） |
-| `RELAYHOST_USERNAME` | SMTP 認証のユーザー名 |
-| `RELAYHOST_PASSWORD` | SMTP 認証のパスワード |
+| `SMTP_RELAYHOST` | 転送先の SMTP サーバー（例 `[smtp.gmail.com]:587`） |
+| `SMTP_RELAYHOST_USERNAME` | SMTP 認証のユーザー名 |
+| `SMTP_RELAYHOST_PASSWORD` | SMTP 認証のパスワード |
 
-※ Gmail は `smtp.gmail.com:587` を指定します
+※ Gmail は 2 段階認証を有効にしてアプリパスワードを発行し、それを `SMTP_RELAYHOST_PASSWORD` に入れます  
+※ 3 つとも空だと Postfix が相手のメールサーバーへ直接送ろうとし、多くの回線では 25 番が遮断されて届きません
+
+`.env` を変えたら `smtp` サービスを作り直します
+
+```bash
+docker compose -f compose.prod.yml up -d smtp
+```
+
+### 社内の SMTP サーバーに渡す
+
+社内に SMTP サーバーがあるときは、上の 3 つは空のままにします  
+次の「VideoReview 側を設定する」で SMTP host にそのサーバーを指定します  
+`smtp` サービスは使われないだけなので、動いたままで差し支えありません
 
 ### VideoReview 側を設定する
 
@@ -97,5 +102,9 @@ Administration → Integrations の Email を開きます
 | TLS 証明書を厳密に検証 | SMTP サーバーが信頼できる証明書を使っているときだけオン |
 
 Test & save を押し、SMTP サーバーに接続できた設定だけが保存されます
+
+※ Test が確かめるのはリレーへの接続までで、リレーから先の転送は確かめません
+
+届くことは、コメントを 1 件投稿して確かめます
 
 

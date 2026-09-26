@@ -54,32 +54,37 @@ Postfix (container)
 Mail server (Gmail, your ISP's SMTP, ...)
 ```
 
-### Set up an SMTP relay (Docker)
+### Set where the SMTP relay forwards to (Docker)
 
-Add this service to `compose.prod.yml`:
+`compose.prod.yml` includes a Postfix relay (the `smtp` service).
+Put the mail server it forwards to in `.env`:
 
-```yml
-smtp:
-  image: boky/postfix
-  container_name: videoreview-smtp
-  environment:
-    HOSTNAME: "videoreview.local"
-    ALLOW_EMPTY_SENDER_DOMAINS: "true"
-    ALLOWED_NETWORKS: "0.0.0.0/0"
-    RELAYHOST: "[smtp.gmail.com]:587"
-    RELAYHOST_USERNAME: ""
-    RELAYHOST_PASSWORD: ""
-  ports:
-    - "1025:25"
+```env
+SMTP_RELAYHOST="[smtp.gmail.com]:587"
+SMTP_RELAYHOST_USERNAME="you@gmail.com"
+SMTP_RELAYHOST_PASSWORD="xxxx xxxx xxxx xxxx"
 ```
 
 | Variable | Meaning |
 |---|---|
-| `RELAYHOST` | The SMTP server to relay to (e.g. `[smtp.gmail.com]:587`) |
-| `RELAYHOST_USERNAME` | The user name for SMTP authentication |
-| `RELAYHOST_PASSWORD` | The password for SMTP authentication |
+| `SMTP_RELAYHOST` | The SMTP server to forward to (e.g. `[smtp.gmail.com]:587`) |
+| `SMTP_RELAYHOST_USERNAME` | The user name for SMTP authentication |
+| `SMTP_RELAYHOST_PASSWORD` | The password for SMTP authentication |
 
-Note: for Gmail, use `smtp.gmail.com:587`.
+Note: for Gmail, turn on 2-Step Verification, create an App Password, and put it in `SMTP_RELAYHOST_PASSWORD`.  
+Note: with all three empty, Postfix tries to deliver straight to the recipient's mail server, and most networks block outbound port 25, so nothing arrives.
+
+After changing `.env`, recreate the `smtp` service:
+
+```bash
+docker compose -f compose.prod.yml up -d smtp
+```
+
+### Hand mail to your own SMTP server
+
+If you have an SMTP server in-house, leave the three variables empty.
+Point SMTP host at that server in "Configure VideoReview" below.
+The `smtp` service stays idle; leaving it running does no harm.
 
 ### Configure VideoReview
 
@@ -96,3 +101,7 @@ Open Administration → Integrations → Email.
 | Strict TLS | On only when the SMTP server has a trusted certificate |
 
 Press Test & save; only settings that reach the SMTP server are saved.
+
+Note: Test only checks the connection to the relay, not the forwarding beyond it.
+
+To confirm delivery, post one comment and see that the mail arrives.
