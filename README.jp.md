@@ -197,10 +197,10 @@ docker compose -f compose.prod.yml up -d videoreview -d video-processing
 
 ### 初回起動
 
-VideoReview に Web の管理画面はありません
-初回アクセス時に Web UI から管理者を登録し、以降のユーザー管理や動画削除はメンテナンス CLI で行います
+初回アクセス時に Web UI から管理者を登録します
+以降のユーザー、動画、連携、API Token の管理は Web UI の Administration で行います
 
-初期セットアップの手順と、CLI で使う API トークンの発行方法は [Admin Guide](./documents/admin-guide.jp.md) にあります
+手順は [管理画面ガイド](./documents/admin/README.jp.md) にあります
 
 ---
 
@@ -210,7 +210,7 @@ VideoReview に Web の管理画面はありません
 * [Docker Prod / Devlopment Build Guide](./documents/build.run/docker-guide.jp.md)
 * [Local / On‑premise Build Guide](./documents/build.run/local-guide.jp.md)
 * [AI Features Guide](./documents/build.run/ai-guide.jp.md)
-* [Admin Guide (初期セットアップ / API トークン)](./documents/admin-guide.jp.md)
+* [管理画面ガイド](./documents/admin/README.jp.md)
 
 ## License
 

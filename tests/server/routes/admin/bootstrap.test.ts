@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// The first-launch contract documented in documents/admin-guide.md.
+// The first-launch contract documented in documents/admin/README.md.
 // Prisma is mocked so this never empties the shared test database.
 const prismaMock = vi.hoisted(() => ({
     user: {
