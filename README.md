@@ -171,9 +171,8 @@ Guiding ideas are:
 # 1. Copy .env
 cp .example.env .env
 
-# 2. Create image
-docker build -t videoreview:latest -f docker/web/Dockerfile.prod .
-docker build -t video-processing:latest -f docker/video-processing/Dockerfile .
+# 2. Pull the published images
+docker compose -f compose.prod.yml pull
 
 # 3. Run only DB
 docker compose -f compose.prod.yml up -d db
@@ -181,8 +180,8 @@ docker compose -f compose.prod.yml up -d db
 # 4. Run prisma deploy (just once, for initial setup or schema changes)
 docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
 
-# 5. Run web service
-docker compose -f compose.prod.yml up -d videoreview -d video-processing
+# 5. Run the services
+docker compose -f compose.prod.yml up -d
 
 ```
 

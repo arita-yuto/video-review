@@ -1,45 +1,74 @@
 # 🐳 Build & Run Guide (Docker)
-This guide explains how to run VideoReview using Docker.  
-Choose this mode for production or container-based deployment.
 
-## Copy Environment file
+How to run VideoReview with Docker.  
+Use this for production or any container-based deployment.
 
-Please copy .env and edit it to set the required values
+The images are published to ghcr.io for every GitHub release, so there is nothing to build.
+
+---
+
+## 1. Create `.env`
 
 ```bash
 cp .example.env .env
 ```
 
-## Edit Environment
+Two entries concern Docker:
 
-If `DOCKER_HOST_STORAGE` is not specified, uploaded files will be stored in a Docker-managed named volume. 
+| Variable | Meaning |
+|---|---|
+| `DOCKER_HOST_STORAGE` | The host path that holds the uploaded files. Empty keeps them in a Docker named volume |
+| `VIDEO_REVIEW_VERSION` | The release to run (e.g. `v0.2.0`). Empty pulls the latest release |
+
+---
+
+## 2. Start
+
 ```bash
-DOCKER_HOST_STORAGE="/path/on/your/host"
-```
+# 1. Pull the published images
+docker compose -f compose.prod.yml pull
 
-## Docker (Production)
-
-```bash
-
-# 1. Create image
-docker build -t videoreview:latest -f docker/web/Dockerfile.prod .
-
-# 2. Run only DB
+# 2. Start the DB
 docker compose -f compose.prod.yml up -d db
 
-# 3. Run prisma deploy (just once, for initial setup or schema changes)
+# 3. Set up the DB (the first time, and whenever the schema changes)
 docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
 
-# 4. Run web service
-docker compose -f compose.prod.yml up -d videoreview
-
+# 4. Start the services
+docker compose -f compose.prod.yml up -d
 ```
 
-## Docker (Development)
+Open `http://localhost:3489` and register the first administrator ([Admin Screen Guide](../admin/README.md)).
+
+---
+
+## 3. Update
 
 ```bash
-# Install dependencies
+docker compose -f compose.prod.yml pull
+docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
+docker compose -f compose.prod.yml up -d
+```
+
+Note: when `VIDEO_REVIEW_VERSION` pins a release, raise it in `.env` first.
+
+---
+
+## Reference
+
+### Build from source
+
+To build locally instead of pulling, tag the images with the names compose refers to.  
+Then continue from step 2 of "Start" (no `pull` needed).
+
+```bash
+docker build -t ghcr.io/arita-yuto/video-review/videoreview:latest -f docker/web/Dockerfile.prod .
+docker build -t ghcr.io/arita-yuto/video-review/video-processing:latest -f docker/video-processing/Dockerfile .
+```
+
+### Development (Docker)
+
+```bash
 npm install
-# Start containers
 docker compose up -d --build
 ```
