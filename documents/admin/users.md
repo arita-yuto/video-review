@@ -2,16 +2,9 @@
 
 List users, create them and change their role.
 
----
+<img src="image of Users goes here">
 
-## 1. Open
-
-Open Administration → Users.
-Users are listed in creation order (display name, email, role, created).
-
----
-
-## 2. Create a user
+## 1. Create a user
 
 Use Create user below the list.
 
@@ -20,20 +13,41 @@ Use Create user below the list.
 
 The new user is a viewer and appears at the end of the list.
 
-- Guests are not created here. While guest login is on, anyone can log in with just a display name ([General](general.md)).
-- Users who log in with Jira are created on their first login ([Jira](integrations/issue-tracker.md)).
+Note: guests are not created here.  
+Note: while guest login is on, anyone can log in with just a display name ([General](general.md)).  
+Note: users who log in with Jira are created on their first login ([Jira](integrations/issue-tracker.md)).
 
 ---
 
-## 3. Change a role
+## 2. Permissions
 
-Switch between Viewer and Admin in the Role column.
-The change is saved as soon as you pick it.
+Written by what the server's API lets through.
 
-| Role | Can |
-|---|---|
-| viewer | Watch and comment on videos, upload |
-| admin | Everything a viewer can, plus Administration |
+### Reading
 
-- You can change your own role too, but with no admin left nobody can open Administration.
-- Users cannot be deleted, because comments and read marks are tied to them.
+| Action | guest | viewer | admin |
+|---|---|---|---|
+| Video list, folders, metadata, revisions | guest-visible videos only | ○ | ○ |
+| Play a video | guest-visible videos only | ○ | ○ |
+| Download a video file (at a chosen resolution) | × | ○ | ○ |
+| Read comments, keep read marks | ○ | ○ | ○ |
+| Events, VCS Changes and the AI summary | guest-visible videos only | ○ | ○ |
+
+### Writing
+
+| Action | guest | viewer | admin |
+|---|---|---|---|
+| Create and update comments | ○ | ○ | ○ |
+| Draw on a video | ○ | ○ | ○ |
+| Create a Jira issue from a comment | × | ○ | ○ |
+| Send a comment notification (Slack / Webhook / Email) | × | ○ | ○ |
+| Chat search and MCP | × | ○ | ○ |
+| Change own profile and avatar | × | ○ | ○ |
+| Upload a video (Web / CLI) | × | × | ○ |
+| Change video metadata (tags, summary, guest-visible flag) | × | × | ○ |
+| Register thumbnails, read the upload status | × | × | ○ |
+| Everything in Administration (users, deleting videos, integrations, API Token) | × | × | ○ |
+
+Note: the API Token acts as an admin.  
+Note: guest-visible is a flag an admin sets per video.  
+Note: comments can be read and written whatever the video's flag.

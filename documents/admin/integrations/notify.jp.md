@@ -13,42 +13,39 @@
 
 Administration → Integrations の Slack を開きます
 
+<img src="https://github.com/user-attachments/assets/fd3676ec-2366-4a32-aa85-d10b5e631e4a" />
+
 | 項目 | 内容 |
 |---|---|
 | Token | Slack App の Bot Token |
 | Channel | 投稿先のチャンネル ID |
 | Team | Slack のチーム名（入れると VideoReview から Slack のメッセージへ直接飛べます） |
 
-1. 項目を入力します
-2. Test & save を押します
+Test & save を押し、Slack に接続に成功したら設定が保存されます
 
-Slack に接続できた設定だけが保存され、見出しの横の `●` が緑になります
-
----
+※ Token を保存すると変えられなくなるので、変えるときは Reset で消してから入れ直します
 
 ## 2. Webhook
 
 Administration → Integrations の Webhook を開きます
+
+<img src="https://github.com/user-attachments/assets/53122012-649d-43ad-8de6-849a9f2bd288" />
 
 | 項目 | 内容 |
 |---|---|
 | Target | Slack か Teams |
 | URL | Slack または Teams で発行した Incoming Webhook の URL |
 
-1. Target を選び、URL を入力します
-2. Test & save を押します
-
-Test & save はチャンネルにテストのメッセージを 1 件送り、届いた設定だけが保存されます
+Test & save はチャンネルにテストのメッセージを 1 件送り、成功したら保存されます
 
 ※ メッセージの形式は Target ごとに VideoReview が組み立てるので、URL 以外の設定はありません  
 ※ URL を保存すると変えられなくなるので、変えるときは Reset で消してから入れ直します
-
----
 
 ## 3. Email
 
 VideoReview は SMTP サーバーを内蔵しません  
 手元の SMTP リレー（Postfix など）か、社内の SMTP サーバーに渡します
+
 
 ```
 VideoReview
@@ -89,6 +86,8 @@ smtp:
 
 Administration → Integrations の Email を開きます
 
+<img src="https://github.com/user-attachments/assets/a07c85fc-b006-4d97-9b4a-a944a8bf7ca2" />
+
 | 項目 | 内容 |
 |---|---|
 | メールを送る | オンで通知を送ります |
@@ -97,14 +96,6 @@ Administration → Integrations の Email を開きます
 | 送信元 | 送信元のアドレス（例 `VideoReview <noreply@example.com>`） |
 | TLS 証明書を厳密に検証 | SMTP サーバーが信頼できる証明書を使っているときだけオン |
 
-1. 項目を入力します
-2. Test & save を押します
+Test & save を押し、SMTP サーバーに接続できた設定だけが保存されます
 
-SMTP サーバーに接続できた設定だけが保存されます
 
----
-
-## 4. `.env` から移るときの注意
-
-`.env` の `VIDEO_REVIEW_SLACK_*`、`VIDEO_REVIEW_WEBHOOK_*`、`VIDEO_REVIEW_EMAIL_*`、`VIDEO_REVIEW_SMTP_*` は、管理画面で保存するまでは読まれます  
-Test & save を押した時点で `.env` から来ていた値も保存され、以降は `.env` を書き換えても効きません

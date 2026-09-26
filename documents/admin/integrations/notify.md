@@ -13,42 +13,38 @@ Set up only what you need.
 
 Open Administration → Integrations → Slack.
 
+<img src="https://github.com/user-attachments/assets/fd3676ec-2366-4a32-aa85-d10b5e631e4a" />
+
 | Field | Meaning |
 |---|---|
 | Token | The Slack app's bot token |
 | Channel | The ID of the channel to post to |
-| Team | The Slack team name; with it, VideoReview links straight to the Slack message |
+| Team | The Slack team name (with it, VideoReview links straight to the Slack message) |
 
-1. Fill in the fields.
-2. Press Test & save.
+Press Test & save; the settings are saved once Slack accepts the connection.
 
-Only settings that reach Slack are saved, and the `●` next to the heading turns green.
-
----
+Note: once the token is saved it cannot be changed; press Reset to drop it and enter it again.
 
 ## 2. Webhook
 
 Open Administration → Integrations → Webhook.
+
+<img src="https://github.com/user-attachments/assets/53122012-649d-43ad-8de6-849a9f2bd288" />
 
 | Field | Meaning |
 |---|---|
 | Target | Slack or Teams |
 | URL | The Incoming Webhook URL issued by Slack or Teams |
 
-1. Pick the Target and enter the URL.
-2. Press Test & save.
+Test & save posts one test message to the channel and saves the settings when it gets through.
 
-Test & save posts one test message to the channel and saves only settings that get through.
-
-- VideoReview builds the message for each Target, so there is nothing to set besides the URL.
-- Once the URL is saved it is locked. To change it, press Reset to drop it and enter it again.
-
----
+Note: VideoReview builds the message for each Target, so there is nothing to set besides the URL.  
+Note: once the URL is saved it cannot be changed; press Reset to drop it and enter it again.
 
 ## 3. Email
 
 VideoReview has no SMTP server of its own.
-It hands mail to an SMTP relay (Postfix or similar) or to your SMTP server.
+It hands mail to an SMTP relay near it (Postfix or similar) or to your SMTP server.
 
 ```
 VideoReview
@@ -79,32 +75,24 @@ smtp:
 
 | Variable | Meaning |
 |---|---|
-| `RELAYHOST` | The SMTP server to relay to, e.g. `[smtp.gmail.com]:587` |
+| `RELAYHOST` | The SMTP server to relay to (e.g. `[smtp.gmail.com]:587`) |
 | `RELAYHOST_USERNAME` | The user name for SMTP authentication |
 | `RELAYHOST_PASSWORD` | The password for SMTP authentication |
 
-Gmail takes `smtp.gmail.com:587`.
+Note: for Gmail, use `smtp.gmail.com:587`.
 
 ### Configure VideoReview
 
 Open Administration → Integrations → Email.
+
+<img src="https://github.com/user-attachments/assets/a07c85fc-b006-4d97-9b4a-a944a8bf7ca2" />
 
 | Field | Meaning |
 |---|---|
 | Send email | On sends the notifications |
 | SMTP host | The SMTP server's host name (`smtp` for the relay above) |
 | SMTP port | `25` for the relay above |
-| From | The sender address, e.g. `VideoReview <noreply@example.com>` |
+| From | The sender address (e.g. `VideoReview <noreply@example.com>`) |
 | Strict TLS | On only when the SMTP server has a trusted certificate |
 
-1. Fill in the fields.
-2. Press Test & save.
-
-Only settings that reach the SMTP server are saved.
-
----
-
-## 4. Moving from `.env`
-
-The `VIDEO_REVIEW_SLACK_*`, `VIDEO_REVIEW_WEBHOOK_*`, `VIDEO_REVIEW_EMAIL_*` and `VIDEO_REVIEW_SMTP_*` variables are read until you save on the admin screen.
-Test & save also stores the values that came from `.env`; from then on `.env` has no effect.
+Press Test & save; only settings that reach the SMTP server are saved.
