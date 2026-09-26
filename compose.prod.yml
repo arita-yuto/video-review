@@ -3,7 +3,7 @@ services:
     env_file:
       - .env
       
-    image: videoreview:latest
+    image: ghcr.io/arita-yuto/video-review/videoreview:${VIDEO_REVIEW_VERSION:-latest}
     container_name: videoreview
     restart: unless-stopped
 
@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
 
-    image: video-processing:latest
+    image: ghcr.io/arita-yuto/video-review/video-processing:${VIDEO_REVIEW_VERSION:-latest}
     container_name: video-processing
     restart: unless-stopped
 

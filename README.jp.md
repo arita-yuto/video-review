@@ -172,9 +172,8 @@ VideoReview は、制作現場で使われ続けることを前提に
 # 1. 環境変数ファイルコピー
 cp .example.env .env
 
-# 2. イメージの作成
-docker build -t videoreview:latest -f docker/web/Dockerfile.prod .
-docker build -t video-processing:latest -f docker/video-processing/Dockerfile .
+# 2. 公開イメージの取得
+docker compose -f compose.prod.yml pull
 
 # 3. DBを起動
 docker compose -f compose.prod.yml up -d db
@@ -183,7 +182,7 @@ docker compose -f compose.prod.yml up -d db
 docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
 
 # 5. サービス起動
-docker compose -f compose.prod.yml up -d videoreview -d video-processing
+docker compose -f compose.prod.yml up -d
 
 ```
 

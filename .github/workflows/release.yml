@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           # web-runtime is the development base image, built from compose; nobody pulls it.
-          - name: web-prod
+          - name: videoreview
             dockerfile: docker/web/Dockerfile.prod
           - name: video-processing
             dockerfile: docker/video-processing/Dockerfile
