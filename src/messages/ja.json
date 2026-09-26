@@ -156,7 +156,9 @@
         "swapColors": "色を入れ替え",
         "colorHistory": "カラー履歴",
         "colorMode": "HSV / HLS を切り替え",
-        "pressure": "筆圧"
+        "pressure": "筆圧",
+        "opacity": "不透明度",
+        "eyedropper": "スポイト"
     },
     "login": {
         "loginFailedMsg": "ログイン失敗",

@@ -67,12 +67,8 @@ const tracePressureSegments = (ctx: CanvasRenderingContext2D, stroke: Stroke, sc
     piece(last.pressure, () => { ctx.moveTo(...mid(points[points.length - 2], last)); ctx.lineTo(...px(last)); });
 };
 
-/** `scale` converts the stroke's CSS-pixel width to canvas pixels (canvas.width / rect.width). */
-export const drawStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke, scale: number) => {
-    if (stroke.points.length === 0) return;
-
-    ctx.save();
-    ctx.globalCompositeOperation = stroke.tool === "eraser" ? "destination-out" : "source-over";
+/** Stroke the path itself, opaque and with the current composite mode. */
+const paintStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke, scale: number) => {
     ctx.strokeStyle = stroke.color;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -83,6 +79,37 @@ export const drawStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke, scale:
         ctx.lineWidth = stroke.width * scale;
         tracePath(ctx, stroke.points, ctx.canvas.width, ctx.canvas.height);
         ctx.stroke();
+    }
+};
+
+// A translucent stroke is painted opaque here first and then composited once, so the
+// pieces of a pressure stroke (and a path crossing itself) do not stack up darker.
+let scratch: HTMLCanvasElement | null = null;
+const scratchFor = (width: number, height: number) => {
+    scratch ??= document.createElement("canvas");
+    if (scratch.width !== width || scratch.height !== height) {
+        scratch.width = width;
+        scratch.height = height;
+    }
+    return scratch;
+};
+
+/** `scale` converts the stroke's CSS-pixel width to canvas pixels (canvas.width / rect.width). */
+export const drawStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke, scale: number) => {
+    if (stroke.points.length === 0) return;
+
+    ctx.save();
+    ctx.globalCompositeOperation = stroke.tool === "eraser" ? "destination-out" : "source-over";
+
+    if (stroke.opacity >= 1) {
+        paintStroke(ctx, stroke, scale);
+    } else {
+        const layer = scratchFor(ctx.canvas.width, ctx.canvas.height);
+        const lctx = layer.getContext("2d")!;
+        lctx.clearRect(0, 0, layer.width, layer.height);
+        paintStroke(lctx, stroke, scale);
+        ctx.globalAlpha = stroke.opacity;
+        ctx.drawImage(layer, 0, 0);
     }
     ctx.restore();
 };

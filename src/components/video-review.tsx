@@ -12,7 +12,8 @@ import { useDrawingStore } from "@/stores/drawing-store";
 import { useCommentEditStore } from "@/stores/comment-edit-store";
 import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
 import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { brushCursor } from "@/lib/drawing/cursor";
+import { brushCursor, eyedropperCursor } from "@/lib/drawing/cursor";
+import { PickPreview } from "@/components/drawing-tool-panel/pick-preview";
 import { useTranslations } from "next-intl";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { useRouter } from "next/navigation";
@@ -34,9 +35,11 @@ export default function VideoReview() {
         canvasSize,
         canvasEditing,
         drawings,
+        picking,
         loadDrawing } = useDrawingStore();
     const editing = useCommentEditStore((s) => s.editingComment !== null);
-    const brushWidth = useDrawingSettingsStore((s) => s.widths[s.tool]);
+    const brushWidth = useDrawingSettingsStore((s) => s.widths[s.brush]);
+    const pickingTool = useDrawingSettingsStore((s) => s.tool === "eyedropper");
 
     useDrawingCanvas();
 
@@ -346,8 +349,9 @@ export default function VideoReview() {
                                                 "absolute top-0 left-0 w-full h-full touch-none",
                                                 canvasEditing ? "pointer-events-auto brush-cursor" : "pointer-events-none",
                                             )}
-                                            style={{ "--brush-cursor": brushCursor(brushWidth) } as React.CSSProperties}
+                                            style={{ "--brush-cursor": pickingTool ? eyedropperCursor() : brushCursor(brushWidth) } as React.CSSProperties}
                                         />
+                                        {picking && <PickPreview picking={picking} video={videoRef.current} drawing={canvasRef.current} />}
                                     </div>
                                 </div>
 

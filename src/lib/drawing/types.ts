@@ -1,4 +1,7 @@
-export type DrawingTool = "pen" | "eraser";
+/** Tools that lay down strokes. */
+export type BrushTool = "pen" | "eraser";
+/** Everything the tool panel can select; the eyedropper only picks a colour. */
+export type DrawingTool = BrushTool | "eyedropper";
 
 /** Position as fractions (0..1) of the canvas, so strokes are independent of its pixel size. */
 export interface StrokePoint {
@@ -10,9 +13,11 @@ export interface StrokePoint {
 
 /** One committed stroke. Width is in CSS pixels and scaled to canvas pixels at draw time. */
 export interface Stroke {
-    tool: DrawingTool;
+    tool: BrushTool;
     color: string;
     width: number;
+    /** 0..1, applied to the stroke as a whole. */
+    opacity: number;
     /** Whether the width follows the recorded pressure along the stroke. */
     pressure: boolean;
     points: StrokePoint[];

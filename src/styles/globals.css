@@ -170,6 +170,14 @@
   cursor: var(--brush-cursor, crosshair);
 }
 
+/* Eyedropper preview: a ring whose top half is the colour being picked and bottom half
+   the one it replaces; the hole keeps the sampled spot visible. */
+@utility pick-preview {
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, var(--pick-new) 50%, var(--pick-old) 50%);
+  mask: radial-gradient(circle, transparent calc(var(--ring-inner) - 0.5px), #000 calc(var(--ring-inner) + 0.5px));
+}
+
 /* The saturation square sizes itself inline, so the override has to win. */
 @utility hue-ring-square {
   width: var(--ring-square) !important;

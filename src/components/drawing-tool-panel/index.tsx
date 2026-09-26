@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { hexToHsva, type HsvaColor } from "@uiw/color-convert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faEraser, faFile, faRotateLeft, faRotateRight, faRightLeft } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faEraser, faEyeDropper, faFile, faRotateLeft, faRotateRight, faRightLeft } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/ui/button";
 import { Slider } from "@/ui/slider";
 import { Switch } from "@/ui/switch";
@@ -53,10 +53,11 @@ function ColorModeIcon({ next }: { next: ColorMode }) {
 export default function DrawingToolPanel() {
     const t = useTranslations("drawing-tool-panel");
     const {
-        tool, color, subColor, widths, pressureEnabled, colorHistory, colorMode,
-        setTool, setColor, swapColors, setWidth, setColorMode, setPressureEnabled,
+        tool, brush, color, subColor, widths, opacities, pressureEnabled, colorHistory, colorMode,
+        setTool, setColor, swapColors, setWidth, setOpacity, setColorMode, setPressureEnabled,
     } = useDrawingSettingsStore();
-    const width = widths[tool];
+    const width = widths[brush];
+    const opacity = Math.round(opacities[brush] * 100);
     const { history, undoStroke, redoStroke, clearDrawing } = useDrawingStore();
     const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(color));
 
@@ -94,6 +95,10 @@ export default function DrawingToolPanel() {
                             <FontAwesomeIcon icon={faEraser} />
                             {t("eraser")}
                         </Button>
+                        <Button variant={tool === "eyedropper" ? "accent" : "ghost"} title={`${t("eyedropper")} (I, Alt+click)`} onClick={() => setTool("eyedropper")}>
+                            <FontAwesomeIcon icon={faEyeDropper} />
+                            {t("eyedropper")}
+                        </Button>
                     </div>
                 </SidebarGroup>
 
@@ -114,6 +119,21 @@ export default function DrawingToolPanel() {
                         <Switch checked={pressureEnabled} onCheckedChange={setPressureEnabled} />
                         {t("pressure")}
                     </label>
+                </SidebarGroup>
+
+                <SidebarGroup>
+                    <SidebarGroupLabel>{t("opacity")}</SidebarGroupLabel>
+                    <div className="flex items-center gap-3">
+                        <Slider
+                            value={[opacity]}
+                            min={0}
+                            max={100}
+                            step={1}
+                            onValueChange={(v) => setOpacity(v[0] / 100)}
+                            className="flex-1"
+                        />
+                        <span className="w-10 text-right text-xs text-muted-foreground">{opacity}%</span>
+                    </div>
                 </SidebarGroup>
 
                 <SidebarGroup>

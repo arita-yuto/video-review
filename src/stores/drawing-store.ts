@@ -17,6 +17,8 @@ interface DrawingState {
     baseHidden: boolean;
     /** Loaded comment drawings by storage path, ready to drawImage. */
     drawings: Map<string, CanvasImageSource>;
+    /** While the eyedropper is pressed: where it is (canvas fractions), what it sees, and the colour before. */
+    picking: { x: number; y: number; color: string; previous: string } | null;
 
     setCanvasRefElement: (canvas: HTMLCanvasElement | null) => void;
     setCanvasSize: (size: { width: number; height: number }) => void;
@@ -30,6 +32,7 @@ interface DrawingState {
     clearDrawing: () => void;
     /** Fetch a comment's drawing into `drawings` unless it is there or on its way. */
     loadDrawing: (path: string) => Promise<void>;
+    setPicking: (picking: DrawingState["picking"]) => void;
 }
 
 const loading = new Set<string>();
@@ -50,6 +53,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
     history: emptyHistory,
     baseHidden: false,
     drawings: new Map(),
+    picking: null,
 
     // A session starts clean: nothing to save until a stroke lands.
     setCanvasEditing: (r) => set({ canvasEditing: r, history: emptyHistory, baseHidden: false, needSave: false }),
@@ -95,6 +99,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
     undoStroke: () => set((state) => ({ history: undo(state.history), needSave: true })),
     redoStroke: () => set((state) => ({ history: redo(state.history), needSave: true })),
     clearDrawing: () => set({ history: emptyHistory, baseHidden: true, needSave: true }),
+    setPicking: (picking) => set({ picking }),
     loadDrawing: async (path) => {
         if (get().drawings.has(path) || loading.has(path)) return;
 

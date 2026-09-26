@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef } from "react";
 import { useDrawingStore } from "@/stores/drawing-store";
 import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
 import { useCommentEditStore } from "@/stores/comment-edit-store";
+import { useVideoReviewStore } from "@/stores/video-review-store";
+import { sampleColor } from "@/lib/drawing/eyedropper";
 import { renderLayers } from "@/lib/drawing/render";
 import { canvasPointFromClient, canvasScale, isEraserButton, pointerSamples, samplePressure } from "@/lib/drawing/pointer";
 import type { Stroke } from "@/lib/drawing/types";
@@ -24,7 +26,7 @@ export const useDrawingCanvas = () => {
     const canvasSize = useDrawingStore((s) => s.canvasSize);
     const history = useDrawingStore((s) => s.history);
     const baseHidden = useDrawingStore((s) => s.baseHidden);
-    const { commitStroke, undoStroke, redoStroke, loadDrawing } = useDrawingStore();
+    const { commitStroke, undoStroke, redoStroke, loadDrawing, setPicking } = useDrawingStore();
     const drawingPath = useCommentEditStore((s) => s.editingComment?.drawingPath ?? null);
     // The comment's saved drawing, from the shared cache so a just-saved one is current.
     const base = useDrawingStore((s) => (canvasEditing && drawingPath ? s.drawings.get(drawingPath) ?? null : null));
@@ -89,17 +91,51 @@ export const useDrawingCanvas = () => {
         const smoothPressure = (previous: number | undefined, sample: number) =>
             previous === undefined ? sample : (previous + sample) / 2;
 
+        // The eyedropper follows the pointer while it is pressed, showing the colour as
+        // seen (frame plus drawing) next to the one it replaces, and hands the brush back
+        // on release. Alt does the same from any tool without switching.
+        let pickingPointer: number | null = null;
+        let colorBeforePick = "";
+
+        const pickAt = (e: PointerEvent) => {
+            const settings = useDrawingSettingsStore.getState();
+            const video = useVideoReviewStore.getState().videoRefElement;
+            const point = canvasPointFromClient(canvas, e.clientX, e.clientY, 1);
+            const hex = sampleColor(video, committedRef.current, point) ?? settings.color;
+            settings.setColor(hex);
+            setPicking({ x: point.x, y: point.y, color: hex, previous: colorBeforePick });
+        };
+
+        const startPicking = (e: PointerEvent) => {
+            pickingPointer = e.pointerId;
+            colorBeforePick = useDrawingSettingsStore.getState().color;
+            try { canvas.setPointerCapture(e.pointerId); } catch {}
+            pickAt(e);
+        };
+
+        const endPicking = () => {
+            pickingPointer = null;
+            setPicking(null);
+            const settings = useDrawingSettingsStore.getState();
+            if (settings.tool === "eyedropper") settings.setTool(settings.brush);
+        };
+
         const onDown = (e: PointerEvent) => {
             notePen(e);
             const eraserEnd = isEraserButton(e);
             if (isPalm(e) || (e.button !== 0 && !eraserEnd)) return;
-            if (activePointer !== null) {
+            if (activePointer !== null || pickingPointer !== null) {
                 if (!(e.pointerType === "pen" && activeType === "touch")) return;
                 liveRef.current = null;
             }
 
             const settings = useDrawingSettingsStore.getState();
-            const tool = eraserEnd ? "eraser" : settings.tool;
+            if (settings.tool === "eyedropper" || e.altKey) {
+                startPicking(e);
+                return;
+            }
+
+            const tool = eraserEnd ? "eraser" : settings.brush;
             activePointer = e.pointerId;
             activeType = e.pointerType;
             // Capture can fail for a pointer that is already gone; drawing works without it.
@@ -108,6 +144,7 @@ export const useDrawingCanvas = () => {
                 tool,
                 color: settings.color,
                 width: settings.widths[tool],
+                opacity: settings.opacities[tool],
                 pressure: settings.pressureEnabled && e.pointerType === "pen",
                 points: [canvasPointFromClient(canvas, e.clientX, e.clientY, samplePressure(e))],
             };
@@ -116,6 +153,11 @@ export const useDrawingCanvas = () => {
 
         const onMove = (e: PointerEvent) => {
             notePen(e);
+            if (e.pointerId === pickingPointer) {
+                pickAt(e);
+                return;
+            }
+
             const live = liveRef.current;
             if (e.pointerId !== activePointer || !live) return;
 
@@ -129,6 +171,10 @@ export const useDrawingCanvas = () => {
 
         const onUp = (e: PointerEvent) => {
             notePen(e);
+            if (e.pointerId === pickingPointer) {
+                endPicking();
+                return;
+            }
             if (e.pointerId !== activePointer) return;
 
             const stroke = liveRef.current;
@@ -147,12 +193,13 @@ export const useDrawingCanvas = () => {
         canvas.addEventListener("pointercancel", onUp);
 
         return () => {
+            if (pickingPointer !== null) setPicking(null);
             canvas.removeEventListener("pointerdown", onDown);
             canvas.removeEventListener("pointermove", onMove);
             canvas.removeEventListener("pointerup", onUp);
             canvas.removeEventListener("pointercancel", onUp);
         };
-    }, [canvas, canvasEditing, commitStroke, schedulePaint]);
+    }, [canvas, canvasEditing, commitStroke, setPicking, schedulePaint]);
 
     // Shortcuts while editing, except inside text fields where typing and the browser's
     // own undo must keep working (the comment body is a textarea).
@@ -178,6 +225,7 @@ export const useDrawingCanvas = () => {
 
             if (key === "b") settings.setTool("pen");
             else if (key === "e") settings.setTool("eraser");
+            else if (key === "i") settings.setTool("eyedropper");
             else if (key === "x") settings.swapColors();
             else if (key === "[") settings.stepWidth(-1);
             else if (key === "]") settings.stepWidth(1);
