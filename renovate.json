@@ -3,7 +3,13 @@
     "extends": ["config:recommended"],
     "dependencyDashboard": true,
     "dependencyDashboardApproval": true,
+    "dependencyDashboardOSVVulnerabilitySummary": "all",
     "packageRules": [
+        {
+            "description": "npm packages can be unpublished within 72 hours and hijacked releases surface in the first days, so the dashboard offers the newest version that is at least 3 days old. Vulnerability fix PRs ignore this by default.",
+            "matchDatasources": ["npm"],
+            "minimumReleaseAge": "3 days"
+        },
         {
             "description": "The lint plugin is young; each release may add findings, so bump it weekly and let the CI lint job show the effect.",
             "matchPackageNames": ["@shadcn/lint"],
