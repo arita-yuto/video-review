@@ -1,5 +1,5 @@
 "use client"
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import VideoTimelineBar from "@/components/video-timeline-bar";
 import { EPlayMode, useVideoPlayerStore } from "@/stores/video-player-store";
@@ -8,46 +8,18 @@ import { useCommentStore } from "@/stores/comment-store";
 import { useVideoStore } from "@/stores/video-store";
 import VideoTitle from "@/components/video-title";
 import { VideoComment } from "@/lib/db-types";
-import { useDrawingStore } from "@/stores/drawing-store";
-import { useCommentEditStore } from "@/stores/comment-edit-store";
-import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { brushCursor, eyedropperCursor } from "@/lib/drawing/cursor";
-import { PickPreview } from "@/components/drawing-tool-panel/pick-preview";
+import { DrawingLayer } from "@/components/drawing-layer";
 import { useTranslations } from "next-intl";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
-import { cn } from "@/lib/utils";
 import { LoadingBadge } from "@/components/controls/loading-badge";
 
 export default function VideoReview() {
     const t = useTranslations("video-review");
     const router = useRouter();
-    const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
-
-    const {
-        setCanvasRefElement,
-        setCanvasSize,
-        setCanvasEditing,
-        canvasSize,
-        canvasEditing,
-        drawings,
-        picking,
-        loadDrawing } = useDrawingStore();
-    const editing = useCommentEditStore((s) => s.editingComment !== null);
-    const brushWidth = useDrawingSettingsStore((s) => s.widths[s.brush]);
-    const pickingTool = useDrawingSettingsStore((s) => s.tool === "eyedropper");
-
-    useDrawingCanvas();
-
-    // Keyed on the boolean: entering a session resets the history, and the edited
-    // comment object is replaced while saving, which must not count as a new session.
-    useEffect(() => {
-        setCanvasEditing(editing);
-    }, [editing]);
 
     const { token } = useAuthStore();
 
@@ -61,7 +33,6 @@ export default function VideoReview() {
 
     const { comments, fetchComments } = useCommentStore();
     const {
-        activeComments,
         setVideoRefElement,
         selectedComment,
         currentTime,
@@ -84,6 +55,12 @@ export default function VideoReview() {
 
     const playModeRef = useRef<EPlayMode>(playMode);
     const timelineTimeRef = useRef<number>(timelineTime);
+
+    // A callback ref keeps the store's element current across remounts of the player.
+    const attachVideo = useCallback((el: HTMLVideoElement | null) => {
+        videoRef.current = el;
+        setVideoRefElement(el);
+    }, []);
 
     const { commentTimeBasedMap, commentTimeList } = useMemo(() => {
         const m = new Map<number, VideoComment[]>();
@@ -122,75 +99,6 @@ export default function VideoReview() {
     }, [playMode]);
 
     useEffect(() => {
-        for (const c of comments) {
-            if (c.drawingPath) void loadDrawing(c.drawingPath);
-        }
-    }, [comments]);
-
-    // While a comment is being edited the drawing hook owns the canvas; repainting here
-    // would wipe the strokes in progress.
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas || canvasEditing) return;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        // The selection holds the object from click time; after a save the list has a
-        // newer one (a first drawing adds its path), so look the comment up again.
-        const current = selectedComment && (comments.find((c) => c.id === selectedComment.id) ?? selectedComment);
-        const toDraw = isPlaying ? activeComments : (current ? [current] : []);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (const comment of toDraw) {
-            const img = comment.drawingPath ? drawings.get(comment.drawingPath) : undefined;
-            if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        }
-    }, [activeComments, selectedComment, comments, isPlaying, canvasEditing, canvasSize, drawings]);
-
-    // Keep the canvas's backing store at the video's on-screen size times the current
-    // device pixel ratio. Both change when the window moves to another display, and a
-    // canvas fitted on one display draws offset and blurry on the other.
-    useEffect(() => {
-        const v = videoRef.current;
-        const c = canvasRef.current;
-        if (!v || !c) return;
-
-        const fit = () => {
-            const rect = v.getBoundingClientRect();
-            const ratio = window.devicePixelRatio || 1;
-            const width = Math.round(rect.width * ratio);
-            const height = Math.round(rect.height * ratio);
-            if (width === 0 || height === 0 || (c.width === width && c.height === height)) return;
-
-            c.width = width;
-            c.height = height;
-            setCanvasSize({ width, height });
-        };
-
-        const observer = new ResizeObserver(fit);
-        observer.observe(v);
-
-        // matchMedia has no "ratio changed" event; a query that matches only the current
-        // ratio flips to false when it changes, then we re-arm for the new one.
-        let ratioQuery: MediaQueryList | null = null;
-        const watchRatio = () => {
-            ratioQuery?.removeEventListener("change", onRatioChange);
-            ratioQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
-            ratioQuery.addEventListener("change", onRatioChange);
-        };
-        const onRatioChange = () => {
-            fit();
-            watchRatio();
-        };
-        watchRatio();
-
-        return () => {
-            observer.disconnect();
-            ratioQuery?.removeEventListener("change", onRatioChange);
-        };
-    }, [selectedRevision]);
-
-    useEffect(() => {
         if (selectedComment && selectedComment.time !== currentTime) {
             setSelectComment(null);
         }
@@ -205,14 +113,6 @@ export default function VideoReview() {
             setActiveComments([]);
         }
     }, [currentTime])
-
-    useEffect(() => {
-        setCanvasRefElement(canvasRef.current);
-    }, [canvasRef.current]);
-
-    useEffect(() => {
-        setVideoRefElement(videoRef.current);
-    }, [videoRef.current]);
 
     useEffect(() => {
         setCurrentTime(0);
@@ -338,20 +238,12 @@ export default function VideoReview() {
                                 <div className="flex-1 flex flex-col items-center justify-center bg-black rounded mb-3 relative">
                                     <div className="relative inline-block">
                                         <video
-                                            ref={videoRef}
+                                            ref={attachVideo}
                                             src={playbackUrl ?? undefined}
                                             onClick={togglePlay}
                                             className="video-stage max-w-full rounded cursor-pointer object-contain"
                                         />
-                                        <canvas
-                                            ref={canvasRef}
-                                            className={cn(
-                                                "absolute top-0 left-0 w-full h-full touch-none",
-                                                canvasEditing ? "pointer-events-auto brush-cursor" : "pointer-events-none",
-                                            )}
-                                            style={{ "--brush-cursor": pickingTool ? eyedropperCursor() : brushCursor(brushWidth) } as React.CSSProperties}
-                                        />
-                                        {picking && <PickPreview picking={picking} video={videoRef.current} drawing={canvasRef.current} />}
+                                        <DrawingLayer />
                                     </div>
                                 </div>
 
