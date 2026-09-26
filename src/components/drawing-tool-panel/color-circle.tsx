@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import Saturation from "@uiw/react-color-saturation";
-import { hexToHsva, hsvaToHex, hsvaToHsla, type HsvaColor } from "@uiw/color-convert";
+import { hsvaToHex, hsvaToHsla, type HsvaColor } from "@uiw/color-convert";
 import { HlsTriangle } from "@/components/drawing-tool-panel/hls-triangle";
 import type { ColorMode } from "@/stores/drawing-settings-store";
 
@@ -62,40 +62,24 @@ const hueFromPointer = (e: React.PointerEvent<HTMLDivElement>) => {
 };
 
 // A paint-app colour circle: hue on the ring, the rest on the mode's inner picker.
-// The ring is our own (a conic gradient plus angle maths).
-// State is HSV because hex forgets the hue once saturation or value hit zero, so it is
-// only re-derived when the store's colour changed elsewhere (history, swap).
-export function ColorCircle({ color, mode, onChange, onHsvaChange }: {
-    color: string;
+// The ring is our own (a conic gradient plus angle maths). Controlled in HSV, since
+// hex forgets the hue once saturation or value hit zero.
+export function ColorCircle({ hsva, mode, onChange }: {
+    hsva: HsvaColor;
     mode: ColorMode;
-    onChange: (hex: string) => void;
-    onHsvaChange?: (hsva: HsvaColor) => void;
+    onChange: (hsva: HsvaColor) => void;
 }) {
-    const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(color));
     const dragging = useRef(false);
     const { Inner } = COLOR_MODES[mode];
-
-    useEffect(() => {
-        if (hsvaToHex(hsva) !== color) setHsva(hexToHsva(color));
-    }, [color]);
-
-    useEffect(() => {
-        onHsvaChange?.(hsva);
-    }, [hsva]);
-
-    const update = (next: HsvaColor) => {
-        setHsva(next);
-        onChange(hsvaToHex(next));
-    };
 
     const onRingDown = (e: React.PointerEvent<HTMLDivElement>) => {
         if (e.button !== 0) return;
         e.currentTarget.setPointerCapture(e.pointerId);
         dragging.current = true;
-        update({ ...hsva, h: hueFromPointer(e) });
+        onChange({ ...hsva, h: hueFromPointer(e) });
     };
     const onRingMove = (e: React.PointerEvent<HTMLDivElement>) => {
-        if (dragging.current) update({ ...hsva, h: hueFromPointer(e) });
+        if (dragging.current) onChange({ ...hsva, h: hueFromPointer(e) });
     };
     const onRingUp = () => { dragging.current = false; };
 
@@ -120,7 +104,7 @@ export function ColorCircle({ color, mode, onChange, onHsvaChange }: {
                 <div className="absolute left-1/2 top-0 -translate-x-1/2 size-(--ring-thickness) rounded-sm border-2 border-white bg-(--swatch) shadow-sm" />
             </div>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none [&>*]:pointer-events-auto">
-                <Inner hsva={hsva} radius={INNER_RADIUS} onChange={update} />
+                <Inner hsva={hsva} radius={INNER_RADIUS} onChange={onChange} />
             </div>
         </div>
     );

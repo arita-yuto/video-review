@@ -3,22 +3,27 @@ import { useDrawingStore } from "@/stores/drawing-store";
 import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
 import { useCommentEditStore } from "@/stores/comment-edit-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { sampleColor } from "@/lib/drawing/eyedropper";
 import { renderLayers } from "@/lib/drawing/render";
-import { canvasPointFromClient, canvasScale, isEraserButton, pointerSamples, samplePressure } from "@/lib/drawing/pointer";
-import type { Stroke } from "@/lib/drawing/types";
+import { canvasScale, isEraserButton } from "@/lib/drawing/pointer";
+import { createBrushTool } from "@/lib/drawing/tools/brush";
+import { createEyedropperTool } from "@/lib/drawing/tools/eyedropper";
+import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
 
 const isTextInput = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
     return target.isContentEditable || target.matches("input, textarea, select");
 };
 
+// A touch that lands while the pen is in use, or right after it lifted, is the hand
+// resting on the display.
+const PALM_WINDOW_MS = 1000;
+
 /**
- * Drives the review canvas while a comment is being edited: pointer input, keyboard
- * shortcuts, the undo/redo history and repainting. The canvas holds three layers,
- * painted back to front on every frame: the base (the drawing the comment already
- * has), the committed strokes, and the stroke under the pen. The committed layer is
- * cached offscreen so a frame costs one drawImage plus the live stroke.
+ * Manages the review canvas while a comment is being edited: hands each pointer to a
+ * tool, keeps palms and the pen's eraser end straight, runs the keyboard shortcuts and
+ * repaints. The canvas holds three layers, painted back to front on every frame: the
+ * base (the drawing the comment already has), the committed strokes, and what the
+ * active tool is doing. The committed layer is cached offscreen.
  */
 export const useDrawingCanvas = () => {
     const canvas = useDrawingStore((s) => s.canvasRefElement);
@@ -32,7 +37,7 @@ export const useDrawingCanvas = () => {
     const base = useDrawingStore((s) => (canvasEditing && drawingPath ? s.drawings.get(drawingPath) ?? null : null));
 
     const committedRef = useRef<HTMLCanvasElement | null>(null);
-    const liveRef = useRef<Stroke | null>(null);
+    const activeToolRef = useRef<PointerTool | null>(null);
     const frameRef = useRef<number | null>(null);
 
     const paint = useCallback(() => {
@@ -40,8 +45,8 @@ export const useDrawingCanvas = () => {
         const ctx = canvas?.getContext("2d");
         if (!canvas || !ctx) return;
 
-        const live = liveRef.current ? [liveRef.current] : [];
-        renderLayers(ctx, committedRef.current, live, canvasScale(canvas));
+        const live = activeToolRef.current?.live();
+        renderLayers(ctx, committedRef.current, live ? [live] : [], canvasScale(canvas));
     }, [canvas]);
 
     const schedulePaint = useCallback(() => {
@@ -55,7 +60,6 @@ export const useDrawingCanvas = () => {
 
     useEffect(() => {
         committedRef.current = null;
-        liveRef.current = null;
         if (canvasEditing && drawingPath) void loadDrawing(drawingPath);
     }, [canvasEditing, drawingPath]);
 
@@ -77,123 +81,76 @@ export const useDrawingCanvas = () => {
     useEffect(() => {
         if (!canvas || !canvasEditing) return;
 
+        const context: ToolContext = {
+            canvas,
+            settings: () => useDrawingSettingsStore.getState(),
+            committedLayer: () => committedRef.current,
+            video: () => useVideoReviewStore.getState().videoRefElement,
+            repaint: schedulePaint,
+            commitStroke,
+            setPicking,
+        };
+        const brush = createBrushTool(context);
+        const eyedropper = createEyedropperTool(context);
+
         let activePointer: number | null = null;
         let activeType: string | null = null;
-        // Palm rejection: a touch that lands while the pen is in use, or right after it
-        // lifted, is the hand resting on the display. A hand that landed first yields
-        // to the pen: its stroke is dropped when the pen comes down.
         let lastPenAt = -Infinity;
-        const PALM_WINDOW_MS = 1000;
         const isPalm = (e: PointerEvent) => e.pointerType === "touch" && performance.now() - lastPenAt < PALM_WINDOW_MS;
         const notePen = (e: PointerEvent) => { if (e.pointerType === "pen") lastPenAt = performance.now(); };
 
-        // Pens report pressure with some jitter; blend each sample with the previous one.
-        const smoothPressure = (previous: number | undefined, sample: number) =>
-            previous === undefined ? sample : (previous + sample) / 2;
-
-        // The eyedropper follows the pointer while it is pressed, showing the colour as
-        // seen (frame plus drawing) next to the one it replaces, and hands the brush back
-        // on release. Alt does the same from any tool without switching.
-        let pickingPointer: number | null = null;
-        let colorBeforePick = "";
-
-        const pickAt = (e: PointerEvent) => {
-            const settings = useDrawingSettingsStore.getState();
-            const video = useVideoReviewStore.getState().videoRefElement;
-            const point = canvasPointFromClient(canvas, e.clientX, e.clientY, 1);
-            const hex = sampleColor(video, committedRef.current, point) ?? settings.color;
-            settings.setColor(hex);
-            setPicking({ x: point.x, y: point.y, color: hex, previous: colorBeforePick });
-        };
-
-        const startPicking = (e: PointerEvent) => {
-            pickingPointer = e.pointerId;
-            colorBeforePick = useDrawingSettingsStore.getState().color;
-            try { canvas.setPointerCapture(e.pointerId); } catch {}
-            pickAt(e);
-        };
-
-        const endPicking = () => {
-            pickingPointer = null;
-            setPicking(null);
-            const settings = useDrawingSettingsStore.getState();
-            if (settings.tool === "eyedropper") settings.setTool(settings.brush);
+        const release = () => {
+            activePointer = null;
+            activeType = null;
+            activeToolRef.current = null;
         };
 
         const onDown = (e: PointerEvent) => {
             notePen(e);
             const eraserEnd = isEraserButton(e);
             if (isPalm(e) || (e.button !== 0 && !eraserEnd)) return;
-            if (activePointer !== null || pickingPointer !== null) {
+            if (activePointer !== null) {
+                // A hand that landed first yields to the pen.
                 if (!(e.pointerType === "pen" && activeType === "touch")) return;
-                liveRef.current = null;
+                activeToolRef.current?.cancel();
+                release();
             }
 
             const settings = useDrawingSettingsStore.getState();
-            if (settings.tool === "eyedropper" || e.altKey) {
-                startPicking(e);
-                return;
-            }
-
-            const tool = eraserEnd ? "eraser" : settings.brush;
+            const tool = !eraserEnd && (settings.tool === "eyedropper" || e.altKey) ? eyedropper : brush;
             activePointer = e.pointerId;
             activeType = e.pointerType;
-            // Capture can fail for a pointer that is already gone; drawing works without it.
+            activeToolRef.current = tool;
+            // Capture can fail for a pointer that is already gone; the tool works without it.
             try { canvas.setPointerCapture(e.pointerId); } catch {}
-            liveRef.current = {
-                tool,
-                color: settings.color,
-                width: settings.widths[tool],
-                opacity: settings.opacities[tool],
-                pressure: settings.pressureEnabled && e.pointerType === "pen",
-                points: [canvasPointFromClient(canvas, e.clientX, e.clientY, samplePressure(e))],
-            };
-            schedulePaint();
+            tool.down(e, { eraserEnd });
         };
 
         const onMove = (e: PointerEvent) => {
             notePen(e);
-            if (e.pointerId === pickingPointer) {
-                pickAt(e);
-                return;
-            }
-
-            const live = liveRef.current;
-            if (e.pointerId !== activePointer || !live) return;
-
-            for (const sample of pointerSamples(e)) {
-                const previous = live.points[live.points.length - 1]?.pressure;
-                const pressure = smoothPressure(previous, samplePressure(sample));
-                live.points.push(canvasPointFromClient(canvas, sample.clientX, sample.clientY, pressure));
-            }
-            schedulePaint();
+            if (e.pointerId === activePointer) activeToolRef.current?.move(e);
         };
 
         const onUp = (e: PointerEvent) => {
             notePen(e);
-            if (e.pointerId === pickingPointer) {
-                endPicking();
-                return;
-            }
             if (e.pointerId !== activePointer) return;
-
-            const stroke = liveRef.current;
-            activePointer = null;
-            activeType = null;
-            liveRef.current = null;
-            if (!stroke) return;
-
-            commitStroke(stroke);
-            if (stroke.tool === "pen") useDrawingSettingsStore.getState().noteColorUsed(stroke.color);
+            activeToolRef.current?.up(e);
+            release();
+            schedulePaint();
         };
 
         canvas.addEventListener("pointerdown", onDown);
         canvas.addEventListener("pointermove", onMove);
         canvas.addEventListener("pointerup", onUp);
+        // A pointer the browser takes away still commits what it drew.
         canvas.addEventListener("pointercancel", onUp);
 
         return () => {
-            if (pickingPointer !== null) setPicking(null);
+            activeToolRef.current?.cancel();
+            release();
+            // A frame still pending would paint over what the layer shows once editing ends.
+            if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+            frameRef.current = null;
             canvas.removeEventListener("pointerdown", onDown);
             canvas.removeEventListener("pointermove", onMove);
             canvas.removeEventListener("pointerup", onUp);

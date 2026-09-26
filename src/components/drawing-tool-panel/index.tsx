@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { hexToHsva, type HsvaColor } from "@uiw/color-convert";
+import { hexToHsva, hsvaToHex, type HsvaColor } from "@uiw/color-convert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faEraser, faEyeDropper, faFile, faRotateLeft, faRotateRight, faRightLeft } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/ui/button";
@@ -59,7 +59,16 @@ export default function DrawingToolPanel() {
     const width = widths[brush];
     const opacity = Math.round(opacities[brush] * 100);
     const { history, undoStroke, redoStroke, clearDrawing } = useDrawingStore();
+    // The circle's HSV, re-derived only when the colour changed elsewhere (history,
+    // swap, eyedropper) so the hue survives a grey or black pick on the square.
     const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(color));
+    useEffect(() => {
+        if (hsvaToHex(hsva) !== color) setHsva(hexToHsva(color));
+    }, [color]);
+    const pickHsva = (next: HsvaColor) => {
+        setHsva(next);
+        setColor(hsvaToHex(next));
+    };
 
     const canUndo = history.items.length > 0;
     const canRedo = history.undone.length > 0;
@@ -139,7 +148,7 @@ export default function DrawingToolPanel() {
                 <SidebarGroup>
                     <SidebarGroupLabel>{t("color")}</SidebarGroupLabel>
                     <div className="flex flex-col items-center gap-2">
-                        <ColorCircle color={color} mode={colorMode} onChange={setColor} onHsvaChange={setHsva} />
+                        <ColorCircle hsva={hsva} mode={colorMode} onChange={pickHsva} />
                         {/* Three equal columns keep the numbers centred under the circle even though
                             the chips on the left are wider than the button on the right. */}
                         <div className="grid w-full grid-cols-3 items-center">
