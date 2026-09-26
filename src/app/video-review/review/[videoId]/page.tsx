@@ -7,6 +7,7 @@ import React, { useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { fetchVideoEvents } from "@/stores/video-event-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { useConfigStore } from "@/stores/config-store";
 import { useRouter } from "next/navigation";
 
 export default function VideoReviewPage() {
@@ -30,7 +31,9 @@ export default function VideoReviewPage() {
         void (async () => {
             if (!(await verifyAuth())) {
                 router.replace("/video-review/login");
+                return;
             }
+            void useConfigStore.getState().loadConfig();
         })();
     }, []);
 

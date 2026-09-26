@@ -8,7 +8,7 @@ import { createRouter } from "@/server/lib/openapi/router";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { z } from "zod";
 import { hash, randomBytes } from "crypto";
-import { env } from "@/lib/env";
+import { getResolutionPresets } from "@/server/lib/integrations/general";
 import { formatVideoRes } from "@/server/lib/utils/format-video-res";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 
@@ -159,7 +159,7 @@ export const maintenanceRouter = createRouter()
 
         try {
             const ret = await VideoReviewStorage.deleteObject(videoRevision.filePath);
-            for (const res of env.RESOLUTION_PRESETS) {
+            for (const res of await getResolutionPresets()) {
                 const derivedStorageKey = formatVideoRes(videoRevision.filePath, res);
                 await VideoReviewStorage.deleteObject(derivedStorageKey);
             }

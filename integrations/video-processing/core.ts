@@ -24,6 +24,20 @@ export const prisma = () => {
     return prismaInstance;
 }
 
+// The presets saved on the admin screen (General) win; env is the fallback for setups configured
+// without it. Read per job so a change applies to the next job without a restart.
+async function resolutionPresets(): Promise<number[]> {
+    const row = await prisma().systemSetting.findUnique({ where: { key: "general.resolutionPresets" } });
+    const presets = typeof row?.value === "string" ? row.value : process.env.NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS ?? "";
+    return presets.split(",").map(preset => preset.trim()).filter(Boolean).map(preset => {
+        const width = parseInt(preset);
+        if (isNaN(width)) {
+            throw new Error(`Invalid resolution preset: ${preset}`);
+        }
+        return width;
+    });
+}
+
 function execFFmpeg(args: string[]): Promise<void> {
     return new Promise((resolve, reject) => {
         const proc = spawn("ffmpeg", args, {
@@ -177,12 +191,7 @@ export async function processVideo(storageKey: string, videoId: string, videoRev
 
         try {
             const sourceWidth = await getVideoWidth(filePath);
-            const presets = process.env.NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS?.split(",") || [];
-            for (const preset of presets) {
-                const width = parseInt(preset.trim());
-                if (isNaN(width)) {
-                    throw new Error(`Invalid resolution preset: ${preset}`);
-                }
+            for (const width of await resolutionPresets()) {
                 if (width > sourceWidth) {
                     console.log(`Skip preset ${width}p because source width is ${sourceWidth}px`);
                     continue;

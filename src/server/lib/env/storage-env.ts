@@ -1,10 +1,9 @@
-import { positiveNumberEnv, typeEnv } from "@/lib/env/helpers";
+import { typeEnv } from "@/lib/env/helpers";
 import { UploadStorageType } from "@prisma/client";
 
 export const env = {
     VIDEO_REVIEW_STORAGE: typeEnv<UploadStorageType>(process.env.VIDEO_REVIEW_STORAGE, UploadStorageType.local),
     VIDEO_REVIEW_LOCAL_ROOTDIR: process.env.VIDEO_REVIEW_LOCAL_ROOTDIR,
-    VIDEO_REVIEW_UPLOAD_CHUNK_MB: positiveNumberEnv(process.env.VIDEO_REVIEW_UPLOAD_CHUNK_MB, 16),
     S3_BUCKET: process.env.S3_BUCKET,
     S3_REGION: process.env.S3_REGION,
     S3_LOCALSTACK_ENDPOINT: process.env.S3_LOCALSTACK_ENDPOINT === "" ? undefined : process.env.S3_LOCALSTACK_ENDPOINT,

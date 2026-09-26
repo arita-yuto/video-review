@@ -11,6 +11,7 @@ import { Label } from "@/ui/label";
 import { Input } from "@/ui/input";
 import { Button } from "@/ui/button";
 import { env } from "@/lib/env";
+import { useConfigStore } from "@/stores/config-store";
 import { AuthCard, AuthLayout } from "@/components/auth/auth-layout";
 
 export default function Login() {
@@ -20,14 +21,10 @@ export default function Login() {
     const cacheDisplayName = useAuthStore((e) => e.displayName);
     const cacheEmail = useAuthStore((e) => e.email);
     const { setAuth } = useAuthStore();
+    const { guestEnabled, loginDefaultType, loadLoginOptions } = useConfigStore();
 
-    // Don't open on the guest tab when guest login is hidden.
-    const initialType: LoginType =
-        !env.PUBLIC_ALLOW_GUEST && env.PUBLIC_LOGIN_DEFAULT_TYPE === "guest"
-            ? "password"
-            : env.PUBLIC_LOGIN_DEFAULT_TYPE;
-
-    const [type, setType] = useState<LoginType>(initialType);
+    // null until the login options are in, so the tabs never open on a guess and then jump.
+    const [type, setType] = useState<LoginType | null>(null);
     const [email, setEmail] = useState<string | null>(null);
     const [password, setPassword] = useState("");
     const [displayName, setDisplayName] = useState("");
@@ -35,7 +32,14 @@ export default function Login() {
     useEffect(() => {
         setEmail(cacheEmail ?? "");
         setDisplayName(cacheDisplayName ?? "");
+        void loadLoginOptions();
     }, []);
+
+    useEffect(() => {
+        if (guestEnabled === null || loginDefaultType === null) return;
+        // Don't open on the guest tab when guest login is hidden.
+        setType(loginDefaultType === "guest" && !guestEnabled ? "password" : loginDefaultType);
+    }, [guestEnabled, loginDefaultType]);
 
     const handleLogin = async () => {
         try {
@@ -54,13 +58,14 @@ export default function Login() {
 
     return (
         <AuthLayout title={env.PUBLIC_VIDEO_REVIEW_TITLE} backgroundImageUrl={env.PUBLIC_LOGIN_BG_URL}>
-                <Tabs defaultValue={type} onValueChange={(val) => setType(val as LoginType)}>
+            {type && (
+                <Tabs value={type} onValueChange={(val) => setType(val as LoginType)}>
                     <TabsList>
-                        {env.PUBLIC_ALLOW_GUEST && <TabsTrigger value="guest">Guest</TabsTrigger>}
+                        {guestEnabled && <TabsTrigger value="guest">Guest</TabsTrigger>}
                         <TabsTrigger value="jira">JIRA</TabsTrigger>
                         <TabsTrigger value="password">Email & Password</TabsTrigger>
                     </TabsList>
-                    {env.PUBLIC_ALLOW_GUEST && (
+                    {guestEnabled && (
                         <TabsContent value="guest">
                             <AuthCard>
                                 <div className="h-8"></div>
@@ -107,6 +112,7 @@ export default function Login() {
                         </AuthCard>
                     </TabsContent>
                 </Tabs>
+            )}
         </AuthLayout>
     );
 }

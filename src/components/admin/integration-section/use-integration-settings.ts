@@ -26,7 +26,8 @@ const SECRET_MASK = "********";
 
 const valueOf = (state: FieldState | undefined) => (state && "value" in state ? state.value ?? "" : "");
 
-export function useIntegrationSettings(name: IntegrationName) {
+// A screen with no connection to test replaces the "connected" / "failed to test" wording.
+export function useIntegrationSettings(name: IntegrationName, wording: { saved?: string; failed?: string } = {}) {
     const t = useTranslations("admin-settings");
     const endpoint = api.admin.settings[name];
 
@@ -78,7 +79,7 @@ export function useIntegrationSettings(name: IntegrationName) {
         try {
             await action();
         } catch (e) {
-            setStatus({ state: "error", message: `${t(failure)}: ${e instanceof Error ? e.message : String(e)}` });
+            setStatus({ state: "error", message: `${failure}: ${e instanceof Error ? e.message : String(e)}` });
         }
     }
 
@@ -90,19 +91,19 @@ export function useIntegrationSettings(name: IntegrationName) {
         const { result, state } = (await res.json()) as { result: { ok: boolean; error?: string }; state: Settings };
         if (result.ok) {
             load(state);
-            setStatus({ state: "ok", message: t("integrations.saved") });
+            setStatus({ state: "ok", message: wording.saved ?? t("integrations.saved") });
             void checkConnection();
         } else {
             setStatus({ state: "error", message: t("integrations.notSaved", { error: result.error ?? "" }) });
         }
-    }, "integrations.testFailed");
+    }, wording.failed ?? t("integrations.testFailed"));
 
     const reset = () => run(async () => {
         const res = await endpoint.$delete();
         if (res.status !== 200) throw new Error(await readError(res));
         load((await res.json()) as Settings);
         void checkConnection();
-    }, "integrations.resetFailed");
+    }, t("integrations.resetFailed"));
 
     function field(field: string) {
         const state = settings?.[field];

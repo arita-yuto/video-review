@@ -2,13 +2,13 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { env } from "@/lib/env";
 import ComboBox from "@/components/controls/combo-box";
 import { ControlRow } from "@/components/controls/control-row";
 import { FormDialog } from "@/components/dialog/form-dialog";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth-store";
 import { useVideoStore } from "@/stores/video-store";
+import { useConfigStore } from "@/stores/config-store";
 
 async function downloadVideo(videoId: string, videoRevId: string, width?: number): Promise<void> {
     const res = await api.media.download.$get({
@@ -40,14 +40,15 @@ async function downloadVideo(videoId: string, videoRevId: string, width?: number
 export function VideoDownloadDialog({ videoId, videoRevId, open, onClose }: { videoId: string; videoRevId: string; open: boolean; onClose: () => void }) {
     const t = useTranslations("video-download");
     const [selectedResolution, setSelectedResolution] = useState<number | undefined>(undefined);
+    const presets = useConfigStore(s => s.resolutionPresets);
     const resolutions = useMemo(() => {
         const res: Record<string, number | undefined> = {};
         res["original"] = undefined;
-        env.RESOLUTION_PRESETS.forEach((w) => {
+        presets.forEach((w) => {
             res[`${w}p`] = w;
         });
         return res;
-    }, []);
+    }, [presets]);
 
     useEffect(() => {
         if (open) {

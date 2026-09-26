@@ -3,6 +3,7 @@ import { createRouter } from "@/server/lib/openapi/router";
 import { z } from "zod";
 import { ChatProviders, ChatType } from "@/server/lib/chat/chat-type";
 import { authorize } from "@/server/lib/token";
+import { getUrlSchema } from "@/server/lib/integrations/general";
 import { ServerError } from "@/server/lib/server-error";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { chatSlack, chatWebhook, chatEmail } from "@/server/lib/chat";
@@ -35,12 +36,12 @@ function getFile(form: FormData, key: string): File | undefined {
     return v instanceof File ? v : undefined;
 }
 
-function buildChatContext(form: FormData): ChatType {
+async function buildChatContext(form: FormData): Promise<ChatType> {
     const baseURL = getStr(form, "baseURL");
     const videoId = getStr(form, "videoId");
     const commentId = getStr(form, "commentId");
     const scenePath = getStr(form, "scenePath");
-    const sceneLink = createOpenSceneLink(scenePath!) ?? undefined;
+    const sceneLink = createOpenSceneLink(await getUrlSchema(), scenePath!) ?? undefined;
     const videoLink = createVideoCommentLink(baseURL!, videoId!, commentId!) ?? undefined;
 
     return {
@@ -99,7 +100,7 @@ export const chatRouter = createRouter()
         }
 
         const form = await c.req.formData();
-        const ctx = buildChatContext(form);
+        const ctx = await buildChatContext(form);
         const notifiedProviders: ChatProviders[] = []
 
         if (await chatSlack(ctx)) {

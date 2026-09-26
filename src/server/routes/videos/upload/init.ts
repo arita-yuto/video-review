@@ -5,6 +5,7 @@ import { authorize } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
 import { VideoReviewStorage } from "@/server/lib/storage";
 import { env } from "@/server/lib/env/storage-env";
+import { getUploadChunkMb } from "@/server/lib/integrations/general";
 import path from "path";
 import { createSession } from "@/server/lib/upload-session";
 import { UploadStorageType } from "@/lib/db-types";
@@ -162,7 +163,7 @@ export const initRouter = createRouter()
                     console.log("[upload.init] upload url issued");
                     // The chunk size is a property of this deployment (an upload limit in front
                     // of the server), so the clients are told rather than configured.
-                    complete(c.json({ url, session, chunkSize: env.VIDEO_REVIEW_UPLOAD_CHUNK_MB * 1024 * 1024 }));
+                    complete(c.json({ url, session, chunkSize: (await getUploadChunkMb()) * 1024 * 1024 }));
                 } catch (err) {
                     fail(err);
                 }

@@ -19,7 +19,7 @@ test.describe("smoke: reach the app and log in", () => {
     test("email/password login lands on the review main page", async ({ page }) => {
         await page.goto("/login");
 
-        // Default tab is "guest"; switch to the email/password form.
+        // The default tab is configurable, so pick "Email & Password" explicitly.
         await page.getByRole("tab", { name: "Email & Password" }).click();
 
         // Only the active tab panel is mounted, so these selectors are unambiguous.
