@@ -115,7 +115,7 @@ Slack へ共有したり、Jira のチケットとして起票することがで
 <img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="700" />
 
 動画レビューに紐づいたファイルやシーンを直接開けるため、
-レビュー後の修正作業までスムーズにつながります
+レビュー後の修正作業までスムーズにつながります（[エディタ連携ガイド](./documents/editor-guide.jp.md)）
 
 # ✨ Advanced Features
 
@@ -210,6 +210,7 @@ docker compose -f compose.prod.yml up -d
 * [Local / On‑premise Build Guide](./documents/build.run/local-guide.jp.md)
 * [AI Features Guide](./documents/build.run/ai-guide.jp.md)
 * [管理画面ガイド](./documents/admin/README.jp.md)
+* [エディタ連携ガイド（Open Scene）](./documents/editor-guide.jp.md)
 
 ## License
 

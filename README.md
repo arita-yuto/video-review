@@ -116,7 +116,7 @@ keeping feedback actionable without switching tools.
 <img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="700" />
 
 Open the relevant Unity scene or asset directly from a reviewed video,
-so feedback naturally leads into the next step of work.
+so feedback naturally leads into the next step of work ([Editor Integration Guide](./documents/editor-guide.md)).
 
 # ✨ Advanced Features
 ### Powerful Search for Review Workflow
@@ -209,6 +209,7 @@ For detailed instructions, see:
 * [Local / On‑premise Build Guide](./documents/build.run/local-guide.md)
 * [AI Features Guide](./documents/build.run/ai-guide.md)
 * [Admin Screen Guide](./documents/admin/README.md)
+* [Editor Integration Guide (Open Scene)](./documents/editor-guide.md)
 
 ## License
 
