@@ -33,9 +33,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: web-runtime
+          - name: videoreview-runtime
             dockerfile: docker/web/Dockerfile
-          - name: web-prod
+          - name: videoreview
             dockerfile: docker/web/Dockerfile.prod
           - name: video-processing
             dockerfile: docker/video-processing/Dockerfile
