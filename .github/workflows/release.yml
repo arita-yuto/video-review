@@ -37,9 +37,14 @@ jobs:
       - uses: ./.github/actions/build-cli
         with:
           package: "true"
+      - uses: ./.github/actions/build-launcher
+        with:
+          package: "true"
       - name: Attach the binaries to the release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
-          files: maintenance/dist/*
+          files: |
+            maintenance/dist/*
+            integrations/launcher/dist/*.zip
           # GitHub writes the body from the pull request titles merged since the last tag.
           generate_release_notes: true

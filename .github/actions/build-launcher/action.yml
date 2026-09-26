@@ -1,0 +1,38 @@
+name: Build the launcher
+description: Builds the videoreview:// launcher and, when asked, leaves one zip per OS with its installer in dist/
+
+inputs:
+  package:
+    description: Write the zips to integrations/launcher/dist instead of discarding the build
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v7
+      with:
+        go-version-file: integrations/launcher/go.mod
+
+    - name: Build
+      shell: bash
+      working-directory: integrations/launcher
+      run: go build ./...
+
+    # Each zip unpacks to the binary next to its installer, which is the layout the installers expect.
+    - name: Cross-compile and zip with the installers
+      if: inputs.package == 'true'
+      shell: bash
+      working-directory: integrations/launcher
+      run: |
+        rm -rf dist && mkdir -p dist/windows-amd64 dist/darwin-arm64 dist/darwin-amd64
+        GOOS=windows GOARCH=amd64 go build -o dist/windows-amd64/videoreview-launcher.exe .
+        cp installers/windows/install.ps1 dist/windows-amd64/
+        for arch in arm64 amd64; do
+          GOOS=darwin GOARCH=$arch go build -o dist/darwin-$arch/videoreview-launcher .
+          cp installers/mac/build-app.sh installers/mac/Info.plist installers/mac/videoreview-bridge.script dist/darwin-$arch/
+        done
+        for dir in windows-amd64 darwin-arm64 darwin-amd64; do
+          (cd dist/$dir && zip -q -r ../videoreview-launcher-$dir.zip .)
+        done
