@@ -9,13 +9,6 @@
     Comment on timelines, draw on frames, and connect feedback to action.
   </p>
 
-  <!-- Buttons -->
-  <p>
-    <a href="https://demo-video-review.d16slh4aq95cwn.amplifyapp.com/" target="_blank" rel="noopener noreferrer">
-      <img alt="Start Demo" src="https://img.shields.io/badge/Start%20Demo-Open-blue?style=for-the-badge" />
-    </a>
-  </p>
-
   <p align="center">
     <a href="https://github.com/arita-yuto/video-review/stargazers">
       <img src="https://img.shields.io/github/stars/arita-yuto/video-review?style=social" alt="GitHub stars" />
@@ -89,6 +82,17 @@ VideoReviewはオンプレミス環境での運用を前提に設計していま
 
 これらはバッジや色分けによって強調され、読む前に一目で分かります
 
+#### 動画に直接お絵かきできます
+
+<img src="https://github.com/user-attachments/assets/47c65756-c12c-40f6-b67b-c826a5d021d0" width="700" />
+
+気になる箇所は、言葉で説明する代わりにフレームへ直接描き込めます
+
+1. 動画を止めてコメントを投稿します
+2. そのコメントのメニューから Edit を選ぶと、動画の上に描けるようになります
+3. 左上のツールでペンと消しゴムを切り替え、太さと色を選んで描きます
+4. コメントを保存すると、描き込みがそのコメントに付き、再生時に同じ時刻で表示されます
+
 
 ## Never Miss Feedback with Slack & JIRA
 
@@ -121,15 +125,43 @@ Slack へ共有したり、Jira のチケットとして起票することがで
 
 ## Powerful Search for Review Workflow
 
-動画とコメントをそれぞれ独立して検索できます
+動画、コメント、イベントをそれぞれ別の条件で検索できます
 
-- コメントがある動画だけを探す
-- 特定の人・期間のレビューを抽出する
-- 描画やチケット付きの指摘を絞り込む
+- 動画: コメントの有無、チケットや描画の有無、コメントした人、本文、コメント日、動画の更新日
+- コメント: 本文、日付、描画やチケットの有無、書いた人
+- イベント: 台詞や字幕などのテキスト、種類、リンクの有無
 
+「先週 A さんが描画付きで指摘した動画」「このセリフが出てくる動画」のような探し方が、条件を組み合わせるだけでできます  
 日々のレビューから、後日の振り返りまで必要な情報にすぐたどり着けます
 
-<img src="https://github.com/user-attachments/assets/2ff99052-bf6f-409a-aab9-e6628444e61a" width="700"></img>
+<img src="https://github.com/user-attachments/assets/cccd3a3c-2d50-4963-85a5-6659d4a6b972" width="700" />
+
+## Ask in Plain Language: AI Chat Search
+
+条件を組み立てる代わりに、そのまま質問できます
+
+- 「先月レビューが集中した動画は？」
+- 「未対応の指摘が残っている動画を教えて」
+- 「このリビジョンで何が変わった？」
+
+AI が動画アップロード日、タグ、コメント、コード変更を横断して答えます
+
+<img src="https://github.com/user-attachments/assets/82679465-046f-45c4-94cf-40b8bb8dc41b" width="30%" />
+
+同じ検索は MCP でも公開しているので、Claude Code や Codex CLI、Gemini CLI などの AI エージェントからも VideoReview に質問できます
+
+LLM は Claude / OpenAI / Gemini のほか、Ollama でローカル完結にもできます（[AI 機能ガイド](./documents/build.run/ai-guide.jp.md)）
+
+## See the Code Behind Every Revision
+
+リポジトリを接続すると、動画のサイドパネルの Changes タブに、前のリビジョンからこのリビジョンまでに入ったコミットと Pull Request が並びます
+
+- 動画に紐づけたパスに触れた変更だけを表示し、関係の薄いものは畳んでおく
+- AI 機能を有効にすると、変更内容の要約も出る
+
+<img src="https://github.com/user-attachments/assets/ebe41883-3720-4b3f-9bc1-3177e36f3bbd" width="320" />
+
+「この見た目の変化はどの変更のせいか」を、レビューの画面から離れずに追えます（[VCS 設定](./documents/admin/integrations/vcs.jp.md)）
 
 ## Built for Production Pipelines
 

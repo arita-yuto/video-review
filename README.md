@@ -11,9 +11,6 @@
 
   <!-- Buttons -->
   <p>
-    <a href="https://demo-video-review.d16slh4aq95cwn.amplifyapp.com/" target="_blank" rel="noopener noreferrer">
-      <img alt="Start Demo" src="https://img.shields.io/badge/Start%20Demo-Open-blue?style=for-the-badge" />
-    </a>
     <a href="./README.jp.md">
       <img alt="日本語 README" src="https://img.shields.io/badge/README-日本語-ff69b4?style=for-the-badge" />
     </a>
@@ -92,6 +89,17 @@ The comment list is designed with a social‑style, intuitive UI:
 
 Badges and color cues highlight what needs action at a glance.
 
+#### Draw on the frame
+
+<img src="https://github.com/user-attachments/assets/47c65756-c12c-40f6-b67b-c826a5d021d0" width="700" />
+
+Instead of describing a spot in words, draw on the frame itself.
+
+1. Pause the video and post a comment.
+2. Choose Edit from that comment's menu; the video becomes a canvas.
+3. Use the tools at the top left to switch between pen and eraser and pick the width and color.
+4. Save the comment. The drawing is attached to it and shows up at the same time during playback.
+
 ### Never Miss Feedback with Slack & Jira
 
 **Make feedback visible where your team already works.**
@@ -121,15 +129,43 @@ so feedback naturally leads into the next step of work.
 # ✨ Advanced Features
 ### Powerful Search for Review Workflow
 
-Search videos and comments independently:
+Videos, comments and events each have their own search:
 
-- Find videos that have comments
-- Filter by specific people or time ranges
-- Narrow down to drawings or ticketed feedback
+- Videos: has comments, has a ticket or a drawing, comment author, text, comment date, video update date
+- Comments: text, date, has a drawing or a ticket, author
+- Events: the text of a line or a caption, the kind, has a link
 
+Queries like "videos A drew on last week" or "videos where this line is spoken" are just a few filters combined.  
 From day-to-day reviews to later retrospectives, the right info is always close.
 
-<img src="https://github.com/user-attachments/assets/2ff99052-bf6f-409a-aab9-e6628444e61a" width="700"></img>
+<img src="https://github.com/user-attachments/assets/cccd3a3c-2d50-4963-85a5-6659d4a6b972" width="700" />
+
+### Ask in Plain Language: AI Chat Search
+
+Instead of building a query, just ask:
+
+- "Which videos got the most reviews last month?"
+- "Which videos still have unresolved feedback?"
+- "What changed in this revision?"
+
+The AI answers across videos, comments, events and code changes.
+
+<img src="https://github.com/user-attachments/assets/82679465-046f-45c4-94cf-40b8bb8dc41b" width="50%" />
+
+The same search is exposed over MCP, so AI agents such as Claude Code, Codex CLI or Gemini CLI can ask VideoReview too.
+
+The LLM can be Claude, OpenAI or Gemini, or Ollama for a fully local setup ([AI Features Guide](./documents/build.run/ai-guide.md)).
+
+### See the Code Behind Every Revision
+
+With a repository connected, the Changes tab in a video's side panel lists the commits and pull requests that landed between the previous revision and this one.
+
+- Only changes that touched the paths tied to the video are shown; low-relevance ones stay folded
+- With the AI features on, a summary of the changes appears as well
+
+<img src="https://github.com/user-attachments/assets/ebe41883-3720-4b3f-9bc1-3177e36f3bbd" width="320" />
+
+Trace "which change caused this" without leaving the review screen ([VCS settings](./documents/admin/integrations/vcs.md)).
 
 ### Built for Production Pipelines
 
