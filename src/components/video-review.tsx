@@ -7,9 +7,12 @@ import VideoControlPanel from "@/components/video-control-panel";
 import { useCommentStore } from "@/stores/comment-store";
 import { useVideoStore } from "@/stores/video-store";
 import VideoTitle from "@/components/video-title";
-import CanvasControlPanel from "@/components/canvas-control-panel";
 import { VideoComment } from "@/lib/db-types";
 import { useDrawingStore } from "@/stores/drawing-store";
+import { useCommentEditStore } from "@/stores/comment-edit-store";
+import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
+import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
+import { brushCursor } from "@/lib/drawing/cursor";
 import { useTranslations } from "next-intl";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { useRouter } from "next/navigation";
@@ -22,12 +25,26 @@ export default function VideoReview() {
     const router = useRouter();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const commentDrawingCache = useRef<Map<string, HTMLImageElement>>(new Map());
     const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
 
     const {
         setCanvasRefElement,
-        canvasEditing } = useDrawingStore();
+        setCanvasSize,
+        setCanvasEditing,
+        canvasSize,
+        canvasEditing,
+        drawings,
+        loadDrawing } = useDrawingStore();
+    const editing = useCommentEditStore((s) => s.editingComment !== null);
+    const brushWidth = useDrawingSettingsStore((s) => s.width);
+
+    useDrawingCanvas();
+
+    // Keyed on the boolean: entering a session resets the history, and the edited
+    // comment object is replaced while saving, which must not count as a new session.
+    useEffect(() => {
+        setCanvasEditing(editing);
+    }, [editing]);
 
     const { token } = useAuthStore();
 
@@ -102,50 +119,73 @@ export default function VideoReview() {
     }, [playMode]);
 
     useEffect(() => {
-        let canceled = false;
-        void (async () => {
-            for (const c of comments) {
-                const path = c.drawingPath;
-                if (!path) continue;
-
-                if (commentDrawingCache.current.has(path)) continue;
-                const url = await resolveMediaUrl(path);
-                if (canceled || !url) return;
-
-                const img = new Image();
-                img.src = url;
-                img.onload = () => {
-                    if (canceled) return;
-                    commentDrawingCache.current.set(path, img);
-                };
-                commentDrawingCache.current.set(path, img);
-            }
-        })();
-
-        return () => { canceled = true; };
+        for (const c of comments) {
+            if (c.drawingPath) void loadDrawing(c.drawingPath);
+        }
     }, [comments]);
 
+    // While a comment is being edited the drawing hook owns the canvas; repainting here
+    // would wipe the strokes in progress.
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas || canvasEditing) return;
 
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        const toDraw = isPlaying ? activeComments : (selectedComment ? [selectedComment] : []);
+        // The selection holds the object from click time; after a save the list has a
+        // newer one (a first drawing adds its path), so look the comment up again.
+        const current = selectedComment && (comments.find((c) => c.id === selectedComment.id) ?? selectedComment);
+        const toDraw = isPlaying ? activeComments : (current ? [current] : []);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (const comment of toDraw) {
-            if (!comment.drawingPath) continue;
-
-            const img = commentDrawingCache.current.get(comment.drawingPath);
-            if (!img || !img.complete || img.width === 0 || img.height === 0) continue;
-
-            ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            ctx.restore();
+            const img = comment.drawingPath ? drawings.get(comment.drawingPath) : undefined;
+            if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
-    }, [activeComments, selectedComment, isPlaying]);
+    }, [activeComments, selectedComment, comments, isPlaying, canvasEditing, canvasSize, drawings]);
+
+    // Keep the canvas's backing store at the video's on-screen size times the current
+    // device pixel ratio. Both change when the window moves to another display, and a
+    // canvas fitted on one display draws offset and blurry on the other.
+    useEffect(() => {
+        const v = videoRef.current;
+        const c = canvasRef.current;
+        if (!v || !c) return;
+
+        const fit = () => {
+            const rect = v.getBoundingClientRect();
+            const ratio = window.devicePixelRatio || 1;
+            const width = Math.round(rect.width * ratio);
+            const height = Math.round(rect.height * ratio);
+            if (width === 0 || height === 0 || (c.width === width && c.height === height)) return;
+
+            c.width = width;
+            c.height = height;
+            setCanvasSize({ width, height });
+        };
+
+        const observer = new ResizeObserver(fit);
+        observer.observe(v);
+
+        // matchMedia has no "ratio changed" event; a query that matches only the current
+        // ratio flips to false when it changes, then we re-arm for the new one.
+        let ratioQuery: MediaQueryList | null = null;
+        const watchRatio = () => {
+            ratioQuery?.removeEventListener("change", onRatioChange);
+            ratioQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+            ratioQuery.addEventListener("change", onRatioChange);
+        };
+        const onRatioChange = () => {
+            fit();
+            watchRatio();
+        };
+        watchRatio();
+
+        return () => {
+            observer.disconnect();
+            ratioQuery?.removeEventListener("change", onRatioChange);
+        };
+    }, [selectedRevision]);
 
     useEffect(() => {
         if (selectedComment && selectedComment.time !== currentTime) {
@@ -179,8 +219,7 @@ export default function VideoReview() {
         if (selectedRevision == null) return
 
         const v = videoRef.current;
-        const c = canvasRef.current;
-        if (!c || !v) return;
+        if (!v) return;
 
         fetchComments(selectedRevision);
 
@@ -196,16 +235,6 @@ export default function VideoReview() {
         const onPause = () => setIsPlaying(false);
         const onMeta = () => {
             setDuration(v.duration);
-            const rect = v.getBoundingClientRect();
-            const ratio = window.devicePixelRatio || 1;
-            c.width = rect.width * ratio;
-            c.height = rect.height * ratio;
-
-            const ctx = c.getContext("2d");
-            if (ctx) {
-                ctx.scale(ratio, ratio);
-            }
-
             v.playbackRate = playbackRate;
             v.volume = volumeEnabled ? volume : 0.0;
         }
@@ -314,11 +343,11 @@ export default function VideoReview() {
                                         <canvas
                                             ref={canvasRef}
                                             className={cn(
-                                                "absolute top-0 left-0 w-full h-full",
-                                                canvasEditing ? "pointer-events-auto cursor-crosshair" : "pointer-events-none",
+                                                "absolute top-0 left-0 w-full h-full touch-none",
+                                                canvasEditing ? "pointer-events-auto brush-cursor" : "pointer-events-none",
                                             )}
+                                            style={{ "--brush-cursor": brushCursor(brushWidth) } as React.CSSProperties}
                                         />
-                                        <CanvasControlPanel />
                                     </div>
                                 </div>
 

@@ -157,12 +157,21 @@
   scrollbar-width: none;
 }
 
-.chrome-picker input {
-  background: #222 !important;
-  color: #fff !important;
-  border: 1px solid #444 !important;
+/* Hue ring of the drawing tool panel. A rainbow by nature, so it is the one place
+   colours are not theme tokens. --ring-inner is the hole radius set at runtime. */
+@utility hue-ring {
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  mask: radial-gradient(circle, transparent calc(var(--ring-inner) - 0.5px), #000 calc(var(--ring-inner) + 0.5px));
 }
 
-.chrome-picker label {
-  color: #ccc !important;
+/* Brush outline cursor over the review canvas; the image is built at runtime from the line width. */
+@utility brush-cursor {
+  cursor: var(--brush-cursor, crosshair);
+}
+
+/* The saturation square sizes itself inline, so the override has to win. */
+@utility hue-ring-square {
+  width: var(--ring-square) !important;
+  height: var(--ring-square) !important;
 }

@@ -12,6 +12,8 @@ import VideoFoldersTree from "@/components/video-browser/video-folders-tree";
 import { useVideoStore } from "@/stores/video-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { api } from "@/lib/api-client";
+import { useDrawingStore } from "@/stores/drawing-store";
+import DrawingToolPanel from "@/components/drawing-tool-panel";
 
 export default function VideoListPanel() {
     const router = useRouter();
@@ -21,6 +23,7 @@ export default function VideoListPanel() {
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [thumbnailsOpen, setThumbnailsOpen] = useState(false);
     const [unReadVideoIds, setUnReadVideoIds] = useState<string[]>([]);
+    const canvasEditing = useDrawingStore((s) => s.canvasEditing);
 
     useEffect(() => {
         void (async () => {
@@ -53,27 +56,32 @@ export default function VideoListPanel() {
     return (
         <>
             <Sidebar>
-                <VideoListPanelHeader
-                    onSearchDialogShow={() => setSearchDialogOpen(true)}
-                    onUploadDialogShow={() => setUploadDialogOpen(true)}
-                    onThumbnailsToggle={() => setThumbnailsOpen((open) => !open)}
-                    thumbnailsOpen={thumbnailsOpen}
-                />
-
-                <SidebarContent>
-                    <VideoFoldersTree
-                        videos={videos}
-                        unReadVideoIds={unReadVideoIds}
-                        selectedVideoId={selectedVideo?.id ?? null}
-                        onSelectVideo={(id) => {
-                            router.replace(`/video-review/review/${id}`);
-                        }}
+                {/* While a drawing is being edited the sidebar shows the tool panel instead. The list
+                    is hidden, not unmounted: its header refetches videos on mount, reloading the player. */}
+                {canvasEditing && <DrawingToolPanel />}
+                <div className={canvasEditing ? "hidden" : "contents"}>
+                    <VideoListPanelHeader
+                        onSearchDialogShow={() => setSearchDialogOpen(true)}
+                        onUploadDialogShow={() => setUploadDialogOpen(true)}
+                        onThumbnailsToggle={() => setThumbnailsOpen((open) => !open)}
+                        thumbnailsOpen={thumbnailsOpen}
                     />
-                </SidebarContent>
 
-                <SidebarFooter>
-                    <SettingPopover />
-                </SidebarFooter>
+                    <SidebarContent>
+                        <VideoFoldersTree
+                            videos={videos}
+                            unReadVideoIds={unReadVideoIds}
+                            selectedVideoId={selectedVideo?.id ?? null}
+                            onSelectVideo={(id) => {
+                                router.replace(`/video-review/review/${id}`);
+                            }}
+                        />
+                    </SidebarContent>
+
+                    <SidebarFooter>
+                        <SettingPopover />
+                    </SidebarFooter>
+                </div>
 
                 <VideoSearchDialog open={searchDialogOpen} onClose={() => setSearchDialogOpen(false)} />
                 <VideoUploadDialog open={uploadDialogOpen} onClose={async (uploadedVideoId) => {
