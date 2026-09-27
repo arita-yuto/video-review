@@ -61,7 +61,7 @@ export function HueRing({ hue, size, thickness, onChange, children }: {
             <div className="absolute inset-0 rotate-(--hue-angle) pointer-events-none">
                 <div className="absolute left-1/2 top-0 -translate-x-1/2 size-(--ring-thickness) rounded-sm border-2 border-white bg-(--swatch) shadow-sm" />
             </div>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none [&>*]:pointer-events-auto">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none *:pointer-events-auto">
                 {children}
             </div>
         </div>

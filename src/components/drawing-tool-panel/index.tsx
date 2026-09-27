@@ -29,8 +29,8 @@ export default function DrawingToolPanel() {
     const opacity = Math.round(opacities[brush] * 100);
     const { history, undoStroke, redoStroke, clearDrawing } = useDrawingStore();
 
-    const canUndo = history.items.length > 0;
-    const canRedo = history.undone.length > 0;
+    const canUndo = history.past.length > 0;
+    const canRedo = history.future.length > 0;
 
     return (
         <>

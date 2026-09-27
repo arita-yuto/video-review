@@ -17,22 +17,20 @@ const isTextInput = (target: EventTarget | null) => {
 };
 
 /**
- * Manages the review canvas while a comment is being edited: hands each pointer to a
- * tool, honours the pen's eraser end, runs the keyboard shortcuts and repaints. Touch
- * never draws: on a pen display it is the resting hand, and touch devices are out of scope. The canvas holds three layers, painted back to front on every frame: the
- * base (the drawing the comment already has), the committed strokes, and what the
- * active tool is doing. The committed layer is cached offscreen.
+ * Runs the canvas while a comment is being edited: routes each pointer to the active
+ * tool, handles the keyboard shortcuts, and repaints the base, the committed items and
+ * the tool's live item, in that order. The committed layer is cached offscreen.
  */
 export const useDrawingCanvas = () => {
     const canvas = useDrawingStore((s) => s.canvasRefElement);
     const canvasEditing = useDrawingStore((s) => s.canvasEditing);
     const canvasSize = useDrawingStore((s) => s.canvasSize);
-    const history = useDrawingStore((s) => s.history);
-    const baseHidden = useDrawingStore((s) => s.baseHidden);
+    const state = useDrawingStore((s) => s.history.present);
     const { commitItem, undoStroke, redoStroke, loadDrawing, setPicking } = useDrawingStore();
     const drawingPath = useCommentEditStore((s) => s.editingComment?.drawingPath ?? null);
     // The comment's saved drawing, from the shared cache so a just-saved one is current.
-    const base = useDrawingStore((s) => (canvasEditing && drawingPath ? s.drawings.get(drawingPath) ?? null : null));
+    const saved = useDrawingStore((s) => (canvasEditing && drawingPath ? s.drawings.get(drawingPath) ?? null : null));
+    const base = state.base === "saved" ? saved : state.base;
 
     const committedRef = useRef<HTMLCanvasElement | null>(null);
     const activeToolRef = useRef<PointerTool | null>(null);
@@ -61,7 +59,7 @@ export const useDrawingCanvas = () => {
         if (canvasEditing && drawingPath) void loadDrawing(drawingPath);
     }, [canvasEditing, drawingPath]);
 
-    // Rebuild the committed layer when the strokes or the canvas size change, then repaint.
+    // Rebuild the committed layer when the state or the canvas size change, then repaint.
     // The base is drawn stretched to the current size, so a re-fitted canvas keeps its content.
     useEffect(() => {
         if (!canvas || !canvasEditing) return;
@@ -70,11 +68,11 @@ export const useDrawingCanvas = () => {
         committed.width = canvas.width;
         committed.height = canvas.height;
         const ctx = committed.getContext("2d");
-        if (ctx) renderLayers(ctx, baseHidden ? null : base, history.items, canvasScale(canvas));
+        if (ctx) renderLayers(ctx, base, state.items, canvasScale(canvas));
 
         committedRef.current = committed;
         paint();
-    }, [canvas, canvasEditing, history, baseHidden, base, canvasSize, paint]);
+    }, [canvas, canvasEditing, state, base, canvasSize, paint]);
 
     useEffect(() => {
         if (!canvas || !canvasEditing) return;
@@ -108,6 +106,7 @@ export const useDrawingCanvas = () => {
 
         const onDown = (e: PointerEvent) => {
             const eraserEnd = isEraserButton(e);
+            // Touch is not a drawing input here; only the main button or the pen's eraser end starts a tool.
             if (e.pointerType === "touch" || activePointer !== null || (e.button !== 0 && !eraserEnd)) return;
 
             const settings = useDrawingSettingsStore.getState();

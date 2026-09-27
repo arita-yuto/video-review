@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { api } from "@/lib/api-client";
 import { uploadToSession } from "@/lib/upload-transfer";
 import { resolveMediaUrl } from "@/lib/media-url";
-import { DrawingHistory, emptyHistory, pushItem, redo, undo } from "@/lib/drawing/history";
+import { DrawingHistory, commitSnapshot, initialHistory, pushItem, redo, undo } from "@/lib/drawing/history";
 import type { DrawingItem } from "@/lib/drawing/types";
 
 interface DrawingState {
@@ -11,10 +11,8 @@ interface DrawingState {
     canvasSize: { width: number; height: number };
     canvasEditing: boolean;
     needSave: boolean;
-    /** Strokes of the current editing session. Reset whenever editing starts or ends. */
+    /** Snapshots of the current editing session. Reset whenever editing starts or ends. */
     history: DrawingHistory;
-    /** Set by "clear": the comment's saved drawing is left out of the repaint. */
-    baseHidden: boolean;
     /** Loaded comment drawings by storage path, ready to drawImage. */
     drawings: Map<string, CanvasImageSource>;
     /** While the eyedropper is pressed: where it is (canvas fractions), what it sees, and the colour before. */
@@ -28,7 +26,7 @@ interface DrawingState {
     commitItem: (item: DrawingItem) => void;
     undoStroke: () => void;
     redoStroke: () => void;
-    /** Wipe the session: strokes and the saved drawing underneath. Not undoable. */
+    /** Wipe the canvas: items and the saved drawing underneath. Undoable like any other step. */
     clearDrawing: () => void;
     /** Fetch a comment's drawing into `drawings` unless it is there or on its way. */
     loadDrawing: (path: string) => Promise<void>;
@@ -50,13 +48,12 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
     canvasSize: { width: 0, height: 0 },
     canvasEditing: false,
     needSave: false,
-    history: emptyHistory,
-    baseHidden: false,
+    history: initialHistory,
     drawings: new Map(),
     picking: null,
 
     // A session starts clean: nothing to save until a stroke lands.
-    setCanvasEditing: (r) => set({ canvasEditing: r, history: emptyHistory, baseHidden: false, needSave: false }),
+    setCanvasEditing: (r) => set({ canvasEditing: r, history: initialHistory, needSave: false }),
     setCanvasRefElement: (canvas) => set({ canvasRefElement: canvas }),
     setCanvasSize: (size) => set({ canvasSize: size }),
     // Resolves to the path the comment should keep: the upload's when something was
@@ -98,7 +95,13 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
     commitItem: (item) => set((state) => ({ history: pushItem(state.history, item), needSave: true })),
     undoStroke: () => set((state) => ({ history: undo(state.history), needSave: true })),
     redoStroke: () => set((state) => ({ history: redo(state.history), needSave: true })),
-    clearDrawing: () => set({ history: emptyHistory, baseHidden: true, needSave: true }),
+    clearDrawing: () =>
+        set((state) => {
+            const { base, items } = state.history.present;
+            // Already empty: nothing to wipe, and no step for Undo to chew through.
+            if (base === null && items.length === 0) return state;
+            return { history: commitSnapshot(state.history, { base: null, items: [] }), needSave: true };
+        }),
     setPicking: (picking) => set({ picking }),
     loadDrawing: async (path) => {
         if (get().drawings.has(path) || loading.has(path)) return;
