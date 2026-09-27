@@ -38,6 +38,3 @@ export interface Shape {
 export type DrawingItem = Stroke | Shape;
 
 export const isShape = (item: DrawingItem): item is Shape => "kind" in item;
-
-/** How the colour palette shows the inside of the hue ring: an HSV square or an HLS triangle. */
-export type ColorMode = "hsv" | "hls";

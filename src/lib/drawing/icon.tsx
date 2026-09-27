@@ -1,6 +1,6 @@
 import React from "react";
 import { faEyeDropper } from "@fortawesome/free-solid-svg-icons";
-import type { ColorMode, ShapeKind } from "@/lib/drawing/types";
+import type { ShapeKind } from "@/lib/drawing/types";
 
 // The drawing feature's own pictures: cursors (SVG packed into a CSS cursor value) and
 // the icons FontAwesome has no equivalent for.
@@ -35,18 +35,6 @@ export const eyedropperCursor = () => {
         `</svg>`;
     return svgCursor(svg, 2, size - 2);
 };
-
-/** A colour mode's shape inside a circle: the triangle for HLS, the square for HSV. */
-export function ColorModeIcon({ mode, className }: { mode: ColorMode; className?: string }) {
-    return (
-        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            {mode === "hls"
-                ? <polygon points="8.5,6.5 18,12 8.5,17.5" />
-                : <rect x="7.5" y="7.5" width="9" height="9" />}
-        </svg>
-    );
-}
 
 /** The shape tools' outlines. */
 export function ShapeIcon({ kind, className }: { kind: ShapeKind; className?: string }) {

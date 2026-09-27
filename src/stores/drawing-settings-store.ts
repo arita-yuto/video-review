@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { BrushTool, ColorMode, DrawingTool } from "@/lib/drawing/types";
+import type { BrushTool, DrawingTool } from "@/lib/drawing/types";
 
 /** Widths the [ and ] keys step through, in CSS pixels. */
 export const WIDTH_STEPS = [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40];
@@ -27,12 +27,10 @@ interface DrawingSettingsStore {
     pressureEnabled: boolean;
     /** Colors strokes have used, newest first. */
     colorHistory: string[];
-    colorMode: ColorMode;
 
     setTool: (tool: DrawingTool) => void;
     setColor: (color: string) => void;
     swapColors: () => void;
-    setColorMode: (mode: ColorMode) => void;
     setPressureEnabled: (enabled: boolean) => void;
     /** Set the current brush's width. */
     setWidth: (width: number) => void;
@@ -60,7 +58,6 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
             opacities: { pen: 1, eraser: 1 },
             pressureEnabled: true,
             colorHistory: [],
-            colorMode: "hsv",
 
             setTool: (tool) =>
                 set(tool === "eyedropper" ? { tool }
@@ -68,7 +65,6 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
                     : { tool, lastTool: tool }),
             setColor: (color) => set({ color }),
             swapColors: () => set((state) => ({ color: state.subColor, subColor: state.color })),
-            setColorMode: (colorMode) => set({ colorMode }),
             setPressureEnabled: (pressureEnabled) => set({ pressureEnabled }),
             setWidth: (width) => set((state) => ({ widths: { ...state.widths, [state.brush]: clampWidth(width) } })),
             stepWidth: (direction) =>
