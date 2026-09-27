@@ -1,4 +1,4 @@
-import type { Stroke } from "@/lib/drawing/types";
+import type { DrawingItem } from "@/lib/drawing/types";
 import type { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
 
 export type DrawingSettings = ReturnType<typeof useDrawingSettingsStore.getState>;
@@ -12,7 +12,7 @@ export interface ToolContext {
     video: () => HTMLVideoElement | null;
     /** Ask for the live layer to be painted on the next frame. */
     repaint: () => void;
-    commitStroke: (stroke: Stroke) => void;
+    commitItem: (item: DrawingItem) => void;
     setPicking: (picking: { x: number; y: number; color: string; previous: string } | null) => void;
 }
 
@@ -27,5 +27,5 @@ export interface PointerTool {
     /** Drop the interaction without a result (a palm giving way to the pen, the session ending). */
     cancel: () => void;
     /** What to paint over the committed layer this frame. */
-    live: () => Stroke | null;
+    live: () => DrawingItem | null;
 }

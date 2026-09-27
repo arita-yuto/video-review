@@ -158,7 +158,11 @@
         "colorMode": "Switch HSV / HLS",
         "pressure": "Pen pressure",
         "opacity": "Opacity",
-        "eyedropper": "Eyedropper"
+        "eyedropper": "Eyedropper",
+        "line": "Line",
+        "arrow": "Arrow",
+        "rect": "Rectangle",
+        "ellipse": "Ellipse"
     },
     "login": {
         "loginFailedMsg": "Login failed",

@@ -1,15 +1,15 @@
-import type { Stroke } from "@/lib/drawing/types";
+import type { DrawingItem } from "@/lib/drawing/types";
 
 /** Undo/redo stack for one editing session. Immutable so it can live in a store. */
 export interface DrawingHistory {
-    items: Stroke[];
-    undone: Stroke[];
+    items: DrawingItem[];
+    undone: DrawingItem[];
 }
 
 export const emptyHistory: DrawingHistory = { items: [], undone: [] };
 
-export const pushStroke = (history: DrawingHistory, stroke: Stroke): DrawingHistory => ({
-    items: [...history.items, stroke],
+export const pushItem = (history: DrawingHistory, item: DrawingItem): DrawingHistory => ({
+    items: [...history.items, item],
     undone: [],
 });
 

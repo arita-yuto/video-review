@@ -158,7 +158,11 @@
         "colorMode": "HSV / HLS を切り替え",
         "pressure": "筆圧",
         "opacity": "不透明度",
-        "eyedropper": "スポイト"
+        "eyedropper": "スポイト",
+        "line": "直線",
+        "arrow": "矢印",
+        "rect": "四角",
+        "ellipse": "楕円"
     },
     "login": {
         "loginFailedMsg": "ログイン失敗",

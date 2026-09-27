@@ -10,8 +10,12 @@ import { Switch } from "@/ui/switch";
 import { SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader } from "@/ui/sidebar";
 import { useDrawingStore } from "@/stores/drawing-store";
 import { MAX_WIDTH, MIN_WIDTH, useDrawingSettingsStore } from "@/stores/drawing-settings-store";
+import { ShapeIcon } from "@/lib/drawing/icon";
+import type { ShapeKind } from "@/lib/drawing/types";
 import { ColorPalette } from "@/components/drawing-tool-panel/color-palette";
 import { ColorHistory } from "@/components/drawing-tool-panel/color-history";
+
+const SHAPES: [ShapeKind, string][] = [["line", "L"], ["arrow", "A"], ["rect", "R"], ["ellipse", "O"]];
 
 // Replaces the video list while a comment's drawing is being edited, laid out like a
 // paint app's tool palette so every brush control is one click away.
@@ -63,6 +67,13 @@ export default function DrawingToolPanel() {
                             <FontAwesomeIcon icon={faEyeDropper} />
                             {t("eyedropper")}
                         </Button>
+                    </div>
+                    <div className="mt-2 flex gap-2">
+                        {SHAPES.map(([kind, key]) => (
+                            <Button key={kind} variant={tool === kind ? "accent" : "ghost"} size="icon" title={`${t(kind)} (${key})`} onClick={() => setTool(kind)}>
+                                <ShapeIcon kind={kind} className="size-5" />
+                            </Button>
+                        ))}
                     </div>
                 </SidebarGroup>
 

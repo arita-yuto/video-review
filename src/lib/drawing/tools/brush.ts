@@ -35,7 +35,7 @@ export const createBrushTool = (ctx: ToolContext): PointerTool => {
         },
         up: () => {
             if (!stroke) return;
-            ctx.commitStroke(stroke);
+            ctx.commitItem(stroke);
             if (stroke.tool === "pen") ctx.settings().noteColorUsed(stroke.color);
             stroke = null;
         },

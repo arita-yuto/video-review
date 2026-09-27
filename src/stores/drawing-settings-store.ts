@@ -11,8 +11,10 @@ const HISTORY_SIZE = 32;
 
 interface DrawingSettingsStore {
     tool: DrawingTool;
-    /** The pen or eraser last chosen; what the eyedropper hands back to and what the sliders edit. */
+    /** The pen or eraser last chosen: what the sliders edit and what shapes draw with. */
     brush: BrushTool;
+    /** The drawing tool in use before the eyedropper, to hand back to after a pick. */
+    lastTool: Exclude<DrawingTool, "eyedropper">;
     /** The color strokes are drawn with. */
     color: string;
     /** A second slot to switch back and forth with, like a paint app's sub color. */
@@ -51,6 +53,7 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
         (set) => ({
             tool: "pen",
             brush: "pen",
+            lastTool: "pen",
             color: "#ff8800",
             subColor: "#ffffff",
             widths: { pen: 10, eraser: 20 },
@@ -59,7 +62,10 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
             colorHistory: [],
             colorMode: "hsv",
 
-            setTool: (tool) => set(tool === "eyedropper" ? { tool } : { tool, brush: tool }),
+            setTool: (tool) =>
+                set(tool === "eyedropper" ? { tool }
+                    : tool === "pen" || tool === "eraser" ? { tool, lastTool: tool, brush: tool }
+                    : { tool, lastTool: tool }),
             setColor: (color) => set({ color }),
             swapColors: () => set((state) => ({ color: state.subColor, subColor: state.color })),
             setColorMode: (colorMode) => set({ colorMode }),

@@ -1,6 +1,6 @@
 import React from "react";
 import { faEyeDropper } from "@fortawesome/free-solid-svg-icons";
-import type { ColorMode } from "@/lib/drawing/types";
+import type { ColorMode, ShapeKind } from "@/lib/drawing/types";
 
 // The drawing feature's own pictures: cursors (SVG packed into a CSS cursor value) and
 // the icons FontAwesome has no equivalent for.
@@ -44,6 +44,18 @@ export function ColorModeIcon({ mode, className }: { mode: ColorMode; className?
             {mode === "hls"
                 ? <polygon points="8.5,6.5 18,12 8.5,17.5" />
                 : <rect x="7.5" y="7.5" width="9" height="9" />}
+        </svg>
+    );
+}
+
+/** The shape tools' outlines. */
+export function ShapeIcon({ kind, className }: { kind: ShapeKind; className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {kind === "line" && <line x1="4" y1="20" x2="20" y2="4" />}
+            {kind === "arrow" && <><line x1="4" y1="20" x2="20" y2="4" /><polyline points="11,4 20,4 20,13" /></>}
+            {kind === "rect" && <rect x="4" y="5" width="16" height="14" rx="1" />}
+            {kind === "ellipse" && <ellipse cx="12" cy="12" rx="8.5" ry="6.5" />}
         </svg>
     );
 }

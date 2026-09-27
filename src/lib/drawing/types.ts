@@ -1,7 +1,8 @@
 /** Tools that lay down strokes. */
 export type BrushTool = "pen" | "eraser";
+export type ShapeKind = "line" | "arrow" | "rect" | "ellipse";
 /** Everything the tool panel can select; the eyedropper only picks a colour. */
-export type DrawingTool = BrushTool | "eyedropper";
+export type DrawingTool = BrushTool | ShapeKind | "eyedropper";
 
 /** Position as fractions (0..1) of the canvas, so strokes are independent of its pixel size. */
 export interface StrokePoint {
@@ -22,6 +23,21 @@ export interface Stroke {
     pressure: boolean;
     points: StrokePoint[];
 }
+
+/** A shape dragged out between two corners, in canvas fractions like stroke points. */
+export interface Shape {
+    kind: ShapeKind;
+    color: string;
+    width: number;
+    opacity: number;
+    from: { x: number; y: number };
+    to: { x: number; y: number };
+}
+
+/** One entry of the drawing history. */
+export type DrawingItem = Stroke | Shape;
+
+export const isShape = (item: DrawingItem): item is Shape => "kind" in item;
 
 /** How the colour palette shows the inside of the hue ring: an HSV square or an HLS triangle. */
 export type ColorMode = "hsv" | "hls";

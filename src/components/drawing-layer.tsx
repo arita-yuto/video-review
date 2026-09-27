@@ -33,8 +33,10 @@ export function DrawingLayer() {
     const { comments } = useCommentStore();
     const { activeComments, selectedComment } = useVideoReviewStore();
     const isPlaying = useVideoPlayerStore((s) => s.isPlaying);
-    const brushWidth = useDrawingSettingsStore((s) => s.widths[s.brush]);
-    const pickingTool = useDrawingSettingsStore((s) => s.tool === "eyedropper");
+    const cursor = useDrawingSettingsStore((s) =>
+        s.tool === "eyedropper" ? eyedropperCursor()
+        : s.tool === "pen" || s.tool === "eraser" ? brushCursor(s.widths[s.brush])
+        : "crosshair");
 
     useDrawingCanvas();
 
@@ -113,7 +115,7 @@ export function DrawingLayer() {
                     "absolute top-0 left-0 w-full h-full touch-none",
                     canvasEditing ? "pointer-events-auto brush-cursor" : "pointer-events-none",
                 )}
-                style={{ "--brush-cursor": pickingTool ? eyedropperCursor() : brushCursor(brushWidth) } as React.CSSProperties}
+                style={{ "--brush-cursor": cursor } as React.CSSProperties}
             />
             {picking && <EyedropperPreview picking={picking} video={video} drawing={canvas} />}
         </>

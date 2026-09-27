@@ -1,4 +1,4 @@
-import type { Stroke, StrokePoint } from "@/lib/drawing/types";
+import { isShape, type DrawingItem, type Shape, type Stroke, type StrokePoint } from "@/lib/drawing/types";
 
 /** Width share at zero pressure; tuned by hand on a pen display. */
 export const PRESSURE_MIN_RATIO = 0.15;
@@ -82,6 +82,47 @@ const paintStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke, scale: numbe
     }
 };
 
+/** Outline the shape, opaque. */
+const paintShape = (ctx: CanvasRenderingContext2D, shape: Shape, scale: number) => {
+    const { width: cw, height: ch } = ctx.canvas;
+    const x0 = shape.from.x * cw, y0 = shape.from.y * ch;
+    const x1 = shape.to.x * cw, y1 = shape.to.y * ch;
+    ctx.strokeStyle = shape.color;
+    ctx.lineWidth = shape.width * scale;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+
+    switch (shape.kind) {
+        case "line":
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            break;
+        case "arrow": {
+            // The head is two strokes back from the tip, sized with the line so it stays legible.
+            const angle = Math.atan2(y1 - y0, x1 - x0);
+            const head = Math.max(4 * ctx.lineWidth, 12 * scale);
+            const spread = Math.PI / 6;
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.moveTo(x1 - head * Math.cos(angle - spread), y1 - head * Math.sin(angle - spread));
+            ctx.lineTo(x1, y1);
+            ctx.lineTo(x1 - head * Math.cos(angle + spread), y1 - head * Math.sin(angle + spread));
+            break;
+        }
+        case "rect":
+            ctx.rect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
+            break;
+        case "ellipse":
+            ctx.ellipse((x0 + x1) / 2, (y0 + y1) / 2, Math.abs(x1 - x0) / 2, Math.abs(y1 - y0) / 2, 0, 0, Math.PI * 2);
+            break;
+    }
+    ctx.stroke();
+};
+
+const paintItem = (ctx: CanvasRenderingContext2D, item: DrawingItem, scale: number) =>
+    isShape(item) ? paintShape(ctx, item, scale) : paintStroke(ctx, item, scale);
+
 // A translucent stroke is painted opaque here first and then composited once, so the
 // pieces of a pressure stroke (and a path crossing itself) do not stack up darker.
 let scratch: HTMLCanvasElement | null = null;
@@ -94,31 +135,31 @@ const scratchFor = (width: number, height: number) => {
     return scratch;
 };
 
-/** `scale` converts the stroke's CSS-pixel width to canvas pixels (canvas.width / rect.width). */
-export const drawStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke, scale: number) => {
-    if (stroke.points.length === 0) return;
+/** `scale` converts the item's CSS-pixel width to canvas pixels (canvas.width / rect.width). */
+export const drawItem = (ctx: CanvasRenderingContext2D, item: DrawingItem, scale: number) => {
+    if (!isShape(item) && item.points.length === 0) return;
 
     ctx.save();
-    ctx.globalCompositeOperation = stroke.tool === "eraser" ? "destination-out" : "source-over";
+    ctx.globalCompositeOperation = !isShape(item) && item.tool === "eraser" ? "destination-out" : "source-over";
 
-    if (stroke.opacity >= 1) {
-        paintStroke(ctx, stroke, scale);
+    if (item.opacity >= 1) {
+        paintItem(ctx, item, scale);
     } else {
         const layer = scratchFor(ctx.canvas.width, ctx.canvas.height);
         const lctx = layer.getContext("2d")!;
         lctx.clearRect(0, 0, layer.width, layer.height);
-        paintStroke(lctx, stroke, scale);
-        ctx.globalAlpha = stroke.opacity;
+        paintItem(lctx, item, scale);
+        ctx.globalAlpha = item.opacity;
         ctx.drawImage(layer, 0, 0);
     }
     ctx.restore();
 };
 
-/** Repaint the canvas from scratch: the base image (the comment's saved drawing), then every stroke. */
+/** Repaint the canvas from scratch: the base image (the comment's saved drawing), then every item. */
 export const renderLayers = (
     ctx: CanvasRenderingContext2D,
     base: CanvasImageSource | null,
-    strokes: Stroke[],
+    items: DrawingItem[],
     scale: number,
 ) => {
     const { width, height } = ctx.canvas;
@@ -129,5 +170,5 @@ export const renderLayers = (
     if (base) ctx.drawImage(base, 0, 0, width, height);
     ctx.restore();
 
-    for (const stroke of strokes) drawStroke(ctx, stroke, scale);
+    for (const item of items) drawItem(ctx, item, scale);
 };

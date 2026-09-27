@@ -4,8 +4,8 @@ import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
 
 /**
  * Follows the pointer while it is pressed, showing the colour as seen (frame plus
- * drawing) next to the one it replaces, and hands the brush back on release. Used
- * with Alt from any tool, it leaves the tool alone.
+ * drawing) next to the one it replaces, and hands the previous tool back on release.
+ * Used with Alt from any tool, it leaves the tool alone.
  */
 export const createEyedropperTool = (ctx: ToolContext): PointerTool => {
     let colorBefore = "";
@@ -27,7 +27,7 @@ export const createEyedropperTool = (ctx: ToolContext): PointerTool => {
         up: () => {
             ctx.setPicking(null);
             const settings = ctx.settings();
-            if (settings.tool === "eyedropper") settings.setTool(settings.brush);
+            if (settings.tool === "eyedropper") settings.setTool(settings.lastTool);
         },
         cancel: () => ctx.setPicking(null),
         live: () => null,

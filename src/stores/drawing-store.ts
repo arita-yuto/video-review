@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { api } from "@/lib/api-client";
 import { uploadToSession } from "@/lib/upload-transfer";
 import { resolveMediaUrl } from "@/lib/media-url";
-import { DrawingHistory, emptyHistory, pushStroke, redo, undo } from "@/lib/drawing/history";
-import type { Stroke } from "@/lib/drawing/types";
+import { DrawingHistory, emptyHistory, pushItem, redo, undo } from "@/lib/drawing/history";
+import type { DrawingItem } from "@/lib/drawing/types";
 
 interface DrawingState {
     canvasRefElement: HTMLCanvasElement | null,
@@ -25,7 +25,7 @@ interface DrawingState {
     setCanvasEditing: (r: boolean) => void;
     canvasSave: (drawingPath: string | null) => Promise<string | null>;
     setNeedSave: (r: boolean) => void;
-    commitStroke: (stroke: Stroke) => void;
+    commitItem: (item: DrawingItem) => void;
     undoStroke: () => void;
     redoStroke: () => void;
     /** Wipe the session: strokes and the saved drawing underneath. Not undoable. */
@@ -95,7 +95,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
         });
     },
     setNeedSave: (r) => set({ needSave: r }),
-    commitStroke: (stroke) => set((state) => ({ history: pushStroke(state.history, stroke), needSave: true })),
+    commitItem: (item) => set((state) => ({ history: pushItem(state.history, item), needSave: true })),
     undoStroke: () => set((state) => ({ history: undo(state.history), needSave: true })),
     redoStroke: () => set((state) => ({ history: redo(state.history), needSave: true })),
     clearDrawing: () => set({ history: emptyHistory, baseHidden: true, needSave: true }),

@@ -7,7 +7,9 @@ import { renderLayers } from "@/lib/drawing/render";
 import { canvasScale, isEraserButton } from "@/lib/drawing/pointer";
 import { createBrushTool } from "@/lib/drawing/tools/brush";
 import { createEyedropperTool } from "@/lib/drawing/tools/eyedropper";
+import { createShapeTool } from "@/lib/drawing/tools/shape";
 import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
+import type { DrawingTool } from "@/lib/drawing/types";
 
 const isTextInput = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
@@ -31,7 +33,7 @@ export const useDrawingCanvas = () => {
     const canvasSize = useDrawingStore((s) => s.canvasSize);
     const history = useDrawingStore((s) => s.history);
     const baseHidden = useDrawingStore((s) => s.baseHidden);
-    const { commitStroke, undoStroke, redoStroke, loadDrawing, setPicking } = useDrawingStore();
+    const { commitItem, undoStroke, redoStroke, loadDrawing, setPicking } = useDrawingStore();
     const drawingPath = useCommentEditStore((s) => s.editingComment?.drawingPath ?? null);
     // The comment's saved drawing, from the shared cache so a just-saved one is current.
     const base = useDrawingStore((s) => (canvasEditing && drawingPath ? s.drawings.get(drawingPath) ?? null : null));
@@ -87,11 +89,19 @@ export const useDrawingCanvas = () => {
             committedLayer: () => committedRef.current,
             video: () => useVideoReviewStore.getState().videoRefElement,
             repaint: schedulePaint,
-            commitStroke,
+            commitItem,
             setPicking,
         };
         const brush = createBrushTool(context);
         const eyedropper = createEyedropperTool(context);
+        // The pen and the eraser are both the brush; everything else has its own tool.
+        const tools: Partial<Record<DrawingTool, PointerTool>> = {
+            eyedropper,
+            line: createShapeTool(context, "line"),
+            arrow: createShapeTool(context, "arrow"),
+            rect: createShapeTool(context, "rect"),
+            ellipse: createShapeTool(context, "ellipse"),
+        };
 
         let activePointer: number | null = null;
         let activeType: string | null = null;
@@ -117,9 +127,9 @@ export const useDrawingCanvas = () => {
             }
 
             const settings = useDrawingSettingsStore.getState();
-            const wantsEyedropper = settings.tool === "eyedropper" || e.altKey;
+            const selected = e.altKey ? eyedropper : tools[settings.tool] ?? brush;
             // The eraser end is a physical gesture; it wins over a selected tool.
-            const tool = wantsEyedropper && !eraserEnd ? eyedropper : brush;
+            const tool = eraserEnd ? brush : selected;
             activePointer = e.pointerId;
             activeType = e.pointerType;
             activeToolRef.current = tool;
@@ -158,7 +168,7 @@ export const useDrawingCanvas = () => {
             canvas.removeEventListener("pointerup", onUp);
             canvas.removeEventListener("pointercancel", onUp);
         };
-    }, [canvas, canvasEditing, commitStroke, setPicking, schedulePaint]);
+    }, [canvas, canvasEditing, commitItem, setPicking, schedulePaint]);
 
     // Shortcuts while editing, except inside text fields where typing and the browser's
     // own undo must keep working (the comment body is a textarea).
@@ -185,6 +195,10 @@ export const useDrawingCanvas = () => {
             if (key === "b") settings.setTool("pen");
             else if (key === "e") settings.setTool("eraser");
             else if (key === "i") settings.setTool("eyedropper");
+            else if (key === "l") settings.setTool("line");
+            else if (key === "a") settings.setTool("arrow");
+            else if (key === "r") settings.setTool("rect");
+            else if (key === "o") settings.setTool("ellipse");
             else if (key === "x") settings.swapColors();
             else if (key === "[") settings.stepWidth(-1);
             else if (key === "]") settings.stepWidth(1);
