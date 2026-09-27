@@ -143,9 +143,25 @@
         "ok": "検索",
         "cancel": "キャンセル"
     },
-    "canvas-setting": {
+    "drawing-tool-panel": {
+        "title": "Drawing",
+        "tool": "ツール",
+        "pen": "ペン",
+        "eraser": "消しゴム",
+        "undo": "Undo",
+        "redo": "Redo",
+        "clear": "Clear",
         "lineWidth": "太さ",
-        "color": "色"
+        "color": "色",
+        "swapColors": "色を入れ替え",
+        "colorHistory": "カラー履歴",
+        "pressure": "筆圧",
+        "opacity": "不透明度",
+        "eyedropper": "スポイト",
+        "line": "直線",
+        "arrow": "矢印",
+        "rect": "四角",
+        "ellipse": "楕円"
     },
     "login": {
         "loginFailedMsg": "ログイン失敗",

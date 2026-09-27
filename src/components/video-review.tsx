@@ -1,5 +1,5 @@
 "use client"
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import VideoTimelineBar from "@/components/video-timeline-bar";
 import { EPlayMode, useVideoPlayerStore } from "@/stores/video-player-store";
@@ -7,27 +7,19 @@ import VideoControlPanel from "@/components/video-control-panel";
 import { useCommentStore } from "@/stores/comment-store";
 import { useVideoStore } from "@/stores/video-store";
 import VideoTitle from "@/components/video-title";
-import CanvasControlPanel from "@/components/canvas-control-panel";
 import { VideoComment } from "@/lib/db-types";
-import { useDrawingStore } from "@/stores/drawing-store";
+import { DrawingLayer } from "@/components/drawing-layer";
 import { useTranslations } from "next-intl";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
-import { cn } from "@/lib/utils";
 import { LoadingBadge } from "@/components/controls/loading-badge";
 
 export default function VideoReview() {
     const t = useTranslations("video-review");
     const router = useRouter();
-    const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const commentDrawingCache = useRef<Map<string, HTMLImageElement>>(new Map());
     const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
-
-    const {
-        setCanvasRefElement,
-        canvasEditing } = useDrawingStore();
 
     const { token } = useAuthStore();
 
@@ -41,7 +33,6 @@ export default function VideoReview() {
 
     const { comments, fetchComments } = useCommentStore();
     const {
-        activeComments,
         setVideoRefElement,
         selectedComment,
         currentTime,
@@ -64,6 +55,12 @@ export default function VideoReview() {
 
     const playModeRef = useRef<EPlayMode>(playMode);
     const timelineTimeRef = useRef<number>(timelineTime);
+
+    // A callback ref keeps the store's element current across remounts of the player.
+    const attachVideo = useCallback((el: HTMLVideoElement | null) => {
+        videoRef.current = el;
+        setVideoRefElement(el);
+    }, []);
 
     const { commentTimeBasedMap, commentTimeList } = useMemo(() => {
         const m = new Map<number, VideoComment[]>();
@@ -102,52 +99,6 @@ export default function VideoReview() {
     }, [playMode]);
 
     useEffect(() => {
-        let canceled = false;
-        void (async () => {
-            for (const c of comments) {
-                const path = c.drawingPath;
-                if (!path) continue;
-
-                if (commentDrawingCache.current.has(path)) continue;
-                const url = await resolveMediaUrl(path);
-                if (canceled || !url) return;
-
-                const img = new Image();
-                img.src = url;
-                img.onload = () => {
-                    if (canceled) return;
-                    commentDrawingCache.current.set(path, img);
-                };
-                commentDrawingCache.current.set(path, img);
-            }
-        })();
-
-        return () => { canceled = true; };
-    }, [comments]);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        const toDraw = isPlaying ? activeComments : (selectedComment ? [selectedComment] : []);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (const comment of toDraw) {
-            if (!comment.drawingPath) continue;
-
-            const img = commentDrawingCache.current.get(comment.drawingPath);
-            if (!img || !img.complete || img.width === 0 || img.height === 0) continue;
-
-            ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            ctx.restore();
-        }
-    }, [activeComments, selectedComment, isPlaying]);
-
-    useEffect(() => {
         if (selectedComment && selectedComment.time !== currentTime) {
             setSelectComment(null);
         }
@@ -164,14 +115,6 @@ export default function VideoReview() {
     }, [currentTime])
 
     useEffect(() => {
-        setCanvasRefElement(canvasRef.current);
-    }, [canvasRef.current]);
-
-    useEffect(() => {
-        setVideoRefElement(videoRef.current);
-    }, [videoRef.current]);
-
-    useEffect(() => {
         setCurrentTime(0);
     }, [selectedVideo])
 
@@ -179,8 +122,7 @@ export default function VideoReview() {
         if (selectedRevision == null) return
 
         const v = videoRef.current;
-        const c = canvasRef.current;
-        if (!c || !v) return;
+        if (!v) return;
 
         fetchComments(selectedRevision);
 
@@ -196,16 +138,6 @@ export default function VideoReview() {
         const onPause = () => setIsPlaying(false);
         const onMeta = () => {
             setDuration(v.duration);
-            const rect = v.getBoundingClientRect();
-            const ratio = window.devicePixelRatio || 1;
-            c.width = rect.width * ratio;
-            c.height = rect.height * ratio;
-
-            const ctx = c.getContext("2d");
-            if (ctx) {
-                ctx.scale(ratio, ratio);
-            }
-
             v.playbackRate = playbackRate;
             v.volume = volumeEnabled ? volume : 0.0;
         }
@@ -306,19 +238,12 @@ export default function VideoReview() {
                                 <div className="flex-1 flex flex-col items-center justify-center bg-black rounded mb-3 relative">
                                     <div className="relative inline-block">
                                         <video
-                                            ref={videoRef}
+                                            ref={attachVideo}
                                             src={playbackUrl ?? undefined}
                                             onClick={togglePlay}
                                             className="video-stage max-w-full rounded cursor-pointer object-contain"
                                         />
-                                        <canvas
-                                            ref={canvasRef}
-                                            className={cn(
-                                                "absolute top-0 left-0 w-full h-full",
-                                                canvasEditing ? "pointer-events-auto cursor-crosshair" : "pointer-events-none",
-                                            )}
-                                        />
-                                        <CanvasControlPanel />
+                                        <DrawingLayer />
                                     </div>
                                 </div>
 

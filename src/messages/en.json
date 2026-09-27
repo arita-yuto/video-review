@@ -143,9 +143,25 @@
         "ok": "Search",
         "cancel": "Cancel"
     },
-    "canvas-setting": {
+    "drawing-tool-panel": {
+        "title": "Drawing",
+        "tool": "Tool",
+        "pen": "Pen",
+        "eraser": "Eraser",
+        "undo": "Undo",
+        "redo": "Redo",
+        "clear": "Clear",
         "lineWidth": "Line width",
-        "color": "Color"
+        "color": "Color",
+        "swapColors": "Swap colors",
+        "colorHistory": "Color history",
+        "pressure": "Pen pressure",
+        "opacity": "Opacity",
+        "eyedropper": "Eyedropper",
+        "line": "Line",
+        "arrow": "Arrow",
+        "rect": "Rectangle",
+        "ellipse": "Ellipse"
     },
     "login": {
         "loginFailedMsg": "Login failed",
