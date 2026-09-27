@@ -24,7 +24,7 @@ export interface PointerTool {
     down: (e: PointerEvent, options: { eraserEnd: boolean }) => void;
     move: (e: PointerEvent) => void;
     up: (e: PointerEvent) => void;
-    /** Drop the interaction without a result (a palm giving way to the pen, the session ending). */
+    /** Drop the interaction without a result (the session ending). */
     cancel: () => void;
     /** What to paint over the committed layer this frame. */
     live: () => DrawingItem | null;

@@ -16,14 +16,10 @@ const isTextInput = (target: EventTarget | null) => {
     return target.isContentEditable || target.matches("input, textarea, select");
 };
 
-// A touch that lands while the pen is in use, or right after it lifted, is the hand
-// resting on the display.
-const PALM_WINDOW_MS = 1000;
-
 /**
  * Manages the review canvas while a comment is being edited: hands each pointer to a
- * tool, keeps palms and the pen's eraser end straight, runs the keyboard shortcuts and
- * repaints. The canvas holds three layers, painted back to front on every frame: the
+ * tool, honours the pen's eraser end, runs the keyboard shortcuts and repaints. Touch
+ * never draws: on a pen display it is the resting hand, and touch devices are out of scope. The canvas holds three layers, painted back to front on every frame: the
  * base (the drawing the comment already has), the committed strokes, and what the
  * active tool is doing. The committed layer is cached offscreen.
  */
@@ -104,34 +100,21 @@ export const useDrawingCanvas = () => {
         };
 
         let activePointer: number | null = null;
-        let activeType: string | null = null;
-        let lastPenAt = -Infinity;
-        const isPalm = (e: PointerEvent) => e.pointerType === "touch" && performance.now() - lastPenAt < PALM_WINDOW_MS;
-        const notePen = (e: PointerEvent) => { if (e.pointerType === "pen") lastPenAt = performance.now(); };
 
         const release = () => {
             activePointer = null;
-            activeType = null;
             activeToolRef.current = null;
         };
 
         const onDown = (e: PointerEvent) => {
-            notePen(e);
             const eraserEnd = isEraserButton(e);
-            if (isPalm(e) || (e.button !== 0 && !eraserEnd)) return;
-            if (activePointer !== null) {
-                // A hand that landed first yields to the pen.
-                if (!(e.pointerType === "pen" && activeType === "touch")) return;
-                activeToolRef.current?.cancel();
-                release();
-            }
+            if (e.pointerType === "touch" || activePointer !== null || (e.button !== 0 && !eraserEnd)) return;
 
             const settings = useDrawingSettingsStore.getState();
             const selected = e.altKey ? eyedropper : tools[settings.tool] ?? brush;
             // The eraser end is a physical gesture; it wins over a selected tool.
             const tool = eraserEnd ? brush : selected;
             activePointer = e.pointerId;
-            activeType = e.pointerType;
             activeToolRef.current = tool;
             // Capture can fail for a pointer that is already gone; the tool works without it.
             try { canvas.setPointerCapture(e.pointerId); } catch {}
@@ -139,12 +122,10 @@ export const useDrawingCanvas = () => {
         };
 
         const onMove = (e: PointerEvent) => {
-            notePen(e);
             if (e.pointerId === activePointer) activeToolRef.current?.move(e);
         };
 
         const onUp = (e: PointerEvent) => {
-            notePen(e);
             if (e.pointerId !== activePointer) return;
             activeToolRef.current?.up(e);
             release();
