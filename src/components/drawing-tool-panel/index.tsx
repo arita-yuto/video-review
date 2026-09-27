@@ -1,74 +1,29 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslations } from "next-intl";
-import { hexToHsva, hsvaToHex, type HsvaColor } from "@uiw/color-convert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faEraser, faEyeDropper, faFile, faRotateLeft, faRotateRight, faRightLeft } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faEraser, faEyeDropper, faFile, faRotateLeft, faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/ui/button";
 import { Slider } from "@/ui/slider";
 import { Switch } from "@/ui/switch";
 import { SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader } from "@/ui/sidebar";
 import { useDrawingStore } from "@/stores/drawing-store";
-import { MAX_WIDTH, MIN_WIDTH, useDrawingSettingsStore, type ColorMode } from "@/stores/drawing-settings-store";
-import { ColorCircle, colorReadout } from "@/components/drawing-tool-panel/color-circle";
-import { cn } from "@/lib/utils";
-
-function ColorSwatch({ color, selected, title, onSelect }: {
-    color: string;
-    selected?: boolean;
-    title?: string;
-    /** Without a handler the swatch only displays the colour. */
-    onSelect?: () => void;
-}) {
-    const className = cn(
-        "size-7 rounded-md border bg-(--swatch) transition-all",
-        selected ? "border-primary ring-2 ring-primary/50" : "border-input",
-        onSelect && !selected && "hover:border-ring",
-    );
-    const style = { "--swatch": color } as React.CSSProperties;
-
-    if (!onSelect) return <div title={title ?? color} className={className} style={style} />;
-
-    return (
-        <button type="button" title={title ?? color} aria-pressed={selected} onClick={onSelect} className={className} style={style} />
-    );
-}
-
-// The colour-mode button shows the shape it switches to, the way paint apps do:
-// a triangle (HLS) while the square is up, a square (HSV) while the triangle is.
-function ColorModeIcon({ next }: { next: ColorMode }) {
-    return (
-        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            {next === "hls"
-                ? <polygon points="8.5,6.5 18,12 8.5,17.5" />
-                : <rect x="7.5" y="7.5" width="9" height="9" />}
-        </svg>
-    );
-}
+import { MAX_WIDTH, MIN_WIDTH, useDrawingSettingsStore } from "@/stores/drawing-settings-store";
+import { ColorPalette } from "@/components/drawing-tool-panel/color-palette";
+import { ColorHistory } from "@/components/drawing-tool-panel/color-history";
 
 // Replaces the video list while a comment's drawing is being edited, laid out like a
 // paint app's tool palette so every brush control is one click away.
 export default function DrawingToolPanel() {
     const t = useTranslations("drawing-tool-panel");
     const {
-        tool, brush, color, subColor, widths, opacities, pressureEnabled, colorHistory, colorMode,
-        setTool, setColor, swapColors, setWidth, setOpacity, setColorMode, setPressureEnabled,
+        tool, brush, color, widths, opacities, pressureEnabled, colorHistory,
+        setTool, setColor, setWidth, setOpacity, setPressureEnabled,
     } = useDrawingSettingsStore();
     const width = widths[brush];
     const opacity = Math.round(opacities[brush] * 100);
     const { history, undoStroke, redoStroke, clearDrawing } = useDrawingStore();
-    // The circle's HSV, re-derived only when the colour changed elsewhere (history,
-    // swap, eyedropper) so the hue survives a grey or black pick on the square.
-    const [hsva, setHsva] = useState<HsvaColor>(() => hexToHsva(color));
-    useEffect(() => {
-        if (hsvaToHex(hsva) !== color) setHsva(hexToHsva(color));
-    }, [color]);
-    const pickHsva = (next: HsvaColor) => {
-        setHsva(next);
-        setColor(hsvaToHex(next));
-    };
 
     const canUndo = history.items.length > 0;
     const canRedo = history.undone.length > 0;
@@ -147,42 +102,13 @@ export default function DrawingToolPanel() {
 
                 <SidebarGroup>
                     <SidebarGroupLabel>{t("color")}</SidebarGroupLabel>
-                    <div className="flex flex-col items-center gap-2">
-                        <ColorCircle hsva={hsva} mode={colorMode} onChange={pickHsva} />
-                        {/* Three equal columns keep the numbers centred under the circle even though
-                            the chips on the left are wider than the button on the right. */}
-                        <div className="grid w-full grid-cols-3 items-center">
-                            <div className="flex items-center gap-1 justify-self-start">
-                                <ColorSwatch color={color} selected />
-                                <Button variant="ghost" size="icon-sm" title={`${t("swapColors")} (X)`} onClick={swapColors}>
-                                    <FontAwesomeIcon icon={faRightLeft} />
-                                </Button>
-                                <ColorSwatch color={subColor} onSelect={swapColors} />
-                            </div>
-                            {/* Fixed-width numbers so the labels stay put while the digits change. */}
-                            <div className="flex gap-2 justify-self-center text-xs text-muted-foreground tabular-nums leading-none">
-                                {colorReadout(hsva, colorMode).map(([label, value]) => (
-                                    <span key={label} className="inline-flex gap-1">
-                                        <span>{label}</span>
-                                        <span className="w-6 text-right">{Math.round(value)}</span>
-                                    </span>
-                                ))}
-                            </div>
-                            <Button variant="ghost" size="icon-sm" className="justify-self-end" title={t("colorMode")} onClick={() => setColorMode(colorMode === "hsv" ? "hls" : "hsv")}>
-                                <ColorModeIcon next={colorMode === "hsv" ? "hls" : "hsv"} />
-                            </Button>
-                        </div>
-                    </div>
+                    <ColorPalette />
                 </SidebarGroup>
 
                 {colorHistory.length > 0 && (
                     <SidebarGroup>
                         <SidebarGroupLabel>{t("colorHistory")}</SidebarGroupLabel>
-                        <div className="flex flex-wrap gap-1.5">
-                            {colorHistory.map((c) => (
-                                <ColorSwatch key={c} color={c} selected={c === color} onSelect={() => setColor(c)} />
-                            ))}
-                        </div>
+                        <ColorHistory colors={colorHistory} selected={color} onSelect={setColor} />
                     </SidebarGroup>
                 )}
             </SidebarContent>

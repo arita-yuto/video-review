@@ -22,3 +22,6 @@ export interface Stroke {
     pressure: boolean;
     points: StrokePoint[];
 }
+
+/** How the colour palette shows the inside of the hue ring: an HSV square or an HLS triangle. */
+export type ColorMode = "hsv" | "hls";

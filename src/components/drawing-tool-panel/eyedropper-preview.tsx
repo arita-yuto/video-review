@@ -11,7 +11,7 @@ const ZOOM = 4;
  * picked and bottom half the one it replaces, with the spot under the pointer
  * magnified in the hole.
  */
-export function PickPreview({ picking, video, drawing }: {
+export function EyedropperPreview({ picking, video, drawing }: {
     picking: { x: number; y: number; color: string; previous: string };
     video: HTMLVideoElement | null;
     drawing: HTMLCanvasElement | null;

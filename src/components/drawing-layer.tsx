@@ -8,8 +8,8 @@ import { useCommentStore } from "@/stores/comment-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
 import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
-import { brushCursor, eyedropperCursor } from "@/lib/drawing/cursor";
-import { PickPreview } from "@/components/drawing-tool-panel/pick-preview";
+import { brushCursor, eyedropperCursor } from "@/lib/drawing/icon";
+import { EyedropperPreview } from "@/components/drawing-tool-panel/eyedropper-preview";
 import { cn } from "@/lib/utils";
 
 /**
@@ -115,7 +115,7 @@ export function DrawingLayer() {
                 )}
                 style={{ "--brush-cursor": pickingTool ? eyedropperCursor() : brushCursor(brushWidth) } as React.CSSProperties}
             />
-            {picking && <PickPreview picking={picking} video={video} drawing={canvas} />}
+            {picking && <EyedropperPreview picking={picking} video={video} drawing={canvas} />}
         </>
     );
 }

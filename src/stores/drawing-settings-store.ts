@@ -1,9 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { BrushTool, DrawingTool } from "@/lib/drawing/types";
-
-/** How the colour circle shows the inside of the hue ring: a saturation/value square or an HLS triangle. */
-export type ColorMode = "hsv" | "hls";
+import type { BrushTool, ColorMode, DrawingTool } from "@/lib/drawing/types";
 
 /** Widths the [ and ] keys step through, in CSS pixels. */
 export const WIDTH_STEPS = [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40];

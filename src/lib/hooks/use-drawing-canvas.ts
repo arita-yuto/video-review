@@ -117,7 +117,9 @@ export const useDrawingCanvas = () => {
             }
 
             const settings = useDrawingSettingsStore.getState();
-            const tool = !eraserEnd && (settings.tool === "eyedropper" || e.altKey) ? eyedropper : brush;
+            const wantsEyedropper = settings.tool === "eyedropper" || e.altKey;
+            // The eraser end is a physical gesture; it wins over a selected tool.
+            const tool = wantsEyedropper && !eraserEnd ? eyedropper : brush;
             activePointer = e.pointerId;
             activeType = e.pointerType;
             activeToolRef.current = tool;

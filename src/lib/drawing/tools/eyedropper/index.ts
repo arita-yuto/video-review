@@ -1,5 +1,5 @@
 import { canvasPointFromClient } from "@/lib/drawing/pointer";
-import { sampleColor } from "@/lib/drawing/sample-color";
+import { sampleColor } from "@/lib/drawing/tools/eyedropper/sample-color";
 import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
 
 /**
