@@ -8,7 +8,7 @@ import { useCommentStore } from "@/stores/comment-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
 import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
-import { brushCursor, eyedropperCursor } from "@/lib/drawing/icon";
+import { toolClass } from "@/lib/drawing/tools";
 import { EyedropperPreview } from "@/components/drawing-tool-panel/eyedropper-preview";
 import { cn } from "@/lib/utils";
 
@@ -33,10 +33,7 @@ export function DrawingLayer() {
     const { comments } = useCommentStore();
     const { activeComments, selectedComment } = useVideoReviewStore();
     const isPlaying = useVideoPlayerStore((s) => s.isPlaying);
-    const cursor = useDrawingSettingsStore((s) =>
-        s.tool === "eyedropper" ? eyedropperCursor()
-        : s.tool === "pen" || s.tool === "eraser" ? brushCursor(s.widths[s.brush])
-        : "crosshair");
+    const cursor = useDrawingSettingsStore((s) => toolClass(s.tool).cursor(s.params[s.tool]));
 
     useDrawingCanvas();
 

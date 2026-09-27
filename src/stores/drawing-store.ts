@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { api } from "@/lib/api-client";
 import { uploadToSession } from "@/lib/upload-transfer";
 import { resolveMediaUrl } from "@/lib/media-url";
-import { DrawingHistory, commitSnapshot, initialHistory, pushItem, redo, undo } from "@/lib/drawing/history";
-import type { DrawingItem } from "@/lib/drawing/types";
+import { DrawingHistory, commitSnapshot, initialHistory, pushMark, redo, undo } from "@/lib/drawing/history";
+import type { Mark } from "@/lib/drawing/types";
 
 interface DrawingState {
     canvasRefElement: HTMLCanvasElement | null,
@@ -23,10 +23,10 @@ interface DrawingState {
     setCanvasEditing: (r: boolean) => void;
     canvasSave: (drawingPath: string | null) => Promise<string | null>;
     setNeedSave: (r: boolean) => void;
-    commitItem: (item: DrawingItem) => void;
+    commitMark: (mark: Mark) => void;
     undoStroke: () => void;
     redoStroke: () => void;
-    /** Wipe the canvas: items and the saved drawing underneath. Undoable like any other step. */
+    /** Wipe the canvas: marks and the saved drawing underneath. Undoable like any other step. */
     clearDrawing: () => void;
     /** Fetch a comment's drawing into `drawings` unless it is there or on its way. */
     loadDrawing: (path: string) => Promise<void>;
@@ -92,15 +92,15 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
         });
     },
     setNeedSave: (r) => set({ needSave: r }),
-    commitItem: (item) => set((state) => ({ history: pushItem(state.history, item), needSave: true })),
+    commitMark: (mark) => set((state) => ({ history: pushMark(state.history, mark), needSave: true })),
     undoStroke: () => set((state) => ({ history: undo(state.history), needSave: true })),
     redoStroke: () => set((state) => ({ history: redo(state.history), needSave: true })),
     clearDrawing: () =>
         set((state) => {
-            const { base, items } = state.history.present;
+            const { base, marks } = state.history.present;
             // Already empty: nothing to wipe, and no step for Undo to chew through.
-            if (base === null && items.length === 0) return state;
-            return { history: commitSnapshot(state.history, { base: null, items: [] }), needSave: true };
+            if (base === null && marks.length === 0) return state;
+            return { history: commitSnapshot(state.history, { base: null, marks: [] }), needSave: true };
         }),
     setPicking: (picking) => set({ picking }),
     loadDrawing: async (path) => {

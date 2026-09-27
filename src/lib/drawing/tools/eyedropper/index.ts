@@ -1,35 +1,48 @@
 import { canvasPointFromClient } from "@/lib/drawing/pointer";
 import { sampleColor } from "@/lib/drawing/tools/eyedropper/sample-color";
-import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
+import { EYEDROPPER_CURSOR, EyedropperIcon } from "@/lib/drawing/icon";
+import { Tool } from "@/lib/drawing/tools/tool";
 
 /**
  * Follows the pointer while it is pressed, showing the colour as seen (frame plus
  * drawing) next to the one it replaces, and hands the previous tool back on release.
  * Used with Alt from any tool, it leaves the tool alone.
  */
-export const createEyedropperTool = (ctx: ToolContext): PointerTool => {
-    let colorBefore = "";
+export class EyedropperTool extends Tool {
+    static readonly id = "eyedropper";
+    static readonly icon = EyedropperIcon;
+    static readonly shortcut = "I";
+    static readonly hint = "Alt+click";
+    static cursor() {
+        return EYEDROPPER_CURSOR;
+    }
 
-    const pickAt = (e: PointerEvent) => {
-        const settings = ctx.settings();
-        const point = canvasPointFromClient(ctx.canvas, e.clientX, e.clientY, 1);
-        const hex = sampleColor(ctx.video(), ctx.committedLayer(), point) ?? settings.color;
+    private colorBefore = "";
+
+    private pickAt(e: PointerEvent) {
+        const settings = this.ctx.settings();
+        const point = canvasPointFromClient(this.ctx.canvas, e.clientX, e.clientY, 1);
+        const hex = sampleColor(this.ctx.video(), this.ctx.committedLayer(), point) ?? settings.color;
         settings.setColor(hex);
-        ctx.setPicking({ x: point.x, y: point.y, color: hex, previous: colorBefore });
-    };
+        this.ctx.setPicking({ x: point.x, y: point.y, color: hex, previous: this.colorBefore });
+    }
 
-    return {
-        down: (e) => {
-            colorBefore = ctx.settings().color;
-            pickAt(e);
-        },
-        move: pickAt,
-        up: () => {
-            ctx.setPicking(null);
-            const settings = ctx.settings();
-            if (settings.tool === "eyedropper") settings.setTool(settings.lastTool);
-        },
-        cancel: () => ctx.setPicking(null),
-        live: () => null,
-    };
-};
+    down(e: PointerEvent) {
+        this.colorBefore = this.ctx.settings().color;
+        this.pickAt(e);
+    }
+
+    move(e: PointerEvent) {
+        this.pickAt(e);
+    }
+
+    up() {
+        this.ctx.setPicking(null);
+        const settings = this.ctx.settings();
+        if (settings.tool === "eyedropper") settings.setTool(settings.lastTool);
+    }
+
+    cancel() {
+        this.ctx.setPicking(null);
+    }
+}

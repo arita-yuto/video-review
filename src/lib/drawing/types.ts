@@ -1,8 +1,7 @@
-/** Tools that lay down strokes. */
-export type BrushTool = "pen" | "eraser";
+export type BrushKind = "pen" | "eraser";
 export type ShapeKind = "line" | "arrow" | "rect" | "ellipse";
-/** Everything the tool panel can select; the eyedropper only picks a colour. */
-export type DrawingTool = BrushTool | ShapeKind | "eyedropper";
+/** Every tool's id; the panel, the shortcuts and the saved settings speak in these. */
+export type ToolId = BrushKind | ShapeKind | "eyedropper";
 
 /** Position as fractions (0..1) of the canvas, so strokes are independent of its pixel size. */
 export interface StrokePoint {
@@ -14,7 +13,7 @@ export interface StrokePoint {
 
 /** One committed stroke. Width is in CSS pixels and scaled to canvas pixels at draw time. */
 export interface Stroke {
-    tool: BrushTool;
+    kind: BrushKind;
     color: string;
     width: number;
     /** 0..1, applied to the stroke as a whole. */
@@ -34,7 +33,7 @@ export interface Shape {
     to: { x: number; y: number };
 }
 
-/** One entry of the drawing history. */
-export type DrawingItem = Stroke | Shape;
+/** What a tool leaves on the canvas; the history is a list of these. */
+export type Mark = Stroke | Shape;
 
-export const isShape = (item: DrawingItem): item is Shape => "kind" in item;
+export const isShape = (mark: Mark): mark is Shape => "from" in mark;

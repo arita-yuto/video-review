@@ -1,4 +1,4 @@
-import { isShape, type DrawingItem, type Shape, type Stroke, type StrokePoint } from "@/lib/drawing/types";
+import { isShape, type Mark, type Shape, type Stroke, type StrokePoint } from "@/lib/drawing/types";
 
 /** Width share at zero pressure; tuned by hand on a pen display. */
 export const PRESSURE_MIN_RATIO = 0.15;
@@ -120,8 +120,8 @@ const paintShape = (ctx: CanvasRenderingContext2D, shape: Shape, scale: number) 
     ctx.stroke();
 };
 
-const paintItem = (ctx: CanvasRenderingContext2D, item: DrawingItem, scale: number) =>
-    isShape(item) ? paintShape(ctx, item, scale) : paintStroke(ctx, item, scale);
+const paintMark = (ctx: CanvasRenderingContext2D, mark: Mark, scale: number) =>
+    isShape(mark) ? paintShape(ctx, mark, scale) : paintStroke(ctx, mark, scale);
 
 // A translucent stroke is painted opaque here first and then composited once, so the
 // pieces of a pressure stroke (and a path crossing itself) do not stack up darker.
@@ -135,31 +135,31 @@ const scratchFor = (width: number, height: number) => {
     return scratch;
 };
 
-/** `scale` converts the item's CSS-pixel width to canvas pixels (canvas.width / rect.width). */
-export const drawItem = (ctx: CanvasRenderingContext2D, item: DrawingItem, scale: number) => {
-    if (!isShape(item) && item.points.length === 0) return;
+/** `scale` converts the mark's CSS-pixel width to canvas pixels (canvas.width / rect.width). */
+export const drawMark = (ctx: CanvasRenderingContext2D, mark: Mark, scale: number) => {
+    if (!isShape(mark) && mark.points.length === 0) return;
 
     ctx.save();
-    ctx.globalCompositeOperation = !isShape(item) && item.tool === "eraser" ? "destination-out" : "source-over";
+    ctx.globalCompositeOperation = !isShape(mark) && mark.kind === "eraser" ? "destination-out" : "source-over";
 
-    if (item.opacity >= 1) {
-        paintItem(ctx, item, scale);
+    if (mark.opacity >= 1) {
+        paintMark(ctx, mark, scale);
     } else {
         const layer = scratchFor(ctx.canvas.width, ctx.canvas.height);
         const lctx = layer.getContext("2d")!;
         lctx.clearRect(0, 0, layer.width, layer.height);
-        paintItem(lctx, item, scale);
-        ctx.globalAlpha = item.opacity;
+        paintMark(lctx, mark, scale);
+        ctx.globalAlpha = mark.opacity;
         ctx.drawImage(layer, 0, 0);
     }
     ctx.restore();
 };
 
-/** Repaint the canvas from scratch: the base image (the comment's saved drawing), then every item. */
+/** Repaint the canvas from scratch: the base image (the comment's saved drawing), then every mark. */
 export const renderLayers = (
     ctx: CanvasRenderingContext2D,
     base: CanvasImageSource | null,
-    items: DrawingItem[],
+    marks: Mark[],
     scale: number,
 ) => {
     const { width, height } = ctx.canvas;
@@ -170,5 +170,5 @@ export const renderLayers = (
     if (base) ctx.drawImage(base, 0, 0, width, height);
     ctx.restore();
 
-    for (const item of items) drawItem(ctx, item, scale);
+    for (const mark of marks) drawMark(ctx, mark, scale);
 };

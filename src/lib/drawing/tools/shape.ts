@@ -1,6 +1,7 @@
 import { canvasPointFromClient } from "@/lib/drawing/pointer";
+import { ArrowIcon, EllipseIcon, LineIcon, RectIcon } from "@/lib/drawing/icon";
 import type { Shape, ShapeKind } from "@/lib/drawing/types";
-import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
+import { Tool, type ToolParams } from "@/lib/drawing/tools/tool";
 
 /** Snap the far corner so the shape is square (or the line runs at a multiple of 45°). */
 const constrain = (shape: Shape, canvas: HTMLCanvasElement): Shape => {
@@ -27,43 +28,74 @@ const constrain = (shape: Shape, canvas: HTMLCanvasElement): Shape => {
 const moved = (shape: Shape) => shape.from.x !== shape.to.x || shape.from.y !== shape.to.y;
 
 /** Drags a shape out from where the pointer went down; Shift keeps it regular. */
-export const createShapeTool = (ctx: ToolContext, kind: ShapeKind): PointerTool => {
-    let shape: Shape | null = null;
+export abstract class ShapeTool extends Tool {
+    static readonly group = "shape";
+    static readonly defaults: ToolParams = { width: 6, opacity: 1 };
 
-    return {
-        down: (e) => {
-            const settings = ctx.settings();
-            const point = canvasPointFromClient(ctx.canvas, e.clientX, e.clientY, 1);
-            shape = {
-                kind,
-                color: settings.color,
-                width: settings.widths[settings.brush],
-                opacity: settings.opacities[settings.brush],
-                from: { x: point.x, y: point.y },
-                to: { x: point.x, y: point.y },
-            };
-            ctx.repaint();
-        },
-        move: (e) => {
-            if (!shape) return;
-            const point = canvasPointFromClient(ctx.canvas, e.clientX, e.clientY, 1);
-            shape = { ...shape, to: { x: point.x, y: point.y } };
-            if (e.shiftKey) shape = constrain(shape, ctx.canvas);
-            ctx.repaint();
-        },
-        up: () => {
-            if (!shape) return;
-            // A click without a drag leaves nothing behind.
-            if (moved(shape)) {
-                ctx.commitItem(shape);
-                ctx.settings().noteColorUsed(shape.color);
-            }
-            shape = null;
-        },
-        cancel: () => {
-            shape = null;
-            ctx.repaint();
-        },
-        live: () => (shape && moved(shape) ? shape : null),
-    };
-};
+    private shape: Shape | null = null;
+
+    down(e: PointerEvent) {
+        const settings = this.ctx.settings();
+        const kind = this.id as ShapeKind;
+        const point = canvasPointFromClient(this.ctx.canvas, e.clientX, e.clientY, 1);
+        this.shape = {
+            kind,
+            color: settings.color,
+            ...settings.params[kind],
+            from: { x: point.x, y: point.y },
+            to: { x: point.x, y: point.y },
+        };
+        this.ctx.repaint();
+    }
+
+    move(e: PointerEvent) {
+        if (!this.shape) return;
+        const point = canvasPointFromClient(this.ctx.canvas, e.clientX, e.clientY, 1);
+        this.shape = { ...this.shape, to: { x: point.x, y: point.y } };
+        if (e.shiftKey) this.shape = constrain(this.shape, this.ctx.canvas);
+        this.ctx.repaint();
+    }
+
+    up() {
+        if (!this.shape) return;
+        // A click without a drag leaves nothing behind.
+        if (moved(this.shape)) {
+            this.ctx.commitMark(this.shape);
+            this.ctx.settings().noteColorUsed(this.shape.color);
+        }
+        this.shape = null;
+    }
+
+    cancel() {
+        this.shape = null;
+        this.ctx.repaint();
+    }
+
+    live() {
+        return this.shape && moved(this.shape) ? this.shape : null;
+    }
+}
+
+export class LineTool extends ShapeTool {
+    static readonly id = "line";
+    static readonly icon = LineIcon;
+    static readonly shortcut = "L";
+}
+
+export class ArrowTool extends ShapeTool {
+    static readonly id = "arrow";
+    static readonly icon = ArrowIcon;
+    static readonly shortcut = "A";
+}
+
+export class RectTool extends ShapeTool {
+    static readonly id = "rect";
+    static readonly icon = RectIcon;
+    static readonly shortcut = "R";
+}
+
+export class EllipseTool extends ShapeTool {
+    static readonly id = "ellipse";
+    static readonly icon = EllipseIcon;
+    static readonly shortcut = "O";
+}

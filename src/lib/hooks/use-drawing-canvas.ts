@@ -5,11 +5,9 @@ import { useCommentEditStore } from "@/stores/comment-edit-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import { renderLayers } from "@/lib/drawing/render";
 import { canvasScale, isEraserButton } from "@/lib/drawing/pointer";
-import { createBrushTool } from "@/lib/drawing/tools/brush";
-import { createEyedropperTool } from "@/lib/drawing/tools/eyedropper";
-import { createShapeTool } from "@/lib/drawing/tools/shape";
-import type { PointerTool, ToolContext } from "@/lib/drawing/tools/types";
-import type { DrawingTool } from "@/lib/drawing/types";
+import { TOOLS } from "@/lib/drawing/tools";
+import type { Tool, ToolContext } from "@/lib/drawing/tools/tool";
+import type { ToolId } from "@/lib/drawing/types";
 
 const isTextInput = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
@@ -18,22 +16,22 @@ const isTextInput = (target: EventTarget | null) => {
 
 /**
  * Runs the canvas while a comment is being edited: routes each pointer to the active
- * tool, handles the keyboard shortcuts, and repaints the base, the committed items and
- * the tool's live item, in that order. The committed layer is cached offscreen.
+ * tool, handles the keyboard shortcuts, and repaints the base, the committed marks and
+ * the tool's live mark, in that order. The committed layer is cached offscreen.
  */
 export const useDrawingCanvas = () => {
     const canvas = useDrawingStore((s) => s.canvasRefElement);
     const canvasEditing = useDrawingStore((s) => s.canvasEditing);
     const canvasSize = useDrawingStore((s) => s.canvasSize);
     const state = useDrawingStore((s) => s.history.present);
-    const { commitItem, undoStroke, redoStroke, loadDrawing, setPicking } = useDrawingStore();
+    const { commitMark, undoStroke, redoStroke, loadDrawing, setPicking } = useDrawingStore();
     const drawingPath = useCommentEditStore((s) => s.editingComment?.drawingPath ?? null);
     // The comment's saved drawing, from the shared cache so a just-saved one is current.
     const saved = useDrawingStore((s) => (canvasEditing && drawingPath ? s.drawings.get(drawingPath) ?? null : null));
     const base = state.base === "saved" ? saved : state.base;
 
     const committedRef = useRef<HTMLCanvasElement | null>(null);
-    const activeToolRef = useRef<PointerTool | null>(null);
+    const activeToolRef = useRef<Tool | null>(null);
     const frameRef = useRef<number | null>(null);
 
     const paint = useCallback(() => {
@@ -68,7 +66,7 @@ export const useDrawingCanvas = () => {
         committed.width = canvas.width;
         committed.height = canvas.height;
         const ctx = committed.getContext("2d");
-        if (ctx) renderLayers(ctx, base, state.items, canvasScale(canvas));
+        if (ctx) renderLayers(ctx, base, state.marks, canvasScale(canvas));
 
         committedRef.current = committed;
         paint();
@@ -83,18 +81,16 @@ export const useDrawingCanvas = () => {
             committedLayer: () => committedRef.current,
             video: () => useVideoReviewStore.getState().videoRefElement,
             repaint: schedulePaint,
-            commitItem,
+            commitMark,
             setPicking,
         };
-        const brush = createBrushTool(context);
-        const eyedropper = createEyedropperTool(context);
-        // The pen and the eraser are both the brush; everything else has its own tool.
-        const tools: Partial<Record<DrawingTool, PointerTool>> = {
-            eyedropper,
-            line: createShapeTool(context, "line"),
-            arrow: createShapeTool(context, "arrow"),
-            rect: createShapeTool(context, "rect"),
-            ellipse: createShapeTool(context, "ellipse"),
+        const tools = Object.fromEntries(TOOLS.map((T) => [T.id, new T(context)])) as Record<ToolId, Tool>;
+
+        // Which tool a press goes to: the pen's eraser end and Alt override the selected tool.
+        const toolFor = (e: PointerEvent) => {
+            if (isEraserButton(e)) return tools.eraser;
+            if (e.altKey) return tools.eyedropper;
+            return tools[useDrawingSettingsStore.getState().tool];
         };
 
         let activePointer: number | null = null;
@@ -109,15 +105,12 @@ export const useDrawingCanvas = () => {
             // Touch is not a drawing input here; only the main button or the pen's eraser end starts a tool.
             if (e.pointerType === "touch" || activePointer !== null || (e.button !== 0 && !eraserEnd)) return;
 
-            const settings = useDrawingSettingsStore.getState();
-            const selected = e.altKey ? eyedropper : tools[settings.tool] ?? brush;
-            // The eraser end is a physical gesture; it wins over a selected tool.
-            const tool = eraserEnd ? brush : selected;
+            const tool = toolFor(e);
             activePointer = e.pointerId;
             activeToolRef.current = tool;
             // Capture can fail for a pointer that is already gone; the tool works without it.
             try { canvas.setPointerCapture(e.pointerId); } catch {}
-            tool.down(e, { eraserEnd });
+            tool.down(e);
         };
 
         const onMove = (e: PointerEvent) => {
@@ -148,7 +141,7 @@ export const useDrawingCanvas = () => {
             canvas.removeEventListener("pointerup", onUp);
             canvas.removeEventListener("pointercancel", onUp);
         };
-    }, [canvas, canvasEditing, commitItem, setPicking, schedulePaint]);
+    }, [canvas, canvasEditing, commitMark, setPicking, schedulePaint]);
 
     // Shortcuts while editing, except inside text fields where typing and the browser's
     // own undo must keep working (the comment body is a textarea).
@@ -172,13 +165,8 @@ export const useDrawingCanvas = () => {
                 return;
             }
 
-            if (key === "b") settings.setTool("pen");
-            else if (key === "e") settings.setTool("eraser");
-            else if (key === "i") settings.setTool("eyedropper");
-            else if (key === "l") settings.setTool("line");
-            else if (key === "a") settings.setTool("arrow");
-            else if (key === "r") settings.setTool("rect");
-            else if (key === "o") settings.setTool("ellipse");
+            const picked = TOOLS.find((T) => T.shortcut.toLowerCase() === key);
+            if (picked) settings.setTool(picked.id);
             else if (key === "x") settings.swapColors();
             else if (key === "[") settings.stepWidth(-1);
             else if (key === "]") settings.stepWidth(1);

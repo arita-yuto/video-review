@@ -3,30 +3,27 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faEraser, faEyeDropper, faFile, faRotateLeft, faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { faFile, faRotateLeft, faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/ui/button";
 import { Slider } from "@/ui/slider";
 import { Switch } from "@/ui/switch";
 import { SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader } from "@/ui/sidebar";
 import { useDrawingStore } from "@/stores/drawing-store";
 import { MAX_WIDTH, MIN_WIDTH, useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { ShapeIcon } from "@/lib/drawing/icon";
-import type { ShapeKind } from "@/lib/drawing/types";
+import { TOOLS } from "@/lib/drawing/tools";
 import { ColorPalette } from "@/components/drawing-tool-panel/color-palette";
 import { ColorHistory } from "@/components/drawing-tool-panel/color-history";
-
-const SHAPES: [ShapeKind, string][] = [["line", "L"], ["arrow", "A"], ["rect", "R"], ["ellipse", "O"]];
 
 // Replaces the video list while a comment's drawing is being edited, laid out like a
 // paint app's tool palette so every brush control is one click away.
 export default function DrawingToolPanel() {
     const t = useTranslations("drawing-tool-panel");
-    const {
-        tool, brush, color, widths, opacities, pressureEnabled, colorHistory,
-        setTool, setColor, setWidth, setOpacity, setPressureEnabled,
-    } = useDrawingSettingsStore();
-    const width = widths[brush];
-    const opacity = Math.round(opacities[brush] * 100);
+    const settings = useDrawingSettingsStore();
+    const { tool, color, pressureEnabled, colorHistory, setTool, setColor, setWidth, setOpacity, setPressureEnabled } = settings;
+    const { width, opacity } = settings.params[tool];
+    const percent = Math.round(opacity * 100);
+    const brushTools = TOOLS.filter((T) => T.group === "brush");
+    const shapeTools = TOOLS.filter((T) => T.group === "shape");
     const { history, undoStroke, redoStroke, clearDrawing } = useDrawingStore();
 
     const canUndo = history.past.length > 0;
@@ -55,23 +52,17 @@ export default function DrawingToolPanel() {
                 <SidebarGroup>
                     <SidebarGroupLabel>{t("tool")}</SidebarGroupLabel>
                     <div className="flex gap-2">
-                        <Button variant={tool === "pen" ? "accent" : "ghost"} title={`${t("pen")} (B)`} onClick={() => setTool("pen")}>
-                            <FontAwesomeIcon icon={faPen} />
-                            {t("pen")}
-                        </Button>
-                        <Button variant={tool === "eraser" ? "accent" : "ghost"} title={`${t("eraser")} (E)`} onClick={() => setTool("eraser")}>
-                            <FontAwesomeIcon icon={faEraser} />
-                            {t("eraser")}
-                        </Button>
-                        <Button variant={tool === "eyedropper" ? "accent" : "ghost"} title={`${t("eyedropper")} (I, Alt+click)`} onClick={() => setTool("eyedropper")}>
-                            <FontAwesomeIcon icon={faEyeDropper} />
-                            {t("eyedropper")}
-                        </Button>
+                        {brushTools.map(({ id, icon: Icon, shortcut, hint }) => (
+                            <Button key={id} variant={tool === id ? "accent" : "ghost"} title={`${t(id)} (${[shortcut, hint].filter(Boolean).join(", ")})`} onClick={() => setTool(id)}>
+                                <Icon />
+                                {t(id)}
+                            </Button>
+                        ))}
                     </div>
                     <div className="mt-2 flex gap-2">
-                        {SHAPES.map(([kind, key]) => (
-                            <Button key={kind} variant={tool === kind ? "accent" : "ghost"} size="icon" title={`${t(kind)} (${key})`} onClick={() => setTool(kind)}>
-                                <ShapeIcon kind={kind} className="size-5" />
+                        {shapeTools.map(({ id, icon: Icon, shortcut }) => (
+                            <Button key={id} variant={tool === id ? "accent" : "ghost"} size="icon" title={`${t(id)} (${shortcut})`} onClick={() => setTool(id)}>
+                                <Icon className="size-5" />
                             </Button>
                         ))}
                     </div>
@@ -100,14 +91,14 @@ export default function DrawingToolPanel() {
                     <SidebarGroupLabel>{t("opacity")}</SidebarGroupLabel>
                     <div className="flex items-center gap-3">
                         <Slider
-                            value={[opacity]}
+                            value={[percent]}
                             min={0}
                             max={100}
                             step={1}
                             onValueChange={(v) => setOpacity(v[0] / 100)}
                             className="flex-1"
                         />
-                        <span className="w-10 text-right text-xs text-muted-foreground">{opacity}%</span>
+                        <span className="w-10 text-right text-xs text-muted-foreground">{percent}%</span>
                     </div>
                 </SidebarGroup>
 
