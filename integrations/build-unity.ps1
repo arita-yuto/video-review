@@ -11,7 +11,7 @@ $Work = Join-Path $env:TEMP "videoreview-build-unity"
 
 # The newest editor installed through Unity Hub, unless one is given.
 if (-not $Unity) {
-    $editor = Get-ChildItem "C:\Program Files\Unity\Hub\Editor" -Directory | Sort-Object Name | Select-Object -Last 1
+    $editor = Get-ChildItem "C:\Program Files\Unity\Hub\Editor" -Directory | Sort-Object { [version]($_.Name -replace "[a-z].*$", "") } | Select-Object -Last 1
     $Unity = Join-Path $editor.FullName "Editor\Unity.exe"
 }
 

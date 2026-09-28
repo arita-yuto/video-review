@@ -11,7 +11,7 @@ $Work = Join-Path $env:TEMP "videoreview-build-ue"
 
 # The newest engine from the Epic Games Launcher, unless one is given.
 if (-not $Unreal) {
-    $Unreal = (Get-ChildItem "C:\Program Files\Epic Games" -Directory -Filter "UE_*" | Sort-Object Name | Select-Object -Last 1).FullName
+    $Unreal = (Get-ChildItem "C:\Program Files\Epic Games" -Directory -Filter "UE_*" | Sort-Object { [version]($_.Name -replace "^UE_", "") } | Select-Object -Last 1).FullName
 }
 
 # Built from a local copy: UAT does not handle a network path (a WSL checkout is one).
@@ -33,7 +33,7 @@ Pop-Location
 
 if ($code -ne 0) {
     Write-Host "FAILED (see $log)"
-    Select-String -Path $log -Pattern "error" | Select-Object -First 20 | ForEach-Object { $_.Line }
+    Select-String -Path $log -Pattern ": error " -CaseSensitive | Select-Object -First 20 | ForEach-Object { $_.Line }
     exit 1
 }
 Write-Host "OK"

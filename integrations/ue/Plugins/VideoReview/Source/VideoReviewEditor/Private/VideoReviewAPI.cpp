@@ -85,8 +85,8 @@ TVideoReviewResponse<FVideoReviewGenericResult> FVideoReviewAPI::PurgeRev(const 
 
 TVideoReviewResponse<FVideoReviewAnnotateResult> FVideoReviewAPI::AnnotateVideoRev(const FString& VideoRevId)
 {
-    // The CLI annotates one revision; there is no "all".
-    if (VideoRevId.IsEmpty())
+    // The CLI needs a revision id; without one it would call the API with an empty path.
+    if (VideoRevId.TrimStartAndEnd().IsEmpty())
     {
         TVideoReviewResponse<FVideoReviewAnnotateResult> Response;
         // StdErr, because that is what the test window shows.

@@ -117,7 +117,7 @@ namespace VideoReview.Editor.API
 
         public static VideoReviewResponse<VideoReviewAnnotateResult> AnnotateVideoRev(string videoRevID, string[] tags = null, string summary = null)
         {
-            // The CLI annotates one revision; there is no "all".
+            // The CLI needs a revision id; without one it would call the API with an empty path.
             if (string.IsNullOrWhiteSpace(videoRevID))
             {
                 return new VideoReviewResponse<VideoReviewAnnotateResult>
