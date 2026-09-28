@@ -34,6 +34,7 @@ export function EmailSection() {
             {field("port")}
             {field("from")}
             {toggle("tlsStrict")}
+            {field("testTo")}
         </IntegrationForm>
     );
 }
