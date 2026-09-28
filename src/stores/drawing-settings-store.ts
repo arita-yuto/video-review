@@ -25,11 +25,14 @@ interface DrawingSettingsStore {
     pressureEnabled: boolean;
     /** Colors strokes have used, newest first. */
     colorHistory: string[];
+    /** Screenshots carry the drawing shown over the video (see captureView). */
+    captureDrawing: boolean;
 
     setTool: (tool: ToolId) => void;
     setColor: (color: string) => void;
     swapColors: () => void;
     setPressureEnabled: (enabled: boolean) => void;
+    setCaptureDrawing: (enabled: boolean) => void;
     /** Set the current tool's width. */
     setWidth: (width: number) => void;
     /** Move the current tool's width to the next (+1) or previous (-1) step. */
@@ -58,11 +61,13 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
             params: defaultParams(),
             pressureEnabled: true,
             colorHistory: [],
+            captureDrawing: false,
 
             setTool: (tool) => set(tool === "eyedropper" ? { tool } : { tool, lastTool: tool }),
             setColor: (color) => set({ color }),
             swapColors: () => set((state) => ({ color: state.subColor, subColor: state.color })),
             setPressureEnabled: (pressureEnabled) => set({ pressureEnabled }),
+            setCaptureDrawing: (captureDrawing) => set({ captureDrawing }),
             setWidth: (width) => set((state) => updateParams(state, { width: clampWidth(width) })),
             stepWidth: (direction) =>
                 set((state) => {

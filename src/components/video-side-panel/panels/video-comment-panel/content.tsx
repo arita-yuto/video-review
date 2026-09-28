@@ -2,7 +2,7 @@
 
 import { Separator } from "@/ui/separator";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { captureFrame } from "@/lib/utils";
+import { captureView } from "@/lib/drawing/capture-view";
 import { useCommentStore } from "@/stores/comment-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useVideoStore } from "@/stores/video-store";
@@ -26,7 +26,7 @@ export default function VideoCommentContent(props: {
     const { filterText } = useCommentSearchStore();
     const dateFilter = useCommentSearchDateFilterStore();
     const { canvasSave } = useDrawingStore();
-    const { videoRefElement, currentTime } = useVideoReviewStore();
+    const { currentTime } = useVideoReviewStore();
     const {
         editingComment,
         setEditing,
@@ -75,7 +75,7 @@ export default function VideoCommentContent(props: {
     }
 
     const handlePostCommentToChat = async (id: string) => {
-        const screenshot = await captureFrame(videoRefElement);
+        const screenshot = await captureView();
         return await chatToast(id, screenshot);
     }
 

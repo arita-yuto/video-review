@@ -75,7 +75,9 @@
         "normal": "通常再生",
         "loop": "ループ再生",
         "next": "次の動画を自動再生",
-        "playMode": "再生モード"
+        "playMode": "再生モード",
+        "saveScreenshot": "スクリーンショットを保存",
+        "captureDrawing": "スクリーンショットに描画を含める"
     },
     "video-comment-panel": {
         "title": "Comments",

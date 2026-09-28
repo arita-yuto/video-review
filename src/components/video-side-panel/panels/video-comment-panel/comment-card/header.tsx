@@ -17,7 +17,8 @@ import {
     faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { captureFrame, formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/utils";
+import { captureView } from "@/lib/drawing/capture-view";
 import { createVideoCommentLink } from "@/lib/url";
 import { useCommentStore } from "@/stores/comment-store";
 import { useAuthStore } from "@/stores/auth-store";
@@ -87,7 +88,6 @@ function DropdownMenu_CreateIssue(props: { disabled: boolean, comment: VideoComm
     const t = useTranslations("video-comment-panel");
     const { issueLinkedComment } = useCommentStore();
     const { email } = useAuthStore();
-    const { videoRefElement } = useVideoReviewStore();
 
     // NOTE:
     // Issue type and icon are currently derived from translation IDs.
@@ -100,7 +100,7 @@ function DropdownMenu_CreateIssue(props: { disabled: boolean, comment: VideoComm
     return (
         <DropdownMenuItem disabled={props.disabled || issueType === undefined} onClick={async () => {
             if (issueType === undefined || email === null) return;
-            const screenshot = await captureFrame(videoRefElement)
+            const screenshot = await captureView();
             await issueLinkedComment(props.comment.id, email, issueType, screenshot);
         }}>
             <FontAwesomeIcon icon={icon} />
