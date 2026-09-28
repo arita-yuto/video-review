@@ -4,7 +4,7 @@ AI features are optional. Once enabled, you get the AI summary in the VCS Code C
 
 ---
 
-## 1. Set up the LLM provider (administrator)
+## 1. Set up the LLM provider
 
 ### Pick a provider
 
@@ -184,6 +184,30 @@ Open Administration → MCP, write in the text box, and save.
 
 # Common questions
 - "Waiting for review" means videos without the wip tag and with no comments
+```
+
+## 5. Add more information to videos
+
+Videos with tags, events and related files attached are easier to find in search.  
+Attach them with the maintenance CLI ([maintenance CLI guide](../../maintenance/README.md)).
+
+Set tags and a summary
+```bash
+go run . annotate-video-rev \
+  --video_rev_id {uuid} \
+  --tags "A,B,C" --summary "summary text"
+```
+
+Attach events (the JSON format is in the CLI guide)
+```bash
+go run . upload-video-event-context --video_rev_id {uuid} --json_path "events.json"
+```
+
+Register related files (needs a connected VCS, see the [VCS guide](../admin/integrations/vcs.md))
+```bash
+go run . patch-video \
+  --video_id {uuid} \
+  --vcs_watch_paths "/path/to/file1,/path/to/file2"
 ```
 
 ## Reference

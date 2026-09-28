@@ -3,8 +3,7 @@
 メンテナンス CLI と AI エージェントが REST API を呼ぶときに使うトークンです  
 トークンは 1 つで、admin と同じ権限を持ちます
 
-<img src="ここにAPI Tokenの画像を入れる">
-
+<img src="https://github.com/user-attachments/assets/7d1d9203-e97f-44f7-9b28-7a44af2fde63" />
 
 ## 1. 発行する
 

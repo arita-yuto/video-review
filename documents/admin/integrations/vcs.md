@@ -3,9 +3,9 @@
 With a repository connected, the Changes tab of a video's side panel shows the commits and pull requests tied to that revision.
 With the AI features on, it shows a summary of them too ([AI Features Guide](../../build.run/ai-guide.md)).
 
-<img src="image of VCS goes here">
+<img src="https://github.com/user-attachments/assets/65bb0ed7-db7e-4a9d-959e-9cd79d940ca5" />
 
-## 2. Connect and save
+## 1. Connect and save
 
 | Field | Meaning |
 |---|---|
@@ -25,9 +25,29 @@ Note: once the token is saved, Owner, Repository and Token cannot be changed; pr
 
 ---
 
-## 3. Tie videos to the code
+## 2. Tie videos to the code
 
-When uploading a video, pass the paths it relates to.
-They are given on the maintenance CLI's upload ([maintenance CLI guide](../../../maintenance/README.md)).
+Pass the paths a video relates to, either when uploading it or on the video afterwards ([maintenance CLI guide](../../../maintenance/README.md)).
 
-The Changes tab then shows the commits and pull requests that touched those paths between the previous revision and this one.
+```bash
+# When uploading
+go run . upload-video \
+  --title "title" \
+  --folder_key "folder_key" \
+  --scene_path "scene_path" \
+  --video_path "/path/to/video.mp4" \
+  --vcs_watch_paths "/path/to/file1,/path/to/file2"
+```
+
+```bash
+# After uploading, on the video itself
+go run . patch-video \
+  --video_id "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
+  --vcs_watch_paths "/path/to/file1,/path/to/file2"
+```
+
+## 3. Check it
+
+The Changes tab shows the commits and pull requests that touched those paths between the previous revision and the upload date.
+
+<img src="https://github.com/user-attachments/assets/ebe41883-3720-4b3f-9bc1-3177e36f3bbd" width="320" />

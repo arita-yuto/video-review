@@ -4,7 +4,7 @@ AI 機能は任意ですが、有効にすると VCS「コード変更」パネ�
 
 ---
 
-## 1. LLM プロバイダーを設定する（管理者）
+## 1. LLM プロバイダーを設定する
 
 ### プロバイダーを選ぶ
 
@@ -185,6 +185,30 @@ Administration → MCP を開き、テキストボックスに書いて保存し
 
 # よく聞く質問
 - 「レビュー待ち」は wip タグが無く、コメントが 0 件の動画
+```
+
+## 5. 動画に追加情報を付ける
+
+タグ、イベント、関係するファイルを動画に付けておくと、検索で見つかりやすくなります  
+メンテナンス CLI で付けます（[メンテナンス CLI のガイド](../../maintenance/README.jp.md)）
+
+タグと要約を付ける
+```bash
+go run . annotate-video-rev \
+  --video_rev_id {uuid} \
+  --tags "A,B,C" --summary "summary text"
+```
+
+イベントを付ける（JSON の形は CLI のガイドにあります）
+```bash
+go run . upload-video-event-context --video_rev_id {uuid} --json_path "events.json"
+```
+
+関係するファイルを登録する（VCS の接続が前提です、[VCS のガイド](../admin/integrations/vcs.jp.md)）
+```bash
+go run . patch-video \
+  --video_id {uuid} \
+  --vcs_watch_paths "/path/to/file1,/path/to/file2"
 ```
 
 ## 参考

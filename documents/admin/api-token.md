@@ -3,7 +3,7 @@
 The token the maintenance CLI and AI agents use to call the REST API.
 There is one token, and it has the same rights as an admin.
 
-<img src="image of API Token goes here">
+<img src="https://github.com/user-attachments/assets/7d1d9203-e97f-44f7-9b28-7a44af2fde63" />
 
 ## 1. Issue it
 

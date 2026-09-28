@@ -2,7 +2,7 @@
 
 See the list of videos and delete the files of a video or of a revision.
 
-<img src="image of Videos goes here">
+<img src="https://github.com/user-attachments/assets/9c980229-863d-4654-8b34-ed2362e50782" />
 
 ## 1. Delete a video
 

@@ -2,7 +2,7 @@
 
 動画の一覧を見て、動画やリビジョンのファイルを削除します
 
-<img src="ここにVideosの画像をいれる">
+<img src="https://github.com/user-attachments/assets/9c980229-863d-4654-8b34-ed2362e50782" />
 
 ## 1. 動画を削除する
 
