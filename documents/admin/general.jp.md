@@ -3,7 +3,7 @@
 ログイン画面と動画の扱いに関わる設定です  
 接続先はないので、Save を押すとそのまま保存され、次の画面表示から効きます
 
-<img src="ここにGeneralの画像を入れる">
+<img src="https://github.com/user-attachments/assets/bc7b0d99-6d82-46b9-ba23-9253ee23fa25" />
 
 ## 1. 設定する
 

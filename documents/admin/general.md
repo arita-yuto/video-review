@@ -3,7 +3,7 @@
 Settings for the login screen and for how videos are handled.
 There is nothing to connect to, so Save stores the values as they are and they apply from the next page load.
 
-<img src="image of General goes here">
+<img src="https://github.com/user-attachments/assets/bc7b0d99-6d82-46b9-ba23-9253ee23fa25" />
 
 ## 1. Configure
 

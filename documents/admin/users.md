@@ -2,7 +2,7 @@
 
 List users, create them and change their role.
 
-<img src="image of Users goes here">
+<img src="https://github.com/user-attachments/assets/a240238d-d412-40b7-80a0-ffd0a9aad974" />
 
 ## 1. Create a user
 

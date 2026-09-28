@@ -2,7 +2,7 @@
 
 ユーザーの一覧、作成、role の変更をします
 
-<img src="ここにUserの画像を入れる">
+<img src="https://github.com/user-attachments/assets/a240238d-d412-40b7-80a0-ffd0a9aad974" />
 
 ## 1. ユーザーを作る
 
