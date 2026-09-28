@@ -75,7 +75,9 @@
         "normal": "Normal",
         "loop": "Loop playback",
         "next": "Auto play next video",
-        "playMode": "Play mode"
+        "playMode": "Play mode",
+        "saveScreenshot": "Save screenshot",
+        "captureDrawing": "Include drawing in screenshots"
     },
     "video-comment-panel": {
         "title": "Comment",

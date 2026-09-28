@@ -8,6 +8,8 @@ import {
     faLink,
     faDownload,
     faGamepad,
+    faCamera,
+    faPalette,
     faVolumeHigh,
     faVolumeXmark,
 } from "@fortawesome/free-solid-svg-icons";
@@ -28,6 +30,10 @@ import { useTranslations } from "next-intl";
 import { Slider } from "@/ui/slider";
 import { ShareLinkDialog } from "@/components/dialog/share-link";
 import { VideoDownloadDialog } from "@/components/dialog/video-download";
+import { Switch } from "@/ui/switch";
+import { ButtonGroup, ButtonGroupText } from "@/ui/button-group";
+import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
+import { captureView } from "@/lib/drawing/capture-view";
 
 export default function VideoControlPanel() {
     const t = useTranslations("video-control-panel");
@@ -146,11 +152,49 @@ export default function VideoControlPanel() {
             </div>
 
             <div className="ml-auto flex gap-1">
+                <Screenshot title={selectedVideo?.title ?? null} time={currentTime} />
                 <OpenSceneButton scenePath={selectedVideo?.scenePath ?? null} />
                 <DownloadVideo videoId={selectedVideo?.id ?? null} videoRevId={selectedRevision?.id ?? null} />
                 <ButtonShareLink url={createLink()} />
             </div>
         </div>
+    );
+}
+
+function Screenshot({ title, time }: { title: string | null, time: number }) {
+    const t = useTranslations("video-control-panel");
+    const captureDrawing = useDrawingSettingsStore((s) => s.captureDrawing);
+    const setCaptureDrawing = useDrawingSettingsStore((s) => s.setCaptureDrawing);
+    if (title === null) {
+        return <></>
+    }
+
+    const save = async () => {
+        const blob = await captureView();
+        if (!blob) return;
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        // mm-ss: a colon is not allowed in file names on Windows.
+        link.download = `${title}_${formatTime(time).replaceAll(":", "-")}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <ButtonGroup>
+            {/* Part of the label, so clicking the palette toggles the switch too. */}
+            <ButtonGroupText asChild>
+                <label htmlFor="capture-drawing">
+                    <FontAwesomeIcon icon={faPalette} className={captureDrawing ? "text-primary" : "text-muted-foreground"} />
+                    <Switch id="capture-drawing" checked={captureDrawing} onCheckedChange={setCaptureDrawing} aria-label={t("captureDrawing")} />
+                </label>
+            </ButtonGroupText>
+            <Button size="icon-sm" aria-label={t("saveScreenshot")} onClick={save}>
+                <FontAwesomeIcon icon={faCamera} />
+            </Button>
+        </ButtonGroup>
     );
 }
 
