@@ -115,3 +115,27 @@ It runs the maintenance CLI under the hood, so put the CLI binary in place first
 | Unreal Engine | `Plugins/VideoReview/Source/VideoReviewEditor/bin/<Windows / Mac / Linux>/` | Menu Window → VideoReview API Test |
 
 Enter the Server URL and the API Token, press Apply, and you can list videos or upload one (with a scene_path) from the editor.
+
+### Build the launcher locally (for developers)
+
+Go is required to build.
+
+##### Windows (PowerShell)
+```powershell
+cd integrations/launcher
+
+# Build
+$env:GOOS="windows"; $env:GOARCH="amd64"; go build -o installers\windows\videoreview-launcher.exe
+# Install with the script below
+powershell -ExecutionPolicy Bypass -File .\installers\windows\install.ps1
+```
+
+##### macOS
+```bash
+cd integrations/launcher
+
+# On an Intel Mac, use GOARCH=amd64
+GOOS=darwin GOARCH=arm64 go build -o installers/mac/videoreview-launcher
+# Install with the script below
+bash installers/mac/build-app.sh
+```

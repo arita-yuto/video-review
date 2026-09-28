@@ -115,3 +115,27 @@ Unity と UE のプラグインには、エディタの中から VideoReview の
 | Unreal Engine | `Plugins/VideoReview/Source/VideoReviewEditor/bin/<Windows / Mac / Linux>/` | メニュー Window → VideoReview API Test |
 
 Server URL と API Token を入れて Apply を押すと、動画の一覧やアップロード（scene_path 付き）などをエディタから試せます
+
+### launcher のローカルビルド方法（開発者向け）
+
+ビルドするために Go が必要です
+
+##### Windows（PowerShell）
+```powershell
+cd integrations/launcher
+
+# ビルド
+$env:GOOS="windows"; $env:GOARCH="amd64"; go build -o installers\windows\videoreview-launcher.exe
+# 下記スクリプトでインストールします
+powershell -ExecutionPolicy Bypass -File .\installers\windows\install.ps1
+```
+
+##### macOS
+```bash
+cd integrations/launcher
+
+# Intel Mac は GOARCH=amd64 にします
+GOOS=darwin GOARCH=arm64 go build -o installers/mac/videoreview-launcher
+# 下記スクリプトでインストールします
+bash installers/mac/build-app.sh
+```
