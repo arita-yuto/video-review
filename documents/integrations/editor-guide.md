@@ -71,7 +71,7 @@ Note: the bundled sample project was made with Unity 6000.3.
 ## 3. Tie a video to its scene
 
 When uploading a video, pass the scene's path as `scene_path`.
-The maintenance CLI's `upload-video` takes it ([maintenance CLI guide](../maintenance/README.md)).
+The maintenance CLI's `upload-video` takes it ([maintenance CLI guide](../../maintenance/README.md)).
 
 ```bash
 go run . upload-video \
@@ -97,8 +97,8 @@ Each editor expects its own form of path:
 
 <img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="700" />
 
-Note: the editor must be running beforehand.
-Note: if the button is missing, check that the video has a `scene_path` and that the URL scheme in Administration → General is not empty ([General](admin/general.md)).
+Note: the editor must be running beforehand.  
+Note: if the button is missing, check that the video has a `scene_path` and that the URL scheme in Administration → General is not empty ([General](../admin/general.md)).
 
 ---
 

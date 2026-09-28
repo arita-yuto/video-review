@@ -71,7 +71,7 @@ Console に `[VideoReview] TCP server started on port 18766` と出れば待ち�
 ## 3. 動画にシーンを結びつける
 
 動画をアップロードするときに、そのシーンのパスを `scene_path` に付けます  
-メンテナンス CLI の `upload-video` で指定します（[メンテナンス CLI のガイド](../maintenance/README.jp.md)）
+メンテナンス CLI の `upload-video` で指定します（[メンテナンス CLI のガイド](../../maintenance/README.jp.md)）
 
 ```bash
 go run . upload-video \
@@ -98,7 +98,7 @@ go run . upload-video \
 <img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="700" />
 
 ※ エディタを先に起動する必要があります  
-※ ボタンが出ないときは、動画に `scene_path` が付いているか、管理画面の General で URL scheme が空になっていないかを確かめます（[General](admin/general.jp.md)）
+※ ボタンが出ないときは、動画に `scene_path` が付いているか、管理画面の General で URL scheme が空になっていないかを確かめます（[General](../admin/general.jp.md)）
 
 ---
 
