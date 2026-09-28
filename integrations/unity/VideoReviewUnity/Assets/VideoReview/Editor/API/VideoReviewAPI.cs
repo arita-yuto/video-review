@@ -117,9 +117,19 @@ namespace VideoReview.Editor.API
 
         public static VideoReviewResponse<VideoReviewAnnotateResult> AnnotateVideoRev(string videoRevID, string[] tags = null, string summary = null)
         {
+            // The CLI annotates one revision; there is no "all".
+            if (string.IsNullOrWhiteSpace(videoRevID))
+            {
+                return new VideoReviewResponse<VideoReviewAnnotateResult>
+                {
+                    success = false,
+                    parseError = "video revision id is required",
+                };
+            }
+
             var args = new List<string>
             {
-                "--video_rev_id", string.IsNullOrWhiteSpace(videoRevID) ? "all" : videoRevID,
+                "--video_rev_id", videoRevID,
             };
 
             if (tags != null && tags.Length > 0)

@@ -85,8 +85,15 @@ TVideoReviewResponse<FVideoReviewGenericResult> FVideoReviewAPI::PurgeRev(const 
 
 TVideoReviewResponse<FVideoReviewAnnotateResult> FVideoReviewAPI::AnnotateVideoRev(const FString& VideoRevId)
 {
-    FString Id = VideoRevId.IsEmpty() ? TEXT("all") : VideoRevId;
-    return ExecuteAnnotateObject(TEXT("annotate-video-rev"), { TEXT("--video_rev_id"), Id });
+    // The CLI annotates one revision; there is no "all".
+    if (VideoRevId.IsEmpty())
+    {
+        TVideoReviewResponse<FVideoReviewAnnotateResult> Response;
+        // StdErr, because that is what the test window shows.
+        Response.CommandResult.StdErr = TEXT("video revision id is required");
+        return Response;
+    }
+    return ExecuteAnnotateObject(TEXT("annotate-video-rev"), { TEXT("--video_rev_id"), VideoRevId });
 }
 
 TVideoReviewResponse<FVideoReviewSimpleMessage> FVideoReviewAPI::UploadEventContext(const FString& VideoRevId, const FString& JsonPath)
