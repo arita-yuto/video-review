@@ -2,6 +2,10 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { NextIntlClientProvider } from "next-intl";
+import type { Locale as DateFnsLocale } from "date-fns";
+import { enUS } from "date-fns/locale/en-US";
+import { ja } from "date-fns/locale/ja";
+import { ko } from "date-fns/locale/ko";
 
 type LocaleContextType = {
     locale: string;
@@ -13,9 +17,11 @@ const LocaleContext = createContext<LocaleContextType>({
     setLocale: () => {},
 });
 
-const MessagesMap: Record<string, () => Promise<{ default: any }>> = {
-    ja: () => import("../messages/ja.json"),
-    en: () => import("../messages/en.json"),
+// Names are each language's own name, so they read the same whatever the current UI language is.
+export const Locales: Record<string, { name: string; dateFns: DateFnsLocale; load: () => Promise<{ default: any }> }> = {
+    en: { name: "English", dateFns: enUS, load: () => import("../messages/en.json") },
+    ja: { name: "日本語", dateFns: ja, load: () => import("../messages/ja.json") },
+    ko: { name: "한국어", dateFns: ko, load: () => import("../messages/ko.json") },
 };
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
@@ -23,15 +29,17 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     const [messages, setMessagess] = useState<any>(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem("locale") as string ?? "en";
-        setLocaleState(stored);
-        MessagesMap[stored]().then((m: any) => setMessagess(m.default));
+        // A value this build has no messages for (e.g. saved by a newer version) falls back to English.
+        const stored = localStorage.getItem("locale");
+        const initial = stored && stored in Locales ? stored : "en";
+        setLocaleState(initial);
+        Locales[initial].load().then((m: any) => setMessagess(m.default));
     }, []);
 
     const setLocale = (loc: string) => {
         setLocaleState(loc);
         localStorage.setItem("locale", loc);
-        MessagesMap[loc]().then((m: any) => setMessagess(m.default));
+        Locales[loc].load().then((m: any) => setMessagess(m.default));
     };
 
     if (!messages) return null;

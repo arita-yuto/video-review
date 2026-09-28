@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faRightFromBracket, faUserEdit, faUserShield } from "@fortawesome/free-solid-svg-icons";
 import { Popover, PopoverTrigger, PopoverContent } from "@/ui/popover";
-import { useLocale } from "@/app/locale-provider";
-import { Switch } from "@/ui/switch";
+import { Locales, useLocale } from "@/app/locale-provider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/stores/auth-store";
 import { isAdmin } from "@/lib/role";
@@ -75,12 +75,18 @@ export function SettingPopover() {
                     {/* Language setting */}
                     {ControlRow(t("language"), () => {
                         return (
-                            <Switch
-                                checked={locale === "ja"}
-                                onCheckedChange={(x) =>
-                                    setLocale(x ? "ja" : "en")
-                                }
-                            />
+                            <Select value={locale} onValueChange={setLocale}>
+                                <SelectTrigger size="sm" aria-label={t("language")}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.entries(Locales).map(([code, { name }]) => (
+                                        <SelectItem key={code} value={code}>
+                                            {name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         );
                     })}
 

@@ -174,9 +174,7 @@
     },
     "setting": {
         "title": "Setting",
-        "language": "Language Switch",
-        "languageOptionEn": "English",
-        "languageOptionJa": "Japanese",
+        "language": "Language",
         "logout": "Logout",
         "editProfile": "Edit Profile",
         "administration": "Administration",

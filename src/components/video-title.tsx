@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import { useVideoStore } from "@/stores/video-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { useLocale } from "@/app/locale-provider";
 import { isAdmin } from "@/lib/role";
 import { useTranslations } from "next-intl";
 import { SidebarTrigger } from "@/ui/sidebar";
@@ -15,6 +16,7 @@ import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export default function VideoTitle() {
     const t = useTranslations("video-title");
+    const { locale } = useLocale();
 
     const {
         selectedVideo,
@@ -80,7 +82,7 @@ export default function VideoTitle() {
                                         <SelectItem key={r.id} value={r.id}>
                                             {t("revisionOption", {
                                                 revision: r.revision,
-                                                date: new Date(r.uploadedAt).toLocaleDateString("ja-JP")
+                                                date: new Date(r.uploadedAt).toLocaleDateString(locale)
                                             })}
                                         </SelectItem>
                                     ))}
@@ -94,7 +96,7 @@ export default function VideoTitle() {
                         ? t("revisionInfo", {
                             revision: selectedRevision.revision,
                             uploadedAt: new Date(selectedRevision.uploadedAt)
-                                .toLocaleString()
+                                .toLocaleString(locale)
                         })
                         : t("noRevision")}
                 </p>

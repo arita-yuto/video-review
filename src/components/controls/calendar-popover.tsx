@@ -7,6 +7,7 @@ import { Button } from '@/ui/button';
 import { DateRange } from 'react-day-picker';
 import { Calendar } from '@/ui/calendar';
 import CalendarDateRadio from '@/components/controls/calendar-date-radio';
+import { Locales, useLocale } from '@/app/locale-provider';
 
 interface CalendarPopoverProps extends React.ComponentProps<"div"> {
     mode: "none" | "today" | "recent" | "range";
@@ -27,6 +28,7 @@ export default function CalendarPopover({
     className,
     ...props
 }: CalendarPopoverProps) {
+    const { locale } = useLocale();
     const [open, setOpen] = React.useState(false);
     // Local working range so an in-progress selection (only "from" picked) stays
     // visible until both ends are chosen, then it is committed via onSetRange.
@@ -71,6 +73,7 @@ export default function CalendarPopover({
                         selected={draft}
                         onSelect={handleSelect}
                         numberOfMonths={1}
+                        locale={Locales[locale].dateFns}
                     />
                 </div>
             </PopoverContent>
