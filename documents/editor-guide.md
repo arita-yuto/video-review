@@ -139,3 +139,15 @@ GOOS=darwin GOARCH=arm64 go build -o installers/mac/videoreview-launcher
 # Install with the script below
 bash installers/mac/build-app.sh
 ```
+
+### Check the plugins build (for developers)
+
+On Windows, you can check that the Unity and UE plugins build.
+Each script uses the newest editor installed.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\integrations\build-unity.ps1
+powershell -ExecutionPolicy Bypass -File .\integrations\build-ue.ps1
+```
+
+Note: Unity needs you to be signed in to Unity Hub.

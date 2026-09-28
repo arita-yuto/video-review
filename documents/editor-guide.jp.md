@@ -139,3 +139,15 @@ GOOS=darwin GOARCH=arm64 go build -o installers/mac/videoreview-launcher
 # 下記スクリプトでインストールします
 bash installers/mac/build-app.sh
 ```
+
+### プラグインのビルド確認（開発者向け）
+
+Unity と UE のプラグインがビルドできるかを、Windows で確かめられます  
+インストール済みのエディタのうち最新のものを使います
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\integrations\build-unity.ps1
+powershell -ExecutionPolicy Bypass -File .\integrations\build-ue.ps1
+```
+
+※ Unity は、Unity Hub へのログインが必要です
