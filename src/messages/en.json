@@ -335,7 +335,8 @@
                 "host": "SMTP host",
                 "port": "SMTP port",
                 "from": "From",
-                "tlsStrict": "Strict TLS"
+                "tlsStrict": "Strict TLS",
+                "testTo": "Send test mail to"
             },
             "vcs": {
                 "title": "VCS",

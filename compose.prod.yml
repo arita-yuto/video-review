@@ -58,6 +58,19 @@ services:
     volumes:
       - videoreview-db:/var/lib/postgresql/data
 
+  smtp:
+    image: boky/postfix
+    container_name: videoreview-smtp
+    restart: unless-stopped
+    profiles: [smtp]
+
+    environment:
+      HOSTNAME: "videoreview.local"
+      ALLOW_EMPTY_SENDER_DOMAINS: "true"
+      RELAYHOST: ${SMTP_RELAYHOST:-}
+      RELAYHOST_USERNAME: ${SMTP_RELAYHOST_USERNAME:-}
+      RELAYHOST_PASSWORD: ${SMTP_RELAYHOST_PASSWORD:-}
+
 volumes:
   videoreview-storage:
   videoreview-db:

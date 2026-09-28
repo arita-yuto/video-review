@@ -18,11 +18,13 @@ const envMock = vi.hoisted(() => ({
 }));
 
 const authorizeMock = vi.hoisted(() => vi.fn());
+const sendMailMock = vi.hoisted(() => vi.fn(async () => ({})));
 
 type Where = { where: { key: string } };
 
 vi.mock("@/server/lib/env", () => ({ env: envMock }));
 vi.mock("@/server/lib/token", () => ({ authorize: authorizeMock }));
+vi.mock("nodemailer", () => ({ default: { createTransport: () => ({ sendMail: sendMailMock }) } }));
 vi.mock("@/server/lib/db", () => ({
     prisma: {
         systemSetting: {
@@ -72,8 +74,8 @@ function put(body: object) {
     });
 }
 
-// Jira stands in for every integration: the rules live in the shared store and router.
-describe("admin integration settings (via Jira)", () => {
+// Jira stands in for the shared rules (store and router); Email has its own case because its test sends a mail.
+describe("admin integration settings", () => {
     beforeEach(async () => {
         db.settings.clear();
         db.secrets.clear();
@@ -183,6 +185,18 @@ describe("admin integration settings (via Jira)", () => {
             project: "VR",
             issueTypeTask: "Task",
         });
+    });
+
+    it("sends the email test to the entered address, then saves", async () => {
+        const res = await app.request("/settings/email/test-and-save", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ enable: "true", host: "relay.example", port: "25", from: "noreply@example.com", testTo: "admin@example.com" }),
+        });
+
+        expect((await res.json()).result.ok).toBe(true);
+        expect(sendMailMock).toHaveBeenCalledWith(expect.objectContaining({ to: "admin@example.com", from: "noreply@example.com" }));
+        expect(db.settings.get("email.host")).toBe("relay.example");
     });
 
     it("never sends the env token to a url sent in Test & save", async () => {

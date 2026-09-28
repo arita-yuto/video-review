@@ -44,48 +44,38 @@ Note: once the URL is saved it cannot be changed; press Reset to drop it and ent
 ## 3. Email
 
 VideoReview has no SMTP server of its own.
-It hands mail to an SMTP relay near it (Postfix or similar) or to your SMTP server.
+It hands mail to the bundled Postfix relay or to your own SMTP server.
 
-```
-VideoReview
-   ↓ SMTP
-Postfix (container)
-   ↓ SMTP relay
-Mail server (Gmail, your ISP's SMTP, ...)
-```
+### Set where the SMTP relay forwards to (Docker)
 
-### Set up an SMTP relay (Docker)
+Note: skip this step when handing mail to your own SMTP server.
 
-Add this service to `compose.prod.yml`:
+The Postfix relay in `compose.prod.yml` (the `smtp` service) starts only with `--profile smtp`.
+Put the mail server it forwards to in `.env`:
 
-```yml
-smtp:
-  image: boky/postfix
-  container_name: videoreview-smtp
-  environment:
-    HOSTNAME: "videoreview.local"
-    ALLOW_EMPTY_SENDER_DOMAINS: "true"
-    ALLOWED_NETWORKS: "0.0.0.0/0"
-    RELAYHOST: "[smtp.gmail.com]:587"
-    RELAYHOST_USERNAME: ""
-    RELAYHOST_PASSWORD: ""
-  ports:
-    - "1025:25"
+```env
+# The SMTP server to forward to (e.g. `[smtp.gmail.com]:587` for Gmail)
+SMTP_RELAYHOST="[smtp.example.com]:587"
+# The user name for SMTP authentication
+SMTP_RELAYHOST_USERNAME="you@example.com"
+# The password for SMTP authentication
+SMTP_RELAYHOST_PASSWORD="xxxx xxxx xxxx xxxx"
 ```
 
-| Variable | Meaning |
-|---|---|
-| `RELAYHOST` | The SMTP server to relay to (e.g. `[smtp.gmail.com]:587`) |
-| `RELAYHOST_USERNAME` | The user name for SMTP authentication |
-| `RELAYHOST_PASSWORD` | The password for SMTP authentication |
+Note: for Gmail, turn on 2-Step Verification, create an App Password, and put it in `SMTP_RELAYHOST_PASSWORD`.
 
-Note: for Gmail, use `smtp.gmail.com:587`.
+After changing `.env`, start with `--profile smtp`.
+With Ollama as well, pass both: `--profile cpu --profile smtp`.
+
+```bash
+docker compose -f compose.prod.yml --profile smtp up -d
+```
 
 ### Configure VideoReview
 
 Open Administration → Integrations → Email.
 
-<img src="https://github.com/user-attachments/assets/a07c85fc-b006-4d97-9b4a-a944a8bf7ca2" />
+<img src="https://github.com/user-attachments/assets/07480518-867d-455f-9d34-a7690f0d5b72" />
 
 | Field | Meaning |
 |---|---|
@@ -94,5 +84,9 @@ Open Administration → Integrations → Email.
 | SMTP port | `25` for the relay above |
 | From | The sender address (e.g. `VideoReview <noreply@example.com>`) |
 | Strict TLS | On only when the SMTP server has a trusted certificate |
+| Send test mail to | Where Test & save sends its test mail |
 
-Press Test & save; only settings that reach the SMTP server are saved.
+Press Test & save; the settings are saved and one mail arrives at that address.
+If nothing arrives, check the relay's log: `docker compose -f compose.prod.yml logs smtp`.
+
+<img src="https://github.com/user-attachments/assets/0a915fa3-2049-4e0c-a8d3-ab37e07525c2" />

@@ -330,12 +330,13 @@
                 "testNote": "Test & save は、チャンネルにテストのメッセージを 1 件送ります"
             },
             "email": {
-                "title": "メール",
-                "enable": "メールを送る",
+                "title": "Email",
+                "enable": "Email 送信を有効化",
                 "host": "SMTP host",
                 "port": "SMTP port",
                 "from": "送信元",
-                "tlsStrict": "TLS 証明書を厳密に検証"
+                "tlsStrict": "TLS 証明書を厳密に検証",
+                "testTo": "テストの送信先"
             },
             "vcs": {
                 "title": "VCS",
