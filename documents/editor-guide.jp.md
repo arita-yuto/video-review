@@ -2,8 +2,6 @@
 
 動画のプレイヤーにある Open Scene ボタンで、その動画に結びついたシーンを Unity か Unreal Engine で直接開けます
 
-仕組みはこうです
-
 ```
 ブラウザ（Open Scene）
    ↓ videoreview://open?scene=<scenePath>
@@ -13,11 +11,11 @@ launcher（PC ごとにインストール、URL scheme を受け取る）
 ```
 
 launcher とプラグインは、レビューする人の PC ごとに入れます  
-シーンのパスは、動画をアップロードする人が付けます
+シーンのパスは、[動画のアップロード時](#3-動画にシーンを結びつける)に紐づけます
 
 ---
 
-## 1. launcher をインストールする（PC ごと）
+## 1. launcher をインストールする
 
 GitHub の Releases から、自分の OS の zip をダウンロードします
 
@@ -30,7 +28,7 @@ GitHub の Releases から、自分の OS の zip をダウンロードします
 ### Windows
 
 1. zip を展開します
-2. 展開したフォルダで PowerShell を開き、次を実行します
+2. 展開したフォルダで PowerShell で以下を実行します
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1
@@ -41,7 +39,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 ### macOS
 
 1. zip を展開します
-2. 展開したフォルダでターミナルを開き、次を実行します
+2. 展開したフォルダでターミナルで以下を実行します
 
 ```bash
 bash build-app.sh
@@ -51,11 +49,11 @@ bash build-app.sh
 
 ---
 
-## 2. エディタにプラグインを入れる（PC ごと）
+## 2. エディタにプラグインを入れる
 
 ### Unity
 
-1. このリポジトリの `integrations/unity/VideoReviewUnity/Assets/VideoReview` フォルダを、自分のプロジェクトの `Assets/` にコピーします
+1. `integrations/unity/VideoReviewUnity/Assets/VideoReview` フォルダを、自分のプロジェクトの `Assets/` にコピーします
 2. エディタを開き直します
 
 Console に `[VideoReview] TCP server started on port 18766` と出れば待ち受けています
@@ -64,7 +62,7 @@ Console に `[VideoReview] TCP server started on port 18766` と出れば待ち�
 
 ### Unreal Engine
 
-1. このリポジトリの `integrations/ue/Plugins/VideoReview` フォルダを、自分のプロジェクトの `Plugins/` にコピーします
+1. `integrations/ue/Plugins/VideoReview` フォルダを、自分のプロジェクトの `Plugins/` にコピーします
 2. プロジェクトを開き、プラグインのビルドを求められたら Yes を選びます（C++ のプラグインなので、Visual Studio か Xcode が要ります）
 3. Edit → Plugins で VideoReview が有効になっていることを確かめます
 
@@ -92,13 +90,14 @@ go run . upload-video \
 
 ---
 
-## 4. 使う
+## 4. 使い方
 
 1. 動画を開くと、`scene_path` が付いている動画にはプレイヤーの右下にゲームパッドのアイコン（Open Scene）が出ます
 2. 押すと、起動中のエディタがそのシーンを開き、前面に出ます
 
-※ エディタに保存していない変更があると、先に保存するか聞かれます  
-※ プラグインは起動中のエディタにだけ届くので、エディタを先に起動しておきます  
+<img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="700" />
+
+※ エディタを先に起動する必要があります  
 ※ ボタンが出ないときは、動画に `scene_path` が付いているか、管理画面の General で URL scheme が空になっていないかを確かめます（[General](admin/general.jp.md)）
 
 ---
@@ -107,12 +106,12 @@ go run . upload-video \
 
 ### API Test Window（エディタから VideoReview の API を試す）
 
-Unity と UE のプラグインには、エディタの中から VideoReview の API を呼ぶデバッグ用の窓が入っています  
+Unity と UE のプラグインには、エディタの中から VideoReview の API を呼ぶデバッグウィンドウが入っています  
 中身はメンテナンス CLI を呼んでいるので、CLI のバイナリを次の場所に置いてから使います
 
 | エディタ | CLI を置く場所 | 開き方 |
 |---|---|---|
 | Unity | `Assets/VideoReview/Editor/API/bin/<Windows / Mac / Linux>/` | メニュー VideoReview → Open API Test Window |
-| Unreal Engine | `Plugins/VideoReview/Source/VideoReviewEditor/bin/<Windows / Mac / Linux>/` | Level Editor のメニュー → VideoReview API Test |
+| Unreal Engine | `Plugins/VideoReview/Source/VideoReviewEditor/bin/<Windows / Mac / Linux>/` | メニュー Window → VideoReview API Test |
 
 Server URL と API Token を入れて Apply を押すと、動画の一覧やアップロード（scene_path 付き）などをエディタから試せます

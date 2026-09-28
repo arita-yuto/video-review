@@ -2,8 +2,6 @@
 
 The Open Scene button in the video player opens the scene tied to that video directly in Unity or Unreal Engine.
 
-This is how it works:
-
 ```
 Browser (Open Scene)
    ↓ videoreview://open?scene=<scenePath>
@@ -13,11 +11,11 @@ editor plugin (listens inside Unity / UE and opens the scene)
 ```
 
 The launcher and the plugin are installed on each reviewer's PC.
-The scene path is attached by whoever uploads the video.
+The scene path is tied to the video [when it is uploaded](#3-tie-a-video-to-its-scene).
 
 ---
 
-## 1. Install the launcher (per PC)
+## 1. Install the launcher
 
 Download the zip for your OS from the GitHub Releases.
 
@@ -51,11 +49,11 @@ It creates `~/Applications/VideoReview/VideoReview Launcher.app` and registers `
 
 ---
 
-## 2. Install the editor plugin (per PC)
+## 2. Install the editor plugin
 
 ### Unity
 
-1. Copy the `integrations/unity/VideoReviewUnity/Assets/VideoReview` folder of this repository into your project's `Assets/`.
+1. Copy the `integrations/unity/VideoReviewUnity/Assets/VideoReview` folder into your project's `Assets/`.
 2. Reopen the editor.
 
 `[VideoReview] TCP server started on port 18766` in the Console means it is listening.
@@ -64,7 +62,7 @@ Note: the bundled sample project was made with Unity 6000.3.
 
 ### Unreal Engine
 
-1. Copy the `integrations/ue/Plugins/VideoReview` folder of this repository into your project's `Plugins/`.
+1. Copy the `integrations/ue/Plugins/VideoReview` folder into your project's `Plugins/`.
 2. Open the project. When asked to build the plugin, choose Yes (it is a C++ plugin, so Visual Studio or Xcode is needed).
 3. Check that VideoReview is enabled under Edit → Plugins.
 
@@ -92,13 +90,14 @@ Each editor expects its own form of path:
 
 ---
 
-## 4. Use it
+## 4. How to use
 
 1. Open the video. A video with a `scene_path` shows a gamepad icon (Open Scene) at the bottom right of the player.
 2. Press it. The running editor opens that scene and comes to the front.
 
-Note: with unsaved changes in the editor, you are asked to save first.
-Note: the plugin only reaches a running editor, so start the editor beforehand.
+<img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="700" />
+
+Note: the editor must be running beforehand.
 Note: if the button is missing, check that the video has a `scene_path` and that the URL scheme in Administration → General is not empty ([General](admin/general.md)).
 
 ---
@@ -113,6 +112,6 @@ It runs the maintenance CLI under the hood, so put the CLI binary in place first
 | Editor | Where the CLI goes | How to open |
 |---|---|---|
 | Unity | `Assets/VideoReview/Editor/API/bin/<Windows / Mac / Linux>/` | Menu VideoReview → Open API Test Window |
-| Unreal Engine | `Plugins/VideoReview/Source/VideoReviewEditor/bin/<Windows / Mac / Linux>/` | Level Editor menu → VideoReview API Test |
+| Unreal Engine | `Plugins/VideoReview/Source/VideoReviewEditor/bin/<Windows / Mac / Linux>/` | Menu Window → VideoReview API Test |
 
 Enter the Server URL and the API Token, press Apply, and you can list videos or upload one (with a scene_path) from the editor.
