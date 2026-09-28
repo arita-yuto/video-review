@@ -10,7 +10,6 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { ja } from "date-fns/locale/ja"
 
 function Calendar({
   className,
@@ -28,7 +27,6 @@ function Calendar({
 
   return (
     <DayPicker
-      locale={ja}
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",

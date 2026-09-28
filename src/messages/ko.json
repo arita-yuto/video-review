@@ -1,0 +1,363 @@
+{
+    "bootstrap": {
+        "title": "관리자 설정",
+        "email": "이메일",
+        "password": "비밀번호",
+        "initialize": "초기 설정"
+    },
+    "video-title": {
+        "noSelection": "선택된 동영상 없음",
+        "revisionInfo": "리비전: {revision} ({uploadedAt})",
+        "noRevision": "리비전 정보 없음",
+        "revisionOption": "rev_{revision} ({date})",
+        "tagsLabel": "태그",
+        "noTags": "없음",
+        "addTag": "태그 추가",
+        "tagInputPlaceholder": "태그 입력...",
+        "summaryLabel": "요약",
+        "noSummary": "없음",
+        "guestVisible": "게스트에게 공개"
+    },
+    "video-download": {
+        "title": "동영상 다운로드",
+        "selectRes": "해상도 선택",
+        "cancel": "취소",
+        "downloading": "다운로드 중...",
+        "prepare": "다운로드"
+    },
+    "video-upload": {
+        "title": "동영상 업로드",
+        "selectFile": "동영상 파일 선택",
+        "errorNoInput": "제목, 폴더, 파일을 입력해 주세요",
+        "folderKeyPlaceholder": "폴더 키 (예: projectA/scene01)",
+        "cancel": "취소",
+        "upload": "업로드",
+        "uploading": "업로드 중...",
+        "uploadingPercent": "업로드 중... {percent}%",
+        "errorUpload": "동영상 업로드에 실패했습니다. 관리자에게 문의해 주세요",
+        "errorUploadTooLarge": "파일이 너무 커서 거부되었습니다. 서버 앞단 proxy의 업로드 용량 제한을 확인해 주세요"
+    },
+    "video-search": {
+        "title": "동영상 검색",
+        "hasComment": "댓글 있음",
+        "hasIssue": "티켓이 연결된 댓글",
+        "filterIssue": "티켓 상세 검색",
+        "hasDrawing": "그림이 있는 댓글",
+        "userFilter": "댓글 작성자",
+        "searchFilter": "필터",
+        "ok": "검색",
+        "cancel": "취소",
+        "commentsDateRange": "댓글 작성일",
+        "videoDateRange": "동영상 업데이트일"
+    },
+    "video-review": {
+        "noVideoSelected": "동영상을 선택해 주세요"
+    },
+    "video-list-panel": {
+        "title": "동영상 목록",
+        "upload": "동영상 업로드",
+        "thumbnails": "썸네일",
+        "thumbnailsClose": "썸네일 닫기"
+    },
+    "chat-search": {
+        "title": "채팅 검색",
+        "clearHistory": "대화 지우기",
+        "emptyState": "동영상, 댓글, 이벤트에 대해 자연어로 질문할 수 있습니다",
+        "loading": "생각 중...",
+        "inputPlaceholder": "동영상에 대해 물어보세요... (Enter로 전송)",
+        "error": {
+            "notConfigured": "AI가 설정되어 있지 않습니다. 관리자에게 문의해 주세요",
+            "requestFailed": "AI로부터 응답을 받지 못했습니다",
+            "failed": "검색에 실패했습니다"
+        }
+    },
+    "video-control-panel": {
+        "normal": "일반 재생",
+        "loop": "반복 재생",
+        "next": "다음 동영상 자동 재생",
+        "playMode": "재생 모드",
+        "saveScreenshot": "스크린샷 저장",
+        "captureDrawing": "스크린샷에 그림 포함"
+    },
+    "video-comment-panel": {
+        "title": "댓글",
+        "newBadge": "NEW",
+        "commentItemCopyLink": "링크 복사",
+        "commentItemTask": "태스크로 전환",
+        "commentItemBug": "버그로 전환",
+        "commentItemEdit": "편집",
+        "commentItemRemove": "삭제"
+    },
+    "vcs-changes-panel": {
+        "tab": "변경 사항",
+        "loading": "코드 변경 사항을 가져오는 중...",
+        "empty": "이 기간에 머지된 PR이나 커밋이 없습니다",
+        "not-configured": "VCS 연동이 설정되어 있지 않습니다",
+        "error": "오류",
+        "no-revision": "이전 리비전이 없습니다",
+        "section-prs": "머지된 PR",
+        "section-commits": "커밋",
+        "show-unlikely": "관련성이 낮은 변경 사항 표시",
+        "hide-unlikely": "관련성이 낮은 변경 사항 숨기기",
+        "unit-items": "건",
+        "unit-days": "일간",
+        "commits": "커밋",
+        "summary-loading": "요약 생성 중...",
+        "refresh": "새로고침"
+    },
+    "video-event-panel": {
+        "tab": "이벤트",
+        "openLink": "링크 열기",
+        "empty": "이벤트가 없습니다"
+    },
+    "video-event-search": {
+        "title": "이벤트 검색",
+        "searchFilter": "이벤트 텍스트",
+        "kind": "이벤트 종류",
+        "hasLink": "링크 있음",
+        "ok": "검색",
+        "cancel": "취소"
+    },
+    "comment-confirmed": {
+        "commentUpdate": "댓글 수정",
+        "commentAdd": "댓글 추가",
+        "cancel": "취소",
+        "editIssueLink": "이슈 링크",
+        "editComment": "댓글 입력..."
+    },
+    "share-link": {
+        "title": "공유 링크",
+        "helperText": "Ctrl+C로 복사해서 공유하세요",
+        "close": "닫기"
+    },
+    "prompt-edit": {
+        "title": "프롬프트 편집",
+        "save": "저장"
+    },
+    "comment-search": {
+        "title": "댓글 검색",
+        "searchFilter": "텍스트 필터",
+        "dateRange": "댓글 작성일",
+        "hasDrawing": "그림이 있는 댓글",
+        "hasIssue": "티켓이 연결된 댓글",
+        "fetchAllComments": "모든 리비전의 댓글 가져오기",
+        "userFilter": "댓글 작성자",
+        "ok": "검색",
+        "cancel": "취소"
+    },
+    "drawing-tool-panel": {
+        "title": "그리기",
+        "tool": "도구",
+        "pen": "펜",
+        "eraser": "지우개",
+        "undo": "실행 취소",
+        "redo": "다시 실행",
+        "clear": "모두 지우기",
+        "lineWidth": "굵기",
+        "color": "색상",
+        "swapColors": "색상 바꾸기",
+        "colorHistory": "색상 기록",
+        "pressure": "필압",
+        "opacity": "불투명도",
+        "eyedropper": "스포이트",
+        "line": "직선",
+        "arrow": "화살표",
+        "rect": "사각형",
+        "ellipse": "타원"
+    },
+    "login": {
+        "loginFailedMsg": "로그인 실패",
+        "displayName": "표시 이름",
+        "email": "이메일",
+        "password": "비밀번호",
+        "ok": "로그인"
+    },
+    "setting": {
+        "title": "설정",
+        "language": "언어",
+        "logout": "로그아웃",
+        "editProfile": "프로필 편집",
+        "administration": "관리",
+        "editPrompt": "프롬프트 편집"
+    },
+    "calendar-date-radio": {
+        "today": "오늘",
+        "recent": "최근 {days}일",
+        "clear": "지우기"
+    },
+    "edit-user-profile": {
+        "displayName": "표시 이름",
+        "title": "프로필 편집",
+        "save": "저장",
+        "cancel": "취소",
+        "saving": "저장 중...",
+        "saveFailed": "프로필 저장에 실패했습니다",
+        "avatarHint": "PNG / JPEG 형식, 최대 {max}, {size}까지",
+        "change": "변경",
+        "fileTooLarge": "파일 크기({size})가 너무 큽니다",
+        "currentPassword": "현재 비밀번호",
+        "newPassword": "새 비밀번호",
+        "confirmPassword": "새 비밀번호 (확인)",
+        "passwordTooShort": "비밀번호는 6자 이상이어야 합니다",
+        "passwordMismatch": "새 비밀번호가 일치하지 않습니다",
+        "currentPasswordRequired": "현재 비밀번호를 입력해 주세요",
+        "currentPasswordWrong": "현재 비밀번호가 올바르지 않습니다"
+    },
+    "admin-settings": {
+        "title": "관리",
+        "sections": {
+            "general": "General",
+            "users": "사용자",
+            "apiToken": "API Token",
+            "integrations": "연동",
+            "videos": "동영상 관리"
+        },
+        "general": {
+            "title": "General",
+            "allowGuest": "Guest 로그인",
+            "loginDefaultType": "로그인 화면 기본 탭",
+            "urlSchema": "URL scheme",
+            "resolutionPresets": "Resolution presets",
+            "resolutionPresetsExample": "480,720,1080",
+            "uploadChunkMb": "Upload chunk (MB)",
+            "save": "저장",
+            "saveFailed": "저장하지 못했습니다",
+            "saved": "저장했습니다"
+        },
+        "users": {
+            "columns": {
+                "displayName": "표시 이름",
+                "email": "이메일",
+                "role": "권한",
+                "createdAt": "생성일"
+            },
+            "roles": {
+                "viewer": "열람자",
+                "admin": "관리자"
+            },
+            "loadFailed": "사용자를 불러오지 못했습니다",
+            "updateFailed": "권한 변경에 실패했습니다",
+            "create": {
+                "title": "사용자 생성",
+                "displayName": "표시 이름",
+                "email": "이메일",
+                "password": "비밀번호",
+                "submit": "생성",
+                "failed": "사용자 생성에 실패했습니다"
+            }
+        },
+        "apiToken": {
+            "description": "REST API와 maintenance에서 사용하는 토큰입니다",
+            "configured": "설정됨",
+            "notConfigured": "설정 안 됨",
+            "generate": "생성",
+            "regenerate": "재생성",
+            "newTokenHint": "Ctrl+C로 복사해 주세요. 다시 표시되지 않습니다",
+            "loadFailed": "상태를 불러오지 못했습니다",
+            "failed": "토큰 생성에 실패했습니다"
+        },
+        "videos": {
+            "loadFailed": "동영상을 불러오지 못했습니다",
+            "filterPlaceholder": "제목, 폴더로 필터링",
+            "noMatch": "조건에 맞는 동영상이 없습니다",
+            "revisionRow": "리비전 {revision} ({date} 업로드)",
+            "toggleRevisions": "{title}의 리비전 표시",
+            "columns": {
+                "expand": "리비전",
+                "title": "제목",
+                "folder": "폴더",
+                "updatedAt": "업데이트일",
+                "revisions": "리비전",
+                "actions": "작업"
+            },
+            "delete": {
+                "action": "Delete",
+                "wholeLabel": "{title}의 모든 리비전 삭제",
+                "revisionLabel": "{title}의 리비전 {revision} 삭제",
+                "title": "동영상 파일 삭제",
+                "wholeSummary": "{title}의 모든 리비전 파일을 삭제하며, 동영상은 목록에서 사라집니다",
+                "revisionSummary": "{title}의 리비전 {revisions} 파일을 삭제합니다",
+                "irreversible": "되돌릴 수 없습니다",
+                "confirmLabel": "확인을 위해 <word>{confirmWord}</word>를 입력해 주세요",
+                "submit": "Delete",
+                "cancel": "취소",
+                "failed": "파일 삭제에 실패했습니다",
+                "filesLeft": "일부 파일을 삭제하지 못해 스토리지에 남아 있습니다"
+            }
+        },
+        "integrations": {
+            "loadFailed": "설정을 불러오지 못했습니다",
+            "testFailed": "테스트에 실패했습니다",
+            "resetFailed": "Reset에 실패했습니다",
+            "reset": "Reset",
+            "resetConfirm": "연결 정보를 초기화합니다",
+            "cancel": "취소",
+            "jira": {
+                "title": "Jira",
+                "baseUrl": "URL",
+                "token": "Token",
+                "project": "Project",
+                "assignee": "담당자",
+                "issueTypeTask": "Task의 issue type",
+                "issueTypeBug": "Bug의 issue type"
+            },
+            "slack": {
+                "title": "Slack",
+                "token": "Token",
+                "channel": "Channel",
+                "team": "Team"
+            },
+            "testAndSave": "Test & save",
+            "saved": "연결되었습니다. 저장했습니다",
+            "notSaved": "연결하지 못해 저장하지 않았습니다: {error}",
+            "connected": "연결 가능",
+            "disconnected": "테스트 실패",
+            "llm": {
+                "title": "AI",
+                "provider": "Provider",
+                "inUse": "사용 중",
+                "apiKey": "API key",
+                "baseUrl": "Base URL",
+                "model": "Model",
+                "switchFailed": "사용 중인 Provider 전환에 실패했습니다",
+                "use": "이 Provider 사용"
+            },
+            "webhook": {
+                "title": "Webhook",
+                "target": "Target",
+                "targetPlaceholder": "Slack / Teams",
+                "url": "URL",
+                "testNote": "Test & save를 누르면 채널에 테스트 메시지를 1건 보냅니다"
+            },
+            "email": {
+                "title": "Email",
+                "enable": "Email 전송 사용",
+                "host": "SMTP host",
+                "port": "SMTP port",
+                "from": "발신자",
+                "tlsStrict": "TLS 인증서 엄격 검증",
+                "testTo": "테스트 수신자"
+            },
+            "vcs": {
+                "title": "VCS",
+                "provider": "Provider",
+                "inUse": "사용 중",
+                "owner": "Owner",
+                "repo": "Repository",
+                "token": "Token",
+                "branch": "Branch",
+                "switchFailed": "사용 중인 Provider 전환에 실패했습니다",
+                "use": "이 Provider 사용"
+            },
+            "mcp": {
+                "title": "MCP",
+                "notes": "검색 가이드 추가 내용",
+                "notesHelp": "기본 검색 가이드 뒤에 추가됩니다. 태그, 폴더, 자주 묻는 질문 등을 적어 주세요",
+                "save": "저장",
+                "saved": "저장했습니다",
+                "saveFailed": "저장에 실패했습니다",
+                "loadFailed": "추가 내용을 불러오지 못했습니다"
+            }
+        }
+    }
+}

@@ -174,9 +174,7 @@
     },
     "setting": {
         "title": "設定",
-        "language": "言語切替",
-        "languageOptionEn": "英語 (English)",
-        "languageOptionJa": "日本語 (Japanese)",
+        "language": "言語",
         "logout": "ログアウト",
         "editProfile": "プロフィール編集",
         "administration": "管理",
