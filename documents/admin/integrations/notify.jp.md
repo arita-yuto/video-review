@@ -44,67 +44,50 @@ Test & save はチャンネルにテストのメッセージを 1 件送り、�
 ## 3. Email
 
 VideoReview は SMTP サーバーを内蔵しません  
-手元の SMTP リレー（Postfix など）か、社内の SMTP サーバーに渡します
-
-
-```
-VideoReview
-   ↓ SMTP
-Postfix（コンテナ）
-   ↓ SMTP relay
-外部メールサーバー（Gmail / ISP の SMTP など）
-```
+同梱の Postfix リレーか、社内の SMTP サーバーに渡します
 
 ### SMTP リレーの転送先を設定する（Docker）
 
-`compose.prod.yml` には Postfix のリレー（`smtp` サービス）が入っています  
+※ 社内の SMTP サーバーに渡すときは、この手順を飛ばします
+
+`compose.prod.yml` の Postfix リレー（`smtp` サービス）は `--profile smtp` を付けたときだけ起動します  
 転送先のメールサーバーを `.env` に書きます
 
 ```env
-SMTP_RELAYHOST="[smtp.gmail.com]:587"
-SMTP_RELAYHOST_USERNAME="you@gmail.com"
+# 転送先の SMTP サーバー（例 Gmail の場合 `[smtp.gmail.com]:587`）
+SMTP_RELAYHOST="[smtp.example.com]:587"
+# SMTP 認証のユーザー名
+SMTP_RELAYHOST_USERNAME="you@example.com"
+# SMTP 認証のパスワード
 SMTP_RELAYHOST_PASSWORD="xxxx xxxx xxxx xxxx"
 ```
 
-| 変数 | 内容 |
-|---|---|
-| `SMTP_RELAYHOST` | 転送先の SMTP サーバー（例 `[smtp.gmail.com]:587`） |
-| `SMTP_RELAYHOST_USERNAME` | SMTP 認証のユーザー名 |
-| `SMTP_RELAYHOST_PASSWORD` | SMTP 認証のパスワード |
+※ Gmail は 2 段階認証を有効にしてアプリパスワードを発行し、それを `SMTP_RELAYHOST_PASSWORD` に入れます
 
-※ Gmail は 2 段階認証を有効にしてアプリパスワードを発行し、それを `SMTP_RELAYHOST_PASSWORD` に入れます  
-※ 3 つとも空だと Postfix が相手のメールサーバーへ直接送ろうとし、多くの回線では 25 番が遮断されて届きません
-
-`.env` を変えたら `smtp` サービスを作り直します
+`.env` を変更後、`--profile smtp` を付けて起動します  
+Ollama も使うときは `--profile cpu --profile smtp` のように並べます
 
 ```bash
-docker compose -f compose.prod.yml up -d smtp
+docker compose -f compose.prod.yml --profile smtp up -d
 ```
-
-### 社内の SMTP サーバーに渡す
-
-社内に SMTP サーバーがあるときは、上の 3 つは空のままにします  
-次の「VideoReview 側を設定する」で SMTP host にそのサーバーを指定します  
-`smtp` サービスは使われないだけなので、動いたままで差し支えありません
 
 ### VideoReview 側を設定する
 
 Administration → Integrations の Email を開きます
 
-<img src="https://github.com/user-attachments/assets/a07c85fc-b006-4d97-9b4a-a944a8bf7ca2" />
+<img src="https://github.com/user-attachments/assets/07480518-867d-455f-9d34-a7690f0d5b72" />
 
 | 項目 | 内容 |
 |---|---|
-| メールを送る | オンで通知を送ります |
+| Email 送信を有効化 | オンで通知を送ります |
 | SMTP host | SMTP サーバーのホスト名（上のリレーなら `smtp`） |
 | SMTP port | 上のリレーなら `25` |
 | 送信元 | 送信元のアドレス（例 `VideoReview <noreply@example.com>`） |
 | TLS 証明書を厳密に検証 | SMTP サーバーが信頼できる証明書を使っているときだけオン |
-
-Test & save を押し、SMTP サーバーに接続できた設定だけが保存されます
-
-※ Test が確かめるのはリレーへの接続までで、リレーから先の転送は確かめません
-
-届くことは、コメントを 1 件投稿して確かめます
+| テストの送信先 | Test & save が送るテストメールの宛先 |
 
 
+Test & save を押すと保存され、送信先に 1 通届きます  
+届かないときはリレーのログ（`docker compose -f compose.prod.yml logs smtp`）を見ます
+
+<img src="https://github.com/user-attachments/assets/0a915fa3-2049-4e0c-a8d3-ab37e07525c2" />

@@ -58,11 +58,11 @@ services:
     volumes:
       - videoreview-db:/var/lib/postgresql/data
 
-  # Not published on the host: only the compose network may hand mail to this relay.
   smtp:
     image: boky/postfix
     container_name: videoreview-smtp
     restart: unless-stopped
+    profiles: [smtp]
 
     environment:
       HOSTNAME: "videoreview.local"
