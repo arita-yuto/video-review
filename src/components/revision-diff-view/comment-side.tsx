@@ -8,6 +8,7 @@ import { api } from "@/lib/api-client";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import { createVideoTimeLink } from "@/lib/url";
 import { Button } from "@/ui/button";
+import { cn } from "@/lib/utils";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import TimelineCardList from "@/components/video-side-panel/timeline-card-list";
 import { TimelineCardHeader } from "@/components/video-side-panel/timeline-card";
@@ -17,25 +18,14 @@ import CommentCardContent from "@/components/video-side-panel/panels/video-comme
 // Same window the review page uses to light up the comments at the playback position.
 const ACTIVE_WINDOW_SEC = 0.3;
 
-// Read-only; the header button opens the review page at this revision and position.
-export function CommentSide({ revision, selectedId, onSelect, onLeave }: {
-    revision: VideoRevision,
-    // One selection across both sides, so picking a card on one side clears the other.
-    selectedId: string | null,
-    onSelect: (comment: VideoComment) => void,
-    // Called before leaving so the way back can return to the same position.
-    onLeave: (time: number) => void,
-}) {
-    const t = useTranslations("revision-diff-view");
-    const router = useRouter();
-    const currentTime = useVideoReviewStore((s) => s.currentTime);
+// Takes undefined while the page is still loading, so it can be called before the page's early returns.
+export function useRevisionComments(revision: VideoRevision | undefined) {
     const [comments, setComments] = useState<VideoComment[]>([]);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const cardRef = useRef<Record<string, HTMLDivElement | null>>({});
 
     useEffect(() => {
         let canceled = false;
         setComments([]);
+        if (!revision) return;
         void (async () => {
             const res = await api.comments.index.$get({
                 query: { videoId: revision.videoId, selectRevision: String(revision.revision) },
@@ -45,7 +35,28 @@ export function CommentSide({ revision, selectedId, onSelect, onLeave }: {
             if (!canceled) setComments(body);
         })();
         return () => { canceled = true; };
-    }, [revision.id]);
+    }, [revision?.id]);
+
+    return comments;
+}
+
+// Read-only; the header button opens the review page at this revision and position.
+export function CommentSide({ revision, comments, markerClassName, selectedId, onSelect, onLeave }: {
+    revision: VideoRevision,
+    comments: VideoComment[],
+    // The colour of this side's seek bar markers, repeated in the header to tell the sides apart.
+    markerClassName: string,
+    // One selection across both sides, so picking a card on one side clears the other.
+    selectedId: string | null,
+    onSelect: (comment: VideoComment) => void,
+    // Called before leaving so the way back can return to the same position.
+    onLeave: (time: number) => void,
+}) {
+    const t = useTranslations("revision-diff-view");
+    const router = useRouter();
+    const currentTime = useVideoReviewStore((s) => s.currentTime);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const cardRef = useRef<Record<string, HTMLDivElement | null>>({});
 
     const commentHere = () => {
         onLeave(currentTime);
@@ -56,7 +67,10 @@ export function CommentSide({ revision, selectedId, onSelect, onLeave }: {
     return (
         <div className="flex flex-col w-80 shrink-0 min-h-0 border rounded-lg bg-card">
             <div className="flex items-center justify-between gap-2 px-3 py-2 border-b">
-                <span className="text-sm font-medium">Rev.{revision.revision}</span>
+                <span className="flex items-center gap-2 text-sm font-medium">
+                    <span className={cn("size-2 rounded-full", markerClassName)} />
+                    Rev.{revision.revision}
+                </span>
                 <Button variant="ghost" size="sm" onClick={commentHere}>
                     <FontAwesomeIcon icon={faPen} />
                     {t("commentHere")}

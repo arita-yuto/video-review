@@ -1,5 +1,5 @@
 "use client"
-import { Ref, useEffect, useRef, useState } from "react";
+import { Ref, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api-client";
@@ -8,11 +8,14 @@ import { resolveMediaUrl } from "@/lib/media-url";
 import { useLocale } from "@/app/locale-provider";
 import { LoadingBadge } from "@/components/controls/loading-badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import VideoTimelineBar from "@/components/video-timeline-bar";
+import { SeekBar, commentMarkers } from "@/components/video-timeline-bar";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackRateSelect } from "@/components/video-control-panel/playback";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
 import { useDiffSync } from "./use-diff-sync";
-import { CommentSide } from "./comment-side";
+import { CommentSide, useRevisionComments } from "./comment-side";
+
+const LEFT_MARKER = "bg-info";
+const RIGHT_MARKER = "bg-warning";
 
 // Revisions come newest first; without ?left/?right the newest is compared with the one before it.
 const pickRevision = (revisions: VideoRevision[], param: string | null, fallback: number) =>
@@ -33,6 +36,15 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
     const rightRef = useRef<HTMLVideoElement>(null);
     const ready = revisions !== null && revisions.length >= 2;
     useDiffSync(rightRef, leftRef, ready);
+
+    const left = ready ? pickRevision(revisions, searchParams.get("left"), 1) : undefined;
+    const right = ready ? pickRevision(revisions, searchParams.get("right"), 0) : undefined;
+    const leftComments = useRevisionComments(left);
+    const rightComments = useRevisionComments(right);
+    const markers = useMemo(
+        () => [...commentMarkers(leftComments, LEFT_MARKER), ...commentMarkers(rightComments, RIGHT_MARKER)],
+        [leftComments, rightComments],
+    );
 
     // ?t= starts both sides at a position, e.g. when coming back from the review page.
     useEffect(() => {
@@ -76,7 +88,7 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
         );
     }
 
-    if (revisions.length < 2) {
+    if (!left || !right) {
         return (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
                 {t("needsTwoRevisions")}
@@ -84,18 +96,16 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
         );
     }
 
-    const left = pickRevision(revisions, searchParams.get("left"), 1);
-    const right = pickRevision(revisions, searchParams.get("right"), 0);
-
     const setSide = (side: "left" | "right", revision: string) => {
         const params = new URLSearchParams(searchParams);
         params.set(side, revision);
         params.delete("t");
         router.replace(`${pathname}?${params}`);
     };
+    const seek = (time: number) => { if (rightRef.current) rightRef.current.currentTime = time; };
     const selectComment = (comment: VideoComment) => {
         setSelectedCommentId(comment.id);
-        if (rightRef.current) rightRef.current.currentTime = comment.time;
+        seek(comment.time);
     };
     // Written straight into history: a router.replace would be dropped by the navigation that follows.
     const rememberPosition = (time: number) => {
@@ -106,14 +116,14 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
 
     return (
         <div className="flex flex-1 min-w-0 p-3 gap-3">
-            <CommentSide revision={left} selectedId={selectedCommentId} onSelect={selectComment} onLeave={rememberPosition} />
+            <CommentSide revision={left} comments={leftComments} markerClassName={LEFT_MARKER} selectedId={selectedCommentId} onSelect={selectComment} onLeave={rememberPosition} />
             <div className="flex flex-col flex-1 min-w-0 gap-3">
                 <h2 className="px-2 text-lg font-semibold text-primary tracking-wide truncate">{video?.title}</h2>
                 <div className="flex-1 grid grid-cols-2 gap-3 min-h-0">
                     <DiffSide revisions={revisions} revision={left} videoRef={leftRef} onChange={(r) => setSide("left", r)} />
                     <DiffSide revisions={revisions} revision={right} videoRef={rightRef} onChange={(r) => setSide("right", r)} />
                 </div>
-                <VideoTimelineBar />
+                <SeekBar markers={markers} onMarkerClick={seek} />
                 <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
                     <PlayButton />
                     <VolumeControl />
@@ -121,7 +131,7 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
                     <PlaybackRateSelect />
                 </div>
             </div>
-            <CommentSide revision={right} selectedId={selectedCommentId} onSelect={selectComment} onLeave={rememberPosition} />
+            <CommentSide revision={right} comments={rightComments} markerClassName={RIGHT_MARKER} selectedId={selectedCommentId} onSelect={selectComment} onLeave={rememberPosition} />
         </div>
     );
 }
