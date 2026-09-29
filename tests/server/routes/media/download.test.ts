@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/server/lib/db";
+import { ServerError } from "@/server/lib/server-error";
 
 const mocks = vi.hoisted(() => ({
     download: vi.fn(),
@@ -59,5 +60,16 @@ describe("media downloadRouter (DB)", () => {
 
         expect(res.status).toBe(200);
         expect(mocks.download).toHaveBeenCalledWith(`videos/test/${videoId}-rev2.mp4`);
+    });
+
+    it("does not let guests download", async () => {
+        vi.mocked(authorize).mockRejectedValueOnce(new ServerError("forbidden", 403));
+        mocks.download.mockClear();
+
+        const res = await downloadRouter.request(`http://localhost/?videoId=${videoId}`, { method: "GET" });
+
+        expect(res.status).toBe(403);
+        expect(mocks.download).not.toHaveBeenCalled();
+        expect(vi.mocked(authorize).mock.lastCall?.[1]).not.toContain("guest");
     });
 });
