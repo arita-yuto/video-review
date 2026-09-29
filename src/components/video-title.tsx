@@ -29,6 +29,7 @@ export default function VideoTitle() {
     } = useVideoStore();
 
     const role = useAuthStore((s) => s.role);
+    const canEditTags = isAdmin(role);
 
     const [inputVisible, setInputVisible] = useState(false);
     const [inputValue, setInputValue] = useState("");
@@ -110,16 +111,18 @@ export default function VideoTitle() {
                             {currentTags.map((tag) => (
                                 <Badge key={tag} variant="outline">
                                     {tag}
-                                    <button
-                                        onClick={() => void removeTag(tag)}
-                                        className="text-muted-foreground hover:text-destructive transition"
-                                    >
-                                        <FontAwesomeIcon icon={faXmark} className="text-2xs" />
-                                    </button>
+                                    {canEditTags && (
+                                        <button
+                                            onClick={() => void removeTag(tag)}
+                                            className="text-muted-foreground hover:text-destructive transition"
+                                        >
+                                            <FontAwesomeIcon icon={faXmark} className="text-2xs" />
+                                        </button>
+                                    )}
                                 </Badge>
                             ))}
 
-                            {inputVisible ? (
+                            {canEditTags && (inputVisible ? (
                                 <div className="relative">
                                     <Input
                                         ref={inputRef}
@@ -163,7 +166,7 @@ export default function VideoTitle() {
                                 >
                                     <FontAwesomeIcon icon={faPlus} className="text-2xs" />
                                 </button>
-                            )}
+                            ))}
                         </div>
                     </div>
                 )}

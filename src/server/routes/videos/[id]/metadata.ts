@@ -72,6 +72,8 @@ export const metaDataRouter = createRouter()
             500: { description: "" }
         },
     }), async (c) => {
+        await authorize(c.req.raw, ["admin"]);
+
         const id = c.req.param("id");
         const body = c.req.valid("json");
         const { tags, summary } = body;
