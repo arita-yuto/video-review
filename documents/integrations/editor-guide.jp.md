@@ -28,11 +28,7 @@ GitHub の Releases から、自分の OS の zip をダウンロードします
 ### Windows
 
 1. zip を展開します
-2. 展開したフォルダで PowerShell で以下を実行します
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
-```
+2. 展開したフォルダの `install.cmd` をダブルクリックします
 
 `%LOCALAPPDATA%\VideoReview\VideoReview Launcher\` に入り、`videoreview://` がこの launcher に登録されます
 
@@ -127,7 +123,7 @@ cd integrations/launcher
 # ビルド
 $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o installers\windows\videoreview-launcher.exe
 # 下記スクリプトでインストールします
-powershell -ExecutionPolicy Bypass -File .\installers\windows\install.ps1
+.\installers\windows\install.cmd
 ```
 
 ##### macOS

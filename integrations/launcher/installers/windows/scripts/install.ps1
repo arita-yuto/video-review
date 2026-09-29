@@ -12,7 +12,8 @@ $RootDir   = Resolve-Path (Join-Path $ScriptDir "..\..")
 $BinName = "videoreview-launcher.exe"
 $AppName = "VideoReview Launcher"
 
-$BinPath = Join-Path $ScriptDir $BinName
+# install.cmd sits next to the binary and runs this from scripts\.
+$BinPath = Join-Path $ScriptDir "..\$BinName"
 $InstallBase = Join-Path $env:LOCALAPPDATA "VideoReview"
 $AppDir = Join-Path $InstallBase $AppName
 
@@ -21,7 +22,7 @@ $AppDir = Join-Path $InstallBase $AppName
 # --------------------------------------------------
 Write-Host "== Install VideoReview Launcher (Windows) =="
 
-# "Run with PowerShell" closes the window as soon as the script ends, so report the result and wait.
+# The console window closes as soon as the script ends, so report the result and wait.
 $Succeeded = $false
 try {
     # Check prerequisites

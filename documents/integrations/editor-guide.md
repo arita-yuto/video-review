@@ -28,11 +28,7 @@ Download the zip for your OS from the GitHub Releases.
 ### Windows
 
 1. Unpack the zip.
-2. Open PowerShell in the unpacked folder and run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
-```
+2. Double-click `install.cmd` in the unpacked folder.
 
 It installs to `%LOCALAPPDATA%\VideoReview\VideoReview Launcher\` and registers `videoreview://` to this launcher.
 
@@ -127,7 +123,7 @@ cd integrations/launcher
 # Build
 $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o installers\windows\videoreview-launcher.exe
 # Install with the script below
-powershell -ExecutionPolicy Bypass -File .\installers\windows\install.ps1
+.\installers\windows\install.cmd
 ```
 
 ##### macOS
