@@ -219,6 +219,7 @@ describe("videos metadataRouter (DB)", () => {
             body: JSON.stringify({ tags: "a, b" }),
         });
         expect(res.status).toBe(200);
+        expect(authorize).toHaveBeenLastCalledWith(expect.anything(), ["admin"]);
 
         const stored = await prisma.videoRevision.findUnique({
             where: { id: revisionId },
@@ -265,6 +266,27 @@ describe("videos metadataRouter (DB)", () => {
             select: { tags: true },
         });
         expect(stored).toEqual({ tags: [] });
+    });
+
+    it("annotate leaves the revision untouched when authorization fails", async () => {
+        await prisma.videoRevision.update({
+            where: { id: revisionId },
+            data: { summary: "untouched", tags: ["untouched"] },
+        });
+        vi.mocked(authorize).mockRejectedValueOnce(new ServerError("forbidden", 403));
+
+        const res = await app.request(`http://localhost/videos/${revisionId}/metadata/annotate`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ tags: "x", summary: "overwritten" }),
+        });
+        expect(res.ok).toBe(false);
+
+        const stored = await prisma.videoRevision.findUnique({
+            where: { id: revisionId },
+            select: { summary: true, tags: true },
+        });
+        expect(stored).toEqual({ summary: "untouched", tags: ["untouched"] });
     });
 
     it("returns status from ServerError on authorization", async () => {
