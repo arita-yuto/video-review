@@ -53,6 +53,11 @@
     "video-review": {
         "noVideoSelected": "Please select a video"
     },
+    "revision-diff-view": {
+        "needsTwoRevisions": "This video has only one revision, so there is nothing to compare",
+        "notFound": "Video not found",
+        "loading": "Loading..."
+    },
     "video-list-panel": {
         "title": "Video list",
         "upload": "Upload video",

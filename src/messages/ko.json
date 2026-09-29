@@ -53,6 +53,11 @@
     "video-review": {
         "noVideoSelected": "동영상을 선택해 주세요"
     },
+    "revision-diff-view": {
+        "needsTwoRevisions": "이 동영상은 리비전이 하나뿐이라 비교할 수 없습니다",
+        "notFound": "동영상을 찾을 수 없습니다",
+        "loading": "불러오는 중"
+    },
     "video-list-panel": {
         "title": "동영상 목록",
         "upload": "동영상 업로드",

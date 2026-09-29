@@ -53,6 +53,11 @@
     "video-review": {
         "noVideoSelected": "動画を選択してください"
     },
+    "revision-diff-view": {
+        "needsTwoRevisions": "この動画は revision が 1 つだけなので、比較できません",
+        "notFound": "動画が見つかりません",
+        "loading": "読み込み中"
+    },
     "video-list-panel": {
         "title": "動画リスト",
         "upload": "動画をアップロード",
