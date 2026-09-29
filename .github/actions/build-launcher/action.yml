@@ -30,7 +30,7 @@ runs:
       run: |
         rm -rf dist && mkdir -p dist/windows-amd64 dist/darwin-arm64 dist/darwin-amd64
         GOOS=windows GOARCH=amd64 go build -o dist/windows-amd64/videoreview-launcher.exe .
-        cp installers/windows/install.ps1 dist/windows-amd64/
+        cp -r installers/windows/install.cmd installers/windows/scripts dist/windows-amd64/
         for arch in arm64 amd64; do
           GOOS=darwin GOARCH=$arch go build -o dist/darwin-$arch/videoreview-launcher .
           cp installers/mac/build-app.sh installers/mac/Info.plist installers/mac/videoreview-bridge.script dist/darwin-$arch/
