@@ -56,7 +56,9 @@
     "revision-diff-view": {
         "needsTwoRevisions": "This video has only one revision, so there is nothing to compare",
         "notFound": "Video not found",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "commentHere": "Comment on this revision",
+        "compare": "Compare"
     },
     "video-list-panel": {
         "title": "Video list",

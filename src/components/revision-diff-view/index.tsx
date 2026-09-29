@@ -3,7 +3,7 @@ import { Ref, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api-client";
-import { Video, VideoRevision } from "@/lib/db-types";
+import { Video, VideoComment, VideoRevision } from "@/lib/db-types";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { useLocale } from "@/app/locale-provider";
 import { LoadingBadge } from "@/components/controls/loading-badge";
@@ -12,6 +12,7 @@ import VideoTimelineBar from "@/components/video-timeline-bar";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackRateSelect } from "@/components/video-control-panel/playback";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
 import { useDiffSync } from "./use-diff-sync";
+import { CommentSide } from "./comment-side";
 
 // Revisions come newest first; without ?left/?right the newest is compared with the one before it.
 const pickRevision = (revisions: VideoRevision[], param: string | null, fallback: number) =>
@@ -26,10 +27,23 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
     const [video, setVideo] = useState<Video | null>(null);
     const [revisions, setRevisions] = useState<VideoRevision[] | null>(null);
     const [notFound, setNotFound] = useState(false);
+    const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
 
     const leftRef = useRef<HTMLVideoElement>(null);
     const rightRef = useRef<HTMLVideoElement>(null);
-    useDiffSync(rightRef, leftRef, revisions !== null && revisions.length >= 2);
+    const ready = revisions !== null && revisions.length >= 2;
+    useDiffSync(rightRef, leftRef, ready);
+
+    // ?t= starts both sides at a position, e.g. when coming back from the review page.
+    useEffect(() => {
+        const primary = rightRef.current;
+        const start = parseFloat(searchParams.get("t") ?? "");
+        if (!ready || !primary || !Number.isFinite(start)) return;
+
+        const seek = () => { primary.currentTime = start; };
+        primary.addEventListener("loadedmetadata", seek, { once: true });
+        return () => primary.removeEventListener("loadedmetadata", seek);
+    }, [ready]);
 
     useEffect(() => {
         void (async () => {
@@ -76,23 +90,38 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
     const setSide = (side: "left" | "right", revision: string) => {
         const params = new URLSearchParams(searchParams);
         params.set(side, revision);
+        params.delete("t");
         router.replace(`${pathname}?${params}`);
+    };
+    const selectComment = (comment: VideoComment) => {
+        setSelectedCommentId(comment.id);
+        if (rightRef.current) rightRef.current.currentTime = comment.time;
+    };
+    // Written straight into history: a router.replace would be dropped by the navigation that follows.
+    const rememberPosition = (time: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("t", String(time));
+        window.history.replaceState(null, "", `${pathname}?${params}`);
     };
 
     return (
-        <div className="flex flex-col flex-1 min-w-0 p-3 gap-3">
-            <h2 className="px-2 text-lg font-semibold text-primary tracking-wide truncate">{video?.title}</h2>
-            <div className="flex-1 grid grid-cols-2 gap-3 min-h-0">
-                <DiffSide revisions={revisions} revision={left} videoRef={leftRef} onChange={(r) => setSide("left", r)} />
-                <DiffSide revisions={revisions} revision={right} videoRef={rightRef} onChange={(r) => setSide("right", r)} />
+        <div className="flex flex-1 min-w-0 p-3 gap-3">
+            <CommentSide revision={left} selectedId={selectedCommentId} onSelect={selectComment} onLeave={rememberPosition} />
+            <div className="flex flex-col flex-1 min-w-0 gap-3">
+                <h2 className="px-2 text-lg font-semibold text-primary tracking-wide truncate">{video?.title}</h2>
+                <div className="flex-1 grid grid-cols-2 gap-3 min-h-0">
+                    <DiffSide revisions={revisions} revision={left} videoRef={leftRef} onChange={(r) => setSide("left", r)} />
+                    <DiffSide revisions={revisions} revision={right} videoRef={rightRef} onChange={(r) => setSide("right", r)} />
+                </div>
+                <VideoTimelineBar />
+                <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
+                    <PlayButton />
+                    <VolumeControl />
+                    <TimeDisplay />
+                    <PlaybackRateSelect />
+                </div>
             </div>
-            <VideoTimelineBar />
-            <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
-                <PlayButton />
-                <VolumeControl />
-                <TimeDisplay />
-                <PlaybackRateSelect />
-            </div>
+            <CommentSide revision={right} selectedId={selectedCommentId} onSelect={selectComment} onLeave={rememberPosition} />
         </div>
     );
 }

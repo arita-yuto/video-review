@@ -8,11 +8,12 @@ export function createVideoCommentLink(baseURL: string, videoId: string | null, 
     return `${baseURL}/video-review/review/${videoId}?comment=${commentId}`
 }
 
-export function createVideoTimeLink(baseURL: string, videoId: string | null, time: number): string | null {
+export function createVideoTimeLink(baseURL: string, videoId: string | null, time: number, revisionId?: string): string | null {
     if (videoId === null) {
         return null;
     }
-    return `${baseURL}/video-review/review/${videoId}?t=${time}`
+    const revision = revisionId ? `&revision=${revisionId}` : "";
+    return `${baseURL}/video-review/review/${videoId}?t=${time}${revision}`
 }
 
 // template is the General settings' URL scheme, passed in because the server and the client read it from different places.

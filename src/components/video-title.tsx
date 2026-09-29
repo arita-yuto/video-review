@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { formatDateTime } from "@/lib/utils";
+import { CompareButton } from "@/components/revision-diff-view/compare-button";
 
 export default function VideoTitle() {
     const t = useTranslations("video-title");
@@ -68,6 +69,9 @@ export default function VideoTitle() {
                         <span className="truncate">{selectedVideo?.title ?? t("noSelection")}</span>
                     </h2>
                     <div className="flex items-center gap-3">
+                        {revisions.length > 1 && selectedRevision && (
+                            <CompareButton revisions={revisions} selected={selectedRevision} />
+                        )}
                         {revisions.length > 1 && (
                             <Select
                                 value={selectedRevision?.id ?? ""}
