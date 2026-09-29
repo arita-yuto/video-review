@@ -34,9 +34,12 @@ import { Switch } from "@/ui/switch";
 import { ButtonGroup, ButtonGroupText } from "@/ui/button-group";
 import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
 import { captureView } from "@/lib/drawing/capture-view";
+import { useAuthStore } from "@/stores/auth-store";
+import { isGuest } from "@/lib/role";
 
 export default function VideoControlPanel() {
     const t = useTranslations("video-control-panel");
+    const role = useAuthStore((s) => s.role);
 
     const [showVolume, setShowVolume] = useState(false);
     const [showPlayMode, setShowPlayMode] = useState(false);
@@ -152,9 +155,10 @@ export default function VideoControlPanel() {
             </div>
 
             <div className="ml-auto flex gap-1">
-                <Screenshot title={selectedVideo?.title ?? null} time={currentTime} />
+                {/* Guests watch only; saving frames or files would take the footage out. */}
+                {!isGuest(role) && <Screenshot title={selectedVideo?.title ?? null} time={currentTime} />}
                 <OpenSceneButton scenePath={selectedVideo?.scenePath ?? null} />
-                <DownloadVideo videoId={selectedVideo?.id ?? null} videoRevId={selectedRevision?.id ?? null} />
+                {!isGuest(role) && <DownloadVideo videoId={selectedVideo?.id ?? null} videoRevId={selectedRevision?.id ?? null} />}
                 <ButtonShareLink url={createLink()} />
             </div>
         </div>
