@@ -17,7 +17,8 @@ import {
     faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDateTime, formatTime } from "@/lib/utils";
+import { useLocale } from "@/app/locale-provider";
 import { captureView } from "@/lib/drawing/capture-view";
 import { createVideoCommentLink } from "@/lib/url";
 import { useCommentStore } from "@/stores/comment-store";
@@ -137,6 +138,7 @@ function DropdownMenu_Delete(props: { comment: VideoComment }) {
 
 export default function CommentCardHeader(props: { comment: VideoComment }) {
     const { role } = useAuthStore();
+    const { locale } = useLocale();
     const { icon, fetchAvatar } = useAvatarStore();
 
     useEffect(() => {
@@ -158,7 +160,7 @@ export default function CommentCardHeader(props: { comment: VideoComment }) {
                 <div className="flex flex-col leading-none">
                     <span className="text-sm font-medium">{props.comment.userName}</span>
                     <span className="text-xs text-muted-foreground">
-                        {formatDate(props.comment.createdAt)} : Rev.{props.comment.videoRevNum}
+                        {formatDateTime(props.comment.createdAt, locale)} : Rev.{props.comment.videoRevNum}
                     </span>
                 </div>
             </div>

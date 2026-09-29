@@ -13,6 +13,7 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { formatDateTime } from "@/lib/utils";
 
 export default function VideoTitle() {
     const t = useTranslations("video-title");
@@ -96,8 +97,7 @@ export default function VideoTitle() {
                     {selectedRevision
                         ? t("revisionInfo", {
                             revision: selectedRevision.revision,
-                            uploadedAt: new Date(selectedRevision.uploadedAt)
-                                .toLocaleString(locale)
+                            uploadedAt: formatDateTime(selectedRevision.uploadedAt, locale)
                         })
                         : t("noRevision")}
                 </p>

@@ -1,12 +1,8 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateTime } from "@/lib/utils";
 import type { Relevance, VcsCommit, VcsPullRequest } from "@/lib/vcs-types";
 import { Badge } from "@/ui/badge";
-
-function formatDate(date: Date | string): string {
-    const d = new Date(date);
-    return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
+import { useLocale } from "@/app/locale-provider";
 
 // One pull request or commit. The left edge marks relevance to the video's watched paths.
 function ChangeCard({ id, title, url, author, date, relevance, children }: {
@@ -19,6 +15,8 @@ function ChangeCard({ id, title, url, author, date, relevance, children }: {
     relevance: Relevance;
     children?: ReactNode;
 }) {
+    const { locale } = useLocale();
+
     return (
         <div
             className={cn(
@@ -40,7 +38,7 @@ function ChangeCard({ id, title, url, author, date, relevance, children }: {
                 )}
             </div>
             <div className="text-xs text-muted-foreground">
-                @{author} · {formatDate(date)}
+                @{author} · {formatDateTime(date, locale)}
             </div>
             {children}
         </div>
