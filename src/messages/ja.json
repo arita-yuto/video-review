@@ -57,14 +57,14 @@
         "needsTwoRevisions": "revision が 1 つだけなので、比較できません",
         "notFound": "動画が見つかりません",
         "loading": "読み込み中",
-        "commentHere": "Comment on this revision",
+        "openRevision": "Open this revision",
         "compare": "Compare",
         "sideBySide": "Side by side",
         "wipe": "Wipe",
         "leftRevision": "Left revision",
         "rightRevision": "Right revision",
         "diffImage": "Diff",
-        "diffPause": "一時停止すると、2 つのフレームの差分が出ます",
+        "diffPause": "一時停止で差分を表示",
         "diffUnreadable": "このストレージの動画はフレームを読み取れないため、差分を出せません"
     },
     "video-list-panel": {

@@ -57,14 +57,14 @@
         "needsTwoRevisions": "Only one revision, so there is nothing to compare",
         "notFound": "Video not found",
         "loading": "Loading...",
-        "commentHere": "Comment on this revision",
+        "openRevision": "Open this revision",
         "compare": "Compare",
         "sideBySide": "Side by side",
         "wipe": "Wipe",
         "leftRevision": "Left revision",
         "rightRevision": "Right revision",
         "diffImage": "Diff",
-        "diffPause": "Pause to see what changed between the two frames",
+        "diffPause": "Pause to see the diff",
         "diffUnreadable": "The frames of this storage cannot be read, so no diff can be made"
     },
     "video-list-panel": {

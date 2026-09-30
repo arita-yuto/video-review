@@ -57,14 +57,14 @@
         "needsTwoRevisions": "리비전이 하나뿐이라 비교할 수 없습니다",
         "notFound": "동영상을 찾을 수 없습니다",
         "loading": "불러오는 중",
-        "commentHere": "이 리비전에 댓글 작성",
+        "openRevision": "이 리비전 열기",
         "compare": "비교",
         "sideBySide": "나란히 보기",
         "wipe": "와이프",
         "leftRevision": "왼쪽 리비전",
         "rightRevision": "오른쪽 리비전",
         "diffImage": "Diff",
-        "diffPause": "일시 정지하면 두 프레임의 차이가 표시됩니다",
+        "diffPause": "일시 정지하면 차이가 표시됩니다",
         "diffUnreadable": "이 스토리지의 동영상은 프레임을 읽을 수 없어 차이를 표시할 수 없습니다"
     },
     "video-list-panel": {

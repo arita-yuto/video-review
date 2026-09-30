@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { api } from "@/lib/api-client";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import { createVideoTimeLink } from "@/lib/url";
@@ -57,7 +57,7 @@ export function CommentSide({ revision, comments, markerClassName, selectedId, o
     const containerRef = useRef<HTMLDivElement>(null);
     const cardRef = useRef<Record<string, HTMLDivElement | null>>({});
 
-    const commentHere = () => {
+    const openHere = () => {
         onLeave(currentTime);
         const link = createVideoTimeLink("", revision.videoId, currentTime, revision.id);
         if (link) router.push(link);
@@ -70,9 +70,9 @@ export function CommentSide({ revision, comments, markerClassName, selectedId, o
                     <span className={cn("size-2 rounded-full", markerClassName)} />
                     Rev.{revision.revision}
                 </span>
-                <Button variant="ghost" size="sm" onClick={commentHere}>
-                    <FontAwesomeIcon icon={faPen} />
-                    {t("commentHere")}
+                <Button variant="ghost" size="sm" onClick={openHere}>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                    {t("openRevision")}
                 </Button>
             </div>
             <TimelineCardList
