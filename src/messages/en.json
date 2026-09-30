@@ -60,7 +60,9 @@
         "commentHere": "Comment on this revision",
         "compare": "Compare",
         "sideBySide": "Side by side",
-        "wipe": "Wipe"
+        "wipe": "Wipe",
+        "leftRevision": "Left revision",
+        "rightRevision": "Right revision"
     },
     "video-list-panel": {
         "title": "Video list",

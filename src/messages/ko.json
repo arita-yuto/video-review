@@ -60,7 +60,9 @@
         "commentHere": "이 리비전에 댓글 작성",
         "compare": "비교",
         "sideBySide": "Side by side",
-        "wipe": "Wipe"
+        "wipe": "Wipe",
+        "leftRevision": "왼쪽 리비전",
+        "rightRevision": "오른쪽 리비전"
     },
     "video-list-panel": {
         "title": "동영상 목록",

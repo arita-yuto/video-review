@@ -117,9 +117,9 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
             <div className="flex flex-col flex-1 min-w-0 gap-3">
                 <h2 className="px-2 text-lg font-semibold text-primary tracking-wide truncate">{video?.title}</h2>
                 <div className="flex items-center justify-between gap-3">
-                    <RevisionSelect revisions={revisions} revision={left} onChange={(r) => setSide("left", r)} />
+                    <RevisionSelect label={t("leftRevision")} revisions={revisions} revision={left} onChange={(r) => setSide("left", r)} />
                     <ModeTabs />
-                    <RevisionSelect revisions={revisions} revision={right} onChange={(r) => setSide("right", r)} />
+                    <RevisionSelect label={t("rightRevision")} revisions={revisions} revision={right} onChange={(r) => setSide("right", r)} />
                 </div>
                 <DiffStage left={left} right={right} leftRef={leftRef} rightRef={rightRef} />
                 <SeekBar markers={markers} onMarkerClick={seek} />

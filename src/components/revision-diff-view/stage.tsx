@@ -12,7 +12,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/ui/tabs";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
 import { DiffViewMode, useDiffViewStore } from "@/stores/diff-view-store";
 
-export function RevisionSelect({ revisions, revision, onChange }: {
+export function RevisionSelect({ label, revisions, revision, onChange }: {
+    label: string,
     revisions: VideoRevision[],
     revision: VideoRevision,
     onChange: (revision: string) => void,
@@ -22,7 +23,7 @@ export function RevisionSelect({ revisions, revision, onChange }: {
 
     return (
         <Select value={String(revision.revision)} onValueChange={onChange}>
-            <SelectTrigger size="sm">
+            <SelectTrigger size="sm" aria-label={label}>
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
