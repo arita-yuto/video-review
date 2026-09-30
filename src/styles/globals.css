@@ -132,6 +132,11 @@
   max-height: 80vh;
 }
 
+/* Diff-view wipe mode: the top revision shows only left of the handle at --wipe-x. */
+@utility wipe-clip {
+  clip-path: inset(0 calc(100% - var(--wipe-x)) 0 0);
+}
+
 @utility max-w-screen-gutter {
   max-width: calc(100vw - 2rem);
 }

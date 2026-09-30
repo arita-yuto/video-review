@@ -58,7 +58,9 @@
         "notFound": "동영상을 찾을 수 없습니다",
         "loading": "불러오는 중",
         "commentHere": "이 리비전에 댓글 작성",
-        "compare": "비교"
+        "compare": "비교",
+        "sideBySide": "Side by side",
+        "wipe": "Wipe"
     },
     "video-list-panel": {
         "title": "동영상 목록",
