@@ -62,7 +62,10 @@
         "sideBySide": "나란히 보기",
         "wipe": "와이프",
         "leftRevision": "왼쪽 리비전",
-        "rightRevision": "오른쪽 리비전"
+        "rightRevision": "오른쪽 리비전",
+        "diffImage": "Diff",
+        "diffPause": "일시 정지하면 두 프레임의 차이가 표시됩니다",
+        "diffUnreadable": "이 스토리지의 동영상은 프레임을 읽을 수 없어 차이를 표시할 수 없습니다"
     },
     "video-list-panel": {
         "title": "동영상 목록",

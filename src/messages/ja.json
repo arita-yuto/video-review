@@ -62,7 +62,10 @@
         "sideBySide": "Side by side",
         "wipe": "Wipe",
         "leftRevision": "Left revision",
-        "rightRevision": "Right revision"
+        "rightRevision": "Right revision",
+        "diffImage": "Diff",
+        "diffPause": "一時停止すると、2 つのフレームの差分が出ます",
+        "diffUnreadable": "このストレージの動画はフレームを読み取れないため、差分を出せません"
     },
     "video-list-panel": {
         "title": "動画リスト",

@@ -8,9 +8,11 @@ import { LoadingBadge } from "@/components/controls/loading-badge";
 import { SeekBar, commentMarkers } from "@/components/video-timeline-bar";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackRateSelect } from "@/components/video-control-panel/playback";
 import { PlaybackStoreProvider } from "@/stores/playback-store";
+import { useDiffViewStore } from "@/stores/diff-view-store";
 import { useDiffSync } from "./use-diff-sync";
 import { CommentSide, useRevisionComments } from "./comment-side";
 import { DiffStage, ModeTabs, RevisionSelect } from "./stage";
+import { DiffImage, DiffImageSwitch } from "./diff-image";
 
 type Side = "left" | "right";
 
@@ -91,6 +93,7 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
+    const showDiffImage = useDiffViewStore((s) => s.showDiffImage);
 
     const sides = { left: useDiffSide("left", revisions), right: useDiffSide("right", revisions) };
     const primaryRef = sides[PRIMARY].videoRef;
@@ -149,15 +152,21 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
                 <h2 className="px-2 text-lg font-semibold text-primary tracking-wide truncate">{video.title}</h2>
                 <div className="flex items-center justify-between gap-3">
                     {revisionSelect("left")}
-                    <ModeTabs />
+                    <div className="flex items-center gap-4">
+                        <ModeTabs />
+                        <DiffImageSwitch />
+                    </div>
                     {revisionSelect("right")}
                 </div>
-                <DiffStage
-                    left={sides.left.revision}
-                    right={sides.right.revision}
-                    leftRef={sides.left.videoRef}
-                    rightRef={sides.right.videoRef}
-                />
+                <div className="flex flex-col flex-1 min-h-0 gap-3">
+                    <DiffStage
+                        left={sides.left.revision}
+                        right={sides.right.revision}
+                        leftRef={sides.left.videoRef}
+                        rightRef={sides.right.videoRef}
+                    />
+                    {showDiffImage && <DiffImage primaryRef={primaryRef} compareRef={sides[COMPARE].videoRef} />}
+                </div>
                 <SeekBar markers={markers} onMarkerClick={seek} />
                 <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
                     <PlayButton />
