@@ -4,7 +4,7 @@ import { Button } from "@/ui/button";
 import { Textarea } from "@/ui/textarea";
 import { Input } from "@/ui/input";
 import { useEffect, useState } from "react";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { usePlayback } from "@/stores/playback-store";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/stores/auth-store";
 import { isGuest } from "@/lib/role";
@@ -21,7 +21,7 @@ export default function CommentConfirmed(props: {
     const t = useTranslations("comment-confirmed");
     const [comment, setComment] = useState(props.comment);
     const [issueId, setIssueId] = useState(props.issueId);
-    const { setIsPlaying } = useVideoPlayerStore();
+    const setIsPlaying = usePlayback((s) => s.setIsPlaying);
     const { role } = useAuthStore();
 
     const handleConfirmed = () => {

@@ -1,6 +1,6 @@
 "use client";
 import { useCommentStore } from "@/stores/comment-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import { useMemo } from "react";
 import { Slider } from "@/ui/slider";
 import { cn } from "@/lib/utils";
@@ -12,13 +12,11 @@ export function SeekBar({ markers, onMarkerClick }: {
     markers: SeekBarMarker[],
     onMarkerClick: (time: number) => void,
 }) {
-    const {
-        timelineTime,
-        currentTime,
-        duration,
-        setCurrentTime,
-        setTimelineTime,
-    } = useVideoReviewStore();
+    const timelineTime = usePlayback((s) => s.timelineTime);
+    const currentTime = usePlayback((s) => s.currentTime);
+    const duration = usePlayback((s) => s.duration);
+    const setCurrentTime = usePlayback((s) => s.setCurrentTime);
+    const setTimelineTime = usePlayback((s) => s.setTimelineTime);
 
     // Slider API expects an array even for a single thumb.
     const value = [timelineTime ?? currentTime];
@@ -67,7 +65,7 @@ export const commentMarkers = (comments: { time: number }[], className: string):
 
 export default function VideoTimelineBar() {
     const { displayComments } = useCommentStore();
-    const setCurrentTime = useVideoReviewStore((s) => s.setCurrentTime);
+    const setCurrentTime = usePlayback((s) => s.setCurrentTime);
     const markers = useMemo(() => commentMarkers(displayComments, "bg-primary"), [displayComments]);
 
     return <SeekBar markers={markers} onMarkerClick={setCurrentTime} />;

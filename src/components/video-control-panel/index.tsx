@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import { createVideoTimeLink } from "@/lib/url";
 import { useVideoStore } from "@/stores/video-store";
 import { useAuthStore } from "@/stores/auth-store";
@@ -10,7 +10,7 @@ import { ScreenshotButton, ShareLinkButton, DownloadButton, OpenSceneButton } fr
 
 export default function VideoControlPanel() {
     const role = useAuthStore((s) => s.role);
-    const currentTime = useVideoReviewStore((s) => s.currentTime);
+    const currentTime = usePlayback((s) => s.currentTime);
     const { selectedVideo, selectedRevision } = useVideoStore();
 
     const createLink = (): string => {

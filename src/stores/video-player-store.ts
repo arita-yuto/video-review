@@ -4,31 +4,26 @@ import { persist } from "zustand/middleware";
 export type EPlayMode = 'normal' | 'loop' | 'next';
 
 interface VideoPlayerState {
-    isPlaying: boolean;
     volume: number
     volumeEnabled: boolean;
     playMode: EPlayMode,
     playbackRate: number;
 
-    setIsPlaying: (r: boolean) => void;
     setPlaybackRate: (rate: number) => void;
     setVolume: (vol: number) => void;
     setVolumeEnabled: (enabled: boolean) => void;
     setMode(mode: EPlayMode): void;
     toggleMode: () => void;
-    togglePlay: () => void;
 }
 
 export const useVideoPlayerStore = create<VideoPlayerState>()(
     persist(
         (set, get) => ({
-            isPlaying: false,
             volume: 0.3,
             volumeEnabled: true,
             playMode: 'normal',
             playbackRate: 1.0,
 
-            setIsPlaying: (r) => set({ isPlaying: r }),
             setPlaybackRate: (rate) => set({ playbackRate: rate }),
             setMode: (mode) => set({ playMode: mode }),
             toggleMode: () => {
@@ -39,7 +34,6 @@ export const useVideoPlayerStore = create<VideoPlayerState>()(
                     case "next":   set({playMode: "normal"}); break;
                 }
             },
-            togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
             setVolume: (vol) => set({ volume: vol }),
             setVolumeEnabled: (enabled) => set({ volumeEnabled: enabled }),
         }),

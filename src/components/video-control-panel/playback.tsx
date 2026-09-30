@@ -13,12 +13,12 @@ import {
 import { Slider } from "@/ui/slider";
 import { useTranslations } from "next-intl";
 import { formatTime } from "@/lib/utils";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import { EPlayMode, useVideoPlayerStore } from "@/stores/video-player-store";
 
 export function PlayButton() {
-    const isPlaying = useVideoPlayerStore((s) => s.isPlaying);
-    const togglePlay = useVideoPlayerStore((s) => s.togglePlay);
+    const isPlaying = usePlayback((s) => s.isPlaying);
+    const togglePlay = usePlayback((s) => s.togglePlay);
 
     return (
         <Button variant="ghost" size="icon-round" onClick={togglePlay}>
@@ -63,8 +63,8 @@ export function VolumeControl() {
 }
 
 export function TimeDisplay() {
-    const currentTime = useVideoReviewStore((s) => s.currentTime);
-    const duration = useVideoReviewStore((s) => s.duration);
+    const currentTime = usePlayback((s) => s.currentTime);
+    const duration = usePlayback((s) => s.duration);
 
     return (
         <span className="ml-2 flex items-center gap-2 text-sm text-muted-foreground w-30">

@@ -1,7 +1,7 @@
 "use client"
 import { RefObject, useEffect } from "react";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback, usePlaybackStoreApi } from "@/stores/playback-store";
 
 // Past this gap the compare side is sought back to the primary. Smaller gaps are left alone
 // because every forced seek makes the compare side stutter.
@@ -12,18 +12,18 @@ const DRIFT_TOLERANCE_SEC = 0.15;
 export const compareTimeFor = (primaryTime: number, compareDuration: number) =>
     Number.isFinite(compareDuration) ? Math.min(primaryTime, compareDuration) : primaryTime;
 
-// The primary video is the only clock: it drives the shared player stores the controls read,
+// The primary video is the only clock: it drives the playback store the controls read,
 // and the compare video just follows it, muted.
 export function useDiffSync(
     primaryRef: RefObject<HTMLVideoElement | null>,
     compareRef: RefObject<HTMLVideoElement | null>,
 ) {
-    const isPlaying = useVideoPlayerStore((s) => s.isPlaying);
-    const setIsPlaying = useVideoPlayerStore((s) => s.setIsPlaying);
+    const playback = usePlaybackStoreApi();
+    const isPlaying = usePlayback((s) => s.isPlaying);
+    const timelineTime = usePlayback((s) => s.timelineTime);
     const playbackRate = useVideoPlayerStore((s) => s.playbackRate);
     const volume = useVideoPlayerStore((s) => s.volume);
     const volumeEnabled = useVideoPlayerStore((s) => s.volumeEnabled);
-    const timelineTime = useVideoReviewStore((s) => s.timelineTime);
 
     const followPrimary = (force: boolean) => {
         const primary = primaryRef.current;
@@ -41,20 +41,6 @@ export function useDiffSync(
         if (!compareShouldPlay && !compare.paused) compare.pause();
     };
 
-    // The shared stores may still hold the review page's state, and the review page reads
-    // them again once this page is left.
-    useEffect(() => {
-        const reset = () => {
-            setIsPlaying(false);
-            const { setCurrentTime, setTimelineTime, setDuration } = useVideoReviewStore.getState();
-            setCurrentTime(0);
-            setTimelineTime(null);
-            setDuration(0);
-        };
-        reset();
-        return reset;
-    }, []);
-
     useEffect(() => {
         const primary = primaryRef.current;
         const compare = compareRef.current;
@@ -62,7 +48,7 @@ export function useDiffSync(
 
         compare.muted = true;
 
-        const { setCurrentTime, setDuration } = useVideoReviewStore.getState();
+        const { setIsPlaying, setCurrentTime, setDuration } = playback.getState();
         // Loading a new src resets playbackRate to 1, so both sides take the chosen rate again.
         const applyRate = (v: HTMLVideoElement) => { v.playbackRate = useVideoPlayerStore.getState().playbackRate; };
         const onMeta = () => { setDuration(primary.duration); applyRate(primary); };
@@ -75,7 +61,7 @@ export function useDiffSync(
         const onEmptied = () => setIsPlaying(false);
         const onTimeUpdate = () => {
             // While the seek bar is being dragged it owns the displayed time.
-            if (useVideoReviewStore.getState().timelineTime === null) {
+            if (playback.getState().timelineTime === null) {
                 setCurrentTime(primary.currentTime);
             }
             followPrimary(false);
@@ -109,7 +95,7 @@ export function useDiffSync(
 
         if (isPlaying) primary.play().catch(() => {});
         else primary.pause();
-        useVideoReviewStore.getState().setTimelineTime(null);
+        playback.getState().setTimelineTime(null);
     }, [isPlaying]);
 
     useEffect(() => {

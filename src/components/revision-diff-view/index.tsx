@@ -7,6 +7,7 @@ import { Video, VideoComment, VideoRevision } from "@/lib/db-types";
 import { LoadingBadge } from "@/components/controls/loading-badge";
 import { SeekBar, commentMarkers } from "@/components/video-timeline-bar";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackRateSelect } from "@/components/video-control-panel/playback";
+import { PlaybackStoreProvider } from "@/stores/playback-store";
 import { useDiffSync } from "./use-diff-sync";
 import { CommentSide, useRevisionComments } from "./comment-side";
 import { DiffStage, ModeTabs, RevisionSelect } from "./stage";
@@ -67,7 +68,11 @@ export default function RevisionDiffView({ videoId }: { videoId: string }) {
         );
     }
 
-    return <DiffWorkspace video={video} revisions={revisions} />;
+    return (
+        <PlaybackStoreProvider>
+            <DiffWorkspace video={video} revisions={revisions} />
+        </PlaybackStoreProvider>
+    );
 }
 
 function useDiffSide(side: Side, revisions: VideoRevision[]) {

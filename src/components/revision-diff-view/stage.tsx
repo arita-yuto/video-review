@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useLocale } from "@/app/locale-provider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/tabs";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { usePlayback } from "@/stores/playback-store";
 import { DiffViewMode, useDiffViewStore } from "@/stores/diff-view-store";
 
 export function RevisionSelect({ label, revisions, revision, onChange }: {
@@ -102,7 +102,7 @@ function DiffVideo({ revision, videoRef, className }: {
     videoRef: Ref<HTMLVideoElement>,
     className?: string,
 }) {
-    const togglePlay = useVideoPlayerStore((s) => s.togglePlay);
+    const togglePlay = usePlayback((s) => s.togglePlay);
     const [url, setUrl] = useState<string | null>(null);
 
     useEffect(() => {

@@ -1,6 +1,7 @@
 "use client"
 import VideoReview from "@/components/video-review";
 import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import { useVideoStore } from "@/stores/video-store";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
@@ -25,7 +26,8 @@ export default function VideoReviewPage() {
         loading,
     } = useVideoStore();
 
-    const { setSelectComment, setTimelineTime } = useVideoReviewStore();
+    const setSelectComment = useVideoReviewStore((s) => s.setSelectComment);
+    const setTimelineTime = usePlayback((s) => s.setTimelineTime);
 
     useEffect(() => {
         void (async () => {

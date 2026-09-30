@@ -9,7 +9,7 @@ import { VideoComment, VideoRevision } from "@/lib/db-types";
 import { createVideoTimeLink } from "@/lib/url";
 import { Button } from "@/ui/button";
 import { cn } from "@/lib/utils";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import TimelineCardList from "@/components/video-side-panel/timeline-card-list";
 import { TimelineCardHeader } from "@/components/video-side-panel/timeline-card";
 import { CommentAuthor } from "@/components/video-side-panel/panels/video-comment-panel/comment-card/header";
@@ -53,7 +53,7 @@ export function CommentSide({ revision, comments, markerClassName, selectedId, o
 }) {
     const t = useTranslations("revision-diff-view");
     const router = useRouter();
-    const currentTime = useVideoReviewStore((s) => s.currentTime);
+    const currentTime = usePlayback((s) => s.currentTime);
     const containerRef = useRef<HTMLDivElement>(null);
     const cardRef = useRef<Record<string, HTMLDivElement | null>>({});
 

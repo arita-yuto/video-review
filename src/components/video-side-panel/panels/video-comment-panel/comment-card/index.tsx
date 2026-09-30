@@ -1,6 +1,7 @@
 "use client";
 
 import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import { VideoComment } from "@/lib/db-types";
 import { useCommentEditStore } from "@/stores/comment-edit-store";
 import React, { useEffect } from "react";
@@ -29,7 +30,8 @@ export default function CommentCard(props: {
     commentCardRef: React.RefObject<Record<string, HTMLDivElement | null>>,
 }) {
     const { editingComment, setEditing } = useCommentEditStore();
-    const { selectedComment, setSelectComment, activeComments, setTimelineTime } = useVideoReviewStore();
+    const { selectedComment, setSelectComment, activeComments } = useVideoReviewStore();
+    const setTimelineTime = usePlayback((s) => s.setTimelineTime);
 
     const handleSelectComment = (comment: VideoComment) => {
         setTimelineTime(comment.time)
