@@ -1,8 +1,9 @@
 "use client"
-import { RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useReducer, useRef } from "react";
 import { Rgb } from "@/lib/frame-diff";
 import { compareTimeFor } from "./use-diff-sync";
 import type { FrameDiffRequest, FrameDiffResponse } from "./frame-diff.worker";
+import { diffImageReducer, initialDiffImageState } from "./diff-image-state";
 
 // A compare side seeked to its target lands on it exactly; anything further off is still on the
 // way there, e.g. right after the primary moved and before the sync has sent it along.
@@ -34,16 +35,14 @@ const isSecurityError = (e: unknown) => e instanceof DOMException && e.name === 
 const grabFrame = async (video: HTMLVideoElement): Promise<VideoFrame | ImageBitmap> =>
     typeof VideoFrame === "undefined" ? createImageBitmap(video) : new VideoFrame(video);
 
-// The diff of the two frames at the paused position, or "unreadable" when the media comes from
-// another origin and the browser refuses to hand out its pixels. While playing, or while a newer
-// diff is being worked out in the worker, the last one is kept.
+// Works out the diff of the two frames at the paused position in a worker: decides when both
+// frames are ready to take, and keeps only the newest request's result.
 export function useDiffImage(
     primaryRef: RefObject<HTMLVideoElement | null>,
     compareRef: RefObject<HTMLVideoElement | null>,
     settings: { threshold: number, baseOpacity: number },
 ) {
-    const [image, setImage] = useState<ImageBitmap | "unreadable" | null>(null);
-    const [busy, setBusy] = useState(false);
+    const [state, dispatch] = useReducer(diffImageReducer, initialDiffImageState);
     const settingsRef = useRef(settings);
     settingsRef.current = settings;
 
@@ -60,11 +59,9 @@ export function useDiffImage(
 
         // Bitmaps hold GPU memory until closed, so each one is released once replaced.
         let shown: ImageBitmap | null = null;
-        const settle = (next: ImageBitmap | "unreadable" | null) => {
+        const show = (image: ImageBitmap | null) => {
             shown?.close();
-            shown = next instanceof ImageBitmap ? next : null;
-            setImage(next);
-            setBusy(false);
+            shown = image;
         };
 
         worker.addEventListener("message", (e: MessageEvent<FrameDiffResponse>) => {
@@ -73,9 +70,15 @@ export function useDiffImage(
                 if ("image" in res) res.image.close();
                 return;
             }
-            settle("unreadable" in res ? "unreadable" : res.image);
+            if ("unreadable" in res) {
+                show(null);
+                dispatch({ type: "refused" });
+            } else {
+                show(res.image);
+                dispatch({ type: "received", image: res.image });
+            }
         });
-        worker.addEventListener("error", () => setBusy(false));
+        worker.addEventListener("error", () => dispatch({ type: "cancelled" }));
 
         // Any event may try; only a still, aligned moment is taken.
         const capture = async () => {
@@ -88,7 +91,7 @@ export function useDiffImage(
             if (width === 0 || height === 0) return;
 
             const id = ++requestId;
-            setBusy(true);
+            dispatch({ type: "started" });
 
             // Frames pin decoder memory until closed, so every path that doesn't hand them over closes them.
             const grabbed = await Promise.allSettled([grabFrame(primary), grabFrame(compare)]);
@@ -99,8 +102,11 @@ export function useDiffImage(
             if (id !== requestId) return discard();
             if (failure) {
                 discard();
-                if (isSecurityError(failure.reason)) return settle("unreadable");
-                setBusy(false);
+                if (isSecurityError(failure.reason)) {
+                    show(null);
+                    return dispatch({ type: "refused" });
+                }
+                dispatch({ type: "cancelled" });
                 throw failure.reason;
             }
 
@@ -113,7 +119,7 @@ export function useDiffImage(
                 worker.postMessage(request, frames);
             } catch (e) {
                 discard();
-                setBusy(false);
+                dispatch({ type: "cancelled" });
                 throw e;
             }
         };
@@ -121,7 +127,8 @@ export function useDiffImage(
         // A new revision on either side makes the last diff wrong until the next capture.
         const clear = () => {
             requestId++;
-            settle(null);
+            show(null);
+            dispatch({ type: "reset" });
         };
 
         // From the moment a paused primary moves, the shown diff and any still in the worker belong
@@ -129,12 +136,16 @@ export function useDiffImage(
         const moving = () => {
             if (!primary.paused) return;
             requestId++;
-            setBusy(true);
+            dispatch({ type: "started" });
         };
 
         const listeners: [HTMLVideoElement, string, () => void][] = [
             [primary, "pause", () => seekInPlace(primary)],
-            [primary, "play", () => setBusy(false)],
+            // A diff still being worked out would land on a position playback has already left.
+            [primary, "play", () => {
+                requestId++;
+                dispatch({ type: "cancelled" });
+            }],
             [primary, "seeking", moving],
             [primary, "seeked", capture],
             [primary, "loadeddata", capture],
@@ -157,5 +168,5 @@ export function useDiffImage(
         };
     }, []);
 
-    return { image, busy };
+    return state;
 }

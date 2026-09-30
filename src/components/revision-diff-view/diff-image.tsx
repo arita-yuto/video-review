@@ -30,14 +30,16 @@ export function DiffImage({ primaryRef, compareRef }: {
     compareRef: RefObject<HTMLVideoElement | null>,
 }) {
     const t = useTranslations("revision-diff-view");
-    const { image, busy } = useDiffImage(primaryRef, compareRef, { threshold: THRESHOLD, baseOpacity: BASE_OPACITY });
+    const state = useDiffImage(primaryRef, compareRef, { threshold: THRESHOLD, baseOpacity: BASE_OPACITY });
+    const image = state.status === "ready" ? state.image : state.status === "computing" ? state.previous : null;
+    const computing = state.status === "computing";
     const isPlaying = usePlayback((s) => s.isPlaying);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         // A bitmap handed over once is detached and reports a zero size.
-        if (!canvas || !(image instanceof ImageBitmap) || image.width === 0) return;
+        if (!canvas || !image || image.width === 0) return;
 
         // Handing the bitmap over skips a redraw on the page's thread; the canvas needs its size first.
         canvas.width = image.width;
@@ -47,15 +49,15 @@ export function DiffImage({ primaryRef, compareRef }: {
 
     return (
         <div className="relative flex flex-1 min-h-0 items-center justify-center bg-black rounded">
-            {image === "unreadable" ? (
+            {state.status === "unreadable" ? (
                 <p className="text-sm text-muted-foreground">{t("diffUnreadable")}</p>
             ) : image === null ? (
                 isPlaying ? <p className="text-sm text-muted-foreground">{t("diffPause")}</p> : <Spinner />
             ) : (
                 <>
                     {/* Dimmed while playing or recomputing: it still shows an earlier position. */}
-                    <canvas ref={canvasRef} className={cn("max-w-full max-h-full rounded", (isPlaying || busy) && "opacity-50")} />
-                    {busy && <Spinner className="absolute" />}
+                    <canvas ref={canvasRef} className={cn("max-w-full max-h-full rounded", (isPlaying || computing) && "opacity-50")} />
+                    {computing && <Spinner className="absolute" />}
                 </>
             )}
         </div>
