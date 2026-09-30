@@ -14,6 +14,7 @@ import TimelineCardList from "@/components/video-side-panel/timeline-card-list";
 import { TimelineCardHeader } from "@/components/video-side-panel/timeline-card";
 import { CommentAuthor } from "@/components/video-side-panel/panels/video-comment-panel/comment-card/header";
 import CommentCardContent from "@/components/video-side-panel/panels/video-comment-panel/comment-card/content";
+import { commentCardState } from "@/components/video-side-panel/panels/video-comment-panel/comment-card";
 
 // Same window the review page uses to light up the comments at the playback position.
 const ACTIVE_WINDOW_SEC = 0.3;
@@ -82,17 +83,9 @@ export function CommentSide({ revision, comments, markerClassName, selectedId, o
                 itemCardRef={cardRef}
                 getKey={(c) => c.id}
                 getCardState={(c) => {
-                    // Same priority as the review page's cards.
-                    const hasDrawing = c.drawingPath !== "" && c.drawingPath !== null;
-                    const hasIssue = c.issueId !== "" && c.issueId !== null;
                     const atPosition = Math.abs(c.time - currentTime) <= ACTIVE_WINDOW_SEC;
                     // Like the review page, the selection lasts only while playback stays at it.
-                    if (c.id === selectedId && atPosition) return "selected";
-                    if (atPosition) return "active";
-                    if (hasIssue && hasDrawing) return "issue-drawing";
-                    if (hasIssue) return "issue";
-                    if (hasDrawing) return "drawing";
-                    return "none";
+                    return commentCardState(c, c.id === selectedId && atPosition, atPosition);
                 }}
                 onClick={onSelect}
                 renderHeader={(c) => <TimelineCardHeader><CommentAuthor comment={c} /></TimelineCardHeader>}
