@@ -1,0 +1,161 @@
+"use client"
+import { RefObject, useEffect, useRef, useState } from "react";
+import { Rgb } from "@/lib/frame-diff";
+import { compareTimeFor } from "./use-diff-sync";
+import type { FrameDiffRequest, FrameDiffResponse } from "./frame-diff.worker";
+
+// A compare side seeked to its target lands on it exactly; anything further off is still on the
+// way there, e.g. right after the primary moved and before the sync has sent it along.
+const ALIGNED_SEC = 0.02;
+
+// A colour no other part of the diff-view uses, so it reads only as "changed here".
+const HIGHLIGHT_TOKEN = "--chart-2";
+
+// A 1px fill turns any CSS colour, oklch included, into RGB.
+const tokenRgb = (name: string): Rgb => {
+    const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+    if (!ctx) return { r: 255, g: 0, b: 0 };
+
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(name);
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return { r, g, b };
+};
+
+// A video paused during playback can keep showing a frame past its currentTime, while the compare
+// side is seeked to exactly that time. Assigning currentTime seeks even to the same position, so
+// both end up on the frame a seek to that time lands on.
+const seekInPlace = (video: HTMLVideoElement) => { video.currentTime = video.currentTime; };
+
+const isSecurityError = (e: unknown) => e instanceof DOMException && e.name === "SecurityError";
+
+// A VideoFrame only references the decoded frame, where createImageBitmap copies it on the page's
+// thread; the copy is the fallback for browsers without WebCodecs.
+const grabFrame = async (video: HTMLVideoElement): Promise<VideoFrame | ImageBitmap> =>
+    typeof VideoFrame === "undefined" ? createImageBitmap(video) : new VideoFrame(video);
+
+// The diff of the two frames at the paused position, or "unreadable" when the media comes from
+// another origin and the browser refuses to hand out its pixels. While playing, or while a newer
+// diff is being worked out in the worker, the last one is kept.
+export function useDiffImage(
+    primaryRef: RefObject<HTMLVideoElement | null>,
+    compareRef: RefObject<HTMLVideoElement | null>,
+    settings: { threshold: number, baseOpacity: number },
+) {
+    const [image, setImage] = useState<ImageBitmap | "unreadable" | null>(null);
+    const [busy, setBusy] = useState(false);
+    const settingsRef = useRef(settings);
+    settingsRef.current = settings;
+
+    useEffect(() => {
+        const primary = primaryRef.current;
+        const compare = compareRef.current;
+        if (!primary || !compare) return;
+
+        const worker = new Worker(new URL("./frame-diff.worker.ts", import.meta.url), { type: "module" });
+        const highlight = tokenRgb(HIGHLIGHT_TOKEN);
+        // Only the response to this request is shown. Bumping it without sending one drops
+        // every request still in flight, e.g. after the position or a revision changed.
+        let requestId = 0;
+
+        // Bitmaps hold GPU memory until closed, so each one is released once replaced.
+        let shown: ImageBitmap | null = null;
+        const settle = (next: ImageBitmap | "unreadable" | null) => {
+            shown?.close();
+            shown = next instanceof ImageBitmap ? next : null;
+            setImage(next);
+            setBusy(false);
+        };
+
+        worker.addEventListener("message", (e: MessageEvent<FrameDiffResponse>) => {
+            const res = e.data;
+            if (res.id !== requestId) {
+                if ("image" in res) res.image.close();
+                return;
+            }
+            settle("unreadable" in res ? "unreadable" : res.image);
+        });
+        worker.addEventListener("error", () => setBusy(false));
+
+        // Any event may try; only a still, aligned moment is taken.
+        const capture = async () => {
+            if (!primary.paused || !compare.paused || primary.seeking || compare.seeking) return;
+            if (primary.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+            if (compare.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+            if (Math.abs(compare.currentTime - compareTimeFor(primary.currentTime, compare.duration)) > ALIGNED_SEC) return;
+
+            const { videoWidth: width, videoHeight: height } = primary;
+            if (width === 0 || height === 0) return;
+
+            const id = ++requestId;
+            setBusy(true);
+
+            // Frames pin decoder memory until closed, so every path that doesn't hand them over closes them.
+            const grabbed = await Promise.allSettled([grabFrame(primary), grabFrame(compare)]);
+            const frames = grabbed.flatMap((r) => r.status === "fulfilled" ? [r.value] : []);
+            const failure = grabbed.find((r) => r.status === "rejected");
+            const discard = () => { for (const frame of frames) frame.close(); };
+
+            if (id !== requestId) return discard();
+            if (failure) {
+                discard();
+                if (isSecurityError(failure.reason)) return settle("unreadable");
+                setBusy(false);
+                throw failure.reason;
+            }
+
+            const [primaryFrame, compareFrame] = frames;
+            const request: FrameDiffRequest = {
+                id, width, height, primary: primaryFrame, compare: compareFrame,
+                options: { ...settingsRef.current, highlight },
+            };
+            try {
+                worker.postMessage(request, frames);
+            } catch (e) {
+                discard();
+                setBusy(false);
+                throw e;
+            }
+        };
+
+        // A new revision on either side makes the last diff wrong until the next capture.
+        const clear = () => {
+            requestId++;
+            settle(null);
+        };
+
+        // From the moment a paused primary moves, the shown diff and any still in the worker belong
+        // to the old position; on a slow machine the compare side can take a while to follow.
+        const moving = () => {
+            if (!primary.paused) return;
+            requestId++;
+            setBusy(true);
+        };
+
+        const listeners: [HTMLVideoElement, string, () => void][] = [
+            [primary, "pause", () => seekInPlace(primary)],
+            [primary, "play", () => setBusy(false)],
+            [primary, "seeking", moving],
+            [primary, "seeked", capture],
+            [primary, "loadeddata", capture],
+            [compare, "pause", capture],
+            [compare, "seeked", capture],
+            [compare, "loadeddata", capture],
+            [primary, "emptied", clear],
+            [compare, "emptied", clear],
+        ];
+
+        // Turned on while paused: the primary may still hold the frame playback stopped on.
+        if (primary.paused) seekInPlace(primary);
+        for (const [video, event, handler] of listeners) video.addEventListener(event, handler);
+        return () => {
+            // A capture still awaiting its frames closes them instead of posting to a dead worker.
+            requestId++;
+            for (const [video, event, handler] of listeners) video.removeEventListener(event, handler);
+            worker.terminate();
+            shown?.close();
+        };
+    }, []);
+
+    return { image, busy };
+}

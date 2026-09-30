@@ -3,28 +3,14 @@ import { RefObject, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Label } from "@/ui/label";
 import { Switch } from "@/ui/switch";
+import { Spinner } from "@/ui/spinner";
 import { cn } from "@/lib/utils";
-import { frameDiff, Rgb } from "@/lib/frame-diff";
 import { usePlayback } from "@/stores/playback-store";
 import { useDiffViewStore } from "@/stores/diff-view-store";
-import { useFramePair } from "./use-frame-pair";
+import { useDiffImage } from "./use-diff-image";
 
 const THRESHOLD = 24;
 const BASE_OPACITY = 0.4;
-
-// A colour no other part of the diff-view uses, so it reads only as "changed here".
-const HIGHLIGHT_TOKEN = "--chart-2";
-
-// The highlight follows a theme token; a 1px fill turns any CSS colour, oklch included, into RGB.
-const tokenRgb = (name: string): Rgb => {
-    const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-    if (!ctx) return { r: 255, g: 0, b: 0 };
-
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(name);
-    ctx.fillRect(0, 0, 1, 1);
-    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-    return { r, g, b };
-};
 
 export function DiffImageSwitch() {
     const t = useTranslations("revision-diff-view");
@@ -44,36 +30,33 @@ export function DiffImage({ primaryRef, compareRef }: {
     compareRef: RefObject<HTMLVideoElement | null>,
 }) {
     const t = useTranslations("revision-diff-view");
-    const pair = useFramePair(primaryRef, compareRef);
+    const { image, busy } = useDiffImage(primaryRef, compareRef, { threshold: THRESHOLD, baseOpacity: BASE_OPACITY });
     const isPlaying = usePlayback((s) => s.isPlaying);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || !pair || pair === "unreadable") return;
+        // A bitmap handed over once is detached and reports a zero size.
+        if (!canvas || !(image instanceof ImageBitmap) || image.width === 0) return;
 
-        canvas.width = pair.width;
-        canvas.height = pair.height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        const pixels = frameDiff(pair.primary, pair.compare, {
-            threshold: THRESHOLD,
-            baseOpacity: BASE_OPACITY,
-            highlight: tokenRgb(HIGHLIGHT_TOKEN),
-        });
-        ctx.putImageData(new ImageData(pixels, pair.width, pair.height), 0, 0);
-    }, [pair]);
+        // Handing the bitmap over skips a redraw on the page's thread; the canvas needs its size first.
+        canvas.width = image.width;
+        canvas.height = image.height;
+        canvas.getContext("bitmaprenderer")?.transferFromImageBitmap(image);
+    }, [image]);
 
     return (
-        <div className="flex flex-1 min-h-0 items-center justify-center bg-black rounded">
-            {pair === "unreadable" ? (
+        <div className="relative flex flex-1 min-h-0 items-center justify-center bg-black rounded">
+            {image === "unreadable" ? (
                 <p className="text-sm text-muted-foreground">{t("diffUnreadable")}</p>
-            ) : pair === null ? (
-                <p className="text-sm text-muted-foreground">{isPlaying ? t("diffPause") : t("loading")}</p>
+            ) : image === null ? (
+                isPlaying ? <p className="text-sm text-muted-foreground">{t("diffPause")}</p> : <Spinner />
             ) : (
-                // Dimmed while playing: it still shows the position playback was paused at.
-                <canvas ref={canvasRef} className={cn("max-w-full max-h-full rounded", isPlaying && "opacity-50")} />
+                <>
+                    {/* Dimmed while playing or recomputing: it still shows an earlier position. */}
+                    <canvas ref={canvasRef} className={cn("max-w-full max-h-full rounded", (isPlaying || busy) && "opacity-50")} />
+                    {busy && <Spinner className="absolute" />}
+                </>
             )}
         </div>
     );
