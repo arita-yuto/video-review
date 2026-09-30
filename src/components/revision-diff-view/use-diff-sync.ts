@@ -2,7 +2,6 @@
 import { RefObject, useEffect } from "react";
 import { useVideoPlayerStore } from "@/stores/video-player-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { useCommentStore } from "@/stores/comment-store";
 
 // Past this gap the compare side is sought back to the primary. Smaller gaps are left alone
 // because every forced seek makes the compare side stutter.
@@ -18,7 +17,6 @@ export const compareTimeFor = (primaryTime: number, compareDuration: number) =>
 export function useDiffSync(
     primaryRef: RefObject<HTMLVideoElement | null>,
     compareRef: RefObject<HTMLVideoElement | null>,
-    ready: boolean,
 ) {
     const isPlaying = useVideoPlayerStore((s) => s.isPlaying);
     const setIsPlaying = useVideoPlayerStore((s) => s.setIsPlaying);
@@ -52,7 +50,6 @@ export function useDiffSync(
             setCurrentTime(0);
             setTimelineTime(null);
             setDuration(0);
-            useCommentStore.getState().setDisplayComments([]);
         };
         reset();
         return reset;
@@ -61,7 +58,7 @@ export function useDiffSync(
     useEffect(() => {
         const primary = primaryRef.current;
         const compare = compareRef.current;
-        if (!ready || !primary || !compare) return;
+        if (!primary || !compare) return;
 
         compare.muted = true;
 
@@ -104,7 +101,7 @@ export function useDiffSync(
             primary.pause();
             compare.pause();
         };
-    }, [ready]);
+    }, []);
 
     useEffect(() => {
         const primary = primaryRef.current;
@@ -119,12 +116,12 @@ export function useDiffSync(
         for (const v of [primaryRef.current, compareRef.current]) {
             if (v) v.playbackRate = playbackRate;
         }
-    }, [playbackRate, ready]);
+    }, [playbackRate]);
 
     useEffect(() => {
         const primary = primaryRef.current;
         if (primary) primary.volume = volumeEnabled ? volume : 0.0;
-    }, [volume, volumeEnabled, ready]);
+    }, [volume, volumeEnabled]);
 
     useEffect(() => {
         const primary = primaryRef.current;

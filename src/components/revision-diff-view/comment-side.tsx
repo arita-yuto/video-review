@@ -19,14 +19,12 @@ import { commentCardState } from "@/components/video-side-panel/panels/video-com
 // Same window the review page uses to light up the comments at the playback position.
 const ACTIVE_WINDOW_SEC = 0.3;
 
-// Takes undefined while the page is still loading, so it can be called before the page's early returns.
-export function useRevisionComments(revision: VideoRevision | undefined) {
+export function useRevisionComments(revision: VideoRevision) {
     const [comments, setComments] = useState<VideoComment[]>([]);
 
     useEffect(() => {
         let canceled = false;
         setComments([]);
-        if (!revision) return;
         void (async () => {
             const res = await api.comments.index.$get({
                 query: { videoId: revision.videoId, selectRevision: String(revision.revision) },
@@ -36,7 +34,7 @@ export function useRevisionComments(revision: VideoRevision | undefined) {
             if (!canceled) setComments(body);
         })();
         return () => { canceled = true; };
-    }, [revision?.id]);
+    }, [revision.id]);
 
     return comments;
 }
