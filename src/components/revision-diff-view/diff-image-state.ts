@@ -11,7 +11,7 @@ export type DiffImageEvent =
     | { type: "started" }
     | { type: "received", image: ImageBitmap }
     | { type: "refused" }
-    // No result is coming: playback started, or the capture or the worker failed.
+    // No result is coming: playback started, or the capture or the diff failed.
     | { type: "cancelled" }
     | { type: "reset" };
 

@@ -2,7 +2,7 @@
 import { RefObject, useEffect, useReducer, useRef } from "react";
 import { Rgb } from "@/lib/frame-diff";
 import { compareTimeFor } from "./use-diff-sync";
-import type { FrameDiffRequest, FrameDiffResponse } from "./frame-diff.worker";
+import { createDiffEngine } from "./diff-engine/select-engine";
 import { diffImageReducer, initialDiffImageState } from "./diff-image-state";
 
 // A compare side seeked to its target lands on it exactly; anything further off is still on the
@@ -35,8 +35,8 @@ const isSecurityError = (e: unknown) => e instanceof DOMException && e.name === 
 const grabFrame = async (video: HTMLVideoElement): Promise<VideoFrame | ImageBitmap> =>
     typeof VideoFrame === "undefined" ? createImageBitmap(video) : new VideoFrame(video);
 
-// Works out the diff of the two frames at the paused position in a worker: decides when both
-// frames are ready to take, and keeps only the newest request's result.
+// The diff of the two frames at the paused position: decides when both frames are ready to take,
+// hands them to a diff engine, and keeps only the newest request's result.
 export function useDiffImage(
     primaryRef: RefObject<HTMLVideoElement | null>,
     compareRef: RefObject<HTMLVideoElement | null>,
@@ -52,7 +52,7 @@ export function useDiffImage(
         const compare = compareRef.current;
         if (!primary || !compare) return;
 
-        const worker = new Worker(new URL("./frame-diff.worker.ts", import.meta.url), { type: "module" });
+        const engine = createDiffEngine();
         const highlight = tokenRgb(HIGHLIGHT_TOKEN);
         // Only the response to this request is shown. Bumping it without sending one drops
         // every request still in flight, e.g. after the position or a revision changed.
@@ -64,22 +64,6 @@ export function useDiffImage(
             shown?.close();
             shown = image;
         };
-
-        worker.addEventListener("message", (e: MessageEvent<FrameDiffResponse>) => {
-            const res = e.data;
-            if (res.id !== requestId) {
-                if ("image" in res) res.image.close();
-                return;
-            }
-            if ("unreadable" in res) {
-                show(null);
-                dispatch({ type: "refused" });
-            } else {
-                show(res.image);
-                dispatch({ type: "received", image: res.image });
-            }
-        });
-        worker.addEventListener("error", () => dispatch({ type: "cancelled" }));
 
         // Any event may try; only a still, aligned moment is taken.
         const capture = async () => {
@@ -112,17 +96,25 @@ export function useDiffImage(
             }
 
             const [primaryFrame, compareFrame] = frames;
-            const request: FrameDiffRequest = {
-                id, width, height, primary: primaryFrame, compare: compareFrame,
-                options: { ...settingsRef.current, highlight },
-            };
+            let image: ImageBitmap;
             try {
-                worker.postMessage(request, frames);
+                image = await engine.diff({
+                    width, height, primary: primaryFrame, compare: compareFrame,
+                    options: { ...settingsRef.current, highlight },
+                });
             } catch (e) {
-                discard();
+                if (id !== requestId) return;
+                if (isSecurityError(e)) {
+                    show(null);
+                    return dispatch({ type: "refused" });
+                }
                 dispatch({ type: "cancelled" });
                 throw e;
             }
+
+            if (id !== requestId) return image.close();
+            show(image);
+            dispatch({ type: "received", image });
         };
 
         // A new revision on either side makes the last diff wrong until the next capture.
@@ -132,7 +124,7 @@ export function useDiffImage(
             dispatch({ type: "reset" });
         };
 
-        // From the moment a paused primary moves, the shown diff and any still in the worker belong
+        // From the moment a paused primary moves, the shown diff and any still being worked out belong
         // to the old position; on a slow machine the compare side can take a while to follow.
         const moving = () => {
             if (!primary.paused) return;
@@ -163,10 +155,10 @@ export function useDiffImage(
         if (primary.paused) seekInPlace(primary);
         for (const [video, event, handler] of listeners) video.addEventListener(event, handler);
         return () => {
-            // A capture still awaiting its frames closes them instead of posting to a dead worker.
+            // A capture still in flight sees the bumped id and stops.
             requestId++;
             for (const [video, event, handler] of listeners) video.removeEventListener(event, handler);
-            worker.terminate();
+            engine.dispose();
             shown?.close();
             recapture.current = () => {};
         };

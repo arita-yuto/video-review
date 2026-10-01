@@ -1,20 +1,14 @@
-import { frameDiff, FrameDiffOptions } from "@/lib/frame-diff";
+import { frameDiff } from "@/lib/frame-diff";
+import { DiffFrame, DiffRequest } from "../types";
 
-export type FrameDiffRequest = {
-    id: number,
-    width: number,
-    height: number,
-    // The compare frame may differ in size; it is scaled to width x height so the pixels line up.
-    primary: VideoFrame | ImageBitmap,
-    compare: VideoFrame | ImageBitmap,
-    options: FrameDiffOptions,
-};
+export type FrameDiffRequest = DiffRequest & { id: number };
 
 export type FrameDiffResponse =
     | { id: number, image: ImageBitmap }
-    | { id: number, unreadable: true };
+    | { id: number, unreadable: true }
+    | { id: number, error: string };
 
-const readPixels = (frame: VideoFrame | ImageBitmap, width: number, height: number) => {
+const readPixels = (frame: DiffFrame, width: number, height: number) => {
     const ctx = new OffscreenCanvas(width, height).getContext("2d", { willReadFrequently: true });
     if (!ctx) throw new Error("no 2d context");
 
@@ -35,8 +29,10 @@ addEventListener("message", (e: MessageEvent<FrameDiffRequest>) => {
         response = { id, image: canvas.transferToImageBitmap() };
     } catch (err) {
         // Media from another origin taints the frames, and the browser refuses to hand out their pixels.
-        if (!(err instanceof DOMException && err.name === "SecurityError")) throw err;
-        response = { id, unreadable: true };
+        // Any other failure is answered too, so the request waiting for it isn't left hanging.
+        response = err instanceof DOMException && err.name === "SecurityError"
+            ? { id, unreadable: true }
+            : { id, error: err instanceof Error ? err.message : String(err) };
     } finally {
         // Frames pin decoder memory until closed, whichever way the work above ended.
         primary.close();
