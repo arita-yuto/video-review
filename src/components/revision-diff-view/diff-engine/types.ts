@@ -15,6 +15,10 @@ export type DiffRequest = {
 // them; the caller owns the returned bitmap. A SecurityError rejection means the browser
 // refused to hand out the frames' pixels.
 export type DiffEngine = {
+    // Shown in the console, e.g. "cpu" or "gpu (<renderer>)".
+    name: string,
     diff: (request: DiffRequest) => Promise<ImageBitmap>,
     dispose: () => void,
 };
+
+export const isSecurityError = (e: unknown) => e instanceof DOMException && e.name === "SecurityError";

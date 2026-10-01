@@ -29,6 +29,7 @@ export const createCpuEngine = (): DiffEngine => {
     });
 
     return {
+        name: "cpu",
         diff: (request: DiffRequest) => new Promise<ImageBitmap>((resolve, reject) => {
             const id = nextId++;
             const message: FrameDiffRequest = { id, ...request };

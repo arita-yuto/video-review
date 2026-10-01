@@ -3,6 +3,7 @@ import { RefObject, useEffect, useReducer, useRef } from "react";
 import { Rgb } from "@/lib/frame-diff";
 import { compareTimeFor } from "./use-diff-sync";
 import { createDiffEngine } from "./diff-engine/select-engine";
+import { isSecurityError } from "./diff-engine/types";
 import { diffImageReducer, initialDiffImageState } from "./diff-image-state";
 
 // A compare side seeked to its target lands on it exactly; anything further off is still on the
@@ -27,8 +28,6 @@ const tokenRgb = (name: string): Rgb => {
 // side is seeked to exactly that time. Assigning currentTime seeks even to the same position, so
 // both end up on the frame a seek to that time lands on.
 const seekInPlace = (video: HTMLVideoElement) => { video.currentTime = video.currentTime; };
-
-const isSecurityError = (e: unknown) => e instanceof DOMException && e.name === "SecurityError";
 
 // A VideoFrame only references the decoded frame, where createImageBitmap copies it on the page's
 // thread; the copy is the fallback for browsers without WebCodecs.

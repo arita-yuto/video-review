@@ -24,4 +24,11 @@ describe("frameDiff", () => {
         // 60% highlight over the dimmed base.
         expect(pixel(out, 1)).toEqual([173, 20, 20, 255]);
     });
+
+    it("counts a difference exactly at the threshold as changed", () => {
+        // Gray 100 vs 124 differ by exactly 24 in luminance.
+        const out = frameDiff(frame(100), frame(124), options);
+
+        expect(pixel(out, 0)).toEqual([173, 20, 20, 255]);
+    });
 });
