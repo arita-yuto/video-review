@@ -1,6 +1,7 @@
 "use client"
 import { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import VideoTimelineBar from "@/components/video-timeline-bar";
 import { EPlayMode, useVideoPlayerStore } from "@/stores/video-player-store";
 import VideoControlPanel from "@/components/video-control-panel";
@@ -35,21 +36,23 @@ export default function VideoReview() {
     const {
         setVideoRefElement,
         selectedComment,
+        setSelectComment,
+        setActiveComments } = useVideoReviewStore();
+
+    const {
+        isPlaying,
         currentTime,
         timelineTime,
-        setSelectComment,
-        setActiveComments,
+        togglePlay,
+        setIsPlaying,
         setTimelineTime,
         setCurrentTime,
-        setDuration } = useVideoReviewStore();
+        setDuration } = usePlayback((s) => s);
 
     const {
         playMode,
-        isPlaying,
-        togglePlay,
         volume,
         volumeEnabled,
-        setIsPlaying,
         playbackRate,
     } = useVideoPlayerStore();
 

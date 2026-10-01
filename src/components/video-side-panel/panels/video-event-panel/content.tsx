@@ -4,7 +4,7 @@ import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useVideoStore } from "@/stores/video-store";
 import { useVideoEventStore } from "@/stores/video-event-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import EventCard from "@/components/video-side-panel/panels/video-event-panel/event-card";
 import { useVideoEventSearchStore } from "@/stores/video-event-search-store";
 
@@ -17,7 +17,8 @@ export default function VideoEventContent(props: {
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
     const { selectedRevision } = useVideoStore();
-    const { currentTime, setTimelineTime } = useVideoReviewStore();
+    const currentTime = usePlayback((s) => s.currentTime);
+    const setTimelineTime = usePlayback((s) => s.setTimelineTime);
     const { events, fetchEvents, clearEvents } = useVideoEventStore();
     const { filterText, kind, hasLink } = useVideoEventSearchStore();
 

@@ -6,7 +6,7 @@ import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
 import { useCommentEditStore } from "@/stores/comment-edit-store";
 import { useCommentStore } from "@/stores/comment-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { usePlayback } from "@/stores/playback-store";
 import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
 import { toolClass } from "@/lib/drawing/tools";
 import { EyedropperPreview } from "@/components/drawing-tool-panel/eyedropper-preview";
@@ -32,7 +32,7 @@ export function DrawingLayer() {
     const editing = useCommentEditStore((s) => s.editingComment !== null);
     const { comments } = useCommentStore();
     const { activeComments, selectedComment } = useVideoReviewStore();
-    const isPlaying = useVideoPlayerStore((s) => s.isPlaying);
+    const isPlaying = usePlayback((s) => s.isPlaying);
     const cursor = useDrawingSettingsStore((s) => toolClass(s.tool).cursor(s.params[s.tool]));
 
     useDrawingCanvas();

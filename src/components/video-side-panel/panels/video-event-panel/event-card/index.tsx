@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import TimelineCardList from "@/components/video-side-panel/timeline-card-list";
 import EventCardHeader from "@/components/video-side-panel/panels/video-event-panel/event-card/header";
 import EventCardContent from "@/components/video-side-panel/panels/video-event-panel/event-card/content";
@@ -14,7 +14,7 @@ export default function EventCard(props: {
     containerRef: React.RefObject<HTMLDivElement | null>;
     eventCardRef: React.RefObject<Record<string, HTMLDivElement | null>>;
 }) {
-    const { currentTime } = useVideoReviewStore();
+    const currentTime = usePlayback((s) => s.currentTime);
 
     const activeEventIds = useMemo(() => {
         const nowMs = currentTime * 1000;

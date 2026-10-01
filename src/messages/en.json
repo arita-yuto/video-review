@@ -53,6 +53,23 @@
     "video-review": {
         "noVideoSelected": "Please select a video"
     },
+    "revision-diff-view": {
+        "needsTwoRevisions": "Only one revision, so there is nothing to compare",
+        "notFound": "Video not found",
+        "loading": "Loading...",
+        "openRevision": "Open this revision",
+        "compare": "Compare",
+        "sideBySide": "Side by side",
+        "wipe": "Wipe",
+        "leftRevision": "Left revision",
+        "rightRevision": "Right revision",
+        "diffImage": "Diff",
+        "diffPause": "Pause to see the diff",
+        "diffUnreadable": "Diff isn't available for this video",
+        "threshold": "Threshold",
+        "base": "Base",
+        "saveDiffImage": "Save diff image"
+    },
     "video-list-panel": {
         "title": "Video list",
         "upload": "Upload video",

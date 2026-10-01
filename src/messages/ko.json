@@ -53,6 +53,23 @@
     "video-review": {
         "noVideoSelected": "동영상을 선택해 주세요"
     },
+    "revision-diff-view": {
+        "needsTwoRevisions": "리비전이 하나뿐이라 비교할 수 없습니다",
+        "notFound": "동영상을 찾을 수 없습니다",
+        "loading": "불러오는 중",
+        "openRevision": "이 리비전 열기",
+        "compare": "비교",
+        "sideBySide": "나란히 보기",
+        "wipe": "와이프",
+        "leftRevision": "왼쪽 리비전",
+        "rightRevision": "오른쪽 리비전",
+        "diffImage": "차이",
+        "diffPause": "일시 정지하면 차이가 표시됩니다",
+        "diffUnreadable": "이 동영상에서는 차이를 표시할 수 없습니다",
+        "threshold": "한계값",
+        "base": "원본",
+        "saveDiffImage": "차이 이미지 저장"
+    },
     "video-list-panel": {
         "title": "동영상 목록",
         "upload": "동영상 업로드",

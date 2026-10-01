@@ -136,8 +136,7 @@ function DropdownMenu_Delete(props: { comment: VideoComment }) {
     );
 }
 
-export default function CommentCardHeader(props: { comment: VideoComment }) {
-    const { role } = useAuthStore();
+export function CommentAuthor(props: { comment: VideoComment }) {
     const { locale } = useLocale();
     const { icon, fetchAvatar } = useAvatarStore();
 
@@ -151,19 +150,27 @@ export default function CommentCardHeader(props: { comment: VideoComment }) {
     }, [props.comment.userEmail]);
 
     return (
-        <TimelineCardHeader>
-            <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                    {icon(props.comment.userEmail) ? (<><AvatarImage src={icon(props.comment.userEmail)} /></>) : (<><AvatarFallback/></>)}
-                    
-                </Avatar>
-                <div className="flex flex-col leading-none">
-                    <span className="text-sm font-medium">{props.comment.userName}</span>
-                    <span className="text-xs text-muted-foreground">
-                        {formatDateTime(props.comment.createdAt, locale)} : Rev.{props.comment.videoRevNum}
-                    </span>
-                </div>
+        <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+                {icon(props.comment.userEmail) ? (<><AvatarImage src={icon(props.comment.userEmail)} /></>) : (<><AvatarFallback/></>)}
+                
+            </Avatar>
+            <div className="flex flex-col leading-none">
+                <span className="text-sm font-medium">{props.comment.userName}</span>
+                <span className="text-xs text-muted-foreground">
+                    {formatDateTime(props.comment.createdAt, locale)} : Rev.{props.comment.videoRevNum}
+                </span>
             </div>
+        </div>
+    );
+}
+
+export default function CommentCardHeader(props: { comment: VideoComment }) {
+    const { role } = useAuthStore();
+
+    return (
+        <TimelineCardHeader>
+            <CommentAuthor comment={props.comment} />
 
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>

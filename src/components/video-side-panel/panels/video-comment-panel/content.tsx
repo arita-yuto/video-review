@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@/ui/separator";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { usePlayback } from "@/stores/playback-store";
 import { captureView } from "@/lib/drawing/capture-view";
 import { useCommentStore } from "@/stores/comment-store";
 import { useAuthStore } from "@/stores/auth-store";
@@ -26,7 +26,7 @@ export default function VideoCommentContent(props: {
     const { filterText } = useCommentSearchStore();
     const dateFilter = useCommentSearchDateFilterStore();
     const { canvasSave } = useDrawingStore();
-    const { currentTime } = useVideoReviewStore();
+    const currentTime = usePlayback((s) => s.currentTime);
     const {
         editingComment,
         setEditing,
