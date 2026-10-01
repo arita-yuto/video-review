@@ -1,6 +1,12 @@
 FROM node:24-slim AS deps
 WORKDIR /app
 
+# Prisma picks its engines by the OpenSSL it finds at install, so the runner's OpenSSL is here
+# too; otherwise migrating on start fetches an engine from the internet and fails offline.
+RUN apt-get update \
+ && apt-get install -y openssl \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 RUN npm ci
 
@@ -32,4 +38,5 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+# compose starts this once the database accepts connections (the db healthcheck).
+CMD ["sh", "-c", "npm run prisma:deploy && exec npm run start"]

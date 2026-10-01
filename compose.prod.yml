@@ -1,8 +1,10 @@
 services:
   videoreview:
+    # Optional: settings live in the admin screen; a .env only overrides them.
     env_file:
-      - .env
-      
+      - path: .env
+        required: false
+
     image: ghcr.io/arita-yuto/video-review/videoreview:${VIDEO_REVIEW_VERSION:-latest}
     container_name: videoreview
     restart: unless-stopped
@@ -21,11 +23,13 @@ services:
       - videoreview-secrets:/app/secrets
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   video-processing:
     env_file:
-      - .env
+      - path: .env
+        required: false
 
     image: ghcr.io/arita-yuto/video-review/video-processing:${VIDEO_REVIEW_VERSION:-latest}
     container_name: video-processing
@@ -40,7 +44,8 @@ services:
       - ${DOCKER_HOST_STORAGE:-videoreview-storage}:/storage
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:15
@@ -54,6 +59,11 @@ services:
       POSTGRES_USER: videoreview
       POSTGRES_PASSWORD: videoreview
       POSTGRES_DB: videoreview
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "videoreview", "-d", "videoreview"]
+      interval: 2s
+      retries: 30
 
     volumes:
       - videoreview-db:/var/lib/postgresql/data
