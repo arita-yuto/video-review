@@ -65,7 +65,10 @@
         "rightRevision": "Right revision",
         "diffImage": "Diff",
         "diffPause": "Pause to see the diff",
-        "diffUnreadable": "The frames of this storage cannot be read, so no diff can be made"
+        "diffUnreadable": "The frames of this storage cannot be read, so no diff can be made",
+        "threshold": "Threshold",
+        "base": "Base",
+        "saveDiffImage": "Save diff image"
     },
     "video-list-panel": {
         "title": "Video list",

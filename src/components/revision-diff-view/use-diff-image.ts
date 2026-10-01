@@ -45,6 +45,7 @@ export function useDiffImage(
     const [state, dispatch] = useReducer(diffImageReducer, initialDiffImageState);
     const settingsRef = useRef(settings);
     settingsRef.current = settings;
+    const recapture = useRef(() => {});
 
     useEffect(() => {
         const primary = primaryRef.current;
@@ -156,6 +157,8 @@ export function useDiffImage(
             [compare, "emptied", clear],
         ];
 
+        recapture.current = capture;
+
         // Turned on while paused: the primary may still hold the frame playback stopped on.
         if (primary.paused) seekInPlace(primary);
         for (const [video, event, handler] of listeners) video.addEventListener(event, handler);
@@ -165,8 +168,12 @@ export function useDiffImage(
             for (const [video, event, handler] of listeners) video.removeEventListener(event, handler);
             worker.terminate();
             shown?.close();
+            recapture.current = () => {};
         };
     }, []);
+
+    // New settings redo the diff at the same position; capture itself skips it while playing.
+    useEffect(() => { recapture.current(); }, [settings.threshold, settings.baseOpacity]);
 
     return state;
 }

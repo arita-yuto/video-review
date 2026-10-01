@@ -93,6 +93,7 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
+    const [diffControls, setDiffControls] = useState<HTMLDivElement | null>(null);
     const showDiffImage = useDiffViewStore((s) => s.showDiffImage);
 
     const sides = { left: useDiffSide("left", revisions), right: useDiffSide("right", revisions) };
@@ -165,7 +166,14 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
                         leftRef={sides.left.videoRef}
                         rightRef={sides.right.videoRef}
                     />
-                    {showDiffImage && <DiffImage primaryRef={primaryRef} compareRef={sides[COMPARE].videoRef} />}
+                    {showDiffImage && (
+                        <DiffImage
+                            primaryRef={primaryRef}
+                            compareRef={sides[COMPARE].videoRef}
+                            controlsSlot={diffControls}
+                            fileName={`${video.title}_rev${sides.left.revision.revision}-rev${sides.right.revision.revision}`}
+                        />
+                    )}
                 </div>
                 <SeekBar markers={markers} onMarkerClick={seek} />
                 <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
@@ -173,6 +181,7 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
                     <VolumeControl />
                     <TimeDisplay />
                     <PlaybackRateSelect />
+                    <div ref={setDiffControls} className="ml-auto flex items-center gap-4" />
                 </div>
             </div>
             {commentSide("right")}
