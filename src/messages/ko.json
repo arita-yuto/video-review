@@ -63,11 +63,11 @@
         "wipe": "와이프",
         "leftRevision": "왼쪽 리비전",
         "rightRevision": "오른쪽 리비전",
-        "diffImage": "Diff",
+        "diffImage": "차이",
         "diffPause": "일시 정지하면 차이가 표시됩니다",
         "diffUnreadable": "이 동영상에서는 차이를 표시할 수 없습니다",
-        "threshold": "Threshold",
-        "base": "Base",
+        "threshold": "한계값",
+        "base": "원본",
         "saveDiffImage": "차이 이미지 저장"
     },
     "video-list-panel": {
