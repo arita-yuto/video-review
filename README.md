@@ -203,22 +203,9 @@ Guiding ideas are:
 ### Quick Start (Docker)
 
 ```bash
-
-# 1. Copy .env
-cp .example.env .env
-
-# 2. Pull the published images
-docker compose -f compose.prod.yml pull
-
-# 3. Run only DB
-docker compose -f compose.prod.yml up -d db
-
-# 4. Run prisma deploy (just once, for initial setup or schema changes)
-docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
-
-# 5. Run the services
+git clone --depth 1 https://github.com/arita-yuto/video-review.git
+cd video-review
 docker compose -f compose.prod.yml up -d
-
 ```
 
 ### Access

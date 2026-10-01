@@ -5,15 +5,35 @@ Use this for production or any container-based deployment.
 
 The images are published to ghcr.io for every GitHub release, so there is nothing to build.
 
+Note: Docker Compose 2.24 or later is required (check with `docker compose version`).
+
 ---
 
-## 1. Create `.env`
+## 1. Start
 
 ```bash
-cp .example.env .env
+git clone --depth 1 https://github.com/arita-yuto/video-review.git
+cd video-review
+docker compose -f compose.prod.yml up -d
 ```
 
-Two entries concern Docker:
+Open `http://localhost:3489` and register the first administrator ([Admin Screen Guide](../admin/README.md)).
+
+---
+
+## 2. Update
+
+```bash
+git pull
+docker compose -f compose.prod.yml pull
+docker compose -f compose.prod.yml up -d
+```
+
+---
+
+## 3. Pin the storage path or the version
+
+Only when you need to, create a `.env` at the root of the repository.
 
 | Variable | Meaning |
 |---|---|
@@ -22,44 +42,11 @@ Two entries concern Docker:
 
 ---
 
-## 2. Start
-
-```bash
-# 1. Pull the published images
-docker compose -f compose.prod.yml pull
-
-# 2. Start the DB
-docker compose -f compose.prod.yml up -d db
-
-# 3. Set up the DB (the first time, and whenever the schema changes)
-docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
-
-# 4. Start the services
-docker compose -f compose.prod.yml up -d
-```
-
-Open `http://localhost:3489` and register the first administrator ([Admin Screen Guide](../admin/README.md)).
-
----
-
-## 3. Update
-
-```bash
-docker compose -f compose.prod.yml pull
-docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
-docker compose -f compose.prod.yml up -d
-```
-
-Note: when `VIDEO_REVIEW_VERSION` pins a release, raise it in `.env` first.
-
----
-
 ## Reference
 
 ### Build from source
 
-To build locally instead of pulling, tag the images with the names compose refers to.  
-Then continue from step 2 of "Start" (no `pull` needed).
+To build locally instead of pulling, tag the images with the names compose refers to.
 
 ```bash
 docker build -t ghcr.io/arita-yuto/video-review/videoreview:latest -f docker/web/Dockerfile.prod .

@@ -200,22 +200,9 @@ VideoReview は、制作現場で使われ続けることを前提に
 ### Quick Start (Docker)
 
 ```bash
-
-# 1. 環境変数ファイルコピー
-cp .example.env .env
-
-# 2. 公開イメージの取得
-docker compose -f compose.prod.yml pull
-
-# 3. DBを起動
-docker compose -f compose.prod.yml up -d db
-
-# 4. DB構築 (初回起動、またはschemaが更新されたとき)
-docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
-
-# 5. サービス起動
+git clone --depth 1 https://github.com/arita-yuto/video-review.git
+cd video-review
 docker compose -f compose.prod.yml up -d
-
 ```
 
 ### Access

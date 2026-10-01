@@ -5,15 +5,35 @@ VideoReview を Docker で動かす手順です
 
 イメージは GitHub のリリースごとに ghcr.io に公開されているので、build は要りません
 
+※ Docker Compose 2.24 以降が必要です（`docker compose version` で確認できます）
+
 ---
 
-## 1. `.env` を作る
+## 1. 起動する
 
 ```bash
-cp .example.env .env
+git clone --depth 1 https://github.com/arita-yuto/video-review.git
+cd video-review
+docker compose -f compose.prod.yml up -d
 ```
 
-Docker に関わる項目は 2 つです
+`http://localhost:3489` を開くと、最初の管理者を登録する画面が出ます（[管理画面ガイド](../admin/README.jp.md)）
+
+---
+
+## 2. 更新する
+
+```bash
+git pull
+docker compose -f compose.prod.yml pull
+docker compose -f compose.prod.yml up -d
+```
+
+---
+
+## 3. 保存先や版を固定する
+
+必要なときだけ、リポジトリの直下に `.env` を作ります
 
 | 変数 | 内容 |
 |---|---|
@@ -22,43 +42,10 @@ Docker に関わる項目は 2 つです
 
 ---
 
-## 2. 起動する
-
-```bash
-# 1. 公開イメージを取得
-docker compose -f compose.prod.yml pull
-
-# 2. DB を起動
-docker compose -f compose.prod.yml up -d db
-
-# 3. DB を構築（初回と、schema が更新されたとき）
-docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
-
-# 4. サービスを起動
-docker compose -f compose.prod.yml up -d
-```
-
-`http://localhost:3489` を開くと、最初の管理者を登録する画面が出ます（[管理画面ガイド](../admin/README.jp.md)）
-
----
-
-## 3. 更新する
-
-```bash
-docker compose -f compose.prod.yml pull
-docker compose -f compose.prod.yml run --rm videoreview npm run prisma:deploy
-docker compose -f compose.prod.yml up -d
-```
-
-※ `VIDEO_REVIEW_VERSION` で版を固定しているときは、先に `.env` の版を上げます
-
----
-
 ## Reference
 ### ソースから build する
 
-公開イメージの代わりに手元で build するときは、compose が参照する名前で tag を付けます  
-その後の手順は「起動する」の 2 番以降と同じです（`pull` は不要）
+公開イメージの代わりに手元で build するときは、compose が参照する名前で tag を付けます
 
 ```bash
 docker build -t ghcr.io/arita-yuto/video-review/videoreview:latest -f docker/web/Dockerfile.prod .

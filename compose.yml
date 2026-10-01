@@ -1,7 +1,9 @@
 services:
   web:
+    # Optional: settings live in the admin screen; a .env only overrides them.
     env_file:
-      - .env
+      - path: .env
+        required: false
     build: 
         context: ./
         dockerfile: ./docker/web/Dockerfile
@@ -19,7 +21,8 @@ services:
       # If you want to specify Local Storage
       # - /mnt/d/data/videoreview:/storage
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:15
@@ -30,6 +33,10 @@ services:
       POSTGRES_USER: videoreview
       POSTGRES_PASSWORD: videoreview
       POSTGRES_DB: videoreview
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "videoreview", "-d", "videoreview"]
+      interval: 2s
+      retries: 30
     volumes:
       - videoreview-db:/var/lib/postgresql/data
 
@@ -43,7 +50,8 @@ services:
 
   video-processing:
     env_file:
-      - .env
+      - path: .env
+        required: false
     build:
       context: ./
       dockerfile: ./docker/video-processing/Dockerfile
@@ -56,11 +64,13 @@ services:
       # If you want to specify Local Storage
       # - /mnt/d/data/videoreview:/storage
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   localstack:
       env_file:
-        - .env
+        - path: .env
+          required: false
       image: localstack/localstack:latest
       container_name: "videoreview-localstack"
       depends_on:
