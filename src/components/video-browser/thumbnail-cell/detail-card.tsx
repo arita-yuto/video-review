@@ -47,7 +47,7 @@ export function ThumbnailDetailCard({ video, thumbnailUrl }: Props) {
                             {format.dateTime(new Date(latest.uploadedAt), { dateStyle: "medium", timeStyle: "short" })}
                             <span className="text-muted-foreground">
                                 {" · "}
-                                {format.relativeTime(new Date(latest.uploadedAt))}
+                                {format.relativeTime(new Date(latest.uploadedAt), new Date())}
                             </span>
                         </span>
                     </div>
