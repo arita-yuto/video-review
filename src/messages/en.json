@@ -54,7 +54,7 @@
         "noVideoSelected": "Please select a video"
     },
     "revision-diff-view": {
-        "needsTwoRevisions": "This video has only one revision, so there is nothing to compare",
+        "needsTwoRevisions": "Only one revision, so there is nothing to compare",
         "notFound": "Video not found",
         "loading": "Loading...",
         "commentHere": "Comment on this revision",

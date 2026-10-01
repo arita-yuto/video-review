@@ -54,13 +54,13 @@
         "noVideoSelected": "동영상을 선택해 주세요"
     },
     "revision-diff-view": {
-        "needsTwoRevisions": "이 동영상은 리비전이 하나뿐이라 비교할 수 없습니다",
+        "needsTwoRevisions": "리비전이 하나뿐이라 비교할 수 없습니다",
         "notFound": "동영상을 찾을 수 없습니다",
         "loading": "불러오는 중",
         "commentHere": "이 리비전에 댓글 작성",
         "compare": "비교",
-        "sideBySide": "Side by side",
-        "wipe": "Wipe",
+        "sideBySide": "나란히 보기",
+        "wipe": "와이프",
         "leftRevision": "왼쪽 리비전",
         "rightRevision": "오른쪽 리비전"
     },
