@@ -65,7 +65,7 @@
         "rightRevision": "Right revision",
         "diffImage": "Diff",
         "diffPause": "一時停止で差分を表示",
-        "diffUnreadable": "このストレージの動画はフレームを読み取れないため、差分を出せません",
+        "diffUnreadable": "この動画では差分を表示できません",
         "threshold": "Threshold",
         "base": "Base",
         "saveDiffImage": "差分画像を保存"
