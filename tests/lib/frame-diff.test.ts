@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { frameDiff } from "@/lib/frame-diff";
+import { frameDiff } from "@/components/revision-diff-view/diff-engine/cpu/frame-diff";
 
 const highlight = { r: 255, g: 0, b: 0 };
 const options = { threshold: 24, baseOpacity: 0.5, highlight };

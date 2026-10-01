@@ -1,9 +1,8 @@
 "use client"
 import { RefObject, useEffect, useReducer, useRef } from "react";
-import { Rgb } from "@/lib/frame-diff";
 import { compareTimeFor } from "./use-diff-sync";
 import { createDiffEngine } from "./diff-engine/select-engine";
-import { isSecurityError } from "./diff-engine/types";
+import { isSecurityError, Rgb } from "./diff-engine/types";
 import { diffImageReducer, initialDiffImageState } from "./diff-image-state";
 
 // A compare side seeked to its target lands on it exactly; anything further off is still on the
@@ -95,6 +94,7 @@ export function useDiffImage(
             }
 
             const [primaryFrame, compareFrame] = frames;
+            const engineName = engine.name;
             let image: ImageBitmap;
             try {
                 image = await engine.diff({
@@ -107,6 +107,9 @@ export function useDiffImage(
                     show(null);
                     return dispatch({ type: "refused" });
                 }
+                // The GPU failed and the CPU engine took over; the frames went with the failed
+                // request, so the same position is taken again.
+                if (engine.name !== engineName) return capture();
                 dispatch({ type: "cancelled" });
                 throw e;
             }

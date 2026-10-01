@@ -1,7 +1,7 @@
 #version 300 es
 precision highp float;
 
-// The same rule as frameDiff in src/lib/frame-diff.ts, one pixel per invocation.
+// The same rule as frameDiff in ../cpu/frame-diff.ts, one pixel per invocation.
 
 uniform sampler2D u_primary;
 uniform sampler2D u_compare;

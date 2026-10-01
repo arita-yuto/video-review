@@ -1,22 +1,4 @@
-export type Rgb = { r: number, g: number, b: number };
-
-export type FrameDiffOptions = {
-    // Luminance difference (0-255) below which a pixel counts as unchanged.
-    threshold: number,
-    // 0 (black) to 1 (full grayscale).
-    baseOpacity: number,
-    highlight: Rgb,
-};
-
-// Less than 1 so the changed shapes stay visible under the highlight.
-export const HIGHLIGHT_MIX = 0.6;
-
-// Rec. 601; the GPU engine's shader gets the same weights.
-export const LUMA = { r: 0.299, g: 0.587, b: 0.114 };
-
-// Half a luminance step (0.001), so a difference exactly at the threshold counts as changed on
-// both the CPU (double) and the GPU (float32).
-export const THRESHOLD_SLACK = 5e-4;
+import { FrameDiffOptions, HIGHLIGHT_MIX, LUMA, THRESHOLD_SLACK } from "../types";
 
 const luminance = (px: Uint8ClampedArray, i: number) => LUMA.r * px[i] + LUMA.g * px[i + 1] + LUMA.b * px[i + 2];
 
