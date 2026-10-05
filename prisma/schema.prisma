@@ -176,6 +176,7 @@ model UserVideoReadStatus {
 
   videoId           String
   lastReadCommentId String?
+  lastSeenRevision  Int?
   updatedAt         DateTime @updatedAt
 
   @@unique([userId, videoId])
