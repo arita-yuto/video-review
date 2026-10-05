@@ -40,6 +40,7 @@ model User {
   active        Boolean                 @default(true)
   readStatuses  UserVideoReadStatus[]
   identities    Identity[]
+  comments      VideoComment[]
 }
 
 model Identity {
@@ -136,6 +137,8 @@ model VideoComment {
   videoRevNum       Int
   userName          String
   userEmail         String          @default("")
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id])
   comment           String
   time              Float
   issueId           String?
