@@ -46,7 +46,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <LocaleContext.Provider value={{ locale, setLocale }}>
-            <NextIntlClientProvider messages={messages} locale={locale}>
+            <NextIntlClientProvider messages={messages} locale={locale} timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>
                 {children}
             </NextIntlClientProvider>
         </LocaleContext.Provider>
