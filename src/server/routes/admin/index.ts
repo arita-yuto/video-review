@@ -29,6 +29,11 @@ const UpdateRoleBody = z.object({
     role: z.enum(ASSIGNABLE_ROLES).optional(),
 });
 
+const ResetPasswordBody = z.object({
+    userId: z.string(),
+    pass: z.string().min(6),
+});
+
 const UserListResponse = z.object({
     users: z.array(z.object({
         id: z.string(),
@@ -241,6 +246,55 @@ export const adminRouter = createRouter()
             data: { role },
         });
         return c.json(updated, { status: 200 });
+    })
+    .openapi(createRoute({
+        method: "patch",
+        summary: "Reset another user's password",
+        description: "Sets a new password for a user who forgot theirs. The current password is not asked for.",
+        path: "/user-password",
+        request: {
+            body: {
+                content: {
+                    "application/json": {
+                        schema: ResetPasswordBody,
+                    },
+                },
+            },
+        },
+        responses: {
+            200: {
+                description: "Password set",
+                content: {
+                    "application/json": {
+                        schema: z.object({ success: z.boolean() }),
+                    },
+                },
+            },
+            401: errorResponse("Unauthorized"),
+            403: errorResponse("Forbidden"),
+            404: errorResponse("The user has no password login"),
+        },
+    }), async (c) => {
+        const auth = await authorize(c.req.raw, ["admin"]);
+        const { userId, pass } = c.req.valid("json");
+
+        // Own password goes through the profile settings, which re-checks the current one.
+        if (auth.type === "jwt" && auth.decoded.id === userId) {
+            return c.json({ error: "use the profile settings to change your own password" }, 403);
+        }
+
+        const identity = await prisma.identity.findFirst({
+            where: { userId, provider: "password" },
+        });
+        if (!identity) {
+            return c.json({ error: "the user has no password login" }, 404);
+        }
+
+        await prisma.identity.update({
+            where: { id: identity.id },
+            data: { secretHash: await bcrypt.hash(pass, 10) },
+        });
+        return c.json({ success: true }, 200);
     })
     .openapi(createRoute({
         method: "get",

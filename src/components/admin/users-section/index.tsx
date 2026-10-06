@@ -99,6 +99,9 @@ export function UsersSection() {
                                 <TableHead>{t("users.columns.email")}</TableHead>
                                 <TableHead>{t("users.columns.role")}</TableHead>
                                 <TableHead>{t("users.columns.createdAt")}</TableHead>
+                                <TableHead>
+                                    <span className="sr-only">{t("users.columns.actions")}</span>
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

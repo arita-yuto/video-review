@@ -246,7 +246,8 @@
                 "displayName": "표시 이름",
                 "email": "이메일",
                 "role": "권한",
-                "createdAt": "생성일"
+                "createdAt": "생성일",
+                "actions": "작업"
             },
             "roles": {
                 "viewer": "열람자",
@@ -261,6 +262,15 @@
                 "password": "비밀번호",
                 "submit": "생성",
                 "failed": "사용자 생성에 실패했습니다"
+            },
+            "resetPassword": {
+                "open": "비밀번호 재설정",
+                "label": "{name}의 비밀번호 재설정",
+                "title": "{name}의 비밀번호 재설정",
+                "password": "새 비밀번호",
+                "submit": "재설정",
+                "cancel": "취소",
+                "failed": "비밀번호 재설정에 실패했습니다"
             }
         },
         "apiToken": {
