@@ -5,7 +5,7 @@ import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { useLocale } from "@/app/locale-provider";
 import { Button } from "@/ui/button";
 import { TableCell, TableRow } from "@/ui/table";
-import { IconAction } from "@/components/admin/videos-section/videos-table/icon-action";
+import { IconAction } from "@/components/admin/icon-action";
 import { revisionRowId } from "@/components/admin/videos-section/videos-table/revision-row";
 import type { VideoWithRevisionList } from "@/lib/db-types";
 

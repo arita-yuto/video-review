@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { useLocale } from "@/app/locale-provider";
 import { TableCell, TableRow } from "@/ui/table";
-import { IconAction } from "@/components/admin/videos-section/videos-table/icon-action";
+import { IconAction } from "@/components/admin/icon-action";
 
 // Ties the disclosure button on the video row to the child rows it reveals.
 export const revisionRowId = (videoId: string, revision: number) => `video-${videoId}-rev-${revision}`;

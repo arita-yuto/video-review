@@ -246,7 +246,8 @@
                 "displayName": "表示名",
                 "email": "メール",
                 "role": "権限",
-                "createdAt": "作成日"
+                "createdAt": "作成日",
+                "actions": "操作"
             },
             "roles": {
                 "viewer": "閲覧者",
@@ -261,6 +262,15 @@
                 "password": "パスワード",
                 "submit": "作成",
                 "failed": "ユーザーの作成に失敗しました"
+            },
+            "resetPassword": {
+                "open": "パスワードをリセット",
+                "label": "{name} のパスワードをリセット",
+                "title": "{name} のパスワードをリセット",
+                "password": "新しいパスワード",
+                "submit": "リセット",
+                "cancel": "キャンセル",
+                "failed": "パスワードのリセットに失敗しました"
             }
         },
         "apiToken": {

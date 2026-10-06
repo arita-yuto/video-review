@@ -246,7 +246,8 @@
                 "displayName": "Display name",
                 "email": "Email",
                 "role": "Role",
-                "createdAt": "Created"
+                "createdAt": "Created",
+                "actions": "Actions"
             },
             "roles": {
                 "viewer": "Viewer",
@@ -261,6 +262,15 @@
                 "password": "Password",
                 "submit": "Create",
                 "failed": "Failed to create the user"
+            },
+            "resetPassword": {
+                "open": "Reset password",
+                "label": "Reset the password for {name}",
+                "title": "Reset the password for {name}",
+                "password": "New password",
+                "submit": "Reset",
+                "cancel": "Cancel",
+                "failed": "Failed to reset the password"
             }
         },
         "apiToken": {
