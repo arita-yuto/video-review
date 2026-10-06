@@ -31,6 +31,9 @@ const InitVideoSearchState = {
     tags: []
 };
 
+const isUnset = (value: unknown) =>
+    value === undefined || value === "" || value === false || (Array.isArray(value) && value.length === 0);
+
 export const useVideoSearchStore = create<VideoSearchState>()(
     persist(
         (set, get) => ({
@@ -48,8 +51,7 @@ export const useVideoSearchStore = create<VideoSearchState>()(
                 const state = get();
 
                 return Object.keys(InitVideoSearchState).some((key) => {
-                    return state[key as keyof typeof InitVideoSearchState]
-                        !== InitVideoSearchState[key as keyof typeof InitVideoSearchState];
+                    return !isUnset(state[key as keyof typeof InitVideoSearchState]);
                 });
             }
         }),
