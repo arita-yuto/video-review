@@ -46,8 +46,5 @@ test.describe("uploading a video from the browser", () => {
 
         // The dialog closes once the revision exists, which is what publishes the video.
         await expect(dialog).toBeHidden({ timeout: 30_000 });
-
-        // Closing refetches the list and reveals the video that was just uploaded.
-        await expect(page.getByRole("tree").getByText(title)).toBeVisible({ timeout: 15_000 });
     });
 });

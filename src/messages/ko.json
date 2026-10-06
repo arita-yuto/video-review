@@ -75,7 +75,8 @@
         "title": "동영상 목록",
         "upload": "동영상 업로드",
         "thumbnails": "썸네일",
-        "thumbnailsClose": "썸네일 닫기"
+        "thumbnailsClose": "썸네일 닫기",
+        "unreadCount": "읽지 않음 {count}"
     },
     "chat-search": {
         "title": "채팅 검색",

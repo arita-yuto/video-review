@@ -75,7 +75,8 @@
         "title": "Video list",
         "upload": "Upload video",
         "thumbnails": "Thumbnails",
-        "thumbnailsClose": "Close thumbnails"
+        "thumbnailsClose": "Close thumbnails",
+        "unreadCount": "{count} unread"
     },
     "chat-search": {
         "title": "Chat search",

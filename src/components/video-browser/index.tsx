@@ -8,9 +8,11 @@ import VideoUploadDialog from "@/components/dialog/video-upload";
 import VideoListPanelHeader from "@/components/video-browser/header";
 import { VideoSearchDialog } from "@/components/dialog/video-search";
 import VideoThumbnailsPanel from "@/components/video-browser/video-thumbnails-panel";
-import VideoFoldersTree from "@/components/video-browser/video-folders-tree";
+import VideoSections from "@/components/video-browser/sections";
 import { useVideoStore } from "@/stores/video-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { useVideoSearchStore } from "@/stores/video-search-store";
+import { useVideoDateFilterStore } from "@/stores/date-filter-store";
 import { api } from "@/lib/api-client";
 import { useDrawingStore } from "@/stores/drawing-store";
 import DrawingToolPanel from "@/components/drawing-tool-panel";
@@ -24,6 +26,8 @@ export default function VideoListPanel() {
     const [thumbnailsOpen, setThumbnailsOpen] = useState(false);
     const [unReadVideoIds, setUnReadVideoIds] = useState<string[]>([]);
     const canvasEditing = useDrawingStore((s) => s.canvasEditing);
+    const searching = useVideoSearchStore((s) => s.isFiltering());
+    const dateFiltering = useVideoDateFilterStore((s) => s.mode !== "none");
 
     useEffect(() => {
         void (async () => {
@@ -68,10 +72,11 @@ export default function VideoListPanel() {
                     />
 
                     <SidebarContent>
-                        <VideoFoldersTree
+                        <VideoSections
                             videos={videos}
                             unReadVideoIds={unReadVideoIds}
                             selectedVideoId={selectedVideo?.id ?? null}
+                            expandAll={searching || dateFiltering}
                             onSelectVideo={(id) => {
                                 router.replace(`/video-review/review/${id}`);
                             }}
@@ -94,8 +99,7 @@ export default function VideoListPanel() {
                         selectVideoRevision(revisions[0]);
                     }
 
-                    // The tree is virtualised and a new folder can land outside the rendered
-                    // window, so selecting the video brings it into view.
+                    // A new folder can land in a closed section, so selecting the video reveals it.
                     if (uploadedVideoId) {
                         router.replace(`/video-review/review/${uploadedVideoId}`);
                     }

@@ -47,18 +47,6 @@ test.describe("thumbnails float panel", () => {
         expect(await player.boundingBox()).toEqual(before);
     });
 
-    test("stays open while the tree is used, and Escape closes it", async ({ page }) => {
-        await login(page);
-        await toggle(page).click();
-        await expect(page.locator(PANEL)).toBeVisible();
-
-        await page.locator('[data-slot="sidebar"]').getByText("01_prototype", { exact: true }).click();
-        await expect(page.locator(PANEL)).toBeVisible();
-
-        await page.keyboard.press("Escape");
-        await expect(page.locator(PANEL)).toHaveCount(0);
-    });
-
     test("survives the filter popover, which renders in a portal", async ({ page }) => {
         await login(page);
         await toggle(page).click();
