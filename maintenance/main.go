@@ -24,6 +24,10 @@ var commands = map[string]Command{
 		Run:  RunCreateUser,
 		Desc: "Create user",
 	},
+	"import-users": {
+		Run:  RunImportUsers,
+		Desc: "Create users from a CSV file",
+	},
 	"get-videos": {
 		Run:  RunGetVideos,
 		Desc: "List videos",

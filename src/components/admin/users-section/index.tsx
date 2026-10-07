@@ -67,9 +67,25 @@ export function UsersSection() {
         }
     }
 
+    async function onImported() {
+        setError(null);
+        try {
+            setUsers(await loadUsers());
+        } catch (e) {
+            setError(`${t("users.loadFailed")}: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
     async function onCreated(createdEmail: string) {
         // The create route returns no row, so refetch to pick up the server-assigned id and date.
-        const rows = await loadUsers();
+        setError(null);
+        let rows: User[];
+        try {
+            rows = await loadUsers();
+        } catch (e) {
+            setError(`${t("users.loadFailed")}: ${e instanceof Error ? e.message : String(e)}`);
+            return;
+        }
         setUsers(rows);
 
         // Reveal the new user: scroll the list down to it and highlight it briefly.
@@ -121,7 +137,7 @@ export function UsersSection() {
 
             {error && <p className="shrink-0 text-sm text-destructive">{error}</p>}
 
-            <CreateUserForm onCreated={onCreated} />
+            <CreateUserForm onCreated={onCreated} onImported={() => void onImported()} />
         </AdminSection>
     );
 }

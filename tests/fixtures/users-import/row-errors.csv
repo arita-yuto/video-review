@@ -1,0 +1,13 @@
+id,name,email,pass,role
+,Sakura,sakura@example.com,secret01,viewer
+,,empty-name@example.com,secret02,viewer
+,No Email,,secret03,viewer
+,No Pass,nopass@example.com,,viewer
+,Short Pass,short@example.com,abc,viewer
+,Bad Role,badrole@example.com,secret04,editor
+123,Has Id,hasid@example.com,secret05,viewer
+,Sakura,sakura2@example.com,secret06,viewer
+,Same Email,sakura@example.com,secret07,viewer
+,Existing,Bocchi@example.com,secret08,viewer
+,Too Many,toomany@example.com,secret09,viewer,extra
+,Bad Email,not-an-email,secret10,viewer

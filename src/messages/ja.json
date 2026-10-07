@@ -35,7 +35,8 @@
         "uploading": "アップロード中...",
         "uploadingPercent": "アップロード中... {percent}%",
         "errorUpload": "動画のアップロードに失敗しました。管理者へ連絡してください",
-        "errorUploadTooLarge": "ファイルが大きすぎて拒否されました。サーバーの前段にある proxy のアップロード上限を確認してください"
+        "errorUploadTooLarge": "ファイルが大きすぎて拒否されました。サーバーの前段にある proxy のアップロード上限を確認してください",
+        "uploaded": "動画をアップロードしました"
     },
     "video-search": {
         "title": "動画検索",
@@ -271,7 +272,21 @@
                 "submit": "リセット",
                 "cancel": "キャンセル",
                 "failed": "パスワードのリセットに失敗しました"
-            }
+            },
+            "import": {
+                "open": "CSV を読み込む",
+                "title": "CSV からユーザーを作成",
+                "file": "CSV ファイルを選択",
+                "submit": "読み込む",
+                "cancel": "キャンセル",
+                "failed": "読み込みに失敗しました",
+                "errors": {
+                    "idReadOnly": "id は指定、書き換えできません",
+                    "emailTaken": "このメールのユーザーは既にいます"
+                },
+                "created": "ユーザーを作成しました"
+            },
+            "created": "ユーザーを作成しました"
         },
         "apiToken": {
             "description": "RestAPI や maintenance で使用するトークンです",
@@ -385,6 +400,27 @@
                 "saveFailed": "保存に失敗しました",
                 "loadFailed": "追記の取得に失敗しました"
             }
+        }
+    },
+    "csv-import": {
+        "columns": {
+            "line": "行",
+            "column": "列",
+            "reason": "理由"
+        },
+        "errors": {
+            "notUtf8": "UTF-8 ではありません。CSV UTF-8 で保存し直してください",
+            "malformed": "CSV として読めません（引用符の閉じ忘れなど）",
+            "unknownColumn": "知らない列名です",
+            "duplicateColumn": "同じ列名が 2 つあります",
+            "missingColumn": "必須の列がありません",
+            "cellCount": "セルの数がヘッダーと合いません",
+            "required": "空です",
+            "duplicateInFile": "{otherLine} 行目と同じです",
+            "tooShort": "{min} 文字以上にしてください",
+            "tooLong": "{max} 文字以下にしてください",
+            "notOneOf": "{values} のどれかにしてください",
+            "invalid": "値が正しくありません"
         }
     }
 }

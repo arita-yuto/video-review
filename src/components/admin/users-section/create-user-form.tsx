@@ -2,16 +2,22 @@
 
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { api, readError } from "@/lib/api-client";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Button } from "@/ui/button";
 import { Spinner } from "@/ui/spinner";
+import { Upload } from "lucide-react";
+import { ImportUsersDialog } from "@/components/admin/users-section/import-users-dialog";
 
 // Mirrors the server's zod rule so the button only enables for a request that can succeed.
 const MIN_PASSWORD_LENGTH = 6;
 
-export function CreateUserForm({ onCreated }: { onCreated: (email: string) => Promise<void> }) {
+export function CreateUserForm({ onCreated, onImported }: {
+    onCreated: (email: string) => Promise<void>;
+    onImported: () => void;
+}) {
     const t = useTranslations("admin-settings");
 
     const [displayName, setDisplayName] = useState("");
@@ -19,6 +25,7 @@ export function CreateUserForm({ onCreated }: { onCreated: (email: string) => Pr
     const [password, setPassword] = useState("");
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [importing, setImporting] = useState(false);
 
     const canSubmit = email.trim().length > 0 && password.length >= MIN_PASSWORD_LENGTH && !creating;
 
@@ -47,6 +54,7 @@ export function CreateUserForm({ onCreated }: { onCreated: (email: string) => Pr
             setEmail("");
             setPassword("");
 
+            toast.success(t("users.created"));
             await onCreated(createdEmail);
         } catch (e) {
             setError(`${t("users.create.failed")}: ${e instanceof Error ? e.message : String(e)}`);
@@ -57,7 +65,14 @@ export function CreateUserForm({ onCreated }: { onCreated: (email: string) => Pr
 
     return (
         <form onSubmit={onSubmit} className="shrink-0 space-y-3 border-t pt-3">
-            <h4 className="text-sm font-medium">{t("users.create.title")}</h4>
+            <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">{t("users.create.title")}</h4>
+                <Button type="button" variant="outline" size="sm" onClick={() => setImporting(true)}>
+                    <Upload />
+                    {t("users.import.open")}
+                </Button>
+            </div>
+            {importing && <ImportUsersDialog onClose={() => setImporting(false)} onImported={onImported} />}
 
             <div className="grid gap-3 sm:grid-cols-3">
                 <div className="grid gap-2">
