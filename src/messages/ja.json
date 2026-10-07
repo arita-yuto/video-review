@@ -226,15 +226,15 @@
         "title": "管理",
         "sections": {
             "general": "General",
-            "users": "ユーザー",
+            "users": "Users",
             "apiToken": "API Token",
-            "integrations": "連携",
-            "videos": "動画管理"
+            "integrations": "Integrations",
+            "videos": "Videos"
         },
         "general": {
             "title": "General",
             "allowGuest": "Guest ログイン",
-            "loginDefaultType": "ログイン画面の既定タブ",
+            "loginDefaultType": "ログインの既定タブ",
             "urlSchema": "URL scheme",
             "resolutionPresets": "Resolution presets",
             "resolutionPresetsExample": "480,720,1080",
