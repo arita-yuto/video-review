@@ -222,7 +222,7 @@
         "currentPasswordWrong": "현재 비밀번호가 올바르지 않습니다"
     },
     "admin-settings": {
-        "title": "Administration",
+        "title": "관리",
         "sections": {
             "general": "General",
             "users": "Users",
@@ -232,173 +232,173 @@
         },
         "general": {
             "title": "General",
-            "allowGuest": "Guest login",
-            "loginDefaultType": "Default login tab",
-            "urlSchema": "URL scheme",
-            "resolutionPresets": "Resolution presets",
+            "allowGuest": "게스트 로그인",
+            "loginDefaultType": "로그인 기본 탭",
+            "urlSchema": "URL 스킴",
+            "resolutionPresets": "해상도 프리셋",
             "resolutionPresetsExample": "480,720,1080",
-            "uploadChunkMb": "Upload chunk (MB)",
-            "save": "Save",
-            "saveFailed": "Could not save",
-            "saved": "Saved"
+            "uploadChunkMb": "업로드 청크 (MB)",
+            "save": "저장",
+            "saveFailed": "저장하지 못했습니다",
+            "saved": "저장했습니다"
         },
         "users": {
             "columns": {
-                "displayName": "Display name",
-                "email": "Email",
-                "role": "Role",
-                "createdAt": "Created",
-                "actions": "Actions"
+                "displayName": "표시 이름",
+                "email": "이메일",
+                "role": "권한",
+                "createdAt": "생성일",
+                "actions": "작업"
             },
             "roles": {
-                "viewer": "Viewer",
-                "admin": "Admin"
+                "viewer": "열람자",
+                "admin": "관리자"
             },
-            "loadFailed": "Failed to load users",
-            "updateFailed": "Failed to update the role",
+            "loadFailed": "사용자를 불러오지 못했습니다",
+            "updateFailed": "권한 변경에 실패했습니다",
             "create": {
-                "title": "Create user",
-                "displayName": "Display name",
-                "email": "Email",
-                "password": "Password",
-                "submit": "Create",
-                "failed": "Failed to create the user"
+                "title": "사용자 생성",
+                "displayName": "표시 이름",
+                "email": "이메일",
+                "password": "비밀번호",
+                "submit": "생성",
+                "failed": "사용자 생성에 실패했습니다"
             },
             "resetPassword": {
-                "open": "Reset password",
-                "label": "Reset the password for {name}",
-                "title": "Reset the password for {name}",
-                "password": "New password",
-                "submit": "Reset",
-                "cancel": "Cancel",
-                "failed": "Failed to reset the password"
+                "open": "비밀번호 재설정",
+                "label": "{name}의 비밀번호 재설정",
+                "title": "{name}의 비밀번호 재설정",
+                "password": "새 비밀번호",
+                "submit": "재설정",
+                "cancel": "취소",
+                "failed": "비밀번호 재설정에 실패했습니다"
             },
             "import": {
-                "open": "Import CSV",
-                "title": "Create users from CSV",
-                "file": "Choose a CSV file",
-                "submit": "Import",
-                "cancel": "Cancel",
-                "failed": "Failed to import",
+                "open": "CSV 가져오기",
+                "title": "CSV로 사용자 생성",
+                "file": "CSV 파일 선택",
+                "submit": "가져오기",
+                "cancel": "취소",
+                "failed": "가져오기에 실패했습니다",
                 "errors": {
-                    "idReadOnly": "id cannot be set or changed",
-                    "emailTaken": "A user with this email already exists"
+                    "idReadOnly": "id는 지정하거나 변경할 수 없습니다",
+                    "emailTaken": "이 이메일의 사용자가 이미 있습니다"
                 },
-                "created": "Users created"
+                "created": "사용자를 생성했습니다"
             },
-            "created": "User created"
+            "created": "사용자를 생성했습니다"
         },
         "apiToken": {
-            "description": "A token for the REST API and maintenance.",
-            "configured": "Configured",
-            "notConfigured": "Not configured",
-            "generate": "Generate",
-            "regenerate": "Regenerate",
-            "newTokenHint": "Copy it now with Ctrl+C. It is not shown again.",
-            "loadFailed": "Failed to load the status",
-            "failed": "Failed to generate the token"
+            "description": "REST API와 유지보수 CLI에서 사용하는 토큰입니다",
+            "configured": "설정됨",
+            "notConfigured": "설정 안 됨",
+            "generate": "생성",
+            "regenerate": "재생성",
+            "newTokenHint": "Ctrl+C로 복사해 주세요. 다시 표시되지 않습니다",
+            "loadFailed": "상태를 불러오지 못했습니다",
+            "failed": "토큰 생성에 실패했습니다"
         },
         "videos": {
-            "loadFailed": "Failed to load the videos",
-            "filterPlaceholder": "Filter by title or folder...",
-            "noMatch": "No video matches the filter.",
-            "revisionRow": "Revision {revision}, uploaded {date}",
-            "toggleRevisions": "Show the revisions of {title}",
+            "loadFailed": "동영상을 불러오지 못했습니다",
+            "filterPlaceholder": "제목, 폴더로 필터링",
+            "noMatch": "조건에 맞는 동영상이 없습니다",
+            "revisionRow": "리비전 {revision} ({date} 업로드)",
+            "toggleRevisions": "{title}의 리비전 표시",
             "columns": {
-                "expand": "Revisions",
-                "title": "Title",
-                "folder": "Folder",
-                "updatedAt": "Updated",
-                "revisions": "Revisions",
-                "actions": "Actions"
+                "expand": "리비전",
+                "title": "제목",
+                "folder": "폴더",
+                "updatedAt": "업데이트일",
+                "revisions": "리비전",
+                "actions": "작업"
             },
             "delete": {
-                "action": "Delete",
-                "wholeLabel": "Delete every revision of {title}",
-                "revisionLabel": "Delete revision {revision} of {title}",
-                "title": "Delete the video files",
-                "wholeSummary": "Every revision file of {title} is deleted, and the video leaves the list.",
-                "revisionSummary": "Revision {revisions} of {title} will be deleted.",
-                "irreversible": "This cannot be undone.",
-                "confirmLabel": "Type <word>{confirmWord}</word> to confirm",
-                "submit": "Delete",
-                "cancel": "Cancel",
-                "failed": "Failed to delete the files",
-                "filesLeft": "Some files could not be removed and are still in storage."
+                "action": "삭제",
+                "wholeLabel": "{title}의 모든 리비전 삭제",
+                "revisionLabel": "{title}의 리비전 {revision} 삭제",
+                "title": "동영상 파일 삭제",
+                "wholeSummary": "{title}의 모든 리비전 파일을 삭제하며, 동영상은 목록에서 사라집니다",
+                "revisionSummary": "{title}의 리비전 {revisions} 파일을 삭제합니다",
+                "irreversible": "되돌릴 수 없습니다",
+                "confirmLabel": "확인을 위해 <word>{confirmWord}</word>를 입력해 주세요",
+                "submit": "삭제",
+                "cancel": "취소",
+                "failed": "파일 삭제에 실패했습니다",
+                "filesLeft": "일부 파일을 삭제하지 못해 스토리지에 남아 있습니다"
             }
         },
         "integrations": {
-            "loadFailed": "Failed to load the settings",
-            "testFailed": "Failed to test",
-            "resetFailed": "Failed to reset",
-            "reset": "Reset",
-            "resetConfirm": "This resets the connection.",
-            "cancel": "Cancel",
+            "loadFailed": "설정을 불러오지 못했습니다",
+            "testFailed": "테스트에 실패했습니다",
+            "resetFailed": "초기화에 실패했습니다",
+            "reset": "초기화",
+            "resetConfirm": "연결 정보를 초기화합니다",
+            "cancel": "취소",
             "jira": {
                 "title": "Jira",
                 "baseUrl": "URL",
-                "token": "Token",
-                "project": "Project",
-                "assignee": "Assignee",
-                "issueTypeTask": "Task issue type",
-                "issueTypeBug": "Bug issue type"
+                "token": "토큰",
+                "project": "프로젝트",
+                "assignee": "담당자",
+                "issueTypeTask": "Task 이슈 유형",
+                "issueTypeBug": "Bug 이슈 유형"
             },
             "slack": {
                 "title": "Slack",
-                "token": "Token",
-                "channel": "Channel",
-                "team": "Team"
+                "token": "토큰",
+                "channel": "채널",
+                "team": "팀"
             },
-            "testAndSave": "Test & save",
-            "saved": "Connected. Saved.",
-            "notSaved": "Could not connect, so nothing was saved: {error}",
-            "connected": "Connected",
-            "disconnected": "Test failed",
+            "testAndSave": "테스트 후 저장",
+            "saved": "연결되었습니다. 저장했습니다",
+            "notSaved": "연결하지 못해 저장하지 않았습니다: {error}",
+            "connected": "연결 가능",
+            "disconnected": "테스트 실패",
             "llm": {
                 "title": "AI",
-                "provider": "Provider",
-                "inUse": "in use",
-                "apiKey": "API key",
-                "baseUrl": "Base URL",
-                "model": "Model",
-                "switchFailed": "Switching the provider in use failed.",
-                "use": "Use this provider"
+                "provider": "프로바이더",
+                "inUse": "사용 중",
+                "apiKey": "API 키",
+                "baseUrl": "기본 URL",
+                "model": "모델",
+                "switchFailed": "사용 중인 프로바이더 전환에 실패했습니다",
+                "use": "이 프로바이더 사용"
             },
             "webhook": {
                 "title": "Webhook",
-                "target": "Target",
+                "target": "대상",
                 "targetPlaceholder": "Slack / Teams",
                 "url": "URL",
-                "testNote": "Test & save posts one test message to the channel."
+                "testNote": "테스트 후 저장을 누르면 채널에 테스트 메시지를 1건 보냅니다"
             },
             "email": {
                 "title": "Email",
-                "enable": "Send email",
-                "host": "SMTP host",
-                "port": "SMTP port",
-                "from": "From",
-                "tlsStrict": "Strict TLS",
-                "testTo": "Send test mail to"
+                "enable": "이메일 전송 사용",
+                "host": "SMTP 호스트",
+                "port": "SMTP 포트",
+                "from": "발신자",
+                "tlsStrict": "TLS 인증서 엄격 검증",
+                "testTo": "테스트 수신자"
             },
             "vcs": {
                 "title": "VCS",
-                "provider": "Provider",
-                "inUse": "in use",
-                "owner": "Owner",
-                "repo": "Repository",
-                "token": "Token",
-                "branch": "Branch",
-                "switchFailed": "Switching the provider in use failed.",
-                "use": "Use this provider"
+                "provider": "프로바이더",
+                "inUse": "사용 중",
+                "owner": "소유자",
+                "repo": "저장소",
+                "token": "토큰",
+                "branch": "브랜치",
+                "switchFailed": "사용 중인 프로바이더 전환에 실패했습니다",
+                "use": "이 프로바이더 사용"
             },
             "mcp": {
                 "title": "MCP",
-                "notes": "Search guide notes",
-                "notesHelp": "Added after the built-in search guide. Write your tags, folders and common questions.",
-                "save": "Save",
-                "saved": "Saved.",
-                "saveFailed": "Save failed",
-                "loadFailed": "Could not load the notes"
+                "notes": "검색 가이드 추가 내용",
+                "notesHelp": "기본 검색 가이드 뒤에 추가됩니다. 태그, 폴더, 자주 묻는 질문 등을 적어 주세요",
+                "save": "저장",
+                "saved": "저장했습니다",
+                "saveFailed": "저장에 실패했습니다",
+                "loadFailed": "추가 내용을 불러오지 못했습니다"
             }
         }
     },
