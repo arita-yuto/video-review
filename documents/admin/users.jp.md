@@ -1,6 +1,6 @@
 # Users
 
-ユーザーの一覧、作成、role の変更をします
+ユーザーの一覧、作成、role の変更、CSV での一括作成・更新をします
 
 <img src="https://github.com/user-attachments/assets/a240238d-d412-40b7-80a0-ffd0a9aad974" />
 
@@ -13,13 +13,59 @@
 
 作ったユーザーは viewer になり、一覧の末尾に出ます
 
-※ Guest はここでは作りません  
-※ Guest ログインが有効なら、誰でも表示名だけでログインできます（[General](general.jp.md)）  
-※ Jira ログインのユーザーは、初めてログインしたときに自動で作られます（[Jira](integrations/issue-tracker.jp.md)）
+---
+
+## 2. CSV でまとめて作成・更新する
+
+ユーザーを CSV に書き出し、編集して読み込むと、作成と更新をまとめてできます
+
+### CSV に書き出す
+
+Create user の右上の Export CSV を押すと、`users.csv` がダウンロードされます
+
+※ CLI では `export-users` で書き出せます（[メンテナンス CLI のガイド](../../maintenance/README.jp.md)）
+
+### CSV を編集する
+
+| 列 | 内容 |
+|---|---|
+| id | 空欄なら新しく作り、値があればそのユーザーを更新します |
+| name | 表示名（必須） |
+| email | ログインに使うメールアドレス（作るときは必須） |
+| pass | パスワード、6 文字以上（作るときは必須）<br>更新では、リセットするときだけ入力します |
+| role | `viewer` か `admin`（作るときに空欄なら `viewer`） |
+| active | `true` か `false`（作るときに空欄なら `true`）<br>`false` のユーザーはログインできません |
+
+更新する行で空欄にしたセルは、今の値のままです  
+書き出した CSV の pass は空欄です
+
+### 新しいユーザーを 1 行足し、既存のユーザーの role と active を変える例です
+
+```
+id,name,email,pass,role,active
+9b2f6c1e-4a7d-4e0b-8f3a-2c5d7e9a1b40,Nijika,nijika@example.com,,admin,false
+,Bocchi,bocchi@example.com,secret01,viewer,
+```
+
+※ UTF-8 で保存します  
+※ 自分の行の role、active、pass は変えられません
+
+### CSV を読み込む
+
+1. Create user の右上の Import CSV を押します
+
+<img src="https://github.com/user-attachments/assets/2246ff2b-1086-4978-b3e3-582099c02491" />
+
+2. CSV ファイルを選んで、Import を押します
+
+<img src="https://github.com/user-attachments/assets/cf554c0e-f801-4e54-bbee-f9beb6fb6158" />
+
+取り込みに成功した場合、作成と更新の人数が表示されます  
+エラーがある場合は何も反映されず、行・列・理由の一覧が出ます
 
 ---
 
-## 2. 権限について
+## 3. 権限について
 
 サーバーの API が通すかどうかで書いています
 
