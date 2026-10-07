@@ -36,6 +36,8 @@ model User {
   displayName   String
   avatarPath    String?
   createdAt     DateTime                @default(now())
+  /// False blocks sign-in; the row stays so comments and read marks are kept.
+  active        Boolean                 @default(true)
   readStatuses  UserVideoReadStatus[]
   identities    Identity[]
 }

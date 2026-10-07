@@ -67,6 +67,21 @@ export function UsersSection() {
         }
     }
 
+    async function onActiveChange(user: User, active: boolean) {
+        setError(null);
+        setUsers(rows => rows.map(r => r.id === user.id ? { ...r, active } : r));
+
+        try {
+            const res = await api.admin["user-active"].$patch({ json: { userId: user.id, active } });
+            if (res.status !== 200) {
+                throw new Error(await readError(res));
+            }
+        } catch (e) {
+            setUsers(rows => rows.map(r => r.id === user.id ? { ...r, active: !active } : r));
+            setError(`${t("users.activeFailed")}: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
     async function onImported() {
         setError(null);
         try {
@@ -114,6 +129,7 @@ export function UsersSection() {
                                 <TableHead>{t("users.columns.displayName")}</TableHead>
                                 <TableHead>{t("users.columns.email")}</TableHead>
                                 <TableHead>{t("users.columns.role")}</TableHead>
+                                <TableHead>{t("users.columns.active")}</TableHead>
                                 <TableHead>{t("users.columns.createdAt")}</TableHead>
                                 <TableHead>
                                     <span className="sr-only">{t("users.columns.actions")}</span>
@@ -128,6 +144,7 @@ export function UsersSection() {
                                     isSelf={user.id === selfId}
                                     justAdded={user.id === justAddedId}
                                     onRoleChange={(role) => onRoleChange(user, role)}
+                                    onActiveChange={(active) => onActiveChange(user, active)}
                                 />
                             ))}
                         </TableBody>

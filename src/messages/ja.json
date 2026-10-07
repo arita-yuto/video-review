@@ -188,7 +188,8 @@
         "displayName": "表示名",
         "email": "メールアドレス",
         "password": "パスワード",
-        "ok": "ログイン"
+        "ok": "ログイン",
+        "accountDisabledMsg": "このアカウントは無効です"
     },
     "setting": {
         "title": "設定",
@@ -248,7 +249,8 @@
                 "email": "メール",
                 "role": "権限",
                 "createdAt": "作成日",
-                "actions": "操作"
+                "actions": "操作",
+                "active": "Active"
             },
             "roles": {
                 "viewer": "閲覧者",
@@ -286,7 +288,9 @@
                 },
                 "created": "ユーザーを作成しました"
             },
-            "created": "ユーザーを作成しました"
+            "created": "ユーザーを作成しました",
+            "activeLabel": "{name} のログインを許可",
+            "activeFailed": "ログインの許可の切り替えに失敗しました"
         },
         "apiToken": {
             "description": "RestAPI や maintenance で使用するトークンです",

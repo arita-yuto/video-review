@@ -35,6 +35,11 @@ const ResetPasswordBody = z.object({
     pass: z.string().min(6),
 });
 
+const SetActiveBody = z.object({
+    userId: z.string(),
+    active: z.boolean(),
+});
+
 const UserListResponse = z.object({
     users: z.array(z.object({
         id: z.string(),
@@ -43,6 +48,7 @@ const UserListResponse = z.object({
         role: z.string(),
         avatarPath: z.string().nullable(),
         createdAt: z.string(),
+        active: z.boolean(),
     })),
 });
 
@@ -295,6 +301,47 @@ export const adminRouter = createRouter()
             where: { id: identity.id },
             data: { secretHash: await bcrypt.hash(pass, 10) },
         });
+        return c.json({ success: true }, 200);
+    })
+    .openapi(createRoute({
+        method: "patch",
+        summary: "Enable or disable a user",
+        description: "A disabled user cannot sign in; the user stays, with their comments and read marks.",
+        path: "/user-active",
+        request: {
+            body: {
+                content: {
+                    "application/json": {
+                        schema: SetActiveBody,
+                    },
+                },
+            },
+        },
+        responses: {
+            200: {
+                description: "Updated",
+                content: {
+                    "application/json": {
+                        schema: z.object({ success: z.boolean() }),
+                    },
+                },
+            },
+            401: errorResponse("Unauthorized"),
+            403: errorResponse("Forbidden"),
+            404: errorResponse("User not found"),
+        },
+    }), async (c) => {
+        const auth = await authorize(c.req.raw, ["admin"]);
+        const { userId, active } = c.req.valid("json");
+
+        if (auth.type === "jwt" && auth.decoded.id === userId) {
+            return c.json({ error: "you cannot disable yourself" }, 403);
+        }
+
+        const { count } = await prisma.user.updateMany({ where: { id: userId }, data: { active } });
+        if (count === 0) {
+            return c.json({ error: "user not found" }, 404);
+        }
         return c.json({ success: true }, 200);
     })
     .openapi(createRoute({

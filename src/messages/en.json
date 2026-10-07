@@ -188,7 +188,8 @@
         "displayName": "Display Name",
         "email": "Email",
         "password": "Password",
-        "ok": "Login"
+        "ok": "Login",
+        "accountDisabledMsg": "This account is disabled"
     },
     "setting": {
         "title": "Setting",
@@ -248,7 +249,8 @@
                 "email": "Email",
                 "role": "Role",
                 "createdAt": "Created",
-                "actions": "Actions"
+                "actions": "Actions",
+                "active": "Active"
             },
             "roles": {
                 "viewer": "Viewer",
@@ -286,7 +288,9 @@
                 },
                 "created": "Users created"
             },
-            "created": "User created"
+            "created": "User created",
+            "activeLabel": "{name} can sign in",
+            "activeFailed": "Failed to change whether the user can sign in"
         },
         "apiToken": {
             "description": "A token for the REST API and maintenance.",

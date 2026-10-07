@@ -27,6 +27,10 @@ export async function loginUser(c: LoginRequest): Promise<LoginResponse> {
         throw new ServerError("invalid password", 401);
     }
 
+    if (!identity.user.active) {
+        throw new ServerError("user disabled", 403);
+    }
+
     let tokenPayload: Record<string, any> = {
         id: identity.user.id, displayName: identity.user.displayName, role: identity.user.role, provider: "password"
     };
