@@ -8,8 +8,6 @@ import { FormDialog } from "@/components/dialog/form-dialog";
 import { FilePicker } from "@/components/controls/file-picker";
 import { CsvErrorTable, type CsvImportError } from "@/components/controls/csv-error-table";
 
-const USER_ERROR_CODES = ["idReadOnly", "emailTaken"];
-
 export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void; onImported: () => void }) {
     const t = useTranslations("admin-settings");
 
@@ -35,7 +33,7 @@ export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void
                 throw new Error(await readError(res));
             }
 
-            toast.success(t("users.import.created"));
+            toast.success(t("users.import.done", await res.json()));
             onImported();
             onClose();
         } catch (e) {
@@ -70,7 +68,10 @@ export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void
             {errors.length > 0 && (
                 <CsvErrorTable
                     errors={errors}
-                    describe={(error) => USER_ERROR_CODES.includes(error.code) ? t(`users.import.errors.${error.code}`) : null}
+                    describe={(error) => {
+                        const key = `users.import.errors.${error.code}` as const;
+                        return t.has(key) ? t(key) : null;
+                    }}
                 />
             )}
         </FormDialog>

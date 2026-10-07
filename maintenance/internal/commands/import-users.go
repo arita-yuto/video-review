@@ -9,7 +9,7 @@ import (
 
 func RunImportUsers(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	file := fs.String("file", "", "UTF-8 CSV with the columns id, name, email, pass, role")
+	file := fs.String("file", "", "UTF-8 CSV with the columns id, name, email, pass, role, active")
 	fs.Parse(args)
 
 	if *file == "" {

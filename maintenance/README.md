@@ -50,17 +50,22 @@ Note: the first administrator can also be created on the web screen.
 ##### Create a user
 > go run . create-user --name Nijika --email Nijika@example.com --pass 123abc
 
-##### Create users from a CSV file
+##### Export users to a CSV file
+> go run . export-users --file users.csv
+
+##### Create and update users from a CSV file
 > go run . import-users --file users.csv
 
 ##### CSV example
-| id | name (required) | email (required) | pass (required) | role |
-|---|---|---|---|---|
-|  | Bocchi | bocchi@example.com | secret01 | viewer |
-|  | Nijika | nijika@example.com | secret02 |  |
+| id | name (required) | email | pass | role | active |
+|---|---|---|---|---|---|
+|  | Bocchi | bocchi@example.com | secret01 | viewer |  |
+| 9b2f6c1e-4a7d-4e0b-8f3a-2c5d7e9a1b40 | Nijika | nijika@example.com |  | admin | false |
 
-Note: an empty `role` means `viewer`.  
-Note: leave `id` empty; the system uses it.  
+Note: a row without `id` creates a user. `email` and `pass` are required.  
+Note: a row with `id` updates that user. An empty cell keeps the current value.  
+Note: when creating, an empty `role` means `viewer` and an empty `active` means `true`.  
+Note: `export-users` leaves `pass` empty. Fill it in only to reset the password.  
 Note: save the file as UTF-8.  
 
 ##### Get the video list (JSON)

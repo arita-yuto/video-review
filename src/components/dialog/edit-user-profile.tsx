@@ -11,6 +11,7 @@ import { api } from "@/lib/api-client";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Separator } from "@/ui/separator";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-types";
 
 export default function EditUserProfileDialog({
     open,
@@ -62,7 +63,7 @@ export default function EditUserProfileDialog({
             const changingPassword = !!(currentPass || newPass || confirmPass);
             let passFields: { pass?: string; currentPass?: string } = {};
             if (changingPassword) {
-                if (newPass.length < 6) {
+                if (newPass.length < MIN_PASSWORD_LENGTH) {
                     setError(t("passwordTooShort"));
                     return;
                 }

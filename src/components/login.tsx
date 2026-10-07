@@ -41,12 +41,24 @@ export default function Login() {
         setType(loginDefaultType === "guest" && !guestEnabled ? "password" : loginDefaultType);
     }, [guestEnabled, loginDefaultType]);
 
+    const requestLogin = () => {
+        switch (type) {
+            case "password":
+                return api.auth.login.password.$post({ json: { email: email ?? "", password } });
+            case "jira":
+                return api.auth.login.jira.$post({ json: { email: email ?? "" } });
+            default:
+                return api.auth.login.guest.$post({ json: { displayName } });
+        }
+    };
+
     const handleLogin = async () => {
         try {
-            const res =
-                type === "password" ? await api.auth.login.password.$post({ json: { email: email ?? "", password } }) :
-                type === "jira" ? await api.auth.login.jira.$post({ json: { email: email ?? "" } }) :
-                await api.auth.login.guest.$post({ json: { displayName } });
+            const res = await requestLogin();
+            if (res.status === 403 && type !== "guest") {
+                alert(t("accountDisabledMsg"));
+                return;
+            }
             if (res.status !== 200) throw new Error("Failed to login");
             const data = await res.json();
             setAuth(data.id, data.email ?? null, data.role, data.token, data.displayName, data.provider);

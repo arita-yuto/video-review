@@ -4,6 +4,8 @@ import { Role } from "@/lib/role";
 // the JWT `provider` claim, and the login routes.
 export type LoginType = "guest" | "jira" | "password";
 
+export const MIN_PASSWORD_LENGTH = 6;
+
 export interface LoginRequest {
     displayName: string;
     email: string;

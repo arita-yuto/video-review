@@ -6,12 +6,13 @@ import { UserSchema } from "@/schema/zod";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorize } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-types";
 
 const UpdateProfileBody = z.object({
     userId: z.string().optional(),
     displayName: z.string().optional(),
     email: z.string().optional(),
-    pass: z.string().min(6).optional(),
+    pass: z.string().min(MIN_PASSWORD_LENGTH).optional(),
     currentPass: z.string().optional(),
 });
 

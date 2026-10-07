@@ -13,6 +13,11 @@ export async function loginWithJira(c: LoginRequest): Promise<LoginResponse> {
         throw e;
     }
 
+    const existing = await prisma.user.findUnique({ where: { email: c.email }, select: { active: true } });
+    if (existing && !existing.active) {
+        throw new ServerError("user disabled", 403);
+    }
+
     const userDB = await upsertUser(
         c.email,
         jiraInfo.displayName

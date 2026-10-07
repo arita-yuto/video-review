@@ -23,6 +23,7 @@ const FIRST = {
     role: "admin",
     avatarPath: null,
     createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    active: true,
 };
 
 const SECOND = {
@@ -32,6 +33,7 @@ const SECOND = {
     role: "viewer",
     avatarPath: "avatars/user-2.png",
     createdAt: new Date("2026-02-01T00:00:00.000Z"),
+    active: false,
 };
 
 function listRequest() {
@@ -58,6 +60,7 @@ describe("GET /users", () => {
             role: "admin",
             avatarPath: null,
             createdAt: "2026-01-01T00:00:00.000Z",
+            active: true,
         });
         expect(body.users[1].email).toBeNull();
 

@@ -74,6 +74,7 @@ export const loginRouter = createRouter()
             },
             400: errorResponse("Invalid parameters"),
             401: errorResponse("Unauthorized"),
+            403: errorResponse("The account is disabled"),
             500: errorResponse("Login failed"),
         },
     }), async (c) => {
@@ -87,7 +88,7 @@ export const loginRouter = createRouter()
             return c.json(response, 200);
         } catch(e) {
             if (e instanceof ServerError) {
-                return c.json({ error: e.message }, e.status as 400 | 401 | 500);
+                return c.json({ error: e.message }, e.status as 400 | 401 | 403 | 500);
             } else {
                 return c.json({ error: "failed to login" }, 500);
             }
@@ -169,6 +170,7 @@ export const loginRouter = createRouter()
             },
             400: errorResponse("Invalid parameters"),
             401: errorResponse("Unauthorized"),
+            403: errorResponse("The account is disabled"),
             500: errorResponse("Login failed"),
         },
     }), async (c) => {
@@ -183,7 +185,7 @@ export const loginRouter = createRouter()
             return c.json(response, 200);
         } catch(e) {
             if (e instanceof ServerError) {
-                return c.json({ error: e.message }, e.status as 400 | 401 | 500);
+                return c.json({ error: e.message }, e.status as 400 | 401 | 403 | 500);
             } else {
                 return c.json({ error: "failed to login" }, 500);
             }

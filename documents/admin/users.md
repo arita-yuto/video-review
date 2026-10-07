@@ -1,6 +1,6 @@
 # Users
 
-List users, create them and change their role.
+List users, create them, change their role, and create or update them in bulk with a CSV file.
 
 <img src="https://github.com/user-attachments/assets/a240238d-d412-40b7-80a0-ffd0a9aad974" />
 
@@ -13,13 +13,59 @@ Use Create user below the list.
 
 The new user is a viewer and appears at the end of the list.
 
-Note: guests are not created here.  
-Note: while guest login is on, anyone can log in with just a display name ([General](general.md)).  
-Note: users who log in with Jira are created on their first login ([Jira](integrations/issue-tracker.md)).
+---
+
+## 2. Create and update users with a CSV file
+
+Export the users to a CSV file, edit it and import it to create and update users in one go.
+
+### Export to a CSV file
+
+Press Export CSV at the top right of Create user to download `users.csv`.
+
+Note: the CLI exports with `export-users` ([maintenance CLI guide](../../maintenance/README.md)).
+
+### Edit the CSV file
+
+| Column | Content |
+|---|---|
+| id | Empty creates a new user; a value updates that user |
+| name | Display name (required) |
+| email | The email address used to log in (required when creating) |
+| pass | Password, 6 characters or more (required when creating)<br>When updating, fill it in only to reset the password |
+| role | `viewer` or `admin` (empty means `viewer` when creating) |
+| active | `true` or `false` (empty means `true` when creating)<br>A `false` user cannot log in |
+
+An empty cell in a row that updates a user keeps the current value.  
+The exported file has an empty pass column.
+
+### An example that adds a new user and changes the role and active of an existing one
+
+```
+id,name,email,pass,role,active
+9b2f6c1e-4a7d-4e0b-8f3a-2c5d7e9a1b40,Nijika,nijika@example.com,,admin,false
+,Bocchi,bocchi@example.com,secret01,viewer,
+```
+
+Note: save the file as UTF-8.  
+Note: you cannot change the role, active or pass of your own row.
+
+### Import the CSV file
+
+1. Press Import CSV at the top right of Create user.
+
+<img src="https://github.com/user-attachments/assets/2246ff2b-1086-4978-b3e3-582099c02491" />
+
+2. Choose the CSV file and press Import.
+
+<img src="https://github.com/user-attachments/assets/cf554c0e-f801-4e54-bbee-f9beb6fb6158" />
+
+When the import succeeds, the number of created and updated users is shown.  
+When there are errors, nothing is applied and a list of the row, column and reason is shown.
 
 ---
 
-## 2. Permissions
+## 3. Permissions
 
 Written by what the server's API lets through.
 

@@ -7,9 +7,7 @@ import { FormDialog } from "@/components/dialog/form-dialog";
 import type { User } from "@/lib/db-types";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
-
-// Mirrors the server's zod rule so the button only enables for a request that can succeed.
-const MIN_PASSWORD_LENGTH = 6;
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-types";
 
 export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: () => void }) {
     const t = useTranslations("admin-settings");

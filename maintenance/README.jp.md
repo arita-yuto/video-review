@@ -48,17 +48,22 @@ VideoReview にて発行した API トークンを設定
 ##### ユーザーを作成します
 > go run . create-user --name Nijika --email Nijika@example.com --pass 123abc
 
-##### CSV からユーザーをまとめて作成します
+##### ユーザーを CSV に書き出します
+> go run . export-users --file users.csv
+
+##### CSV からユーザーをまとめて作成・更新します
 > go run . import-users --file users.csv
 
 ##### CSV の例
-| id | name（必須） | email（必須） | pass（必須） | role |
-|---|---|---|---|---|
-|  | Bocchi | bocchi@example.com | secret01 | viewer |
-|  | Nijika | nijika@example.com | secret02 |  |
+| id | name（必須） | email | pass | role | active |
+|---|---|---|---|---|---|
+|  | Bocchi | bocchi@example.com | secret01 | viewer |  |
+| 9b2f6c1e-4a7d-4e0b-8f3a-2c5d7e9a1b40 | Nijika | nijika@example.com |  | admin | false |
 
-※ `role` が空欄の場合、`viewer` になります  
-※ `id` はシステムが使うため、入力しないでください  
+※ `id` が空の行は、ユーザーを作成します。`email` と `pass` は必須です  
+※ `id` がある行は、そのユーザーを更新します。空欄のセルは今の値のままです  
+※ 作成するとき、`role` が空欄なら `viewer`、`active` が空欄なら `true` になります  
+※ `export-users` で書き出した CSV の `pass` は空欄です。パスワードをリセットするときだけ入力します  
 ※ UTF-8 で保存します  
 
 ##### 動画のリストを取得します（JSON）

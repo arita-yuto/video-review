@@ -8,11 +8,9 @@ import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Button } from "@/ui/button";
 import { Spinner } from "@/ui/spinner";
-import { Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { ImportUsersDialog } from "@/components/admin/users-section/import-users-dialog";
-
-// Mirrors the server's zod rule so the button only enables for a request that can succeed.
-const MIN_PASSWORD_LENGTH = 6;
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-types";
 
 export function CreateUserForm({ onCreated, onImported }: {
     onCreated: (email: string) => Promise<void>;
@@ -63,14 +61,39 @@ export function CreateUserForm({ onCreated, onImported }: {
         }
     }
 
+    async function onExport() {
+        setError(null);
+        try {
+            const res = await api.admin.users.export.$get();
+            if (res.status !== 200) {
+                throw new Error(await readError(res));
+            }
+
+            const url = URL.createObjectURL(await res.blob());
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "users.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            setError(`${t("users.export.failed")}: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
     return (
         <form onSubmit={onSubmit} className="shrink-0 space-y-3 border-t pt-3">
             <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium">{t("users.create.title")}</h4>
-                <Button type="button" variant="outline" size="sm" onClick={() => setImporting(true)}>
-                    <Upload />
-                    {t("users.import.open")}
-                </Button>
+                <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => void onExport()}>
+                        <Download />
+                        {t("users.export.open")}
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => setImporting(true)}>
+                        <Upload />
+                        {t("users.import.open")}
+                    </Button>
+                </div>
             </div>
             {importing && <ImportUsersDialog onClose={() => setImporting(false)} onImported={onImported} />}
 
