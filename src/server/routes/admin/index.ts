@@ -3,6 +3,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { maintenanceRouter } from "@/server/routes/admin/maintenance";
 import { settingsRouter } from "@/server/routes/admin/settings";
+import { usersImportRouter } from "@/server/routes/admin/users-import";
 import { getVCSProvider } from "@/server/lib/integrations/vcs";
 import { listUTCDays, upsertMerge, upsertCommit } from "@/server/lib/vcs/cache";
 import { authorize } from "@/server/lib/token";
@@ -453,4 +454,5 @@ export const adminRouter = createRouter()
         });
     })
     .route("/maintenance", maintenanceRouter)
-    .route("/settings", settingsRouter);
+    .route("/settings", settingsRouter)
+    .route("/users/import", usersImportRouter);

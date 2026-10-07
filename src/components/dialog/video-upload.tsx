@@ -5,9 +5,11 @@ import { Input } from "@/ui/input";
 import { api } from "@/lib/api-client";
 import { UploadTransferError, uploadToSession } from "@/lib/upload-transfer";
 import { FormDialog } from "@/components/dialog/form-dialog";
-import { Upload } from "lucide-react";
+import { FilePicker } from "@/components/controls/file-picker";
 import path from "path";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { toastIds } from "@/lib/toast-ids";
 import { UploadSession } from "@/lib/db-types";
 
 const POLL_FAILURE_LIMIT = 3;
@@ -129,6 +131,7 @@ export default function VideoUploadDialog({ open, onClose }: {
 
                 if (status === "completed") {
                     setStep("done");
+                    toast.success(t("uploaded"), { id: toastIds.videoUploaded(session.id) });
                     onClose(body.videoId);
                     return;
                 }
@@ -165,22 +168,7 @@ export default function VideoUploadDialog({ open, onClose }: {
             message={message}
         >
                 <div className="flex flex-col gap-3">
-                    <label
-                        htmlFor="video-file"
-                        className="flex items-center justify-between w-full p-2 rounded-md bg-muted border border-input cursor-pointer hover:bg-accent"
-                    >
-                        <span className="text-muted-foreground">
-                            {file ? file.name : t("selectFile")}
-                        </span>
-                        <input
-                            id="video-file"
-                            type="file"
-                            accept="video/mp4"
-                            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                            className="hidden"
-                        />
-                        <Upload size={16} className="text-muted-foreground" />
-                    </label>
+                    <FilePicker accept="video/mp4" file={file} placeholder={t("selectFile")} onChange={setFile} />
 
                     <Input
                         type="text"

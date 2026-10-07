@@ -1,0 +1,5 @@
+id,name,email,pass,role
+,Sakura,sakura@example.com,secret01,
+,山田 花子,hanako@example.com,secret02,viewer
+,김민지,minji@example.com,secret03,admin
+,"Doe, Jane",jane@example.com,secret04,viewer

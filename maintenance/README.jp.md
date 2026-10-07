@@ -48,6 +48,19 @@ VideoReview にて発行した API トークンを設定
 ##### ユーザーを作成します
 > go run . create-user --name Nijika --email Nijika@example.com --pass 123abc
 
+##### CSV からユーザーをまとめて作成します
+> go run . import-users --file users.csv
+
+##### CSV の例
+| id | name（必須） | email（必須） | pass（必須） | role |
+|---|---|---|---|---|
+|  | Bocchi | bocchi@example.com | secret01 | viewer |
+|  | Nijika | nijika@example.com | secret02 |  |
+
+※ `role` が空欄の場合、`viewer` になります  
+※ `id` はシステムが使うため、入力しないでください  
+※ UTF-8 で保存します  
+
 ##### 動画のリストを取得します（JSON）
 > go run . get-videos  
 > go run . get-videos --include_revisions true  

@@ -35,7 +35,8 @@
         "uploading": "Uploading...",
         "uploadingPercent": "Uploading... {percent}%",
         "errorUpload": "Video upload failed. Please contact the admin",
-        "errorUploadTooLarge": "The file was rejected as too large. A proxy in front of the server may limit the upload size"
+        "errorUploadTooLarge": "The file was rejected as too large. A proxy in front of the server may limit the upload size",
+        "uploaded": "Video uploaded"
     },
     "video-search": {
         "title": "Video Search",
@@ -271,7 +272,21 @@
                 "submit": "Reset",
                 "cancel": "Cancel",
                 "failed": "Failed to reset the password"
-            }
+            },
+            "import": {
+                "open": "Import CSV",
+                "title": "Create users from CSV",
+                "file": "Choose a CSV file",
+                "submit": "Import",
+                "cancel": "Cancel",
+                "failed": "Failed to import",
+                "errors": {
+                    "idReadOnly": "id cannot be set or changed",
+                    "emailTaken": "A user with this email already exists"
+                },
+                "created": "Users created"
+            },
+            "created": "User created"
         },
         "apiToken": {
             "description": "A token for the REST API and maintenance.",
@@ -385,6 +400,27 @@
                 "saveFailed": "Save failed",
                 "loadFailed": "Could not load the notes"
             }
+        }
+    },
+    "csv-import": {
+        "columns": {
+            "line": "Row",
+            "column": "Column",
+            "reason": "Reason"
+        },
+        "errors": {
+            "notUtf8": "Not UTF-8. Save the file as CSV UTF-8",
+            "malformed": "Cannot be read as CSV (an unclosed quote?)",
+            "unknownColumn": "Unknown column",
+            "duplicateColumn": "This column appears twice",
+            "missingColumn": "Required column is missing",
+            "cellCount": "The number of cells does not match the header",
+            "required": "Empty",
+            "duplicateInFile": "Same as row {otherLine}",
+            "tooShort": "Must be at least {min} characters",
+            "tooLong": "Must be at most {max} characters",
+            "notOneOf": "Must be one of: {values}",
+            "invalid": "Invalid value"
         }
     }
 }

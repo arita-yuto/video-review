@@ -50,6 +50,19 @@ Note: the first administrator can also be created on the web screen.
 ##### Create a user
 > go run . create-user --name Nijika --email Nijika@example.com --pass 123abc
 
+##### Create users from a CSV file
+> go run . import-users --file users.csv
+
+##### CSV example
+| id | name (required) | email (required) | pass (required) | role |
+|---|---|---|---|---|
+|  | Bocchi | bocchi@example.com | secret01 | viewer |
+|  | Nijika | nijika@example.com | secret02 |  |
+
+Note: an empty `role` means `viewer`.  
+Note: leave `id` empty; the system uses it.  
+Note: save the file as UTF-8.  
+
 ##### Get the video list (JSON)
 > go run . get-videos  
 > go run . get-videos --include_revisions true  
