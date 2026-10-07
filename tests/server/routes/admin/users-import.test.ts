@@ -5,6 +5,10 @@ const prismaMock = vi.hoisted(() => ({
     user: {
         findMany: vi.fn(),
         create: vi.fn(),
+        update: vi.fn(),
+    },
+    identity: {
+        updateMany: vi.fn(),
     },
 }));
 
@@ -13,6 +17,7 @@ const authorizeMock = vi.hoisted(() => vi.fn());
 vi.mock("@/server/lib/db", () => ({ prisma: prismaMock }));
 vi.mock("@/server/lib/token", () => ({ authorize: authorizeMock }));
 
+import { usersExportRouter } from "@/server/routes/admin/users-export";
 import { usersImportRouter } from "@/server/routes/admin/users-import";
 
 function importRequest(csv: string) {
@@ -37,7 +42,7 @@ describe("POST /users/import", () => {
         authorizeMock.mockResolvedValue({ type: "jwt", decoded: { id: "admin-1", role: "admin" } });
         prismaMock.user.findMany.mockResolvedValue([]);
         prismaMock.user.create.mockImplementation((args: unknown) => args);
-        prismaMock.$transaction.mockResolvedValue([]);
+        prismaMock.$transaction.mockImplementation(async (write: (tx: typeof prismaMock) => Promise<void>) => write(prismaMock));
     });
 
     it("creates every row, as a viewer when the role is left empty", async () => {
@@ -48,12 +53,31 @@ describe("POST /users/import", () => {
         ].join("\n"));
 
         expect(res.status).toBe(200);
-        expect(await res.json()).toEqual({ created: 2 });
+        expect(await res.json()).toEqual({ created: 2, updated: 0 });
         expect(prismaMock.$transaction).toHaveBeenCalledTimes(1);
         expect(createdUsers()).toEqual([
             { email: "kita@example.com", displayName: "Kita", role: "viewer" },
             { email: "ryo@example.com", displayName: "Ryo", role: "admin" },
         ]);
+    });
+
+    it("reads the cells missing at the end of a short row as empty, and refuses a row with extra cells", async () => {
+        const res = await importRequest([
+            "id,name,email,pass,role,active",
+            ",Kita,kita@example.com,secret1",
+            ",Ryo,ryo@example.com,secret2,admin,true,extra",
+        ].join("\n"));
+
+        expect(res.status).toBe(422);
+        expect(await res.json()).toEqual({ errors: [{ line: 3, column: null, code: "cellCount" }] });
+
+        const short = await importRequest([
+            "id,name,email,pass,role,active",
+            ",Kita,kita@example.com,secret1",
+        ].join("\n"));
+
+        expect(short.status).toBe(200);
+        expect(createdUsers()).toEqual([{ email: "kita@example.com", displayName: "Kita", role: "viewer" }]);
     });
 
     it("creates nobody when any row is wrong, and names each row, column and reason", async () => {
@@ -77,7 +101,7 @@ describe("POST /users/import", () => {
     });
 
     it("points a duplicate email at the row it repeats, and refuses an email already in use", async () => {
-        prismaMock.user.findMany.mockResolvedValue([{ email: "bocchi@example.com" }]);
+        prismaMock.user.findMany.mockResolvedValue([{ id: "user-9", email: "bocchi@example.com" }]);
 
         const res = await importRequest([
             "name,email,pass",
@@ -105,5 +129,35 @@ describe("POST /users/import", () => {
         expect(res.status).toBe(422);
         expect(await res.json()).toEqual({ errors: [{ line: null, column: null, code: "notUtf8" }] });
         expect(prismaMock.$transaction).not.toHaveBeenCalled();
+    });
+
+    it("moves the password login to the new email when a row changes it", async () => {
+        prismaMock.user.findMany.mockResolvedValueOnce([
+            { id: "user-1", displayName: "Kita", email: "old@example.com", role: "viewer", active: true },
+        ]);
+
+        const res = await importRequest([
+            "id,name,email,pass,role,active",
+            "user-1,Kita,new@example.com,,viewer,true",
+        ].join("\n"));
+
+        expect(res.status).toBe(200);
+        expect(prismaMock.identity.updateMany).toHaveBeenCalledWith({
+            where: { userId: "user-1", provider: "password" },
+            data: { providerUid: "new@example.com" },
+        });
+    });
+
+    it("changes nothing when the exported file is imported as it is", async () => {
+        prismaMock.user.findMany.mockResolvedValue([
+            { id: "user-1", displayName: "User", email: "a@example.com", role: "admin", active: true },
+            { id: "user-2", displayName: "User", email: "b@example.com", role: "viewer", active: false },
+        ]);
+
+        const exported = await (await usersExportRouter.request("http://localhost/")).text();
+        const res = await importRequest(exported);
+
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({ created: 0, updated: 0 });
     });
 });

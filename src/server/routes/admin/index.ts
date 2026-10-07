@@ -3,6 +3,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { maintenanceRouter } from "@/server/routes/admin/maintenance";
 import { settingsRouter } from "@/server/routes/admin/settings";
+import { usersExportRouter } from "@/server/routes/admin/users-export";
 import { usersImportRouter } from "@/server/routes/admin/users-import";
 import { getVCSProvider } from "@/server/lib/integrations/vcs";
 import { listUTCDays, upsertMerge, upsertCommit } from "@/server/lib/vcs/cache";
@@ -13,16 +14,17 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { ASSIGNABLE_ROLES } from "@/lib/role";
 import bcrypt from "bcrypt";
 import { hash, randomBytes } from "crypto";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-types";
 
 const CreateAdminBody = z.object({
     email: z.string().optional(),
-    pass: z.string().min(6).optional(),
+    pass: z.string().min(MIN_PASSWORD_LENGTH).optional(),
 });
 
 const CreateUserBody = z.object({
     displayName: z.string().optional(),
     email: z.string().optional(),
-    pass: z.string().min(6).optional(),
+    pass: z.string().min(MIN_PASSWORD_LENGTH).optional(),
 });
 
 const UpdateRoleBody = z.object({
@@ -32,7 +34,7 @@ const UpdateRoleBody = z.object({
 
 const ResetPasswordBody = z.object({
     userId: z.string(),
-    pass: z.string().min(6),
+    pass: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
 const SetActiveBody = z.object({
@@ -502,4 +504,5 @@ export const adminRouter = createRouter()
     })
     .route("/maintenance", maintenanceRouter)
     .route("/settings", settingsRouter)
+    .route("/users/export", usersExportRouter)
     .route("/users/import", usersImportRouter);

@@ -79,15 +79,17 @@ export function readCsv<C extends Columns>(columns: C, csv: string): { records: 
         // A blank row still counts toward the numbering, so later rows keep the spreadsheet's number.
         if (row.every(cell => cell.trim() === "")) return;
 
-        if (row.length !== header.length) {
+        if (row.length > header.length) {
             errors.push({ line, column: null, code: "cellCount" });
             return;
         }
+        // Fill in the trailing commas some editors drop from a row typed by hand.
+        const filled = [...row, ...Array<string>(header.length - row.length).fill("")];
 
         const cells: Record<string, string> = {};
         for (const [name, column] of Object.entries(columns)) {
             const at = header.indexOf(name);
-            const cell = at < 0 ? "" : row[at];
+            const cell = at < 0 ? "" : filled[at];
             cells[name] = column.trim === false ? cell : cell.trim();
         }
         records.push({ line, cells: cells as CsvRecord<C>["cells"] });
@@ -170,4 +172,14 @@ function describeIssue(issue: z.core.$ZodIssue): [CsvError["code"], CsvError["pa
         default:
             return ["invalid"];
     }
+}
+
+// The BOM lets Excel open the file as UTF-8, so non-ASCII names survive the round trip.
+export function writeCsv(header: string[], rows: string[][]): string {
+    const line = (cells: string[]) => cells.map(escapeCell).join(",");
+    return "\uFEFF" + [header, ...rows].map(line).join("\r\n") + "\r\n";
+}
+
+function escapeCell(cell: string): string {
+    return /[",\r\n]/.test(cell) ? `"${cell.replaceAll("\"", "\"\"")}"` : cell;
 }

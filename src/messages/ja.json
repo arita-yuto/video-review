@@ -275,18 +275,23 @@
                 "cancel": "キャンセル",
                 "failed": "パスワードのリセットに失敗しました"
             },
+            "export": {
+                "open": "CSV に書き出す",
+                "failed": "書き出しに失敗しました"
+            },
             "import": {
                 "open": "CSV を読み込む",
-                "title": "CSV からユーザーを作成",
+                "title": "CSV からユーザーを読み込む",
                 "file": "CSV ファイルを選択",
                 "submit": "読み込む",
                 "cancel": "キャンセル",
                 "failed": "読み込みに失敗しました",
                 "errors": {
-                    "idReadOnly": "id は指定、書き換えできません",
+                    "unknownId": "この id のユーザーはいません",
+                    "selfChange": "自分のこの項目は変えられません",
                     "emailTaken": "このメールのユーザーは既にいます"
                 },
-                "created": "ユーザーを作成しました"
+                "done": "{created} 人を作成、{updated} 人を更新しました"
             },
             "created": "ユーザーを作成しました",
             "activeLabel": "{name} のログインを許可",
@@ -413,12 +418,12 @@
             "reason": "理由"
         },
         "errors": {
-            "notUtf8": "UTF-8 ではありません。CSV UTF-8 で保存し直してください",
+            "notUtf8": "UTF-8 で保存してください",
             "malformed": "CSV として読めません（引用符の閉じ忘れなど）",
             "unknownColumn": "知らない列名です",
             "duplicateColumn": "同じ列名が 2 つあります",
             "missingColumn": "必須の列がありません",
-            "cellCount": "セルの数がヘッダーと合いません",
+            "cellCount": "ヘッダーよりセルが多いです",
             "required": "空です",
             "duplicateInFile": "{otherLine} 行目と同じです",
             "tooShort": "{min} 文字以上にしてください",

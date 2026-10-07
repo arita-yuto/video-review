@@ -275,18 +275,23 @@
                 "cancel": "취소",
                 "failed": "비밀번호 재설정에 실패했습니다"
             },
+            "export": {
+                "open": "CSV 내보내기",
+                "failed": "내보내기에 실패했습니다"
+            },
             "import": {
                 "open": "CSV 가져오기",
-                "title": "CSV로 사용자 생성",
+                "title": "CSV에서 사용자 가져오기",
                 "file": "CSV 파일 선택",
                 "submit": "가져오기",
                 "cancel": "취소",
                 "failed": "가져오기에 실패했습니다",
                 "errors": {
-                    "idReadOnly": "id는 지정하거나 변경할 수 없습니다",
+                    "unknownId": "이 id의 사용자가 없습니다",
+                    "selfChange": "자신의 이 항목은 변경할 수 없습니다",
                     "emailTaken": "이 이메일의 사용자가 이미 있습니다"
                 },
-                "created": "사용자를 생성했습니다"
+                "done": "{created}명 생성, {updated}명 업데이트했습니다"
             },
             "created": "사용자를 생성했습니다",
             "activeLabel": "{name} 로그인 허용",
@@ -413,12 +418,12 @@
             "reason": "사유"
         },
         "errors": {
-            "notUtf8": "UTF-8이 아닙니다. CSV UTF-8로 다시 저장해 주세요",
+            "notUtf8": "UTF-8로 저장해 주세요",
             "malformed": "CSV로 읽을 수 없습니다 (닫히지 않은 따옴표 등)",
             "unknownColumn": "알 수 없는 열입니다",
             "duplicateColumn": "같은 열 이름이 두 개 있습니다",
             "missingColumn": "필수 열이 없습니다",
-            "cellCount": "셀 수가 헤더와 맞지 않습니다",
+            "cellCount": "헤더보다 셀이 많습니다",
             "required": "비어 있습니다",
             "duplicateInFile": "{otherLine}행과 같습니다",
             "tooShort": "{min}자 이상이어야 합니다",

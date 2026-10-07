@@ -275,18 +275,23 @@
                 "cancel": "Cancel",
                 "failed": "Failed to reset the password"
             },
+            "export": {
+                "open": "Export CSV",
+                "failed": "Failed to export"
+            },
             "import": {
                 "open": "Import CSV",
-                "title": "Create users from CSV",
+                "title": "Import users from CSV",
                 "file": "Choose a CSV file",
                 "submit": "Import",
                 "cancel": "Cancel",
                 "failed": "Failed to import",
                 "errors": {
-                    "idReadOnly": "id cannot be set or changed",
+                    "unknownId": "No user has this id",
+                    "selfChange": "You cannot change this for yourself",
                     "emailTaken": "A user with this email already exists"
                 },
-                "created": "Users created"
+                "done": "{created} created, {updated} updated"
             },
             "created": "User created",
             "activeLabel": "{name} can sign in",
@@ -413,12 +418,12 @@
             "reason": "Reason"
         },
         "errors": {
-            "notUtf8": "Not UTF-8. Save the file as CSV UTF-8",
+            "notUtf8": "Save the file as UTF-8",
             "malformed": "Cannot be read as CSV (an unclosed quote?)",
             "unknownColumn": "Unknown column",
             "duplicateColumn": "This column appears twice",
             "missingColumn": "Required column is missing",
-            "cellCount": "The number of cells does not match the header",
+            "cellCount": "More cells than the header",
             "required": "Empty",
             "duplicateInFile": "Same as row {otherLine}",
             "tooShort": "Must be at least {min} characters",
