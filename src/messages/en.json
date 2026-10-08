@@ -344,14 +344,14 @@
                 "wholeLabel": "Delete every revision of {title}",
                 "revisionLabel": "Delete revision {revision} of {title}",
                 "title": "Delete the video files",
-                "wholeSummary": "All revision files of {title} will be deleted and the video removed from the list.",
-                "revisionSummary": "Revision {revisions} of {title} will be deleted.",
+                "wholeSummary": "All revision files will be deleted and the video removed from the list.",
+                "revisionSummary": "Revision {revisions} will be deleted.",
                 "irreversible": "This cannot be undone.",
                 "confirmLabel": "Type <word>{confirmWord}</word> to confirm",
                 "submit": "Delete",
                 "cancel": "Cancel",
                 "failed": "Failed to delete the files",
-                "filesLeft": "Some files could not be removed and are still in storage."
+                "filesLeft": "Failed to delete the video"
             }
         },
         "integrations": {

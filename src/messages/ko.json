@@ -344,14 +344,14 @@
                 "wholeLabel": "{title}의 모든 리비전 삭제",
                 "revisionLabel": "{title}의 리비전 {revision} 삭제",
                 "title": "동영상 파일 삭제",
-                "wholeSummary": "{title}의 모든 리비전 파일을 삭제하며, 동영상은 목록에서 사라집니다",
-                "revisionSummary": "{title}의 리비전 {revisions} 파일을 삭제합니다",
+                "wholeSummary": "모든 리비전 파일을 삭제하며, 동영상은 목록에서 사라집니다",
+                "revisionSummary": "리비전 {revisions} 파일을 삭제합니다",
                 "irreversible": "되돌릴 수 없습니다",
                 "confirmLabel": "확인을 위해 <word>{confirmWord}</word>를 입력해 주세요",
                 "submit": "삭제",
                 "cancel": "취소",
                 "failed": "파일 삭제에 실패했습니다",
-                "filesLeft": "일부 파일을 삭제하지 못해 스토리지에 남아 있습니다"
+                "filesLeft": "동영상 삭제에 실패했습니다"
             }
         },
         "integrations": {
