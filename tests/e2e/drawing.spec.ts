@@ -67,7 +67,7 @@ test.describe("frame drawing", () => {
         await openFirstVideo(page);
 
         await page.getByPlaceholder("Edit comment").fill(text);
-        await page.getByRole("button", { name: "Add Comment" }).click();
+        await page.getByRole("button", { name: "Add comment" }).click();
         await expect(commentCard(page, text)).toBeVisible();
 
         await startEditing(page, text);
@@ -84,7 +84,7 @@ test.describe("frame drawing", () => {
 
         // A first drawing gives the comment a new path; the player must show it
         // straight away, without a click on the comment.
-        await page.getByRole("button", { name: "Update Comment" }).click();
+        await page.getByRole("button", { name: "Update comment" }).click();
         await expect(page.getByText("Video list")).toBeVisible();
         await expect.poll(() => painted(page)).toBeGreaterThan(0);
 

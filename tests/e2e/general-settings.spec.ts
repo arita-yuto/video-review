@@ -17,7 +17,7 @@ async function loginAsAdmin(page: import("@playwright/test").Page) {
 test.describe("General settings", () => {
     test("the default login tab saved by an admin is the one the login screen opens on", async ({ page }) => {
         await loginAsAdmin(page);
-        await page.getByRole("button", { name: "Setting", exact: true }).click();
+        await page.getByRole("button", { name: "Settings", exact: true }).click();
         await page.getByRole("button", { name: "Administration" }).click();
 
         const dialog = page.getByRole("dialog");

@@ -165,7 +165,7 @@ export default function EditUserProfileDialog({
 
                     {/* Hint */}
                     <div className="text-xs text-muted-foreground text-center">
-                        {t("avatarHint", { max: "1MB", size: "256x256" })}
+                        {t("avatarHint", { max: "1MB" })}
                     </div>
 
                     {/* Error */}

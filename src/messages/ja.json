@@ -29,13 +29,13 @@
         "title": "動画アップロード",
         "selectFile": "動画ファイルを選択",
         "errorNoInput": "タイトル・フォルダ・ファイルを入力してください",
-        "folderKeyPlaceholder": "フォルダーキー（例: projectA/scene01）",
+        "folderKeyPlaceholder": "Folder key（例: projectA/scene01）",
         "cancel": "キャンセル",
         "upload": "アップロード",
         "uploading": "アップロード中...",
         "uploadingPercent": "アップロード中... {percent}%",
         "errorUpload": "動画のアップロードに失敗しました。管理者へ連絡してください",
-        "errorUploadTooLarge": "ファイルが大きすぎて拒否されました。サーバーの前段にある proxy のアップロード上限を確認してください",
+        "errorUploadTooLarge": "ファイルが大きすぎて拒否されました。proxy のアップロード上限を確認してください",
         "uploaded": "動画をアップロードしました"
     },
     "video-search": {
@@ -65,11 +65,11 @@
         "leftRevision": "Left revision",
         "rightRevision": "Right revision",
         "diffImage": "Diff",
-        "diffPause": "一時停止で差分を表示",
-        "diffUnreadable": "この動画では差分を表示できません",
+        "diffPause": "一時停止で Diff を表示",
+        "diffUnreadable": "この動画では Diff を表示できません",
         "threshold": "Threshold",
         "base": "Base",
-        "saveDiffImage": "差分画像を保存"
+        "saveDiffImage": "Diff 画像を保存"
     },
     "video-list-panel": {
         "title": "動画リスト",
@@ -206,12 +206,12 @@
     },
     "edit-user-profile": {
         "displayName": "表示名",
-        "title": "プロフィール 編集",
+        "title": "プロフィール編集",
         "save": "保存",
         "saving": "保存中…",
         "cancel": "キャンセル",
         "saveFailed": "プロフィールの保存に失敗しました",
-        "avatarHint": "PNG / JPEG形式、最大{max}, {size}まで",
+        "avatarHint": "PNG / JPEG 形式、最大 {max}",
         "change": "変更",
         "fileTooLarge": "ファイルサイズ({size})が大きすぎます",
         "currentPassword": "現在のパスワード",
@@ -247,7 +247,7 @@
             "filterPlaceholder": "名前・メールで絞り込み",
             "columns": {
                 "displayName": "表示名",
-                "email": "メール",
+                "email": "Email",
                 "role": "権限",
                 "createdAt": "作成日",
                 "actions": "操作",
@@ -262,7 +262,7 @@
             "create": {
                 "title": "ユーザーを作成",
                 "displayName": "表示名",
-                "email": "メール",
+                "email": "Email",
                 "password": "パスワード",
                 "submit": "作成",
                 "failed": "ユーザーの作成に失敗しました"
@@ -277,16 +277,16 @@
                 "failed": "パスワードのリセットに失敗しました"
             },
             "export": {
-                "open": "書き出し",
-                "failed": "書き出しに失敗しました"
+                "open": "Export",
+                "failed": "Export に失敗しました"
             },
             "import": {
-                "open": "読み込み",
+                "open": "Import",
                 "title": "CSV からユーザーを読み込む",
                 "file": "CSV ファイルを選択",
-                "submit": "読み込む",
+                "submit": "Import",
                 "cancel": "キャンセル",
-                "failed": "読み込みに失敗しました",
+                "failed": "Import に失敗しました",
                 "errors": {
                     "unknownId": "この id のユーザーはいません",
                     "selfChange": "自分のこの項目は変えられません",
@@ -299,7 +299,7 @@
             "activeFailed": "ログインの許可の切り替えに失敗しました"
         },
         "apiToken": {
-            "description": "RestAPI や maintenance で使用するトークンです",
+            "description": "REST API や maintenance で使用するトークンです",
             "configured": "設定済み",
             "notConfigured": "未設定",
             "generate": "生成",
@@ -310,16 +310,16 @@
         },
         "videos": {
             "export": {
-                "open": "書き出し",
-                "failed": "書き出しに失敗しました"
+                "open": "Export",
+                "failed": "Export に失敗しました"
             },
             "import": {
-                "open": "読み込み",
+                "open": "Import",
                 "title": "CSV で動画を移動・名前変更",
                 "file": "CSV ファイルを選択",
-                "submit": "読み込む",
+                "submit": "Import",
                 "cancel": "キャンセル",
-                "failed": "読み込みに失敗しました",
+                "failed": "Import に失敗しました",
                 "done": "{updated} 本の動画を更新しました",
                 "errors": {
                     "unknownId": "この id の動画はありません",
@@ -366,9 +366,9 @@
                 "baseUrl": "URL",
                 "token": "Token",
                 "project": "Project",
-                "assignee": "担当者",
-                "issueTypeTask": "Task の issue type",
-                "issueTypeBug": "Bug の issue type"
+                "assignee": "Assignee",
+                "issueTypeTask": "Task issue type",
+                "issueTypeBug": "Bug issue type"
             },
             "slack": {
                 "title": "Slack",
@@ -404,7 +404,7 @@
                 "host": "SMTP host",
                 "port": "SMTP port",
                 "from": "送信元",
-                "tlsStrict": "TLS 証明書を厳密に検証",
+                "tlsStrict": "TLS証明書を検証する",
                 "testTo": "テストの送信先"
             },
             "vcs": {

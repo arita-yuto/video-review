@@ -13,7 +13,7 @@ test.describe("bootstrap: first launch @bootstrap", () => {
 
         // page.tsx warms the database up first, hence the timeout.
         await expect(page).toHaveURL(/\/bootstrap\b/, { timeout: 60_000 });
-        await expect(page.getByText("Please register an administrator")).toBeVisible();
+        await expect(page.getByText("Register an administrator")).toBeVisible();
     });
 
     test("registering the first administrator logs you in", async ({ page }) => {

@@ -1,6 +1,6 @@
 {
     "bootstrap": {
-        "title": "관리자 설정",
+        "title": "관리자 등록",
         "email": "이메일",
         "password": "비밀번호",
         "initialize": "초기 설정"
@@ -35,7 +35,7 @@
         "uploading": "업로드 중...",
         "uploadingPercent": "업로드 중... {percent}%",
         "errorUpload": "동영상 업로드에 실패했습니다. 관리자에게 문의해 주세요",
-        "errorUploadTooLarge": "파일이 너무 커서 거부되었습니다. 서버 앞단 proxy의 업로드 용량 제한을 확인해 주세요",
+        "errorUploadTooLarge": "파일이 너무 커서 거부되었습니다. 프록시의 업로드 용량 제한을 확인해 주세요",
         "uploaded": "동영상을 업로드했습니다"
     },
     "video-search": {
@@ -67,7 +67,7 @@
         "diffImage": "차이",
         "diffPause": "일시 정지하면 차이가 표시됩니다",
         "diffUnreadable": "이 동영상에서는 차이를 표시할 수 없습니다",
-        "threshold": "한계값",
+        "threshold": "임계값",
         "base": "원본",
         "saveDiffImage": "차이 이미지 저장"
     },
@@ -211,7 +211,7 @@
         "cancel": "취소",
         "saving": "저장 중...",
         "saveFailed": "프로필 저장에 실패했습니다",
-        "avatarHint": "PNG / JPEG 형식, 최대 {max}, {size}까지",
+        "avatarHint": "PNG / JPEG 형식, 최대 {max}",
         "change": "변경",
         "fileTooLarge": "파일 크기({size})가 너무 큽니다",
         "currentPassword": "현재 비밀번호",
@@ -251,10 +251,10 @@
                 "role": "권한",
                 "createdAt": "생성일",
                 "actions": "작업",
-                "active": "Active"
+                "active": "활성"
             },
             "roles": {
-                "viewer": "열람자",
+                "viewer": "뷰어",
                 "admin": "관리자"
             },
             "loadFailed": "사용자를 불러오지 못했습니다",
@@ -289,8 +289,8 @@
                 "failed": "가져오기에 실패했습니다",
                 "errors": {
                     "unknownId": "이 id의 사용자가 없습니다",
-                    "selfChange": "자신의 이 항목은 변경할 수 없습니다",
-                    "emailTaken": "이 이메일의 사용자가 이미 있습니다"
+                    "selfChange": "본인의 이 항목은 변경할 수 없습니다",
+                    "emailTaken": "이미 사용 중인 이메일입니다"
                 },
                 "done": "{created}명 생성, {updated}명 업데이트했습니다"
             },
@@ -367,8 +367,8 @@
                 "token": "토큰",
                 "project": "프로젝트",
                 "assignee": "담당자",
-                "issueTypeTask": "Task 이슈 유형",
-                "issueTypeBug": "Bug 이슈 유형"
+                "issueTypeTask": "작업 이슈 유형",
+                "issueTypeBug": "버그 이슈 유형"
             },
             "slack": {
                 "title": "Slack",
@@ -379,7 +379,7 @@
             "testAndSave": "테스트 후 저장",
             "saved": "연결되었습니다. 저장했습니다",
             "notSaved": "연결하지 못해 저장하지 않았습니다: {error}",
-            "connected": "연결 가능",
+            "connected": "연결됨",
             "disconnected": "테스트 실패",
             "llm": {
                 "title": "AI",
@@ -388,7 +388,7 @@
                 "apiKey": "API 키",
                 "baseUrl": "기본 URL",
                 "model": "모델",
-                "switchFailed": "사용 중인 프로바이더 전환에 실패했습니다",
+                "switchFailed": "프로바이더 전환에 실패했습니다",
                 "use": "이 프로바이더 사용"
             },
             "webhook": {
@@ -404,7 +404,7 @@
                 "host": "SMTP 호스트",
                 "port": "SMTP 포트",
                 "from": "발신자",
-                "tlsStrict": "TLS 인증서 엄격 검증",
+                "tlsStrict": "TLS 인증서 검증",
                 "testTo": "테스트 수신자"
             },
             "vcs": {
@@ -415,7 +415,7 @@
                 "repo": "저장소",
                 "token": "토큰",
                 "branch": "브랜치",
-                "switchFailed": "사용 중인 프로바이더 전환에 실패했습니다",
+                "switchFailed": "프로바이더 전환에 실패했습니다",
                 "use": "이 프로바이더 사용"
             },
             "mcp": {

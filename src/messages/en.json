@@ -1,6 +1,6 @@
 {
     "bootstrap": {
-        "title": "Please register an administrator",
+        "title": "Register an administrator",
         "email": "Email",
         "password": "Password",
         "initialize": "Initialize"
@@ -19,14 +19,14 @@
         "guestVisible": "Visible to guests"
     },
     "video-download": {
-        "title": "Download Video",
+        "title": "Download video",
         "selectRes": "Select resolution",
         "cancel": "Cancel",
         "downloading": "Downloading...",
         "prepare": "Download"
     },
     "video-upload": {
-        "title": "Upload Video",
+        "title": "Upload video",
         "selectFile": "Select a video file",
         "errorNoInput": "Please enter the title, folder, and file",
         "folderKeyPlaceholder": "Folder key (e.g. projectA/scene01)",
@@ -39,17 +39,17 @@
         "uploaded": "Video uploaded"
     },
     "video-search": {
-        "title": "Video Search",
+        "title": "Video search",
         "hasComment": "Has comment",
-        "hasIssue": "Has issue ticket",
-        "filterIssue": "Search issue",
+        "hasIssue": "Has issue",
+        "filterIssue": "Issue",
         "hasDrawing": "Has drawing",
         "userFilter": "Comment author",
         "searchFilter": "Search text",
         "ok": "Search",
         "cancel": "Cancel",
         "commentsDateRange": "Comment date",
-        "videoDateRange": "Video update date"
+        "videoDateRange": "Last updated"
     },
     "video-review": {
         "noVideoSelected": "Please select a video"
@@ -78,9 +78,9 @@
         "thumbnailsClose": "Close thumbnails"
     },
     "chat-search": {
-        "title": "Chat Search",
+        "title": "Chat search",
         "clearHistory": "Clear conversation",
-        "emptyState": "Ask natural-language questions about videos, comments, and events.",
+        "emptyState": "Ask about videos, comments and events.",
         "loading": "Thinking...",
         "inputPlaceholder": "Ask about the videos... (Enter to send)",
         "error": {
@@ -98,7 +98,7 @@
         "captureDrawing": "Include drawing in screenshots"
     },
     "video-comment-panel": {
-        "title": "Comment",
+        "title": "Comments",
         "newBadge": "NEW",
         "commentItemCopyLink": "Copy link",
         "commentItemTask": "Convert to task",
@@ -129,16 +129,16 @@
         "empty": "No events"
     },
     "video-event-search": {
-        "title": "Event Search",
+        "title": "Event search",
         "searchFilter": "Event text",
-        "kind": "Event kind",
+        "kind": "Event type",
         "hasLink": "Has link",
         "ok": "Search",
         "cancel": "Cancel"
     },
     "comment-confirmed": {
-        "commentUpdate": "Update Comment",
-        "commentAdd": "Add Comment",
+        "commentUpdate": "Update comment",
+        "commentAdd": "Add comment",
         "cancel": "Cancel",
         "editIssueLink": "Edit issue link",
         "editComment": "Edit comment"
@@ -149,15 +149,15 @@
         "close": "Close"
     },
     "prompt-edit": {
-        "title": "Prompt Editor",
+        "title": "Prompt editor",
         "save": "Save"
     },
     "comment-search": {
-        "title": "Comment Search",
+        "title": "Comment search",
         "searchFilter": "Filter text",
         "dateRange": "Comment date",
         "hasDrawing": "Has drawing",
-        "hasIssue": "Has issue ticket",
+        "hasIssue": "Has issue",
         "fetchAllComments": "Show all comments",
         "userFilter": "Comment author",
         "ok": "Search",
@@ -185,19 +185,19 @@
     },
     "login": {
         "loginFailedMsg": "Login failed",
-        "displayName": "Display Name",
+        "displayName": "Display name",
         "email": "Email",
         "password": "Password",
-        "ok": "Login",
+        "ok": "Log in",
         "accountDisabledMsg": "This account is disabled"
     },
     "setting": {
-        "title": "Setting",
+        "title": "Settings",
         "language": "Language",
-        "logout": "Logout",
-        "editProfile": "Edit Profile",
+        "logout": "Log out",
+        "editProfile": "Edit profile",
         "administration": "Administration",
-        "editPrompt": "Edit Prompt"
+        "editPrompt": "Edit prompt"
     },
     "calendar-date-radio": {
         "today": "Today",
@@ -205,15 +205,15 @@
         "clear": "Clear"
     },
     "edit-user-profile": {
-        "displayName": "Display Name",
-        "title": "Edit Profile",
+        "displayName": "Display name",
+        "title": "Edit profile",
         "save": "Save",
         "cancel": "Cancel",
         "saving": "Saving...",
         "saveFailed": "Failed to save profile",
-        "avatarHint": "PNG or JPEG. Max size {max}, size {size}.",
+        "avatarHint": "PNG or JPEG, up to {max}",
         "change": "Change",
-        "fileTooLarge": "The selected file({size}) is too large.",
+        "fileTooLarge": "The file ({size}) is too large.",
         "currentPassword": "Current password",
         "newPassword": "New password",
         "confirmPassword": "Confirm new password",
@@ -296,7 +296,7 @@
             },
             "created": "User created",
             "activeLabel": "{name} can sign in",
-            "activeFailed": "Failed to change whether the user can sign in"
+            "activeFailed": "Failed to update sign-in access"
         },
         "apiToken": {
             "description": "A token for the REST API and maintenance.",
@@ -344,7 +344,7 @@
                 "wholeLabel": "Delete every revision of {title}",
                 "revisionLabel": "Delete revision {revision} of {title}",
                 "title": "Delete the video files",
-                "wholeSummary": "Every revision file of {title} is deleted, and the video leaves the list.",
+                "wholeSummary": "All revision files of {title} will be deleted and the video removed from the list.",
                 "revisionSummary": "Revision {revisions} of {title} will be deleted.",
                 "irreversible": "This cannot be undone.",
                 "confirmLabel": "Type <word>{confirmWord}</word> to confirm",
@@ -388,7 +388,7 @@
                 "apiKey": "API key",
                 "baseUrl": "Base URL",
                 "model": "Model",
-                "switchFailed": "Switching the provider in use failed.",
+                "switchFailed": "Failed to switch the provider.",
                 "use": "Use this provider"
             },
             "webhook": {
@@ -415,7 +415,7 @@
                 "repo": "Repository",
                 "token": "Token",
                 "branch": "Branch",
-                "switchFailed": "Switching the provider in use failed.",
+                "switchFailed": "Failed to switch the provider.",
                 "use": "Use this provider"
             },
             "mcp": {
@@ -442,7 +442,7 @@
             "duplicateColumn": "This column appears twice",
             "missingColumn": "Required column is missing",
             "cellCount": "More cells than the header",
-            "required": "Empty",
+            "required": "Required",
             "duplicateInFile": "Same as row {otherLine}",
             "tooShort": "Must be at least {min} characters",
             "tooLong": "Must be at most {max} characters",
