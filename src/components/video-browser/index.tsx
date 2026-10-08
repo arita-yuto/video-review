@@ -18,7 +18,7 @@ import DrawingToolPanel from "@/components/drawing-tool-panel";
 export default function VideoListPanel() {
     const router = useRouter();
     const { userId } = useAuthStore();
-    const { videos, fetchVideos, selectedVideo } = useVideoStore();
+    const { videos, reloadOnViewChange, reloadOnDataChange, selectedVideo } = useVideoStore();
     const [searchDialogOpen, setSearchDialogOpen] = useState(false);
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [thumbnailsOpen, setThumbnailsOpen] = useState(false);
@@ -27,7 +27,7 @@ export default function VideoListPanel() {
 
     useEffect(() => {
         void (async () => {
-            await fetchVideos();
+            await reloadOnViewChange();
         })();
     }, [])
 
@@ -86,7 +86,13 @@ export default function VideoListPanel() {
                 <VideoSearchDialog open={searchDialogOpen} onClose={() => setSearchDialogOpen(false)} />
                 <VideoUploadDialog open={uploadDialogOpen} onClose={async (uploadedVideoId) => {
                     setUploadDialogOpen(false);
-                    await fetchVideos();
+                    await reloadOnDataChange();
+
+                    // A new revision of the open video: show it rather than the one that was playing.
+                    const { selectedVideo: open, revisions, selectVideoRevision } = useVideoStore.getState();
+                    if (uploadedVideoId && uploadedVideoId === open?.id && revisions[0]) {
+                        selectVideoRevision(revisions[0]);
+                    }
 
                     // The tree is virtualised and a new folder can land outside the rendered
                     // window, so selecting the video brings it into view.

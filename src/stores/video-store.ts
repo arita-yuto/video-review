@@ -12,7 +12,8 @@ interface VideoState {
     selectedRevision: VideoRevision | null;
     loading: boolean;
 
-    fetchVideos: () => Promise<void>;
+    reloadOnViewChange: () => Promise<void>;
+    reloadOnDataChange: () => Promise<void>;
     selectVideo: (video: Video) => Promise<void>;
     nextVideo:() => Promise<boolean>;
     selectVideoRevision: (revision: VideoRevision) => void;
@@ -28,30 +29,51 @@ export const useVideoStore = create<VideoState>((set, get) => ({
     selectedRevision: null,
     loading: false,
 
-    async fetchVideos() {
+    // When what the list shows changes (first load, search, filters): reload the list, with the
+    // loading state on screen.
+    async reloadOnViewChange() {
         set({ loading: true });
-        const s = useVideoSearchStore.getState();
-        const videoDateRange = useVideoDateFilterStore.getState().resolve();
-        const commentsDateRange = useVideoCommentsDateFilterStore.getState().resolve();
-        const res = await api.videos.index.$get({
-            query: {
-                videoFrom: videoDateRange?.from?.toISOString(),
-                videoTo: videoDateRange?.to?.toISOString(),
-                commentsFrom: commentsDateRange?.from?.toISOString(),
-                commentsTo: commentsDateRange?.to?.toISOString(),
-                user: s.user || undefined,
-                filterTree: s.filterTree || undefined,
-                filterIssue: s.filterIssue || undefined,
-                hasIssue: s.hasIssue ? "true" : undefined,
-                hasDrawing: s.hasDrawing ? "true" : undefined,
-                hasComment: s.hasComment ? "true" : undefined,
-                tags: s.tags.length > 0 ? s.tags.join(",") : undefined,
-            },
-        });
-        if (res.status !== 200) throw new Error("Failed to fetch videos");
-        const videos = await res.json();
-        const tags = await api.videos.tags.$get();
-        set({ videos, loading: false, allVideoTags: tags.status === 200 ? await tags.json() : [] });
+        const { videos, tags } = await queryVideos();
+        set({ videos, loading: false, allVideoTags: tags });
+    },
+
+    // When videos change on the server (upload, delete, move, rename): bring the list and the open
+    // video up to date in the background. The loading flag and the open video's objects stay as
+    // they are where nothing changed, so the player keeps playing.
+    async reloadOnDataChange() {
+        try {
+            const { videos, tags } = await queryVideos();
+            set({ videos, allVideoTags: tags });
+
+            const open = get().selectedVideo;
+            if (!open) {
+                return;
+            }
+
+            const res = await api.videos[":id"].$get({ param: { id: open.id } });
+            const video = res.status === 200 ? await res.json() : null;
+            if (!video || video.deleted) {
+                set({ selectedVideo: null, revisions: [], selectedRevision: null });
+                return;
+            }
+
+            const revisionsRes = await api.videos[":id"].revisions.$get({ param: { id: open.id } });
+            if (revisionsRes.status !== 200) {
+                throw new Error("Failed to fetch revisions");
+            }
+            const revisions = await revisionsRes.json();
+
+            const renamed = video.title !== open.title || video.folderKey !== open.folderKey;
+            const watchingKept = revisions.some(r => r.id === get().selectedRevision?.id);
+            set({
+                revisions,
+                ...(renamed ? { selectedVideo: { ...open, title: video.title, folderKey: video.folderKey } } : {}),
+                ...(watchingKept ? {} : { selectedRevision: revisions[0] ?? null }),
+            });
+        } catch (e) {
+            // The screen keeps what it showed; the next reload catches up.
+            console.error("Failed to reload videos after a change", e);
+        }
     },
 
     async selectVideo(video) {
@@ -117,3 +139,33 @@ export const useVideoStore = create<VideoState>((set, get) => ({
         }));
     },
 }));
+
+async function queryVideos() {
+    const s = useVideoSearchStore.getState();
+    const videoDateRange = useVideoDateFilterStore.getState().resolve();
+    const commentsDateRange = useVideoCommentsDateFilterStore.getState().resolve();
+    const res = await api.videos.index.$get({
+        query: {
+            videoFrom: videoDateRange?.from?.toISOString(),
+            videoTo: videoDateRange?.to?.toISOString(),
+            commentsFrom: commentsDateRange?.from?.toISOString(),
+            commentsTo: commentsDateRange?.to?.toISOString(),
+            user: s.user || undefined,
+            filterTree: s.filterTree || undefined,
+            filterIssue: s.filterIssue || undefined,
+            hasIssue: s.hasIssue ? "true" : undefined,
+            hasDrawing: s.hasDrawing ? "true" : undefined,
+            hasComment: s.hasComment ? "true" : undefined,
+            tags: s.tags.length > 0 ? s.tags.join(",") : undefined,
+        },
+    });
+    if (res.status !== 200) {
+        throw new Error("Failed to fetch videos");
+    }
+    const videos = await res.json();
+
+    const tagsRes = await api.videos.tags.$get();
+    const tags = tagsRes.status === 200 ? await tagsRes.json() : [];
+
+    return { videos, tags };
+}

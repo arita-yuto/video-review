@@ -10,6 +10,7 @@ import { VideoRow } from "@/components/admin/videos-section/videos-table/video-r
 import { RevisionRow } from "@/components/admin/videos-section/videos-table/revision-row";
 import type { VideoWithRevisionList } from "@/lib/db-types";
 import { Spinner } from "@/ui/spinner";
+import { useVideoStore } from "@/stores/video-store";
 
 // The filter runs on the server, so wait for a pause in typing before asking again.
 const FILTER_DEBOUNCE_MS = 300;
@@ -115,6 +116,7 @@ export function VideosTable({ actions }: { actions: ReactNode }) {
 
         // What the server did decides the list, so read it back rather than guess.
         setReloadToken(token => token + 1);
+        void useVideoStore.getState().reloadOnDataChange();
     }
 
     if (error) {
