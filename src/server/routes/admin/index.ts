@@ -5,6 +5,8 @@ import { maintenanceRouter } from "@/server/routes/admin/maintenance";
 import { settingsRouter } from "@/server/routes/admin/settings";
 import { usersExportRouter } from "@/server/routes/admin/users-export";
 import { usersImportRouter } from "@/server/routes/admin/users-import";
+import { videosExportRouter } from "@/server/routes/admin/videos-export";
+import { videosImportRouter } from "@/server/routes/admin/videos-import";
 import { getVCSProvider } from "@/server/lib/integrations/vcs";
 import { listUTCDays, upsertMerge, upsertCommit } from "@/server/lib/vcs/cache";
 import { authorize } from "@/server/lib/token";
@@ -505,4 +507,6 @@ export const adminRouter = createRouter()
     .route("/maintenance", maintenanceRouter)
     .route("/settings", settingsRouter)
     .route("/users/export", usersExportRouter)
-    .route("/users/import", usersImportRouter);
+    .route("/users/import", usersImportRouter)
+    .route("/videos/export", videosExportRouter)
+    .route("/videos/import", videosImportRouter);

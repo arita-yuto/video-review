@@ -7,6 +7,8 @@ import { useAuthStore } from "@/stores/auth-store";
 import { AdminSection } from "@/components/admin/admin-section";
 import { UserRow } from "@/components/admin/users-section/user-row";
 import type { AssignableRole } from "@/lib/role";
+import { CsvActions } from "@/components/controls/csv-actions";
+import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
 import { CreateUserForm } from "@/components/admin/users-section/create-user-form";
 import type { User } from "@/lib/db-types";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/ui/table";
@@ -22,6 +24,7 @@ export function UsersSection() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [justAddedId, setJustAddedId] = useState<string | null>(null);
+    const [filter, setFilter] = useState("");
     const listRef = useRef<HTMLDivElement>(null);
 
     async function loadUsers(): Promise<User[]> {
@@ -117,6 +120,18 @@ export function UsersSection() {
 
     return (
         <AdminSection title={t("sections.users")}>
+            <div className="flex shrink-0 items-center gap-2">
+                <div className="flex-1">
+                    <SidebarSearchInput value={filter} onChange={setFilter} placeholder={t("users.filterPlaceholder")} />
+                </div>
+                <CsvActions
+                    kind="users"
+                    exportCsv={() => api.admin.users.export.$get()}
+                    importCsv={(csv) => api.admin.users.import.$post({ json: { csv } })}
+                    onImported={() => void onImported()}
+                />
+            </div>
+
             {loading ? (
                 <div className="flex flex-1 items-center justify-center">
                     <Spinner />
@@ -137,7 +152,7 @@ export function UsersSection() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {users.map(user => (
+                            {users.filter(user => matches(user, filter)).map(user => (
                                 <UserRow
                                     key={user.id}
                                     user={user}
@@ -154,7 +169,13 @@ export function UsersSection() {
 
             {error && <p className="shrink-0 text-sm text-destructive">{error}</p>}
 
-            <CreateUserForm onCreated={onCreated} onImported={() => void onImported()} />
+            <CreateUserForm onCreated={onCreated} />
         </AdminSection>
     );
+}
+
+// Every user is already loaded, so the list is narrowed in the browser.
+function matches(user: User, filter: string): boolean {
+    const needle = filter.trim().toLowerCase();
+    return needle === "" || [user.displayName, user.email ?? ""].some(v => v.toLowerCase().includes(needle));
 }

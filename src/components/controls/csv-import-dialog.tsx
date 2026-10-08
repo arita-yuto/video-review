@@ -3,12 +3,21 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { api, readError } from "@/lib/api-client";
+import { readError } from "@/lib/api-client";
 import { FormDialog } from "@/components/dialog/form-dialog";
 import { FilePicker } from "@/components/controls/file-picker";
 import { CsvErrorTable, type CsvImportError } from "@/components/controls/csv-error-table";
 
-export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void; onImported: () => void }) {
+type ImportResponse = { status: number; json: () => Promise<unknown> };
+
+// The texts live under `admin-settings.<messages>`: title, file, submit, cancel, failed, done,
+// and errors.<code> for the reasons the route adds to the shared CSV ones.
+export function CsvImportDialog({ messages, send, onImported, onClose }: {
+    messages: "users.import" | "videos.import";
+    send: (csv: string) => Promise<ImportResponse>;
+    onImported: () => void;
+    onClose: () => void;
+}) {
     const t = useTranslations("admin-settings");
 
     const [file, setFile] = useState<File | null>(null);
@@ -17,27 +26,29 @@ export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void
     const [failure, setFailure] = useState<string | null>(null);
 
     async function onSubmit() {
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
         setImporting(true);
         setErrors([]);
         setFailure(null);
 
         try {
-            const res = await api.admin.users.import.$post({ json: { csv: await file.text() } });
+            const res = await send(await file.text());
             if (res.status === 422) {
-                setErrors((await res.json()).errors);
+                setErrors(((await res.json()) as { errors: CsvImportError[] }).errors);
                 return;
             }
             if (res.status !== 200) {
                 throw new Error(await readError(res));
             }
 
-            toast.success(t("users.import.done", await res.json()));
+            toast.success(t(`${messages}.done`, (await res.json()) as Record<string, number>));
             onImported();
             onClose();
         } catch (e) {
-            setFailure(`${t("users.import.failed")}: ${e instanceof Error ? e.message : String(e)}`);
+            setFailure(`${t(`${messages}.failed`)}: ${e instanceof Error ? e.message : String(e)}`);
         } finally {
             setImporting(false);
         }
@@ -47,10 +58,10 @@ export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void
         <FormDialog
             open
             onClose={onClose}
-            title={t("users.import.title")}
+            title={t(`${messages}.title`)}
             onSubmit={onSubmit}
-            submitLabel={t("users.import.submit")}
-            cancelLabel={t("users.import.cancel")}
+            submitLabel={t(`${messages}.submit`)}
+            cancelLabel={t(`${messages}.cancel`)}
             submitDisabled={!file || importing}
             cancelDisabled={importing}
             message={failure ?? undefined}
@@ -58,7 +69,7 @@ export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void
             <FilePicker
                 accept=".csv,text/csv"
                 file={file}
-                placeholder={t("users.import.file")}
+                placeholder={t(`${messages}.file`)}
                 onChange={(picked) => {
                     setFile(picked);
                     setErrors([]);
@@ -69,7 +80,7 @@ export function ImportUsersDialog({ onClose, onImported }: { onClose: () => void
                 <CsvErrorTable
                     errors={errors}
                     describe={(error) => {
-                        const key = `users.import.errors.${error.code}` as const;
+                        const key = `${messages}.errors.${error.code}` as const;
                         return t.has(key) ? t(key) : null;
                     }}
                 />
