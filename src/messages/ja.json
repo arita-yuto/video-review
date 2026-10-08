@@ -254,8 +254,8 @@
                 "active": "Active"
             },
             "roles": {
-                "viewer": "閲覧者",
-                "admin": "管理者"
+                "viewer": "Viewer",
+                "admin": "Admin"
             },
             "loadFailed": "ユーザーの取得に失敗しました",
             "updateFailed": "権限の更新に失敗しました",
