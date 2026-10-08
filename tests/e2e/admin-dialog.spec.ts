@@ -10,7 +10,7 @@ async function loginAsAdmin(page: import("@playwright/test").Page) {
     await page.locator('input[type="password"]').fill(ADMIN.password);
     await page.locator('input[type="password"]').press("Enter");
     await page.waitForURL(/\/video-review\/review\b/);
-    await expect(page.getByRole("button", { name: "Setting", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Settings", exact: true })).toBeVisible();
 }
 
 async function loginAsGuest(page: import("@playwright/test").Page) {
@@ -18,17 +18,17 @@ async function loginAsGuest(page: import("@playwright/test").Page) {
     // The default tab is configurable, so pick "Guest" explicitly.
     await page.getByRole("tab", { name: "Guest" }).click();
     await page.locator("#displayName").fill("E2E Guest");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByRole("button", { name: "Log in" }).click();
     await page.waitForURL(/\/video-review\/review\b/);
-    await expect(page.getByRole("button", { name: "Setting", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Settings", exact: true })).toBeVisible();
 }
 
 async function openSettings(page: import("@playwright/test").Page) {
-    await page.getByRole("button", { name: "Setting", exact: true }).click();
+    await page.getByRole("button", { name: "Settings", exact: true }).click();
     const popover = page.locator('[data-slot="popover-content"]');
     await expect(popover).toBeVisible();
     // The rows appear once the popover's own auth check resolves.
-    await expect(popover.getByText("Logout")).toBeVisible();
+    await expect(popover.getByText("Log out")).toBeVisible();
     return popover;
 }
 
