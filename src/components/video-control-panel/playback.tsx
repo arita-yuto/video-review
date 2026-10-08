@@ -11,6 +11,9 @@ import {
     SelectValue,
 } from "@/ui/select";
 import { Slider } from "@/ui/slider";
+import { ButtonGroup } from "@/ui/button-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
+import { ArrowRightToLine, ListVideo, Repeat1, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatTime } from "@/lib/utils";
 import { usePlayback } from "@/stores/playback-store";
@@ -99,40 +102,35 @@ export function PlaybackRateSelect() {
     );
 }
 
-export function PlayModeSelect() {
+const PLAY_MODES: { mode: EPlayMode; Icon: LucideIcon }[] = [
+    { mode: "normal", Icon: ArrowRightToLine },
+    { mode: "loop", Icon: Repeat1 },
+    { mode: "next", Icon: ListVideo },
+];
+
+export function PlayModeButtons() {
     const t = useTranslations("video-control-panel");
-    const [showSelect, setShowSelect] = useState(false);
     const playMode = useVideoPlayerStore((s) => s.playMode);
     const setMode = useVideoPlayerStore((s) => s.setMode);
 
     return (
-        <div className="flex items-center gap-2" onMouseOver={() => setShowSelect(true)} onMouseLeave={() => setShowSelect(false)}>
-            <span className="text-xs text-white">
-                {t("playMode")} : {t(playMode)}
-            </span>
-
-            <div
-                className={`transition-opacity ${showSelect
-                        ? "opacity-100 pointer-events-auto"
-                        : "opacity-0 pointer-events-none"}`}>
-                <Select
-                    value={playMode}
-                    onValueChange={(val) => {
-                        setMode(val as EPlayMode);
-                    }}
-                >
-                    <SelectTrigger size="sm" className="relative w-30">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {["normal", "loop", "next"].map((r) => (
-                            <SelectItem key={r} value={r.toString()}>
-                                {t(r)}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-        </div>
+        <ButtonGroup aria-label={t("playMode")}>
+            {PLAY_MODES.map(({ mode, Icon }) => (
+                <Tooltip key={mode}>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant={playMode === mode ? "accent" : "ghost"}
+                            size="icon-sm"
+                            aria-label={t(mode)}
+                            aria-pressed={playMode === mode}
+                            onClick={() => setMode(mode)}
+                        >
+                            <Icon />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t(mode)}</TooltipContent>
+                </Tooltip>
+            ))}
+        </ButtonGroup>
     );
 }
