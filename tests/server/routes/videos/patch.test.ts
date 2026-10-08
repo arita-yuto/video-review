@@ -50,3 +50,42 @@ describe("videos patchVideoRouter guestVisible", () => {
         );
     });
 });
+
+describe("videos patchVideoRouter title and folderKey", () => {
+    const app = new Hono();
+    app.route("/videos/:id", patchVideoRouter);
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    async function patch(body: Record<string, string>, taken: boolean) {
+        vi.spyOn(prisma.video, "findUnique").mockResolvedValue({ id: "video-1", title: "Opening", folderKey: "projectA" } as never);
+        vi.spyOn(prisma.video, "findFirst").mockResolvedValue((taken ? { id: "video-2" } : null) as never);
+        const update = vi.spyOn(prisma.video, "update").mockResolvedValue({ id: "video-1" } as never);
+
+        const res = await app.request("http://localhost/videos/video-1", {
+            method: "PATCH",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(body),
+        });
+        return { res, update };
+    }
+
+    it("renames the video and moves it to another folder", async () => {
+        const { res, update } = await patch({ title: "Ending", folderKey: "projectB" }, false);
+
+        expect(res.status).toBe(200);
+        expect(update).toHaveBeenCalledWith(expect.objectContaining({
+            where: { id: "video-1" },
+            data: expect.objectContaining({ title: "Ending", folderKey: "projectB" }),
+        }));
+    });
+
+    it("refuses a title another video already has in that folder", async () => {
+        const { res, update } = await patch({ folderKey: "projectB" }, true);
+
+        expect(res.status).toBe(409);
+        expect(update).not.toHaveBeenCalled();
+    });
+});

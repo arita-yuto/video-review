@@ -244,6 +244,7 @@
             "saved": "保存しました"
         },
         "users": {
+            "filterPlaceholder": "名前・メールで絞り込み",
             "columns": {
                 "displayName": "表示名",
                 "email": "メール",
@@ -276,11 +277,11 @@
                 "failed": "パスワードのリセットに失敗しました"
             },
             "export": {
-                "open": "CSV に書き出す",
+                "open": "書き出し",
                 "failed": "書き出しに失敗しました"
             },
             "import": {
-                "open": "CSV を読み込む",
+                "open": "読み込み",
                 "title": "CSV からユーザーを読み込む",
                 "file": "CSV ファイルを選択",
                 "submit": "読み込む",
@@ -308,6 +309,23 @@
             "failed": "トークンの生成に失敗しました"
         },
         "videos": {
+            "export": {
+                "open": "書き出し",
+                "failed": "書き出しに失敗しました"
+            },
+            "import": {
+                "open": "読み込み",
+                "title": "CSV で動画を移動・名前変更",
+                "file": "CSV ファイルを選択",
+                "submit": "読み込む",
+                "cancel": "キャンセル",
+                "failed": "読み込みに失敗しました",
+                "done": "{updated} 本の動画を更新しました",
+                "errors": {
+                    "unknownId": "この id の動画はありません",
+                    "pairTaken": "このフォルダに同じタイトルの動画があります"
+                }
+            },
             "loadFailed": "動画の取得に失敗しました",
             "filterPlaceholder": "タイトル・フォルダで絞り込み",
             "noMatch": "条件に合う動画はありません",

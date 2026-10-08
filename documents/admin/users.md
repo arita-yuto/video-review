@@ -21,7 +21,7 @@ Export the users to a CSV file, edit it and import it to create and update users
 
 ### Export to a CSV file
 
-Press Export CSV at the top right of Create user to download `users.csv`.
+Press Export above the list to download `users.csv`.
 
 Note: the CLI exports with `export-users` ([maintenance CLI guide](../../maintenance/README.md)).
 
@@ -37,28 +37,21 @@ Note: the CLI exports with `export-users` ([maintenance CLI guide](../../mainten
 | active | `true` or `false` (empty means `true` when creating)<br>A `false` user cannot log in |
 
 An empty cell in a row that updates a user keeps the current value.  
-The exported file has an empty pass column.
-
-### An example that adds a new user and changes the role and active of an existing one
-
-```
-id,name,email,pass,role,active
-9b2f6c1e-4a7d-4e0b-8f3a-2c5d7e9a1b40,Nijika,nijika@example.com,,admin,false
-,Bocchi,bocchi@example.com,secret01,viewer,
-```
+The exported file leaves pass empty for security.  
+Fill in a new password only for the users whose password should change.
 
 Note: save the file as UTF-8.  
 Note: you cannot change the role, active or pass of your own row.
 
 ### Import the CSV file
 
-1. Press Import CSV at the top right of Create user.
+1. Press Import above the list.
 
-<img src="https://github.com/user-attachments/assets/2246ff2b-1086-4978-b3e3-582099c02491" />
+<img src="https://github.com/user-attachments/assets/352911f9-6063-4d6c-8add-5dd30ddb9799" />
 
 2. Choose the CSV file and press Import.
 
-<img src="https://github.com/user-attachments/assets/cf554c0e-f801-4e54-bbee-f9beb6fb6158" />
+<img src="https://github.com/user-attachments/assets/849e6b93-7ffd-4dc4-8308-fc035d92ed91" />
 
 When the import succeeds, the number of created and updated users is shown.  
 When there are errors, nothing is applied and a list of the row, column and reason is shown.

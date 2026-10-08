@@ -244,6 +244,7 @@
             "saved": "저장했습니다"
         },
         "users": {
+            "filterPlaceholder": "이름, 이메일로 필터링",
             "columns": {
                 "displayName": "표시 이름",
                 "email": "이메일",
@@ -276,11 +277,11 @@
                 "failed": "비밀번호 재설정에 실패했습니다"
             },
             "export": {
-                "open": "CSV 내보내기",
+                "open": "내보내기",
                 "failed": "내보내기에 실패했습니다"
             },
             "import": {
-                "open": "CSV 가져오기",
+                "open": "가져오기",
                 "title": "CSV에서 사용자 가져오기",
                 "file": "CSV 파일 선택",
                 "submit": "가져오기",
@@ -308,6 +309,23 @@
             "failed": "토큰 생성에 실패했습니다"
         },
         "videos": {
+            "export": {
+                "open": "내보내기",
+                "failed": "내보내기에 실패했습니다"
+            },
+            "import": {
+                "open": "가져오기",
+                "title": "CSV로 동영상 이동·이름 변경",
+                "file": "CSV 파일 선택",
+                "submit": "가져오기",
+                "cancel": "취소",
+                "failed": "가져오기에 실패했습니다",
+                "done": "동영상 {updated}개를 업데이트했습니다",
+                "errors": {
+                    "unknownId": "이 id의 동영상이 없습니다",
+                    "pairTaken": "이 폴더에 같은 제목의 동영상이 있습니다"
+                }
+            },
             "loadFailed": "동영상을 불러오지 못했습니다",
             "filterPlaceholder": "제목, 폴더로 필터링",
             "noMatch": "조건에 맞는 동영상이 없습니다",

@@ -1,6 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
-import path from "node:path";
 import { prisma } from "@/server/lib/db";
 
 const mocks = vi.hoisted(() => ({
@@ -101,19 +100,16 @@ describe("videos upload initRouter (DB)", () => {
         const title = `init-title-${randomUUID().slice(0, 8)}`;
         const folderKey = `init-folder-${randomUUID().slice(0, 8)}`;
         const scenePath = "videos/scenes/scene-01.mp4";
-        const expectedStorageKey = path
-            .join("videos", folderKey, title, "rev_001.mp4")
-            .replace(/\\/g, "/");
 
-        mocks.createSession.mockResolvedValueOnce({
+        mocks.createSession.mockImplementationOnce(async ({ storageKey }: { storageKey: string }) => ({
             id: "session-init-new",
             title,
             folderKey,
             scenePath,
             nextRev: 1,
             storage: "local",
-            storageKey: expectedStorageKey,
-        });
+            storageKey,
+        }));
 
         const { body, contentType } = multipartBody({
             title,
@@ -128,6 +124,16 @@ describe("videos upload initRouter (DB)", () => {
         });
 
         expect(res.status).toBe(200);
+
+        const video = await prisma.video.findFirst({
+            where: { title, folderKey },
+            select: { id: true, deleted: true, latestRevisionNum: true, scenePath: true },
+        });
+        expect(video).not.toBeNull();
+        createdVideoIds.push(video!.id);
+        // The file goes under the video id, so renaming the video later leaves its path alone.
+        const expectedStorageKey = `videos/${video!.id}/rev_001.mp4`;
+
         await expect(res.json()).resolves.toEqual({
             url: "https://example.test/upload",
             session: {
@@ -143,12 +149,6 @@ describe("videos upload initRouter (DB)", () => {
             chunkSize: 16 * 1024 * 1024,
         });
 
-        const video = await prisma.video.findFirst({
-            where: { title, folderKey },
-            select: { id: true, deleted: true, latestRevisionNum: true, scenePath: true },
-        });
-        expect(video).not.toBeNull();
-        createdVideoIds.push(video!.id);
         expect(video).toEqual({
             id: video!.id,
             deleted: true,
@@ -177,19 +177,16 @@ describe("videos upload initRouter (DB)", () => {
 
         const title = `init-title-${randomUUID().slice(0, 8)}`;
         const folderKey = `init-folder-${randomUUID().slice(0, 8)}`;
-        const expectedStorageKey = path
-            .join("videos", folderKey, title, "rev_001.mp4")
-            .replace(/\\/g, "/");
 
-        mocks.createSession.mockResolvedValueOnce({
+        mocks.createSession.mockImplementationOnce(async ({ storageKey }: { storageKey: string }) => ({
             id: "session-init-vcs",
             title,
             folderKey,
             scenePath: undefined,
             nextRev: 1,
             storage: "local",
-            storageKey: expectedStorageKey,
-        });
+            storageKey,
+        }));
 
         const { body, contentType } = multipartBody({
             title,

@@ -244,6 +244,7 @@
             "saved": "Saved"
         },
         "users": {
+            "filterPlaceholder": "Filter by name or email...",
             "columns": {
                 "displayName": "Display name",
                 "email": "Email",
@@ -276,11 +277,11 @@
                 "failed": "Failed to reset the password"
             },
             "export": {
-                "open": "Export CSV",
+                "open": "Export",
                 "failed": "Failed to export"
             },
             "import": {
-                "open": "Import CSV",
+                "open": "Import",
                 "title": "Import users from CSV",
                 "file": "Choose a CSV file",
                 "submit": "Import",
@@ -308,6 +309,23 @@
             "failed": "Failed to generate the token"
         },
         "videos": {
+            "export": {
+                "open": "Export",
+                "failed": "Failed to export"
+            },
+            "import": {
+                "open": "Import",
+                "title": "Move and rename videos from CSV",
+                "file": "Choose a CSV file",
+                "submit": "Import",
+                "cancel": "Cancel",
+                "failed": "Failed to import",
+                "done": "{updated} videos updated",
+                "errors": {
+                    "unknownId": "No video has this id",
+                    "pairTaken": "Another video already has this title in this folder"
+                }
+            },
             "loadFailed": "Failed to load the videos",
             "filterPlaceholder": "Filter by title or folder...",
             "noMatch": "No video matches the filter.",

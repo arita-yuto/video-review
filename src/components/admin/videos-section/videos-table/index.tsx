@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
 import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
@@ -15,7 +15,7 @@ import { Spinner } from "@/ui/spinner";
 const FILTER_DEBOUNCE_MS = 300;
 
 // A fragment: the search field and the list are laid out by the AdminSection flex column.
-export function VideosTable() {
+export function VideosTable({ actions }: { actions: ReactNode }) {
     const t = useTranslations("admin-settings");
 
     const [videos, setVideos] = useState<VideoWithRevisionList[] | null>(null);
@@ -123,12 +123,15 @@ export function VideosTable() {
 
     return (
         <>
-            <div className="shrink-0">
-                <SidebarSearchInput
-                    value={filter}
-                    onChange={setFilter}
-                    placeholder={t("videos.filterPlaceholder")}
-                />
+            <div className="flex shrink-0 items-center gap-2">
+                <div className="flex-1">
+                    <SidebarSearchInput
+                        value={filter}
+                        onChange={setFilter}
+                        placeholder={t("videos.filterPlaceholder")}
+                    />
+                </div>
+                {actions}
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto">
