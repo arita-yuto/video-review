@@ -6,7 +6,6 @@ import { ServerError } from "@/server/lib/server-error";
 import { VideoReviewStorage } from "@/server/lib/storage";
 import { env } from "@/server/lib/env/storage-env";
 import { getUploadChunkMb } from "@/server/lib/integrations/general";
-import path from "path";
 import { createSession } from "@/server/lib/upload-session";
 import { UploadStorageType } from "@/lib/db-types";
 import Busboy from "busboy";
@@ -99,7 +98,7 @@ export const initRouter = createRouter()
                     let video = await prisma.video.findFirst({ where: { title, folderKey } });
                     if (!video) {
                         console.log("[upload.init] create video (draft)", { title, folderKey });
-                        await prisma.video.create({
+                        video = await prisma.video.create({
                             data: {
                                 title,
                                 folderKey,
@@ -120,9 +119,10 @@ export const initRouter = createRouter()
                             },
                         });
                     } else {
+                        const videoId = video.id;
                         nextRev = await prisma.$transaction(async (tx) => {
                             const latest = await tx.videoRevision.findFirst({
-                                where: { videoId: video.id },
+                                where: { videoId },
                                 orderBy: { revision: "desc" },
                             });
                             return (latest?.revision ?? 0) + 1;
@@ -134,13 +134,10 @@ export const initRouter = createRouter()
                         });
                     }
 
+                    // Stored by video id, not by folder and title: those can be renamed later, and a new
+                    // video taking an old name must not land on the renamed video's files.
                     const filenameOut = `rev_${String(nextRev).padStart(3, "0")}.mp4`;
-                    const storageKey = path.join(
-                        "videos",
-                        folderKey,
-                        title,
-                        filenameOut
-                    ).replace(/\\/g, "/");
+                    const storageKey = `videos/${video.id}/${filenameOut}`;
 
                     const type = VideoReviewStorage.type();
                     const session = await createSession({
