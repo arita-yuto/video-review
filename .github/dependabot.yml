@@ -1,0 +1,27 @@
+# Dependabot handles security fixes only; version updates are Renovate's job (renovate.json).
+# It reads the lockfile, so it can also fix packages that are only pulled in indirectly.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # 0 turns off version updates. Security updates are not bound by this limit.
+    open-pull-requests-limit: 0
+    groups:
+      # One PR for every patch and minor security fix; a fix that needs a major gets its own PR.
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+        update-types: ["patch", "minor"]
+
+  - package-ecosystem: "gomod"
+    directories: ["/maintenance", "/integrations/launcher"]
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+        update-types: ["patch", "minor"]
