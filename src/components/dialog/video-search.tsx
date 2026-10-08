@@ -16,7 +16,7 @@ import MultiComboBox from "@/components/controls/multi-combobox";
 
 export function VideoSearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     const t = useTranslations("video-search");
-    const { fetchVideos, allVideoTags } = useVideoStore();
+    const { reloadOnViewChange, allVideoTags } = useVideoStore();
     const [commentUsers, setCommentUsers] = useState<{ label: string, value: string }[]>([]);
 
     const {
@@ -48,7 +48,7 @@ export function VideoSearchDialog({ open, onClose }: { open: boolean; onClose: (
     }, [open]);
 
     const handleSearch = () => {
-        fetchVideos();
+        reloadOnViewChange();
         onClose();
     }
 

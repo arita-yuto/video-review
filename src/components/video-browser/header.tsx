@@ -29,14 +29,14 @@ export default function VideoListPanelHeader(
     const tChat = useTranslations("chat-search");
     const { isMobile } = useSidebar();
     const { role } = useAuthStore();
-    const { fetchVideos } = useVideoStore();
+    const { reloadOnViewChange } = useVideoStore();
     const { filterTree, setFilterTree, isFiltering, clear } = useVideoSearchStore();
     const videoDate = useVideoDateFilterStore();
     const { open: openChat } = useChatSearchStore();
 
     // Refetch when the tree text or the date filter changes.
     useEffect(() => {
-        fetchVideos();
+        reloadOnViewChange();
     }, [filterTree, videoDate.mode, videoDate.from, videoDate.to, videoDate.days]);
 
     // The date filter now lives in its own store, so fold it into the indicator.
@@ -45,7 +45,7 @@ export default function VideoListPanelHeader(
     const handleClear = () => {
         clear();
         videoDate.clear();
-        fetchVideos();
+        reloadOnViewChange();
     }
 
     return (

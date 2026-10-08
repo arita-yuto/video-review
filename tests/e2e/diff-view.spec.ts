@@ -39,9 +39,6 @@ test.describe("revision diff-view", () => {
         await upload(page, title, folderKey);
         await upload(page, title, folderKey);
 
-        // Works around a known bug: an open video's revision list does not pick up a revision
-        // uploaded from the browser until the page reloads. Remove once that is fixed.
-        await page.reload();
         await page.getByRole("button", { name: "Compare" }).click();
 
         await page.waitForURL(/\/video-review\/diff\/[^?]+\?left=1&right=2/);
