@@ -5,7 +5,7 @@ const ADMIN = { email: "Bocchi@example.com", password: "pass123" };
 
 async function openJiraSettings(page: import("@playwright/test").Page) {
     await page.getByRole("button", { name: "Settings", exact: true }).click();
-    await page.getByRole("button", { name: "Administration" }).click();
+    await page.getByRole("menuitem", { name: "Administration" }).click();
     const dialog = page.getByRole("dialog");
     await dialog.getByRole("tab", { name: "Jira" }).click();
     await expect(dialog.getByRole("textbox", { name: "URL" })).toBeVisible();

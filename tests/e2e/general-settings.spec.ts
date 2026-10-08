@@ -18,7 +18,7 @@ test.describe("General settings", () => {
     test("the default login tab saved by an admin is the one the login screen opens on", async ({ page }) => {
         await loginAsAdmin(page);
         await page.getByRole("button", { name: "Settings", exact: true }).click();
-        await page.getByRole("button", { name: "Administration" }).click();
+        await page.getByRole("menuitem", { name: "Administration" }).click();
 
         const dialog = page.getByRole("dialog");
         await dialog.getByRole("tab", { name: "General" }).click();
