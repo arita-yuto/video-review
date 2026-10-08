@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ["main"]
 
+# Build checks only; the image job builds without pushing.
+permissions:
+  contents: read
+
 jobs:
   web:
     runs-on: ubuntu-latest
