@@ -4,16 +4,35 @@
     "dependencyDashboard": true,
     "dependencyDashboardApproval": true,
     "dependencyDashboardOSVVulnerabilitySummary": "all",
+    "vulnerabilityAlerts": {
+        "description": "Security fixes come from Dependabot (.github/dependabot.yml), which also reads the lockfile; a second PR from Renovate would duplicate it.",
+        "enabled": false
+    },
+    "lockFileMaintenance": {
+        "description": "Refresh the lockfile once a month in one PR, so indirect packages do not drift far behind.",
+        "enabled": true,
+        "dependencyDashboardApproval": false,
+        "schedule": ["before 9am on the first day of the month"]
+    },
     "packageRules": [
         {
-            "description": "npm packages can be unpublished within 72 hours and hijacked releases surface in the first days, so the dashboard offers the newest version that is at least 3 days old. Vulnerability fix PRs ignore this by default.",
+            "description": "npm packages can be unpublished within 72 hours and hijacked releases surface in the first days, so the dashboard offers the newest version that is at least 3 days old.",
             "matchDatasources": ["npm"],
             "minimumReleaseAge": "3 days"
         },
         {
-            "description": "The lint plugin is young; each release may add findings, so bump it weekly and let the CI lint job show the effect.",
+            "description": "Patch and minor updates arrive together once a week and go in when the PR checks pass. Majors stay on the dashboard until approved.",
+            "matchDatasources": ["npm"],
+            "matchUpdateTypes": ["patch", "minor"],
+            "dependencyDashboardApproval": false,
+            "groupName": "non-major dependencies",
+            "schedule": ["before 9am on monday"]
+        },
+        {
+            "description": "The lint plugin is young; each release may add findings, so bump it weekly in its own PR and let the CI lint job show the effect.",
             "matchPackageNames": ["@shadcn/lint"],
             "dependencyDashboardApproval": false,
+            "groupName": "@shadcn/lint",
             "schedule": ["before 9am on monday"]
         },
         {
