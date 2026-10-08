@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar, SidebarContent, SidebarFooter } from "@/ui/sidebar"
-import { SettingPopover } from "@/components/setting";
+import { AccountMenu } from "@/components/setting";
 import VideoUploadDialog from "@/components/dialog/video-upload";
 import VideoListPanelHeader from "@/components/video-browser/header";
 import { VideoSearchDialog } from "@/components/dialog/video-search";
@@ -79,7 +79,7 @@ export default function VideoListPanel() {
                     </SidebarContent>
 
                     <SidebarFooter>
-                        <SettingPopover />
+                        <AccountMenu />
                     </SidebarFooter>
                 </div>
 

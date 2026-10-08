@@ -25,11 +25,11 @@ async function loginAsGuest(page: import("@playwright/test").Page) {
 
 async function openSettings(page: import("@playwright/test").Page) {
     await page.getByRole("button", { name: "Settings", exact: true }).click();
-    const popover = page.locator('[data-slot="popover-content"]');
-    await expect(popover).toBeVisible();
-    // The rows appear once the popover's own auth check resolves.
-    await expect(popover.getByText("Log out")).toBeVisible();
-    return popover;
+    const menu = page.getByRole("menu");
+    await expect(menu).toBeVisible();
+    // The items appear once the menu's own auth check resolves.
+    await expect(menu.getByRole("menuitem", { name: "Log out" })).toBeVisible();
+    return menu;
 }
 
 // A retry runs against the same seeded DB, so each attempt takes a different video.
@@ -40,8 +40,8 @@ function seededTitle(base: number) {
 test.describe("admin settings dialog", () => {
     test("an admin creates a viewer and promotes them", async ({ page }) => {
         await loginAsAdmin(page);
-        const popover = await openSettings(page);
-        await popover.getByRole("button", { name: "Administration" }).click();
+        const menu = await openSettings(page);
+        await menu.getByRole("menuitem", { name: "Administration" }).click();
 
         const dialog = page.getByRole("dialog");
         await dialog.getByRole("tab", { name: "Users" }).click();
@@ -68,8 +68,8 @@ test.describe("admin settings dialog", () => {
 
     test("deleting a video needs the exact word, and the video stays gone after a reload", async ({ page }) => {
         await loginAsAdmin(page);
-        const popover = await openSettings(page);
-        await popover.getByRole("button", { name: "Administration" }).click();
+        const menu = await openSettings(page);
+        await menu.getByRole("menuitem", { name: "Administration" }).click();
 
         const dialog = page.getByRole("dialog");
         await dialog.getByRole("tab", { name: "Videos" }).click();
@@ -91,7 +91,7 @@ test.describe("admin settings dialog", () => {
         await expect(dialog.getByRole("row", { name: new RegExp(title) })).toHaveCount(0);
         await page.reload();
         const reopened = await openSettings(page);
-        await reopened.getByRole("button", { name: "Administration" }).click();
+        await reopened.getByRole("menuitem", { name: "Administration" }).click();
         await dialog.getByRole("tab", { name: "Videos" }).click();
         await dialog.getByPlaceholder("Filter by title or folder...").fill(title);
         await expect(dialog.getByText("No video matches the filter.")).toBeVisible();
@@ -99,8 +99,8 @@ test.describe("admin settings dialog", () => {
 
     test("a guest does not see the entry", async ({ page }) => {
         await loginAsGuest(page);
-        const popover = await openSettings(page);
+        const menu = await openSettings(page);
 
-        await expect(popover.getByRole("button", { name: "Administration" })).toHaveCount(0);
+        await expect(menu.getByRole("menuitem", { name: "Administration" })).toHaveCount(0);
     });
 });
