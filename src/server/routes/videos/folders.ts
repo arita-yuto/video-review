@@ -53,8 +53,9 @@ export const foldersRouter = createRouter()
                 content: {
                     "application/json": {
                         schema: z.object({
-                            from: z.string().trim().min(1),
-                            to: z.string().trim().min(1),
+                            // Both drop trailing slashes: "new/" would otherwise leave "new//scene01" below it.
+                            from: z.string().trim().transform(s => s.replace(/\/+$/, "")).pipe(z.string().min(1)),
+                            to: z.string().trim().transform(s => s.replace(/\/+$/, "")).pipe(z.string().min(1)),
                         }),
                     },
                 },
