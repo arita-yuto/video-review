@@ -33,13 +33,12 @@ export function DeleteConfirmDialog({ target, busy, onConfirm, onCancel }: {
                 <DialogHeader>
                     <DialogTitle>{t("videos.delete.title")}</DialogTitle>
                     <DialogDescription>
+                        {/* On its own line, so a long title wraps by itself instead of breaking the sentence. */}
+                        <span className="block font-medium text-foreground wrap-break-word">{target.title}</span>
                         <span className="block">
                             {target.whole
-                                ? t("videos.delete.wholeSummary", { title: target.title })
-                                : t("videos.delete.revisionSummary", {
-                                    title: target.title,
-                                    revisions: target.revisions.join(", "),
-                                })}
+                                ? t("videos.delete.wholeSummary")
+                                : t("videos.delete.revisionSummary", { revisions: target.revisions.join(", ") })}
                         </span>
                         <span className="block">{t("videos.delete.irreversible")}</span>
                     </DialogDescription>

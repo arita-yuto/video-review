@@ -344,14 +344,14 @@
                 "wholeLabel": "{title} の全リビジョンを削除",
                 "revisionLabel": "{title} のリビジョン {revision} を削除",
                 "title": "動画のファイルを削除",
-                "wholeSummary": "{title} の全リビジョンのファイルを削除し、動画は一覧から消えます",
-                "revisionSummary": "{title} のリビジョン {revisions} のファイルを削除します",
+                "wholeSummary": "全リビジョンのファイルを削除し、動画は一覧から消えます",
+                "revisionSummary": "リビジョン {revisions} のファイルを削除します",
                 "irreversible": "元に戻せません",
                 "confirmLabel": "確認のため <word>{confirmWord}</word> と入力してください",
                 "submit": "Delete",
                 "cancel": "キャンセル",
                 "failed": "ファイルの削除に失敗しました",
-                "filesLeft": "一部のファイルを消せず、ストレージに残りました"
+                "filesLeft": "動画の削除に失敗しました"
             }
         },
         "integrations": {
