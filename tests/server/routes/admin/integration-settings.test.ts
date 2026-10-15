@@ -58,8 +58,8 @@ let ServerError: typeof import("@/server/lib/server-error").ServerError;
 let workDir: string;
 let getJiraConfig: typeof import("@/server/lib/integrations/jira").getJiraConfig;
 
-function testAndSave(body: object) {
-    return app.request("/settings/jira/test-and-save", {
+function testAndSave(body: object, name = "jira") {
+    return app.request(`/settings/${name}/test-and-save`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),
@@ -197,6 +197,28 @@ describe("admin integration settings", () => {
         expect((await res.json()).result.ok).toBe(true);
         expect(sendMailMock).toHaveBeenCalledWith(expect.objectContaining({ to: "admin@example.com", from: "noreply@example.com" }));
         expect(db.settings.get("email.host")).toBe("relay.example");
+    });
+
+    it("does not keep a login client Jira turns away", async () => {
+        vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false, status: 401, json: async () => ({ error: "invalid_client" }) })));
+
+        const res = await testAndSave({ clientId: "video-review", clientSecret: "wrong" }, "jira-login");
+
+        expect((await res.json()).result.ok).toBe(false);
+        expect(db.secrets.has("jira-login.clientSecret")).toBe(false);
+        expect(db.settings.has("jira-login.clientId")).toBe(false);
+    });
+
+    it("saves the login client once Jira only rejects the made-up code", async () => {
+        const fetchMock = vi.fn(async () => ({ ok: false, status: 400, json: async () => ({ error: "invalid_grant" }) }));
+        vi.stubGlobal("fetch", fetchMock);
+
+        const res = await testAndSave({ clientId: "video-review", clientSecret: "s3cret" }, "jira-login");
+
+        expect((await res.json()).result.ok).toBe(true);
+        expect(fetchMock).toHaveBeenCalledWith("https://env.example.com/rest/oauth2/latest/token", expect.objectContaining({ method: "POST" }));
+        expect(db.secrets.has("jira-login.clientSecret")).toBe(true);
+        expect(db.settings.get("jira-login.clientId")).toBe("video-review");
     });
 
     it("never sends the env token to a url sent in Test & save", async () => {
