@@ -4,6 +4,9 @@ import { Role } from "@/lib/role";
 // the JWT `provider` claim, and the login routes.
 export type LoginType = "guest" | "jira" | "password";
 
+// What the login screen can offer: a tab per LoginType, where the JIRA tab is either the form or the OAuth button.
+export type LoginMethod = LoginType | "jira-oauth";
+
 export const MIN_PASSWORD_LENGTH = 6;
 
 export interface LoginRequest {

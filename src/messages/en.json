@@ -226,6 +226,7 @@
         "email": "Email",
         "password": "Password",
         "ok": "Log in",
+        "jira": "Log in with Jira",
         "accountDisabledMsg": "This account is disabled"
     },
     "setting": {

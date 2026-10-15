@@ -1,13 +1,14 @@
 "use client";
 import { create } from "zustand";
 import { api } from "@/lib/api-client";
-import type { LoginType } from "@/lib/auth-types";
+import type { LoginMethod, LoginType } from "@/lib/auth-types";
 
 // The General settings the screens need, each fetched from its own route at runtime, so a
 // value saved on the admin screen applies on the next page load without a rebuild.
 interface ConfigState {
     // Read before login. null until the answer is in, so the login screen doesn't guess.
-    guestEnabled: boolean | null;
+    // The methods the screen shows, in tab order; hiding one is a matter of leaving it out here.
+    loginMethods: LoginMethod[] | null;
     loginDefaultType: LoginType | null;
     // Read once logged in.
     urlSchema: string | null;
@@ -18,7 +19,7 @@ interface ConfigState {
 }
 
 export const useConfigStore = create<ConfigState>()((set) => ({
-    guestEnabled: null,
+    loginMethods: null,
     loginDefaultType: null,
     urlSchema: null,
     resolutionPresets: [],
@@ -26,11 +27,17 @@ export const useConfigStore = create<ConfigState>()((set) => ({
     loadLoginOptions: async () => {
         // The server enforces the guest flag itself, so when the answer can't be read the
         // screen falls back to the pre-configuration defaults rather than staying blank.
-        const [guest, type] = await Promise.all([
+        const [guest, type, oauth] = await Promise.all([
             api.auth["guest-enabled"].$get().then(res => res.status === 200 ? res.json() : null).catch(() => null),
             api.auth["login-default-type"].$get().then(res => res.status === 200 ? res.json() : null).catch(() => null),
+            api.auth.oauth.$get().then(res => res.status === 200 ? res.json() : null).catch(() => null),
         ]);
-        set({ guestEnabled: guest?.enabled ?? true, loginDefaultType: type?.type ?? "guest" });
+        const methods: LoginMethod[] = [
+            ...(guest?.enabled ?? true ? ["guest" as const] : []),
+            oauth?.providers.includes("jira") ? "jira-oauth" : "jira",
+            "password",
+        ];
+        set({ loginMethods: methods, loginDefaultType: type?.type ?? "guest" });
     },
 
     loadConfig: async () => {

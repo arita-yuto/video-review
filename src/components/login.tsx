@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
-import { LoginType } from "@/lib/auth-types";
+import { LoginMethod, LoginType } from "@/lib/auth-types";
 import { useTranslations } from "next-intl";
 import { Tabs } from "@/ui/tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
@@ -21,7 +21,7 @@ export default function Login() {
     const cacheDisplayName = useAuthStore((e) => e.displayName);
     const cacheEmail = useAuthStore((e) => e.email);
     const { setAuth } = useAuthStore();
-    const { guestEnabled, loginDefaultType, loadLoginOptions } = useConfigStore();
+    const { loginMethods, loginDefaultType, loadLoginOptions } = useConfigStore();
 
     // null until the login options are in, so the tabs never open on a guess and then jump.
     const [type, setType] = useState<LoginType | null>(null);
@@ -29,17 +29,43 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [displayName, setDisplayName] = useState("");
 
+    // A sign-in through a provider comes back here with the session in the cookie, or with an error.
+    const finishRedirectLogin = async () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("error")) {
+            router.replace("/login");
+            alert(t(params.get("error") === "disabled" ? "accountDisabledMsg" : "loginFailedMsg"));
+            return;
+        }
+        if (!params.has("session")) {
+            return;
+        }
+
+        const res = await api.auth.session.$get();
+        if (res.status !== 200) {
+            router.replace("/login");
+            alert(t("loginFailedMsg"));
+            return;
+        }
+        const data = await res.json();
+        setAuth(data.id, data.email, data.role, data.token, data.displayName, data.provider);
+        router.replace("/video-review/review");
+    };
+
     useEffect(() => {
         setEmail(cacheEmail ?? "");
         setDisplayName(cacheDisplayName ?? "");
         void loadLoginOptions();
+        void finishRedirectLogin();
     }, []);
 
+    const tabs = loginMethods ? tabsFor(loginMethods) : [];
+
     useEffect(() => {
-        if (guestEnabled === null || loginDefaultType === null) return;
-        // Don't open on the guest tab when guest login is hidden.
-        setType(loginDefaultType === "guest" && !guestEnabled ? "password" : loginDefaultType);
-    }, [guestEnabled, loginDefaultType]);
+        if (loginMethods === null || loginDefaultType === null) return;
+        // Don't open on a tab that is hidden.
+        setType(tabs.includes(loginDefaultType) ? loginDefaultType : tabs[0]);
+    }, [loginMethods, loginDefaultType]);
 
     const requestLogin = () => {
         switch (type) {
@@ -73,11 +99,11 @@ export default function Login() {
             {type && (
                 <Tabs value={type} onValueChange={(val) => setType(val as LoginType)}>
                     <TabsList>
-                        {guestEnabled && <TabsTrigger value="guest">Guest</TabsTrigger>}
-                        <TabsTrigger value="jira">JIRA</TabsTrigger>
-                        <TabsTrigger value="password">Email & Password</TabsTrigger>
+                        {tabs.includes("guest") && <TabsTrigger value="guest">Guest</TabsTrigger>}
+                        {tabs.includes("jira") && <TabsTrigger value="jira">JIRA</TabsTrigger>}
+                        {tabs.includes("password") && <TabsTrigger value="password">Email & Password</TabsTrigger>}
                     </TabsList>
-                    {guestEnabled && (
+                    {tabs.includes("guest") && (
                         <TabsContent value="guest">
                             <AuthCard>
                                 <div className="h-8"></div>
@@ -92,41 +118,57 @@ export default function Login() {
                             </AuthCard>
                         </TabsContent>
                     )}
-                    <TabsContent value="jira">
-                        <AuthCard>
-                            <div className="h-8"></div>
-                            <div className="grid gap-3 mb-4">
-                                <Label htmlFor="email">{t("email")}</Label>
-                                <Input id="email"
-                                    type="email"
-                                    value={email ?? ""}
-                                    onChange={(x) => setEmail(x.target.value)} />
-                            </div>
-                            <ButtonLogin exec={handleLogin} title={t("ok")} />
-                        </AuthCard>
-                    </TabsContent>
-                    <TabsContent value="password">
-                        <AuthCard>
-                            <div className="grid gap-3 mb-4">
-                                <Label htmlFor="email">{t("email")}</Label>
-                                <Input type="email"
-                                    value={email ?? ""}
-                                    onChange={(x) => setEmail(x.target.value)} />
-                            </div>
-                            <div className="grid gap-3 mb-4">
-                                <Label htmlFor="password">{t("password")}</Label>
-                                <Input type="password"
-                                    onKeyDown={(x) => x.key === "Enter" && handleLogin()}
-                                    value={password ?? ""}
-                                    onChange={(x) => setPassword(x.target.value)} />
-                            </div>
-                            <ButtonLogin exec={handleLogin} title={t("ok")} />
-                        </AuthCard>
-                    </TabsContent>
+                    {tabs.includes("jira") && (
+                        <TabsContent value="jira">
+                            <AuthCard>
+                                <div className="h-8"></div>
+                                {loginMethods?.includes("jira-oauth") ? (
+                                    <ButtonLogin exec={() => window.location.assign("/api/v1/auth/oauth/jira/start")} title={t("jira")} />
+                                ) : (
+                                    <>
+                                        <div className="grid gap-3 mb-4">
+                                            <Label htmlFor="email">{t("email")}</Label>
+                                            <Input id="email"
+                                                type="email"
+                                                value={email ?? ""}
+                                                onChange={(x) => setEmail(x.target.value)} />
+                                        </div>
+                                        <ButtonLogin exec={handleLogin} title={t("ok")} />
+                                    </>
+                                )}
+                            </AuthCard>
+                        </TabsContent>
+                    )}
+                    {tabs.includes("password") && (
+                        <TabsContent value="password">
+                            <AuthCard>
+                                <div className="grid gap-3 mb-4">
+                                    <Label htmlFor="email">{t("email")}</Label>
+                                    <Input type="email"
+                                        value={email ?? ""}
+                                        onChange={(x) => setEmail(x.target.value)} />
+                                </div>
+                                <div className="grid gap-3 mb-4">
+                                    <Label htmlFor="password">{t("password")}</Label>
+                                    <Input type="password"
+                                        onKeyDown={(x) => x.key === "Enter" && handleLogin()}
+                                        value={password ?? ""}
+                                        onChange={(x) => setPassword(x.target.value)} />
+                                </div>
+                                <ButtonLogin exec={handleLogin} title={t("ok")} />
+                            </AuthCard>
+                        </TabsContent>
+                    )}
                 </Tabs>
             )}
         </AuthLayout>
     );
+}
+
+// Both Jira methods share the JIRA tab.
+function tabsFor(methods: LoginMethod[]): LoginType[] {
+    const types: LoginType[] = ["guest", "jira", "password"];
+    return types.filter(type => methods.includes(type) || (type === "jira" && methods.includes("jira-oauth")));
 }
 
 function ButtonLogin({ exec, title }: { exec: () => void; title: string }) {

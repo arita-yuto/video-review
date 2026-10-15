@@ -1,7 +1,6 @@
 import { createRouter } from "@/server/lib/openapi/router";
 import { general } from "@/server/lib/integrations/general";
-import { jira } from "@/server/lib/integrations/jira";
-import { jiraLogin } from "@/server/lib/integrations/jira-login";
+import { jira, jiraLogin } from "@/server/lib/integrations/jira";
 import { slack } from "@/server/lib/integrations/slack";
 import { webhook } from "@/server/lib/integrations/webhook";
 import { email } from "@/server/lib/integrations/email";

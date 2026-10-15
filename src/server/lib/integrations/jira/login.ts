@@ -1,7 +1,8 @@
 import "server-only";
 import { z } from "@hono/zod-openapi";
 import { defineIntegration, TestResultSchema } from "@/server/lib/integrations/define";
-import { getJiraBaseUrl } from "@/server/lib/integrations/jira";
+import { getJiraBaseUrl } from "@/server/lib/integrations/jira/general";
+import { getConfig } from "@/server/lib/integrations/store";
 
 const TokenErrorSchema = z.object({ error: z.string() });
 
@@ -55,3 +56,5 @@ export const jiraLogin = defineIntegration({
         return { ok: true };
     },
 });
+
+export const getJiraLoginConfig = () => getConfig(jiraLogin);

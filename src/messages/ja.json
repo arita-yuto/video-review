@@ -226,6 +226,7 @@
         "email": "メールアドレス",
         "password": "パスワード",
         "ok": "ログイン",
+        "jira": "Jira でログイン",
         "accountDisabledMsg": "このアカウントは無効です"
     },
     "setting": {

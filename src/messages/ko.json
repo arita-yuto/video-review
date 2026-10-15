@@ -226,6 +226,7 @@
         "email": "이메일",
         "password": "비밀번호",
         "ok": "로그인",
+        "jira": "Jira로 로그인",
         "accountDisabledMsg": "비활성화된 계정입니다"
     },
     "setting": {
