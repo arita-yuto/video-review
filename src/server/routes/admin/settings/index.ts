@@ -1,6 +1,7 @@
 import { createRouter } from "@/server/lib/openapi/router";
 import { general } from "@/server/lib/integrations/general";
 import { jira } from "@/server/lib/integrations/jira";
+import { jiraLogin } from "@/server/lib/integrations/jira-login";
 import { slack } from "@/server/lib/integrations/slack";
 import { webhook } from "@/server/lib/integrations/webhook";
 import { email } from "@/server/lib/integrations/email";
@@ -14,6 +15,7 @@ import { integrationRouter } from "@/server/routes/admin/settings/integration-ro
 export const settingsRouter = createRouter()
     .route("/general", integrationRouter(general))
     .route("/jira", integrationRouter(jira))
+    .route("/jira-login", integrationRouter(jiraLogin))
     .route("/slack", integrationRouter(slack))
     .route("/webhook", integrationRouter(webhook))
     .route("/email", integrationRouter(email))

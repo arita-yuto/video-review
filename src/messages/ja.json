@@ -405,7 +405,13 @@
                 "project": "Project",
                 "assignee": "Assignee",
                 "issueTypeTask": "Task issue type",
-                "issueTypeBug": "Bug issue type"
+                "issueTypeBug": "Bug issue type",
+                "issues": "Issues",
+                "login": "Login",
+                "loginTitle": "Jira login",
+                "clientId": "Client ID",
+                "clientSecret": "Client Secret",
+                "callbackUrl": "Callback URL"
             },
             "slack": {
                 "title": "Slack",
