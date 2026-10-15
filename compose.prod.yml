@@ -81,6 +81,25 @@ services:
       RELAYHOST_USERNAME: ${SMTP_RELAYHOST_USERNAME:-}
       RELAYHOST_PASSWORD: ${SMTP_RELAYHOST_PASSWORD:-}
 
+  # TLS in front of the app: docker compose --profile https up -d
+  # Needs certs/fullchain.pem and certs/privkey.pem; see documents/build.run/https-guide.md.
+  nginx:
+    image: nginx:1.30
+    container_name: videoreview-nginx
+    restart: unless-stopped
+    profiles: [https]
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./docker/nginx/videoreview.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+
+    depends_on:
+      - videoreview
+
 volumes:
   videoreview-storage:
   videoreview-db:
