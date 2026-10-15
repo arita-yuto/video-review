@@ -227,6 +227,8 @@
         "password": "パスワード",
         "ok": "ログイン",
         "jira": "Jira でログイン",
+        "jiraSecret": "パスワードまたはトークン",
+        "jiraCaptchaMsg": "Jira が CAPTCHA を求めています。Jira に一度ログインしてから、もう一度試してください",
         "accountDisabledMsg": "このアカウントは無効です"
     },
     "setting": {

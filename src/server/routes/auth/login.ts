@@ -15,8 +15,10 @@ const loginGuestSchema = z.object({
     displayName: z.string().min(1),
 });
 
+// secret: a Jira password or a personal access token.
 const loginJIRASchema = z.object({
     email: z.email(),
+    secret: z.string().min(1),
 });
 
 const LoginResponseSchema = z.object({
@@ -128,7 +130,7 @@ export const loginRouter = createRouter()
     .openapi(createRoute({
         method: "post",
         summary: "Login with Jira",
-        description: "Logs in a user with Jira credentials.",
+        description: "Logs in with a Jira email and password or personal access token; Jira checks them.",
         path: "/jira",
         request: {
             body: {
@@ -151,17 +153,13 @@ export const loginRouter = createRouter()
             },
             400: errorResponse("Invalid parameters"),
             401: errorResponse("Unauthorized"),
-            403: errorResponse("The account is disabled"),
+            403: errorResponse("The account is disabled, or Jira asks for a captcha (error: captcha)"),
             500: errorResponse("Login failed"),
         },
     }), async (c) => {
         try{
-            const body = c.req.valid("json");
-            const response = await loginWithJira({
-                ...body,
-                displayName: "",
-                password: "",
-            });
+            const { email, secret } = c.req.valid("json");
+            const response = await loginWithJira(email, secret);
             setAuthCookie(c, response.token);
             return c.json(response, 200);
         } catch(e) {

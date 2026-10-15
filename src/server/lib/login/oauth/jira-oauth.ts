@@ -2,11 +2,10 @@ import "server-only";
 import { z } from "@hono/zod-openapi";
 import { ServerError } from "@/server/lib/server-error";
 import { getJiraBaseUrl, getJiraLoginConfig } from "@/server/lib/integrations/jira";
-import { loginJiraUser } from "@/server/lib/login/jira/jira-user";
+import { loginJiraUser, MyselfSchema } from "@/server/lib/login/jira/jira-user";
 import type { OAuthProvider } from "@/server/lib/login/oauth";
 
 const TokenSchema = z.object({ access_token: z.string() });
-const MyselfSchema = z.object({ key: z.string(), emailAddress: z.string(), displayName: z.string() });
 
 async function client() {
     const baseUrl = await getJiraBaseUrl();

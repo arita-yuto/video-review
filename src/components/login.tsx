@@ -27,6 +27,7 @@ export default function Login() {
     const [type, setType] = useState<LoginType | null>(null);
     const [email, setEmail] = useState<string | null>(null);
     const [password, setPassword] = useState("");
+    const [jiraSecret, setJiraSecret] = useState("");
     const [displayName, setDisplayName] = useState("");
 
     // A sign-in through a provider comes back here with the session in the cookie, or with an error.
@@ -72,7 +73,7 @@ export default function Login() {
             case "password":
                 return api.auth.login.password.$post({ json: { email: email ?? "", password } });
             case "jira":
-                return api.auth.login.jira.$post({ json: { email: email ?? "" } });
+                return api.auth.login.jira.$post({ json: { email: email ?? "", secret: jiraSecret } });
             default:
                 return api.auth.login.guest.$post({ json: { displayName } });
         }
@@ -82,7 +83,8 @@ export default function Login() {
         try {
             const res = await requestLogin();
             if (res.status === 403 && type !== "guest") {
-                alert(t("accountDisabledMsg"));
+                const { error } = await res.json();
+                alert(t(error === "captcha" ? "jiraCaptchaMsg" : "accountDisabledMsg"));
                 return;
             }
             if (res.status !== 200) throw new Error("Failed to login");
@@ -132,6 +134,14 @@ export default function Login() {
                                                 type="email"
                                                 value={email ?? ""}
                                                 onChange={(x) => setEmail(x.target.value)} />
+                                        </div>
+                                        <div className="grid gap-3 mb-4">
+                                            <Label htmlFor="jira-secret">{t("jiraSecret")}</Label>
+                                            <Input id="jira-secret"
+                                                type="password"
+                                                onKeyDown={(x) => x.key === "Enter" && handleLogin()}
+                                                value={jiraSecret}
+                                                onChange={(x) => setJiraSecret(x.target.value)} />
                                         </div>
                                         <ButtonLogin exec={handleLogin} title={t("ok")} />
                                     </>
