@@ -78,6 +78,7 @@ http://localhost:3489 を開き、管理者アカウントを作成します
 
 - [Docker ガイド](./documents/build.run/docker-guide.jp.md)
 - [Local / On‑premise ガイド](./documents/build.run/local-guide.jp.md)
+- [https ガイド](./documents/build.run/https-guide.jp.md)
 
 ### 設定・連携
 
