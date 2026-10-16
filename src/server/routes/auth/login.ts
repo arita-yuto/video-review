@@ -15,10 +15,9 @@ const loginGuestSchema = z.object({
     displayName: z.string().min(1),
 });
 
-// secret: a Jira password or a personal access token.
 const loginJIRASchema = z.object({
     email: z.email(),
-    secret: z.string().min(1),
+    secret: z.string().min(1).describe("A Jira password or a personal access token"),
 });
 
 const LoginResponseSchema = z.object({
@@ -153,7 +152,7 @@ export const loginRouter = createRouter()
             },
             400: errorResponse("Invalid parameters"),
             401: errorResponse("Unauthorized"),
-            403: errorResponse("The account is disabled, or Jira asks for a captcha (error: captcha)"),
+            403: errorResponse("The account is disabled, or Jira asks for a captcha"),
             500: errorResponse("Login failed"),
         },
     }), async (c) => {

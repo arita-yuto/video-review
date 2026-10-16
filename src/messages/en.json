@@ -228,7 +228,6 @@
         "ok": "Log in",
         "jira": "Log in with Jira",
         "jiraSecret": "Password or token",
-        "jiraCaptchaMsg": "Jira asks for a captcha. Log in to Jira once, then try again",
         "accountDisabledMsg": "This account is disabled"
     },
     "setting": {

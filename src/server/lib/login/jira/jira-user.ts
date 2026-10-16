@@ -1,19 +1,19 @@
+import "server-only";
 import { z } from "@hono/zod-openapi";
 import { signToken } from "@/server/lib/token";
 import { prisma } from "@/server/lib/db";
 import { Role } from "@/lib/role";
 import { LoginResponse } from "@/lib/auth-types";
 import { ServerError } from "@/server/lib/server-error";
-import { getJiraConfig } from "@/server/lib/integrations/jira";
+import { getJiraBaseUrl } from "@/server/lib/integrations/jira";
 
 // What Jira reports about an account (/rest/api/2/myself).
 export const MyselfSchema = z.object({ key: z.string(), emailAddress: z.string(), displayName: z.string() });
 export type JiraUser = z.infer<typeof MyselfSchema>;
 
-// The secret is a password (sent as Basic) or a personal access token (sent as Bearer); Jira says which by
-// answering /myself. Neither is kept.
+// A Jira password (Basic) or personal access token (Bearer), used once against /myself and never stored.
 export async function loginWithJira(email: string, secret: string): Promise<LoginResponse> {
-    const { baseUrl } = await getJiraConfig();
+    const baseUrl = await getJiraBaseUrl();
     if (!baseUrl) {
         throw new ServerError("jira is not configured", 401);
     }
@@ -23,13 +23,17 @@ export async function loginWithJira(email: string, secret: string): Promise<Logi
         res = await askMyself(baseUrl, `Basic ${Buffer.from(`${email}:${secret}`).toString("base64")}`);
     }
     if (res.status === 403 && res.headers.get("x-authentication-denied-reason")?.includes("CAPTCHA_CHALLENGE")) {
-        throw new ServerError("captcha", 403);
+        throw new ServerError("Jira asks for a captcha. Log in to Jira once, then try again", 403);
     }
     if (!res.ok) {
         throw new ServerError("jira did not accept the email and secret", 401);
     }
 
-    const jiraUser = MyselfSchema.parse(await res.json());
+    const parsed = MyselfSchema.safeParse(await res.json());
+    if (!parsed.success) {
+        throw new ServerError("jira sent an unexpected response", 401);
+    }
+    const jiraUser = parsed.data;
     // A token identifies its owner on its own, so the typed email must be that owner's.
     if (jiraUser.emailAddress.toLowerCase() !== email.toLowerCase()) {
         throw new ServerError("jira did not accept the email and secret", 401);

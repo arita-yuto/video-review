@@ -83,8 +83,7 @@ export default function Login() {
         try {
             const res = await requestLogin();
             if (res.status === 403 && type !== "guest") {
-                const { error } = await res.json();
-                alert(t(error === "captcha" ? "jiraCaptchaMsg" : "accountDisabledMsg"));
+                alert((await res.json()).error);
                 return;
             }
             if (res.status !== 200) throw new Error("Failed to login");

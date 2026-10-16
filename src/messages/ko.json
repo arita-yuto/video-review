@@ -228,7 +228,6 @@
         "ok": "로그인",
         "jira": "Jira로 로그인",
         "jiraSecret": "비밀번호 또는 토큰",
-        "jiraCaptchaMsg": "Jira가 캡차를 요구합니다. Jira에 한 번 로그인한 뒤 다시 시도하세요",
         "accountDisabledMsg": "비활성화된 계정입니다"
     },
     "setting": {
