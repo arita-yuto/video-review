@@ -21,7 +21,10 @@ test("a comment posted on one screen shows up on another screen of the video wit
     const writer = await login(browser, WRITER);
     const reader = await login(browser, READER);
     await writer.goto(`/video-review/review/${videoId}`);
+    // The server registers a stream as it answers it, so from then on the reader is told of changes.
+    const streamOpen = reader.waitForResponse((r) => r.url().includes(`/videos/${videoId}/stream`));
     await reader.goto(`/video-review/review/${videoId}`);
+    await streamOpen;
 
     await writer.getByPlaceholder("Edit comment").fill("posted while you watch");
     await writer.getByRole("button", { name: "Add comment" }).click();
