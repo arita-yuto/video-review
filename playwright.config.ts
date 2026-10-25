@@ -15,7 +15,8 @@ export default defineConfig({
     outputDir: "tests/test-results/e2e-artifacts",
     // Fail fast in CI; allow a couple of retries for flake-resistance locally.
     retries: process.env.CI ? 2 : 1,
-    reporter: [["list"], ["junit", { outputFile: "tests/test-results/e2e-junit.xml" }]],
+    // run-e2e.ts names the first-launch pass's file, so the second pass does not overwrite it.
+    reporter: [["list"], ["junit", { outputFile: process.env.E2E_JUNIT_FILE ?? "tests/test-results/e2e-junit.xml" }]],
     use: {
         baseURL: BASE_URL,
         trace: "on-first-retry",
