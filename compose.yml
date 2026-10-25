@@ -88,22 +88,18 @@ services:
         condition: service_healthy
 
   # Only with --profile s3: a local S3 for the s3 storage driver.
-  localstack:
-      profiles: [s3]
-      env_file:
-        - path: .env
-          required: false
-      image: localstack/localstack:latest
-      container_name: "videoreview-localstack"
-      depends_on:
-          - web
-      ports:
-          - "4566:4566"
-      environment:
-          # https://docs.localstack.cloud/references/configuration/
-          - DEBUG=${DEBUG:-0}
-      volumes:
-          - ./docker/localstack:/etc/localstack/init/ready.d
+  # docker/ministack/create-bucket.sh creates the bucket named in .env (S3_BUCKET, S3_REGION).
+  ministack:
+    profiles: [s3]
+    env_file:
+      - path: .env
+        required: false
+    image: ministackorg/ministack:1.5
+    container_name: videoreview-ministack
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./docker/ministack:/docker-entrypoint-initaws.d/ready.d
 
   # Only with --profile nextcloud: the Nextcloud storage driver's test target.
   nextcloud-db:

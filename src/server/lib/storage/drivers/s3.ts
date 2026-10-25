@@ -9,14 +9,14 @@ import { lookup } from "mime-types";
 export class S3Driver implements FileDriver {
     readonly s3: S3Client | undefined = undefined;
     readonly bucket: string | undefined = undefined;
-    readonly localStackEndpoint: string | undefined = undefined;
+    readonly endpoint: string | undefined = undefined;
 
-    constructor(s3LocalStackEndpoint: string | undefined, region: string | undefined, bucket: string | undefined) {
+    constructor(s3Endpoint: string | undefined, region: string | undefined, bucket: string | undefined) {
         this.bucket = bucket;
-        this.localStackEndpoint = s3LocalStackEndpoint;
-        if (this.localStackEndpoint) {
+        this.endpoint = s3Endpoint;
+        if (this.endpoint) {
             this.s3 = new S3Client({
-                endpoint: this.localStackEndpoint,
+                endpoint: this.endpoint,
                 forcePathStyle: true,
                 region: region,
                 requestChecksumCalculation: "WHEN_SUPPORTED",
@@ -63,7 +63,7 @@ export class S3Driver implements FileDriver {
                 Body: src,
                 ContentType: contentType,
                 CacheControl: cacheControl,
-                ...(this.localStackEndpoint
+                ...(this.endpoint
                     ? { ChecksumCRC32: "" }
                     : {}
                 ),
@@ -86,23 +86,20 @@ export class S3Driver implements FileDriver {
     async uploadURL(session_id: string, storageKey: string, contentType: string): Promise<string> {
         if (!this.s3 || !this.bucket) return Promise.reject(undefined);
 
-        let url = await getSignedUrl(
+        const url = await getSignedUrl(
             this.s3,
             new PutObjectCommand({
                 Bucket: this.bucket,
                 Key: storageKey,
                 ContentType: contentType,
-                ...(this.localStackEndpoint
+                ...(this.endpoint
                     ? { ChecksumCRC32: '' }
                     : {}
                 ),
             }),
             { expiresIn: 300 }
         );
-        if (url.includes("http://localstack")) {
-            url = url.replace("http://localstack", "http://localhost");
-        }
-        return url;
+        return this.browserURL(url);
     }
 
     async fallbackURL(storageKey: string): Promise<string> {
@@ -114,7 +111,7 @@ export class S3Driver implements FileDriver {
         }
 
         try {
-            let ret = await getSignedUrl(
+            const ret = await getSignedUrl(
                 this.s3,
                 new GetObjectCommand({
                     Bucket: this.bucket,
@@ -122,11 +119,7 @@ export class S3Driver implements FileDriver {
                 }),
                 { expiresIn: 60 * 10 }
             );
-            if (ret.includes("http://localstack")) {
-                ret = ret.replace("http://localstack", "http://localhost");
-            }
-
-            return ret;
+            return this.browserURL(ret);
         } catch (err) {
             console.error("Failed to get signed URL:", err);
             return Promise.reject(undefined);
@@ -162,7 +155,7 @@ export class S3Driver implements FileDriver {
     async download(storageKey: string): Promise<Readable | string> {
         if (!this.s3 || !this.bucket) return Promise.reject(undefined);
 
-        let url = await getSignedUrl(
+        const url = await getSignedUrl(
             this.s3,
             new GetObjectCommand({
                 Bucket: this.bucket,
@@ -171,9 +164,17 @@ export class S3Driver implements FileDriver {
             { expiresIn: 600 }
         );
 
-        if (url.includes("http://localstack")) {
-            url = url.replace("http://localstack", "http://localhost");
+        return this.browserURL(url);
+    }
+
+    // Presigned URLs carry the in-network host of the emulator; the browser reaches it on localhost.
+    // MiniStack skips signature checks unless AUTH=true, so the host may change after signing.
+    private browserURL(url: string): string {
+        const target = new URL(url);
+        if (target.hostname !== "ministack") {
+            return url;
         }
-        return url;
+        target.hostname = "localhost";
+        return target.toString();
     }
 }

@@ -10,9 +10,9 @@ function createS3Client(): S3Client | null {
     }
 
     let s3: S3Client | null = null;
-    if (env.S3_LOCALSTACK_ENDPOINT) {
+    if (env.S3_ENDPOINT) {
         s3 = new S3Client({
-            endpoint: env.S3_LOCALSTACK_ENDPOINT,
+            endpoint: env.S3_ENDPOINT,
             forcePathStyle: true,
             region: env.S3_REGION,
             requestChecksumCalculation: "WHEN_SUPPORTED",
