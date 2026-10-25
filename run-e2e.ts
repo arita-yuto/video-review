@@ -50,7 +50,9 @@ async function main() {
 
     console.log("[e2e] pass 1/2: first-launch specs against an unseeded database...");
     resetDb({ seed: false });
+    process.env.E2E_JUNIT_FILE = "tests/test-results/e2e-junit-bootstrap.xml";
     run("npx playwright test --grep @bootstrap");
+    delete process.env.E2E_JUNIT_FILE;
 
     console.log("[e2e] pass 2/2: remaining specs against a seeded database...");
     resetDb({ seed: true });
