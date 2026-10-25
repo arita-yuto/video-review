@@ -190,7 +190,7 @@
         "commentAdd": "コメント追加",
         "cancel": "キャンセル",
         "editIssueLink": "Issue リンク",
-        "editComment": "コメントを入力..."
+        "editComment": "コメントを入力...（{keys} で投稿）"
     },
     "share-link": {
         "title": "共有リンク",

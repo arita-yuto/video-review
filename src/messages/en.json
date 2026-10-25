@@ -190,7 +190,7 @@
         "commentAdd": "Add comment",
         "cancel": "Cancel",
         "editIssueLink": "Edit issue link",
-        "editComment": "Edit comment"
+        "editComment": "Edit comment ({keys} to post)"
     },
     "share-link": {
         "title": "Share link",

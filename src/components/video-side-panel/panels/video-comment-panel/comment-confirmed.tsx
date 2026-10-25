@@ -3,13 +3,14 @@
 import { Button } from "@/ui/button";
 import { Textarea } from "@/ui/textarea";
 import { Input } from "@/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { usePlayback } from "@/stores/playback-store";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/stores/auth-store";
 import { isGuest } from "@/lib/role";
 import { useVideoStore } from "@/stores/video-store";
 import { useSyncing } from "@/lib/sync-session";
+import { isMac } from "@/lib/platform";
 
 export type ECommentConfirmedType = "commentUpdate" | "commentAdd";
 
@@ -41,6 +42,23 @@ export default function CommentConfirmed(props: {
         setComment("");
     };
 
+    // Read in the browser only: the server cannot tell the OS, and the hint must not differ on hydration.
+    const mac = useSyncExternalStore(() => () => {}, isMac, () => false);
+
+    // Enter alone stays a new line, and an Enter that confirms the IME conversion is left to it.
+    const submitOnShortcut = (e: KeyboardEvent<HTMLElement>) => {
+        const modifier = mac ? e.metaKey : e.ctrlKey;
+        if (e.key !== "Enter" || !modifier || e.nativeEvent.isComposing) {
+            return;
+        }
+
+        e.preventDefault();
+        if (props.confirmedLabel === "commentAdd" && !canAddComment()) {
+            return;
+        }
+        handleConfirmed();
+    };
+
     const handleCancel = () => {
         props.onCancel();
     };
@@ -61,7 +79,8 @@ export default function CommentConfirmed(props: {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 onFocus={pauseToWrite}
-                placeholder={t("editComment")}
+                onKeyDown={submitOnShortcut}
+                placeholder={t("editComment", { keys: mac ? "⌘ Enter" : "Ctrl Enter" })}
                 className="h-20 mb-2 resize-none"
             />
             <Input
@@ -70,6 +89,7 @@ export default function CommentConfirmed(props: {
                 value={issueId ?? ""}
                 onChange={(e) => setIssueId(e.target.value)}
                 onFocus={pauseToWrite}
+                onKeyDown={submitOnShortcut}
                 placeholder={t("editIssueLink")}
             />
             {props.confirmedLabel === "commentUpdate" ? (
