@@ -12,6 +12,9 @@ import { useVideoStore } from "@/stores/video-store";
 import { useSyncing } from "@/lib/sync-session";
 import { isMac } from "@/lib/platform";
 
+// The OS never changes while the page is open, so there is nothing to subscribe to.
+const subscribeNever = () => () => {};
+
 export type ECommentConfirmedType = "commentUpdate" | "commentAdd";
 
 export default function CommentConfirmed(props: {
@@ -43,7 +46,7 @@ export default function CommentConfirmed(props: {
     };
 
     // Read in the browser only: the server cannot tell the OS, and the hint must not differ on hydration.
-    const mac = useSyncExternalStore(() => () => {}, isMac, () => false);
+    const mac = useSyncExternalStore(subscribeNever, isMac, () => false);
 
     // Enter alone stays a new line, and an Enter that confirms the IME conversion is left to it.
     const submitOnShortcut = (e: KeyboardEvent<HTMLElement>) => {
