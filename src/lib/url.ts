@@ -11,6 +11,20 @@ export function createVideoJoinLink(baseURL: string, videoId: string): string {
     return `${baseURL}/video-review/review/${videoId}?${JOIN_PARAM}=1`;
 }
 
+export function createLoginLink(returnPath: string): string {
+    return `/login?returnUrl=${encodeURIComponent(returnPath)}`;
+}
+
+// Only a page of this app; anything else falls back to the list, so the link cannot send people elsewhere.
+export function parseLoginReturnUrl(search: string): string {
+    const base = "http://video-review.invalid";
+    const url = new URL(new URLSearchParams(search).get("returnUrl") ?? "", base);
+    if (url.origin === base && url.pathname.startsWith("/video-review/")) {
+        return url.pathname + url.search;
+    }
+    return "/video-review/review";
+}
+
 export function createVideoCommentLink(baseURL: string, videoId: string | null, commentId: string | null): string | null {
     if (videoId === null) {
         return null;

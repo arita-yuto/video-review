@@ -3,6 +3,7 @@ import RevisionDiffView from "@/components/revision-diff-view";
 import { useAuthStore } from "@/stores/auth-store";
 import { useConfigStore } from "@/stores/config-store";
 import { useParams, useRouter } from "next/navigation";
+import { createLoginLink } from "@/lib/url";
 import React, { useEffect } from "react";
 
 export default function RevisionDiffPage() {
@@ -13,7 +14,7 @@ export default function RevisionDiffPage() {
     useEffect(() => {
         void (async () => {
             if (!(await verifyAuth())) {
-                router.replace("/video-review/login");
+                router.replace(createLoginLink(window.location.pathname + window.location.search));
                 return;
             }
             void useConfigStore.getState().loadConfig();

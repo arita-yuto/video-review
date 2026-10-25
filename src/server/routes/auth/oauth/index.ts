@@ -12,6 +12,7 @@ import { configuredOAuthProviders, finishOAuthLogin, oauthProviderNames, startOA
 
 const STATE_COOKIE = "video_review_oauth_state";
 const VERIFIER_COOKIE = "video_review_oauth_verifier";
+const RETURN_URL_COOKIE = "video_review_oauth_return_url";
 const LOGIN_PAGE = "/login";
 
 const ProviderParams = z.object({ provider: z.enum(oauthProviderNames) });
@@ -50,13 +51,19 @@ export const oauthRouter = createRouter()
         summary: "start a sign-in",
         description: "Sends the browser to the provider; the state and the PKCE verifier travel in short-lived cookies.",
         path: "/{provider}/start",
-        request: { params: ProviderParams },
+        request: {
+            params: ProviderParams,
+            query: z.object({ returnUrl: z.string().optional() }),
+        },
         responses: {
             302: { description: "Redirect to the provider; to the login screen with ?error=failed when the provider is not set up or cannot be reached" },
             400: errorResponse("Unknown provider"),
         },
     }), async (c) => {
         const { provider } = c.req.valid("param");
+        const { returnUrl } = c.req.valid("query");
+        const returnQuery = returnUrl ? `&returnUrl=${encodeURIComponent(returnUrl)}` : "";
+
         const state = randomBytes(32).toString("hex");
         const verifier = randomBytes(32).toString("base64url");
 
@@ -66,12 +73,15 @@ export const oauthRouter = createRouter()
         } catch (e) {
             // The browser is mid-navigation, so it gets the login screen's error instead of a JSON body.
             console.error(`[auth/oauth] ${provider} start failed`, e);
-            return c.redirect(`${LOGIN_PAGE}?error=failed`, 302);
+            return c.redirect(`${LOGIN_PAGE}?error=failed${returnQuery}`, 302);
         }
 
         const cookie = { httpOnly: true, sameSite: "Lax" as const, secure: isHttps(c), path: "/", maxAge: 60 * 10 };
         setCookie(c, STATE_COOKIE, state, cookie);
         setCookie(c, VERIFIER_COOKIE, verifier, cookie);
+        if (returnUrl) {
+            setCookie(c, RETURN_URL_COOKIE, returnUrl, cookie);
+        }
         return c.redirect(location, 302);
     })
     .openapi(createRoute({
@@ -92,11 +102,16 @@ export const oauthRouter = createRouter()
         const { code, state } = c.req.valid("query");
         const sent = getCookie(c, STATE_COOKIE);
         const verifier = getCookie(c, VERIFIER_COOKIE);
+        const returnUrl = getCookie(c, RETURN_URL_COOKIE);
         deleteCookie(c, STATE_COOKIE, { path: "/" });
         deleteCookie(c, VERIFIER_COOKIE, { path: "/" });
+        deleteCookie(c, RETURN_URL_COOKIE, { path: "/" });
+
+        // Every way back to the login screen keeps where to go, so a retry still ends up there.
+        const returnQuery = returnUrl ? `&returnUrl=${encodeURIComponent(returnUrl)}` : "";
 
         if (!code || !state || !sent || !verifier || !sameState(sent, state)) {
-            return c.redirect(`${LOGIN_PAGE}?error=failed`, 302);
+            return c.redirect(`${LOGIN_PAGE}?error=failed${returnQuery}`, 302);
         }
 
         try {
@@ -106,7 +121,7 @@ export const oauthRouter = createRouter()
             // The browser only sees "failed", so the cause is logged here; this path never reaches onError.
             console.error(`[auth/oauth] ${provider} login failed`, e);
             const reason = e instanceof ServerError && e.status === 403 ? "disabled" : "failed";
-            return c.redirect(`${LOGIN_PAGE}?error=${reason}`, 302);
+            return c.redirect(`${LOGIN_PAGE}?error=${reason}${returnQuery}`, 302);
         }
-        return c.redirect(`${LOGIN_PAGE}?session=1`, 302);
+        return c.redirect(`${LOGIN_PAGE}?session=1${returnQuery}`, 302);
     });

@@ -10,6 +10,7 @@ import { fetchVideoEvents } from "@/stores/video-event-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useConfigStore } from "@/stores/config-store";
 import { useRouter } from "next/navigation";
+import { createLoginLink } from "@/lib/url";
 
 export default function VideoReviewPage() {
     const router = useRouter();
@@ -35,7 +36,7 @@ export default function VideoReviewPage() {
     useEffect(() => {
         void (async () => {
             if (!(await verifyAuth())) {
-                router.replace("/video-review/login");
+                router.replace(createLoginLink(window.location.pathname + window.location.search));
                 return;
             }
             void useConfigStore.getState().loadConfig();
