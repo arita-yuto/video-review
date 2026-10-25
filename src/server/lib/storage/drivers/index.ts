@@ -24,10 +24,10 @@ export interface FileDriver {
 export const DriversFactory = () => {
     switch (env.VIDEO_REVIEW_STORAGE) {
         case UploadStorageType.s3: {
-            const s3LocalStackEndpoint = env.S3_LOCALSTACK_ENDPOINT;
+            const s3Endpoint = env.S3_ENDPOINT;
             const s3Region = env.S3_REGION;
             const s3Bucket = env.S3_BUCKET;
-            return new S3Driver(s3LocalStackEndpoint, s3Region, s3Bucket);
+            return new S3Driver(s3Endpoint, s3Region, s3Bucket);
         }
         case UploadStorageType.nextCloud: {
             const BaseURL = env.NEXTCLOUD_BASE_URL;

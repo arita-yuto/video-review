@@ -87,23 +87,27 @@ services:
       db:
         condition: service_healthy
 
-  # Only with --profile s3: a local S3 for the s3 storage driver.
-  localstack:
-      profiles: [s3]
-      env_file:
-        - path: .env
-          required: false
-      image: localstack/localstack:latest
-      container_name: "videoreview-localstack"
-      depends_on:
-          - web
-      ports:
-          - "4566:4566"
-      environment:
-          # https://docs.localstack.cloud/references/configuration/
-          - DEBUG=${DEBUG:-0}
-      volumes:
-          - ./docker/localstack:/etc/localstack/init/ready.d
+  # Only with --profile s3: a local AWS (S3 and Lambda) for the s3 storage driver.
+  # create-bucket.sh makes the bucket from .env; deploy-lambda.sh deploys video-processing-lambda.zip
+  # (npm run video-processing:package-lambda) as the upload trigger, so stop the video-processing container then.
+  ministack:
+    profiles: [s3]
+    env_file:
+      - path: .env
+        required: false
+    build:
+      context: ./docker/ministack
+    container_name: videoreview-ministack
+    ports:
+      - "4566:4566"
+    environment:
+      DATABASE_URL: postgres://videoreview:videoreview@db:5432/videoreview
+    volumes:
+      - ./docker/ministack:/docker-entrypoint-initaws.d/ready.d
+      - ./integrations/video-processing:/lambda:ro
+    depends_on:
+      db:
+        condition: service_healthy
 
   # Only with --profile nextcloud: the Nextcloud storage driver's test target.
   nextcloud-db:

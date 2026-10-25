@@ -15,6 +15,7 @@
         "test:e2e:install": "npx playwright install chromium --with-deps",
         "video-processing:build": "npx tsx integrations/video-processing/build.ts",
         "video-processing:run": "node integrations/video-processing/dist/main-local.js",
+        "video-processing:package-lambda": "npx tsx integrations/video-processing/package-lambda.ts",
         "mcp:eval": "npx tsx tests/smoke/mcp-eval.ts",
         "llm:check": "set -a && . ./.env && set +a && LLM_SMOKE=1 npx vitest run tests/smoke",
         "prisma:deploy": "npx prisma migrate deploy",

@@ -1,5 +1,5 @@
 import { processVideo, prisma } from "./core.js";
-import { JobStatus, Prisma } from "@prisma/client";
+import { JobStatus } from "@prisma/client";
 
 type S3RecordLike = {
     s3?: {
@@ -53,24 +53,6 @@ export async function handler(event: S3EventLike): Promise<ProcessSummary> {
                 console.log(`video-processing lambda skip: already handled revision=${videoRev.id}`);
                 summary.skipped += 1;
                 continue;
-            }
-
-            try {
-                await prisma().videoProcessingJob.create({
-                    data: {
-                        videoRevisionId: videoRev.id,
-                        status: JobStatus.running,
-                    },
-                });
-            } catch (error) {
-                if (
-                    error instanceof Prisma.PrismaClientKnownRequestError
-                    && error.code === "P2002"
-                ) {
-                    summary.skipped += 1;
-                    continue;
-                }
-                throw error;
             }
 
             try {
