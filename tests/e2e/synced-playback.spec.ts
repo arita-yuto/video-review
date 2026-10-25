@@ -5,9 +5,6 @@ import { uploadVideo } from "./upload-video";
 const HOST = { email: "Bocchi@example.com", password: "pass123" };
 const GUEST = { email: "Kita@example.com", password: "pass123" };
 
-// A tab opened from the sync link has had no click, and Chromium refuses its play() at random.
-test.use({ launchOptions: { args: ["--autoplay-policy=no-user-gesture-required"] } });
-
 // Both browsers' console and failed requests, attached only to a failed run.
 const consoleLines: string[] = [];
 
@@ -68,6 +65,7 @@ async function openSyncedPair(browser: Browser, videoId: string): Promise<Synced
         }
     });
     await guest.goto(link);
+    await guest.getByRole("button", { name: "Join" }).click();
     await expect(syncButton(host)).toContainText("2");
 
     return {
@@ -114,9 +112,10 @@ test.describe("synced playback", () => {
         await host.keyboard.press("Escape");
         await expect(dialog).toBeHidden();
 
-        // Opening the link is enough to join.
+        // The link asks first; the Join click is also the gesture that lets the guest play.
         const guest = await login(browser, GUEST);
         await guest.goto(link);
+        await guest.getByRole("button", { name: "Join" }).click();
         await expect(syncButton(guest)).toHaveAttribute("aria-pressed", "true");
         await expect(syncButton(host)).toContainText("2");
 

@@ -143,6 +143,9 @@
         "presenterRequest": "{name} 님의 발표 교대 요청",
         "acceptRequest": "넘기기",
         "declineRequest": "거절",
+        "joinSync": "동기 재생에 참여할까요?",
+        "acceptJoin": "참여",
+        "declineJoin": "취소",
         "playbackSettings": "재생 설정",
         "showInBar": "바에 표시"
     },

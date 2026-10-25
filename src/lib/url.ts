@@ -1,8 +1,14 @@
-// The review page's sync session lives in this query parameter, so a reload stays in it and a shared link joins it.
+// The review page's sync session lives in this query parameter, so a reload stays in it.
 export const SYNC_PARAM = "sync";
+// The shared link asks before joining, so the click that answers also lets the browser play.
+export const JOIN_PARAM = "join";
 
 export function createVideoSyncLink(baseURL: string, videoId: string): string {
     return `${baseURL}/video-review/review/${videoId}?${SYNC_PARAM}=1`;
+}
+
+export function createVideoJoinLink(baseURL: string, videoId: string): string {
+    return `${baseURL}/video-review/review/${videoId}?${JOIN_PARAM}=1`;
 }
 
 export function createVideoCommentLink(baseURL: string, videoId: string | null, commentId: string | null): string | null {
