@@ -152,6 +152,8 @@ model VideoComment {
   updatedAt         DateTime        @updatedAt
   deleted           Boolean         @default(false)
   thumbsUp          Int             @default(0)
+
+  @@index([videoId, videoRevNum])
 }
 
 model SlackMessage {

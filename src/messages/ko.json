@@ -190,7 +190,7 @@
         "commentAdd": "댓글 추가",
         "cancel": "취소",
         "editIssueLink": "이슈 링크",
-        "editComment": "댓글 입력..."
+        "editComment": "댓글 입력... ({keys}로 게시)"
     },
     "share-link": {
         "title": "공유 링크",

@@ -15,17 +15,19 @@ import { useCommentSearchStore } from "@/stores/comment-search-store";
 import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
 import { chatToast } from "@/components/chat-notice";
 import { canEditComment, isGuest } from "@/lib/role";
+import { useSyncing } from "@/lib/sync-session";
 
 export default function VideoCommentContent() {
     const containerRef = useRef<HTMLDivElement>(null);
     const commentCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
     const { displayName, email, userId, role } = useAuthStore();
     const { selectedVideo, selectedRevision } = useVideoStore();
-    const { setDisplayComments, comments, addComment, updateComment, fetchComments, markRead } = useCommentStore();
+    const { setDisplayComments, comments, liveComments, addComment, updateComment, fetchComments, markRead } = useCommentStore();
     const { filterText } = useCommentSearchStore();
     const dateFilter = useCommentSearchDateFilterStore();
     const { canvasSave } = useDrawingStore();
     const currentTime = usePlayback((s) => s.currentTime);
+    const syncing = useSyncing(selectedVideo?.id ?? null);
     const {
         editingComment,
         setEditing,
@@ -36,7 +38,8 @@ export default function VideoCommentContent() {
     } = useCommentEditStore();
 
     useEffect(() => {
-        if (!userId || isGuest(role) || !selectedVideo) {
+        // Someone else's comment arriving live is not read until the viewer opens the video again.
+        if (!userId || isGuest(role) || !selectedVideo || comments === liveComments) {
             return;
         }
         markRead(selectedVideo.id);
@@ -64,7 +67,10 @@ export default function VideoCommentContent() {
                     time: currentTime,
                     userEmail: email ?? "",
                 })
-                await handlePostCommentToChat(id);
+                // A sync session's comments flow like a chat, so they send no notices.
+                if (!syncing) {
+                    await handlePostCommentToChat(id);
+                }
             }
         } else {
             // Update flow for an existing comment.
@@ -94,7 +100,14 @@ export default function VideoCommentContent() {
         return await chatToast(id, screenshot);
     }
 
+    // A live refresh, as when someone else comments, leaves a still reader where they were.
+    const scrolledAt = useRef<number | null>(null);
+
     useEffect(() => {
+        if (comments === liveComments && scrolledAt.current === currentTime) {
+            return;
+        }
+
         // Find the latest comment whose timestamp is <= current playback time.
         // We assume `comments` is sorted by time in ascending order.
         let target = comments[0];
@@ -113,6 +126,7 @@ export default function VideoCommentContent() {
         const el = commentCardRefs.current[target.id];
 
         if (!el || !containerRef.current) return;
+        scrolledAt.current = currentTime;
 
         // Both offsets are from the same offset parent, so the difference is the card's position in the list.
         // The 5px keeps the card clear of the list's edge.

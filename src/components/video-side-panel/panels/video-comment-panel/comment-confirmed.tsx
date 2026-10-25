@@ -3,11 +3,17 @@
 import { Button } from "@/ui/button";
 import { Textarea } from "@/ui/textarea";
 import { Input } from "@/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { usePlayback } from "@/stores/playback-store";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/stores/auth-store";
 import { isGuest } from "@/lib/role";
+import { useVideoStore } from "@/stores/video-store";
+import { useSyncing } from "@/lib/sync-session";
+import { isMac } from "@/lib/platform";
+
+// The OS never changes while the page is open, so there is nothing to subscribe to.
+const subscribeNever = () => () => {};
 
 export type ECommentConfirmedType = "commentUpdate" | "commentAdd";
 
@@ -24,11 +30,36 @@ export default function CommentConfirmed(props: {
     const [issueId, setIssueId] = useState(props.issueId);
     const setIsPlaying = usePlayback((s) => s.setIsPlaying);
     const { role } = useAuthStore();
+    const syncing = useSyncing(useVideoStore((s) => s.selectedVideo?.id ?? null));
+
+    // Writing pauses so the comment lands on the frame in view; a sync session watches on, like a chat.
+    const pauseToWrite = () => {
+        if (!syncing) {
+            setIsPlaying(false);
+        }
+    };
 
     const handleConfirmed = () => {
         props.onConfirmed(comment, issueId);
         setIssueId(null);
         setComment("");
+    };
+
+    // Read in the browser only: the server cannot tell the OS, and the hint must not differ on hydration.
+    const mac = useSyncExternalStore(subscribeNever, isMac, () => false);
+
+    // Enter alone stays a new line, and an Enter that confirms the IME conversion is left to it.
+    const submitOnShortcut = (e: KeyboardEvent<HTMLElement>) => {
+        const modifier = mac ? e.metaKey : e.ctrlKey;
+        if (e.key !== "Enter" || !modifier || e.nativeEvent.isComposing) {
+            return;
+        }
+
+        e.preventDefault();
+        if (props.confirmedLabel === "commentAdd" && !canAddComment()) {
+            return;
+        }
+        handleConfirmed();
     };
 
     const handleCancel = () => {
@@ -50,8 +81,9 @@ export default function CommentConfirmed(props: {
                 disabled={!props.canEditText}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                onFocus={() => setIsPlaying(false)}
-                placeholder={t("editComment")}
+                onFocus={pauseToWrite}
+                onKeyDown={submitOnShortcut}
+                placeholder={t("editComment", { keys: mac ? "⌘ Enter" : "Ctrl Enter" })}
                 className="h-20 mb-2 resize-none"
             />
             <Input
@@ -59,7 +91,8 @@ export default function CommentConfirmed(props: {
                 className="mb-2"
                 value={issueId ?? ""}
                 onChange={(e) => setIssueId(e.target.value)}
-                onFocus={() => setIsPlaying(false)}
+                onFocus={pauseToWrite}
+                onKeyDown={submitOnShortcut}
                 placeholder={t("editIssueLink")}
             />
             {props.confirmedLabel === "commentUpdate" ? (

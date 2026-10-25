@@ -29,7 +29,12 @@ export const streamRouter = createRouter()
     .openapi(createRoute({
         method: "get",
         summary: "Stream updates for one video",
-        description: "Server-sent events while a review screen has the video open. `sync` carries the names and emails of the connections in the video's sync session, its playback state, who presents, who requests to present, and whether this connection is either. `sync=1` puts this connection in the session. `hello` comes first with the connection id the browser pings with.",
+        description: [
+            "Server-sent events while a review screen has the video open. `sync=1` puts this connection in the video's sync session.",
+            "- `hello`: first, with the connection id the browser pings with.",
+            "- `sync`: the session's participants, playback state, presenter and requester.",
+            "- `comments`: the video's comments changed; fetch them again.",
+        ].join("\n"),
         path: "/",
         request: {
             query: z.object({
