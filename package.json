@@ -25,7 +25,7 @@
         "lint": "eslint src"
     },
     "dependencies": {
-        "@anthropic-ai/sdk": "^0.39.0",
+        "@anthropic-ai/sdk": "^0.133.0",
         "@aws-sdk/client-s3": "^3.953.0",
         "@aws-sdk/s3-request-presigner": "^3.953.0",
         "@emotion/styled": "^11.14.1",
@@ -33,7 +33,7 @@
         "@fortawesome/fontawesome-svg-core": "^7.1.0",
         "@fortawesome/free-solid-svg-icons": "^7.1.0",
         "@fortawesome/react-fontawesome": "^3.1.1",
-        "@hono/swagger-ui": "^0.5.3",
+        "@hono/swagger-ui": "^0.6.0",
         "@hono/zod-openapi": "^1.2.0",
         "@modelcontextprotocol/sdk": "^1.32.0",
         "@prisma/client": "^6.5.0",
@@ -72,7 +72,7 @@
         "dotenv": "^17.4.0",
         "hono": "^4.12.23",
         "jsonwebtoken": "^9.0.2",
-        "lucide-react": "^0.525.0",
+        "lucide-react": "^0.577.0",
         "mime-types": "^3.0.2",
         "next": "^16.4.2",
         "next-intl": "^4.9.2",
