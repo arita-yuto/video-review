@@ -7,3 +7,6 @@ __pycache__/
 *.pyd
 
 */dist/
+
+# Built by npm run video-processing:package-lambda
+video-processing/video-processing-lambda.zip
