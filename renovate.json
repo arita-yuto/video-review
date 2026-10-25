@@ -25,6 +25,12 @@
             "minimumReleaseAge": "14 days"
         },
         {
+            "description": "Overrides pin vulnerable transitive packages by hand; Renovate cannot update them in the lockfile without clashing with the override.",
+            "matchManagers": ["npm"],
+            "matchDepTypes": ["overrides"],
+            "enabled": false
+        },
+        {
             "description": "Patch and minor updates are offered together once a week as one PR.",
             "matchDatasources": ["npm"],
             "matchUpdateTypes": ["patch", "minor"],
