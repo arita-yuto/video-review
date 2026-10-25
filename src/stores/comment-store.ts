@@ -13,9 +13,11 @@ interface CommentState {
     loading: boolean;
     // Videos with comments this user hasn't read, across the whole list.
     unreadVideoIds: ReadonlySet<string>;
+    // The list as a live refresh left it; the panel keeps the reader's scroll and read state for it.
+    liveComments: VideoComment[] | null;
 
     setDisplayComments: (comments: VideoComment[]) => void;
-    fetchComments: (videoRevision: VideoRevision) => Promise<void>;
+    fetchComments: (videoRevision: VideoRevision, options?: { live?: boolean }) => Promise<void>;
     addComment: (c: Omit<VideoComment, "notifiedProviders" | "id" | "createdAt" | "updatedAt" | "deleted" | "drawingPath" | "hasDrawing" | "thumbsUp" | "userId" | "isGuest">) => Promise<string>;
     updateComment: (comment: VideoComment) => void;
     deleteComment: (id: string) => Promise<void>;
@@ -30,14 +32,19 @@ export const useCommentStore = create<CommentState>((set, get) => ({
     displayComments: [],
     loading: false,
     unreadVideoIds: new Set(),
+    liveComments: null,
     editingComment: null,
 
     setDisplayComments: (comments: VideoComment[]) => {
         set({ displayComments: comments })
     },
 
-    fetchComments: async (videoRevision: VideoRevision) => {
-        set({ loading: true });
+    fetchComments: async (videoRevision: VideoRevision, options) => {
+        const live = options?.live ?? false;
+        if (!live) {
+            set({ loading: true });
+        }
+
         const s = useCommentSearchStore.getState();
         const dateRange = useCommentSearchDateFilterStore.getState().resolve();
         const res = await api.comments.index.$get({
@@ -54,7 +61,13 @@ export const useCommentStore = create<CommentState>((set, get) => ({
             },
         });
         if (res.status !== 200) throw new Error("Failed to fetch comments");
-        set({ comments: await res.json(), loading: false });
+        const comments = await res.json();
+
+        // A switch to another revision while this was on its way has a fetch of its own.
+        if (useVideoStore.getState().selectedRevision?.id !== videoRevision.id) {
+            return;
+        }
+        set(live ? { comments, liveComments: comments } : { comments, liveComments: null, loading: false });
     },
 
     addComment: async (c) => {

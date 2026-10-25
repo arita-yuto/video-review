@@ -32,8 +32,18 @@ export function useVideoStream(videoId: string | null) {
         const source = new EventSource(`/api/v1/videos/${encodeURIComponent(videoId)}/stream${query}`);
 
         // The server drops a connection that stops pinging, which is how it notices a closed tab behind a proxy.
+        const fetchCommentsLive = () => {
+            const revision = useVideoStore.getState().selectedRevision;
+            if (revision?.videoId === videoId) {
+                void useCommentStore.getState().fetchComments(revision, { live: true }).catch((e) => console.error("Failed to fetch comments", e));
+            }
+        };
+
         let pingTimer: ReturnType<typeof setInterval> | undefined;
         source.addEventListener("hello", (e) => {
+            // Comments changed while the stream was down sent no signal here.
+            fetchCommentsLive();
+
             const { connectionId } = JSON.parse(e.data) as { connectionId: string };
             store.getState().setConnectionId(connectionId);
             clearInterval(pingTimer);
@@ -77,10 +87,7 @@ export function useVideoStream(videoId: string | null) {
 
             commentsTimer = setTimeout(() => {
                 fetchBy = null;
-                const revision = useVideoStore.getState().selectedRevision;
-                if (revision?.videoId === videoId) {
-                    void useCommentStore.getState().fetchComments(revision).catch((e) => console.error("Failed to fetch comments", e));
-                }
+                fetchCommentsLive();
             }, delay);
         });
 

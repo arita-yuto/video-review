@@ -22,7 +22,7 @@ export default function VideoCommentContent() {
     const commentCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
     const { displayName, email, userId, role } = useAuthStore();
     const { selectedVideo, selectedRevision } = useVideoStore();
-    const { setDisplayComments, comments, addComment, updateComment, fetchComments, markRead } = useCommentStore();
+    const { setDisplayComments, comments, liveComments, addComment, updateComment, fetchComments, markRead } = useCommentStore();
     const { filterText } = useCommentSearchStore();
     const dateFilter = useCommentSearchDateFilterStore();
     const { canvasSave } = useDrawingStore();
@@ -38,7 +38,8 @@ export default function VideoCommentContent() {
     } = useCommentEditStore();
 
     useEffect(() => {
-        if (!userId || isGuest(role) || !selectedVideo) {
+        // Someone else's comment arriving live is not read until the viewer opens the video again.
+        if (!userId || isGuest(role) || !selectedVideo || comments === liveComments) {
             return;
         }
         markRead(selectedVideo.id);
@@ -99,13 +100,11 @@ export default function VideoCommentContent() {
         return await chatToast(id, screenshot);
     }
 
-    // A list that only refreshed, as when someone else comments, stays where the reader left it.
-    const scrolledFor = useRef<{ time: number; revisionId: string | null } | null>(null);
+    // A live refresh, as when someone else comments, leaves a still reader where they were.
+    const scrolledAt = useRef<number | null>(null);
 
     useEffect(() => {
-        const revisionId = selectedRevision?.id ?? null;
-        const last = scrolledFor.current;
-        if (last && last.time === currentTime && last.revisionId === revisionId) {
+        if (comments === liveComments && scrolledAt.current === currentTime) {
             return;
         }
 
@@ -127,7 +126,7 @@ export default function VideoCommentContent() {
         const el = commentCardRefs.current[target.id];
 
         if (!el || !containerRef.current) return;
-        scrolledFor.current = { time: currentTime, revisionId };
+        scrolledAt.current = currentTime;
 
         // Both offsets are from the same offset parent, so the difference is the card's position in the list.
         // The 5px keeps the card clear of the list's edge.
@@ -135,7 +134,7 @@ export default function VideoCommentContent() {
             top: el.offsetTop - containerRef.current.offsetTop - 5,
             behavior: "smooth",
         });
-    }, [currentTime, comments, selectedRevision?.id]);
+    }, [currentTime, comments]);
 
     useEffect(() => {
         setDisplayComments(comments);
