@@ -94,7 +94,16 @@ export default function VideoCommentContent() {
         return await chatToast(id, screenshot);
     }
 
+    // A list that only refreshed, as when someone else comments, stays where the reader left it.
+    const scrolledFor = useRef<{ time: number; revisionId: string | null } | null>(null);
+
     useEffect(() => {
+        const revisionId = selectedRevision?.id ?? null;
+        const last = scrolledFor.current;
+        if (last && last.time === currentTime && last.revisionId === revisionId) {
+            return;
+        }
+
         // Find the latest comment whose timestamp is <= current playback time.
         // We assume `comments` is sorted by time in ascending order.
         let target = comments[0];
@@ -113,6 +122,7 @@ export default function VideoCommentContent() {
         const el = commentCardRefs.current[target.id];
 
         if (!el || !containerRef.current) return;
+        scrolledFor.current = { time: currentTime, revisionId };
 
         // Both offsets are from the same offset parent, so the difference is the card's position in the list.
         // The 5px keeps the card clear of the list's edge.
@@ -120,7 +130,7 @@ export default function VideoCommentContent() {
             top: el.offsetTop - containerRef.current.offsetTop - 5,
             behavior: "smooth",
         });
-    }, [currentTime, comments]);
+    }, [currentTime, comments, selectedRevision?.id]);
 
     useEffect(() => {
         setDisplayComments(comments);
