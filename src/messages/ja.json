@@ -143,6 +143,9 @@
         "presenterRequest": "{name} から発表の交代リクエスト",
         "acceptRequest": "譲る",
         "declineRequest": "断る",
+        "joinSync": "同期再生に参加しますか？",
+        "acceptJoin": "参加",
+        "declineJoin": "キャンセル",
         "playbackSettings": "再生設定",
         "showInBar": "バーに表示"
     },

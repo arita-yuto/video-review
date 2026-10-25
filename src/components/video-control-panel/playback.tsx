@@ -21,11 +21,12 @@ import { ArrowRightToLine, ListVideo, Pin, Presentation, Repeat1, Settings, User
 import { useTranslations } from "next-intl";
 import { formatTime } from "@/lib/utils";
 import { usePlayback } from "@/stores/playback-store";
-import { joinSync, leaveSync, putPresenter, usePresenterLock, useSyncing } from "@/lib/sync-session";
-import { createVideoSyncLink } from "@/lib/url";
+import { joinSync, leaveSync, putPresenter, useJoining, usePresenterLock, useSyncing } from "@/lib/sync-session";
+import { createVideoJoinLink } from "@/lib/url";
 import { useRouter } from "next/navigation";
 import { ShareLinkDialog } from "@/components/dialog/share-link";
 import { PresenterRequestDialog } from "@/components/dialog/presenter-request-dialog";
+import { SyncJoinDialog } from "@/components/dialog/sync-join-dialog";
 import { Spinner } from "@/ui/spinner";
 import { EPlayMode, useVideoPlayerStore, type PlaybackSettingId } from "@/stores/video-player-store";
 import { useConfigStore } from "@/stores/config-store";
@@ -272,6 +273,7 @@ function SyncParticipants() {
 export function SyncButton({ videoId }: { videoId: string | null }) {
     const t = useTranslations("video-control-panel");
     const syncing = useSyncing(videoId);
+    const joining = useJoining(videoId);
     const participants = usePlayback((s) => s.participants);
     const router = useRouter();
     const syncLink = usePlayback((s) => s.syncLink);
@@ -290,7 +292,7 @@ export function SyncButton({ videoId }: { videoId: string | null }) {
         joinSync(videoId, router);
         // The first one in hands out the link; later ones are joining a session that already has it.
         if (participants.length === 0) {
-            setSyncLink(createVideoSyncLink(window.location.origin, videoId));
+            setSyncLink(createVideoJoinLink(window.location.origin, videoId));
         }
     };
 
@@ -320,6 +322,7 @@ export function SyncButton({ videoId }: { videoId: string | null }) {
                 </TooltipContent>
             </Tooltip>
             <ShareLinkDialog url={syncLink ?? ""} open={syncLink !== null} onOpenChange={closeLink} />
+            {joining && <SyncJoinDialog onAnswer={(join) => join ? joinSync(videoId, router) : leaveSync()} />}
         </>
     );
 }

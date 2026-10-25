@@ -13,6 +13,7 @@ import { Button } from "@/ui/button";
 import { env } from "@/lib/env";
 import { useConfigStore } from "@/stores/config-store";
 import { AuthCard, AuthLayout } from "@/components/auth/auth-layout";
+import { createLoginLink, parseLoginReturnUrl } from "@/lib/url";
 
 export default function Login() {
     const t = useTranslations("login");
@@ -32,8 +33,12 @@ export default function Login() {
     // A sign-in through a provider comes back here with the session in the cookie, or with an error.
     const finishRedirectLogin = async () => {
         const params = new URLSearchParams(window.location.search);
+        // Drops the error but keeps returnUrl, so a retry still lands on the same page.
+        const returnUrl = params.get("returnUrl");
+        const loginPage = returnUrl ? createLoginLink(returnUrl) : "/login";
+
         if (params.has("error")) {
-            router.replace("/login");
+            router.replace(loginPage);
             alert(t(params.get("error") === "disabled" ? "accountDisabledMsg" : "loginFailedMsg"));
             return;
         }
@@ -43,13 +48,13 @@ export default function Login() {
 
         const res = await api.auth.session.$get();
         if (res.status !== 200) {
-            router.replace("/login");
+            router.replace(loginPage);
             alert(t("loginFailedMsg"));
             return;
         }
         const data = await res.json();
         setAuth(data.id, data.email, data.role, data.token, data.displayName, data.provider);
-        router.replace("/video-review/review");
+        router.replace(parseLoginReturnUrl(window.location.search));
     };
 
     useEffect(() => {
@@ -88,7 +93,7 @@ export default function Login() {
             if (res.status !== 200) throw new Error("Failed to login");
             const data = await res.json();
             setAuth(data.id, data.email ?? null, data.role, data.token, data.displayName, data.provider);
-            router.push("/video-review/review");
+            router.push(parseLoginReturnUrl(window.location.search));
         } catch (e) {
             alert(t("loginFailedMsg"));
         }
@@ -158,7 +163,7 @@ export default function Login() {
                         <TabsContent value="oidc">
                             <AuthCard>
                                 <div className="h-8"></div>
-                                <ButtonLogin exec={() => window.location.assign(`${OAUTH_PATH}/oidc/start`)} title={t("sso")} />
+                                <ButtonLogin exec={() => window.location.assign(`${OAUTH_PATH}/oidc/start${window.location.search}`)} title={t("sso")} />
                             </AuthCard>
                         </TabsContent>
                     )}

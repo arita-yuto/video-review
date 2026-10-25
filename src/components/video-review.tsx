@@ -12,6 +12,7 @@ import { VideoComment, VideoRevision } from "@/lib/db-types";
 import { DrawingLayer } from "@/components/drawing-layer";
 import { useTranslations } from "next-intl";
 import { resolveMediaUrl } from "@/lib/media-url";
+import { createLoginLink } from "@/lib/url";
 import { downscaledVideoKey } from "@/lib/storage-key";
 import { usePlaybackWidth } from "@/lib/hooks/use-playback-width";
 import { useRouter } from "next/navigation";
@@ -155,8 +156,9 @@ export default function VideoReview() {
     };
 
     useEffect(() => {
-        if (!token)
-            router.replace("/video-review/login");
+        if (!token) {
+            router.replace(createLoginLink(window.location.pathname + window.location.search));
+        }
     }, [token]);
 
     useEffect(() => {

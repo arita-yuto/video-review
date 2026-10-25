@@ -143,6 +143,9 @@
         "presenterRequest": "{name} wants to take over",
         "acceptRequest": "Hand over",
         "declineRequest": "Decline",
+        "joinSync": "Join synced playback?",
+        "acceptJoin": "Join",
+        "declineJoin": "Cancel",
         "playbackSettings": "Playback settings",
         "showInBar": "Show in bar"
     },

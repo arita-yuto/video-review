@@ -1,7 +1,7 @@
 "use client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
-import { createVideoSyncLink, SYNC_PARAM } from "@/lib/url";
+import { createVideoSyncLink, JOIN_PARAM, SYNC_PARAM } from "@/lib/url";
 import { usePlayback } from "@/stores/playback-store";
 
 type Router = ReturnType<typeof useRouter>;
@@ -45,8 +45,17 @@ export function useSyncing(videoId: string | null): boolean {
     return videoId !== null && params.videoId === videoId && searchParams.get(SYNC_PARAM) === "1";
 }
 
+// Opened from the shared link and not yet answered.
+export function useJoining(videoId: string | null): boolean {
+    const params = useParams();
+    const searchParams = useSearchParams();
+
+    return videoId !== null && params.videoId === videoId && searchParams.get(JOIN_PARAM) === "1";
+}
+
 function replaceSyncParam(syncing: boolean) {
     const url = new URL(window.location.href);
+    url.searchParams.delete(JOIN_PARAM);
     if (syncing) {
         url.searchParams.set(SYNC_PARAM, "1");
     } else {
