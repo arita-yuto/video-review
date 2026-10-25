@@ -15,6 +15,7 @@ import { useCommentSearchStore } from "@/stores/comment-search-store";
 import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
 import { chatToast } from "@/components/chat-notice";
 import { canEditComment, isGuest } from "@/lib/role";
+import { useSyncing } from "@/lib/sync-session";
 
 export default function VideoCommentContent() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -26,6 +27,7 @@ export default function VideoCommentContent() {
     const dateFilter = useCommentSearchDateFilterStore();
     const { canvasSave } = useDrawingStore();
     const currentTime = usePlayback((s) => s.currentTime);
+    const syncing = useSyncing(selectedVideo?.id ?? null);
     const {
         editingComment,
         setEditing,
@@ -64,7 +66,10 @@ export default function VideoCommentContent() {
                     time: currentTime,
                     userEmail: email ?? "",
                 })
-                await handlePostCommentToChat(id);
+                // A sync session's comments flow like a chat, so they send no notices.
+                if (!syncing) {
+                    await handlePostCommentToChat(id);
+                }
             }
         } else {
             // Update flow for an existing comment.
