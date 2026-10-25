@@ -7,6 +7,7 @@ import { errorResponse } from "@/server/lib/openapi/error-response";
 import { VideoCommentSchema } from "@/schema/zod";
 import { initRouter } from "@/server/routes/comments/[id]/drawing/init";
 import { finishRouter } from "@/server/routes/comments/[id]/drawing/finish";
+import { broadcastComments } from "@/server/lib/video-stream";
 
 export const drawingRouter = createRouter()
     .openapi(createRoute({
@@ -42,6 +43,7 @@ export const drawingRouter = createRouter()
             where: { id: comment.id },
             data: { hasDrawing: false, updatedAt: new Date() },
         });
+        broadcastComments(updated.videoId);
 
         if (comment.drawingPath) {
             await VideoReviewStorage.deleteObject(comment.drawingPath);

@@ -76,6 +76,18 @@ function broadcastSync(channel: Channel) {
     }
 }
 
+// Tells every open screen of the video to fetch its comments again.
+export function broadcastComments(videoId: string) {
+    const channel = channels.get(videoId);
+    if (!channel) {
+        return;
+    }
+
+    for (const s of channel.subscribers) {
+        s.connection.send("comments", {});
+    }
+}
+
 // Whether others remain to be told; false when already gone, as the close and the patrol can both get here.
 function removeSubscriber(videoId: string, channel: Channel, subscriber: Subscriber): boolean {
     if (!channel.subscribers.delete(subscriber)) {

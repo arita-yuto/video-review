@@ -7,6 +7,7 @@ import { prisma } from "@/server/lib/db";
 import { VideoReviewStorage } from "@/server/lib/storage";
 import { drawingKey } from "@/lib/storage-key";
 import { VideoCommentSchema } from "@/schema/zod";
+import { broadcastComments } from "@/server/lib/video-stream";
 
 export const finishRouter = createRouter()
     .openapi(createRoute({
@@ -52,6 +53,7 @@ export const finishRouter = createRouter()
             where: { id: comment.id },
             data: { drawingPath: storageKey, hasDrawing: true, updatedAt: new Date() },
         });
+        broadcastComments(updated.videoId);
 
         if (comment.drawingPath && comment.drawingPath !== storageKey) {
             await VideoReviewStorage.deleteObject(comment.drawingPath);

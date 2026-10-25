@@ -18,6 +18,7 @@ import { canEditComment } from "@/lib/role";
 import { v4 as uuidv4 } from "uuid";
 import { VideoReviewStorage } from "@/server/lib/storage";
 
+import { broadcastComments } from "@/server/lib/video-stream";
 const QuerySchema = z.object({
     videoId: z.string().optional(),
     from: z.string().optional(),
@@ -200,6 +201,7 @@ export const commentsRouter = createRouter()
         } catch {
             return c.json({ error: "failed to create comment" }, 500);
         }
+            broadcastComments(videoId);
     })
     .openapi(createRoute({
         method: "patch",
@@ -273,6 +275,7 @@ export const commentsRouter = createRouter()
                 await VideoReviewStorage.deleteObject(updated.drawingPath);
             }
 
+            broadcastComments(updated.videoId);
             return c.json(updated, 200);
         } catch {
             return c.json({ error: "failed to update comment" }, 500);

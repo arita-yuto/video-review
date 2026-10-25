@@ -7,6 +7,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { VideoCommentSchema } from "@/schema/zod";
 import { errorResponse } from "@/server/lib/openapi/error-response";
+import { broadcastComments } from "@/server/lib/video-stream";
 
 // The public origin comes from the browser: the server may sit behind a proxy and not know it.
 const IssueForm = z.object({
@@ -84,6 +85,7 @@ export const issueRouter = createRouter()
                 where: { id },
                 data: { issueId: issueKey, updatedAt: new Date() },
             });
+            broadcastComments(updated.videoId);
             return c.json(updated, 200);
         } catch (e) {
             if (e instanceof ServerError) {

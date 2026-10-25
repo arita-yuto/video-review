@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { usePlaybackStoreApi, type Participant, type ReceivedSyncState } from "@/stores/playback-store";
 import { useSyncing } from "@/lib/sync-session";
+import { useCommentStore } from "@/stores/comment-store";
+import { useVideoStore } from "@/stores/video-store";
 
 const PING_MS = 20_000;
 
@@ -56,8 +58,35 @@ export function useVideoStream(videoId: string | null) {
             setRequester(syncing ? requester : null, requesting);
         });
 
+        // Changes in a row are fetched once, but a stream of them that never pauses still shows within about a second.
+        const COMMENTS_SETTLE_MS = 300;
+        const COMMENTS_MAX_WAIT_MS = 1000;
+        // Every screen gets the same signal at once; a random share of this keeps them from all fetching in the same moment.
+        const COMMENTS_SPREAD_MS = 300;
+        let commentsTimer: ReturnType<typeof setTimeout> | undefined;
+        let fetchBy: number | null = null;
+        let spread = 0;
+        source.addEventListener("comments", () => {
+            clearTimeout(commentsTimer);
+            const now = performance.now();
+            if (fetchBy === null) {
+                spread = Math.random() * COMMENTS_SPREAD_MS;
+                fetchBy = now + COMMENTS_MAX_WAIT_MS + spread;
+            }
+            const delay = Math.min(now + COMMENTS_SETTLE_MS + spread, fetchBy) - now;
+
+            commentsTimer = setTimeout(() => {
+                fetchBy = null;
+                const revision = useVideoStore.getState().selectedRevision;
+                if (revision?.videoId === videoId) {
+                    void useCommentStore.getState().fetchComments(revision).catch((e) => console.error("Failed to fetch comments", e));
+                }
+            }, delay);
+        });
+
         return () => {
             clearInterval(pingTimer);
+            clearTimeout(commentsTimer);
             source.close();
             store.getState().setParticipants([]);
             store.getState().setSyncState(null);
