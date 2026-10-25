@@ -1,6 +1,7 @@
 import { PrismaTypes } from "@/lib/db-types";
 import { prisma } from "@/server/lib/db";
 import { createRoute } from "@hono/zod-openapi";
+import { compress } from "hono/compress";
 import { createRouter } from "@/server/lib/openapi/router";
 import { byIdRouter } from "@/server/routes/comments/[id]";
 import { lastUpdatedRouter } from "@/server/routes/comments/last-updated";
@@ -17,8 +18,8 @@ import { drawingKey } from "@/lib/storage-key";
 import { canEditComment } from "@/lib/role";
 import { v4 as uuidv4 } from "uuid";
 import { VideoReviewStorage } from "@/server/lib/storage";
-
 import { broadcastComments } from "@/server/lib/video-stream";
+
 const QuerySchema = z.object({
     videoId: z.string().optional(),
     from: z.string().optional(),
@@ -50,7 +51,11 @@ const UpdateCommentBody = z.object({
     notifiedProviders: z.string().array().optional(),
 });
 
-export const commentsRouter = createRouter()
+// Every open screen fetches the whole list again when a comment changes, so it travels compressed.
+const router = createRouter();
+router.use("/", compress());
+
+export const commentsRouter = router
     .openapi(createRoute({
         method: "get",
         summary: "Get comments",
@@ -196,12 +201,12 @@ export const commentsRouter = createRouter()
                     userEmail,
                 },
             });
+            broadcastComments(videoId);
 
             return c.json(result, 201);
         } catch {
             return c.json({ error: "failed to create comment" }, 500);
         }
-            broadcastComments(videoId);
     })
     .openapi(createRoute({
         method: "patch",
@@ -270,12 +275,12 @@ export const commentsRouter = createRouter()
                 where: { id },
                 data: updateData
             });
+            broadcastComments(updated.videoId);
 
             if (deleted === true && updated.drawingPath) {
                 await VideoReviewStorage.deleteObject(updated.drawingPath);
             }
 
-            broadcastComments(updated.videoId);
             return c.json(updated, 200);
         } catch {
             return c.json({ error: "failed to update comment" }, 500);
