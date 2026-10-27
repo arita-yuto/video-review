@@ -1,15 +1,19 @@
 import { create } from "zustand";
 import { VideoComment } from "@/lib/db-types";
 
+export type CommentSelectionSource = "card" | "link";
+
 interface VideoReviewState {
     videoRefElement: HTMLVideoElement | null,
     // The whole player column goes fullscreen, not just the video.
     playerElement: HTMLElement | null;
     fullscreen: boolean;
     selectedComment: VideoComment | null;
+    // Where the selection came from; null once it is cleared.
+    selectionSource: CommentSelectionSource | null;
     activeComments: VideoComment[];
 
-    setSelectComment: (comment: VideoComment | null) => void;
+    setSelectComment: (comment: VideoComment | null, source?: CommentSelectionSource) => void;
     setVideoRefElement: (video: HTMLVideoElement | null) => void;
     setPlayerElement: (player: HTMLElement | null) => void;
     // Records what the browser reports; toggleFullscreen is what asks the browser to change it.
@@ -26,9 +30,10 @@ export const useVideoReviewStore = create<VideoReviewState>((set, get) => ({
     playerElement: null,
     fullscreen: false,
     selectedComment: null,
+    selectionSource: null,
     activeComments: [],
 
-    setSelectComment: (comment) => set({ selectedComment: comment }),
+    setSelectComment: (comment, source) => set({ selectedComment: comment, selectionSource: comment ? source ?? null : null }),
     setVideoRefElement: (video) => set({ videoRefElement: video }),
     setPlayerElement: (player) => set({ playerElement: player }),
     setFullscreen: (active) => set({ fullscreen: active }),

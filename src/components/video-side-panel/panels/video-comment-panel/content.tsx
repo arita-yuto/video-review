@@ -6,6 +6,7 @@ import { captureView } from "@/lib/drawing/capture-view";
 import { useCommentStore } from "@/stores/comment-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useVideoStore } from "@/stores/video-store";
+import { useVideoReviewStore } from "@/stores/video-review-store";
 import { useCommentEditStore } from "@/stores/comment-edit-store";
 import CommentConfirmed from "@/components/video-side-panel/panels/video-comment-panel/comment-confirmed";
 import { useDrawingStore } from "@/stores/drawing-store";
@@ -27,6 +28,9 @@ export default function VideoCommentContent() {
     const dateFilter = useCommentSearchDateFilterStore();
     const { canvasSave } = useDrawingStore();
     const currentTime = usePlayback((s) => s.currentTime);
+    const isPlaying = usePlayback((s) => s.isPlaying);
+    const selectedComment = useVideoReviewStore((s) => s.selectedComment);
+    const selectionSource = useVideoReviewStore((s) => s.selectionSource);
     const syncing = useSyncing(selectedVideo?.id ?? null);
     const {
         editingComment,
@@ -121,6 +125,11 @@ export default function VideoCommentContent() {
             } else {
                 break;
             }
+        }
+
+        // Keep the list still on the card the reader clicked; once the time moves off that card, any change scrolls again.
+        if (!isPlaying && selectionSource === "card" && selectedComment?.time === currentTime) {
+            return;
         }
 
         const el = commentCardRefs.current[target.id];
