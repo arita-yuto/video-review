@@ -63,6 +63,7 @@
   --text-3xs: 0.5rem;
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-warning-strong: var(--warning-strong);
   --color-info: var(--info);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -111,6 +112,8 @@
   --primary-strong: #ff5500;
   --success: #32cd32;
   --warning: #eae60b;
+  /* Warning on a light surface such as a chip, where the bright yellow fades out. */
+  --warning-strong: #b8860b;
   --info: #4aa3ff;
 }
 

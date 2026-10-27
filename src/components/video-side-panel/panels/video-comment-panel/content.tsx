@@ -14,6 +14,7 @@ import CommentCard from "@/components/video-side-panel/panels/video-comment-pane
 import { useCommentSearchStore } from "@/stores/comment-search-store";
 import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
 import { chatToast } from "@/components/chat-notice";
+import { toast } from "sonner";
 import { canEditComment, isGuest } from "@/lib/role";
 import { useSyncing } from "@/lib/sync-session";
 
@@ -66,7 +67,13 @@ export default function VideoCommentContent() {
                     issueId: issueId,
                     time: currentTime,
                     userEmail: email ?? "",
-                })
+                }).catch((e: Error) => {
+                    toast.error(e.message);
+                    return null;
+                });
+                if (!id) {
+                    return;
+                }
                 // A sync session's comments flow like a chat, so they send no notices.
                 if (!syncing) {
                     await handlePostCommentToChat(id);

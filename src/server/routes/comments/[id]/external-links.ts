@@ -1,5 +1,5 @@
 import { env } from "@/server/lib/env";
-import { getJiraBaseUrl } from "@/server/lib/integrations/jira";
+import { issueTracker } from "@/server/lib/issue-tracker";
 import { getSlackTeam } from "@/server/lib/integrations/slack";
 import { prisma } from "@/server/lib/db";
 import { createRoute, z } from "@hono/zod-openapi";
@@ -69,12 +69,9 @@ export const externalLinksRouter = createRouter()
                     issueId: comment.issueId,
                 });
 
-                const jiraBaseURL = await getJiraBaseUrl();
-                console.debug("[external-links] jiraBaseURL", { jiraBaseURL });
-
-                if (jiraBaseURL) {
-                    externalLinks.jira =
-                        `${jiraBaseURL}/browse/${comment.issueId}`;
+                const tracker = await issueTracker();
+                if (tracker) {
+                    externalLinks.jira = tracker.issueUrl(comment.issueId);
                 }
             }
 

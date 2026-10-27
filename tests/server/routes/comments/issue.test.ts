@@ -33,7 +33,10 @@ const COMMENT = {
     id: "comment-1",
     videoId: "video-1",
     comment: "The door clips through the wall",
+    time: 72.4,
+    userName: "Kita",
     issueId: null,
+    video: { title: "Castle walkthrough" },
 };
 
 type JiraCall = { url: string; init: RequestInit };
@@ -91,12 +94,28 @@ describe("POST /comments/:id/issue", () => {
         expect(fields.issuetype).toEqual({ name: "Bug" });
         expect(prismaMock.user.findUnique.mock.calls[0][0].where).toEqual({ id: "user-1" });
         expect(fields.reporter).toEqual({ name: "reporter@example.com" });
+        expect(fields.description).toContain(COMMENT.comment);
+        expect(fields.description).toContain("Castle walkthrough (01:12)");
+        expect(fields.description).toContain("Kita");
         expect(fields.description).toContain("https://review.example.com");
         expect(fields.description).toContain(COMMENT.videoId);
         expect(fields.description).toContain(COMMENT.id);
 
         expect(prismaMock.videoComment.update).toHaveBeenCalledTimes(1);
         expect(prismaMock.videoComment.update.mock.calls[0][0].data.issueId).toBe("VR-42");
+    });
+
+    it("puts the first line of the comment in the summary, cut to Jira's 255 characters", async () => {
+        const calls = stubJira();
+        const firstLine = "x".repeat(300);
+        prismaMock.videoComment.findUnique.mockResolvedValue({ ...COMMENT, comment: `\n${firstLine}\nsecond line` });
+
+        const res = await commentsRouter.request(issueRequest());
+
+        expect(res.status).toBe(200);
+        const fields = JSON.parse(calls[0].init.body as string).fields;
+        expect(fields.summary).toBe(`${"x".repeat(254)}…`);
+        expect(fields.description).toContain("second line");
     });
 
     it("attaches the screenshot only when one is sent", async () => {

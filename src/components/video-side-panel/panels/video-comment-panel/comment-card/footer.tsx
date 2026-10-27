@@ -1,7 +1,9 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp, faComment, faPalette } from "@fortawesome/free-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faThumbsUp, faComment, faPalette, faClipboardList, faHammer, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import type { IssueStatusCategory } from "@/server/lib/issue-tracker/tracker";
 import { useCommentStore } from "@/stores/comment-store";
 import { VideoComment } from "@/lib/db-types";
 import { TimelineCardFooter } from "@/components/video-side-panel/timeline-card";
@@ -10,7 +12,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function CommentCardFooter(props: { comment: VideoComment }) {
+    // The status name itself varies by workflow, so the chip shows the tracker's category and keeps the name for hover.
+    const STATUS_ICON: Record<IssueStatusCategory, { icon: IconDefinition; tone: string }> = {
+        new: { icon: faClipboardList, tone: "text-background" },
+        indeterminate: { icon: faHammer, tone: "text-warning-strong" },
+        done: { icon: faCircleCheck, tone: "text-success" },
+    };
+
     const { incrementThumbsUpCount } = useCommentStore();
+    const issue = useCommentStore((s) => (props.comment.issueId ? s.issues[props.comment.issueId] : undefined));
     const [externalLinks, setExternalLinks] = useState<Record<string, string> | null>(null);
 
     const handleLike = (id: string) => {
@@ -43,9 +53,10 @@ export default function CommentCardFooter(props: { comment: VideoComment }) {
 
     return (
         <TimelineCardFooter>
-            <div className="flex gap-1">
+            <div className="flex flex-wrap justify-end gap-1">
                 {hasIssueId && (
-                    <Button variant="chip" size="chip" className="group" onClick={async () => await openExternalLink("jira")}>
+                    <Button variant="chip" size="chip" className="group" title={issue && (issue.summary ? `${issue.status.name}: ${issue.summary}` : issue.status.name)} onClick={async () => await openExternalLink("jira")}>
+                        {issue && <FontAwesomeIcon icon={STATUS_ICON[issue.status.category].icon} className={`${STATUS_ICON[issue.status.category].tone} group-hover:text-primary`} />}
                         <span className="text-info group-hover:text-primary group-hover:underline">{props.comment.issueId}</span>
                     </Button>
                 )}

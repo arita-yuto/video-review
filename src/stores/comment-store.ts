@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api, readError } from "@/lib/api-client";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
+import type { Issue } from "@/server/lib/issue-tracker/tracker";
 import { useAuthStore } from "@/stores/auth-store";
 import { useVideoStore } from "@/stores/video-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
@@ -15,9 +16,13 @@ interface CommentState {
     unreadVideoIds: ReadonlySet<string>;
     // The list as a live refresh left it; the panel keeps the reader's scroll and read state for it.
     liveComments: VideoComment[] | null;
+    // Tracker issues by key, for the comments of the selected video.
+    issues: Record<string, Issue>;
 
     setDisplayComments: (comments: VideoComment[]) => void;
     fetchComments: (videoRevision: VideoRevision, options?: { live?: boolean }) => Promise<void>;
+    fetchIssues: (videoId: string) => Promise<void>;
+    transitionIssue: (commentId: string, transitionId: string) => Promise<void>;
     addComment: (c: Omit<VideoComment, "notifiedProviders" | "id" | "createdAt" | "updatedAt" | "deleted" | "drawingPath" | "hasDrawing" | "thumbsUp" | "userId" | "isGuest">) => Promise<string>;
     updateComment: (comment: VideoComment) => void;
     deleteComment: (id: string) => Promise<void>;
@@ -33,6 +38,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
     loading: false,
     unreadVideoIds: new Set(),
     liveComments: null,
+    issues: {},
     editingComment: null,
 
     setDisplayComments: (comments: VideoComment[]) => {
@@ -68,11 +74,42 @@ export const useCommentStore = create<CommentState>((set, get) => ({
             return;
         }
         set(live ? { comments, liveComments: comments } : { comments, liveComments: null, loading: false });
+        void get().fetchIssues(videoRevision.videoId);
+    },
+
+    fetchIssues: async (videoId) => {
+        const res = await api.videos[":id"]["issue-status"].$get({ param: { id: videoId } });
+        if (res.status !== 200) {
+            return;
+        }
+        const issues = await res.json();
+
+        if (useVideoStore.getState().selectedVideo?.id !== videoId) {
+            return;
+        }
+        set({ issues });
+    },
+
+    transitionIssue: async (commentId, transitionId) => {
+        const comment = get().comments.find((c) => c.id === commentId);
+        if (!comment?.issueId) {
+            return;
+        }
+
+        const res = await api.comments[":id"].transitions.$post({ param: { id: commentId }, json: { transitionId } });
+        if (res.status !== 200) {
+            throw new Error(await readError(res));
+        }
+        const status = await res.json();
+        const issues = get().issues;
+        set({ issues: { ...issues, [comment.issueId]: { ...issues[comment.issueId], status } } });
     },
 
     addComment: async (c) => {
         const res = await api.comments.index.$post({ json: c });
-        if (res.status !== 201) throw new Error("Failed to create comment");
+        if (res.status !== 201) {
+            throw new Error(await readError(res));
+        }
         const newComment = await res.json();
         set({ comments: [...get().comments, newComment].sort((a, b) => a.time - b.time) });
         return newComment.id;
@@ -105,6 +142,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
         set({
             comments: get().comments.map((c) => (c.id === id ? updated : c)),
         });
+        void get().fetchIssues(updated.videoId);
     },
 
     deleteComment: async (id) => {
