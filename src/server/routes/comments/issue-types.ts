@@ -2,7 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorize } from "@/server/lib/token";
-import { getJiraIssueTypes } from "@/server/lib/integrations/jira";
+import { issueTracker } from "@/server/lib/issue-tracker";
 
 export const issueTypesRouter = createRouter()
     .openapi(createRoute({
@@ -20,5 +20,6 @@ export const issueTypesRouter = createRouter()
     }), async (c) => {
         await authorize(c.req.raw, ["viewer", "admin"]);
 
-        return c.json(await getJiraIssueTypes(), 200);
+        const tracker = await issueTracker();
+        return c.json(tracker ? await tracker.issueTypes() : { task: null, bug: null }, 200);
     });

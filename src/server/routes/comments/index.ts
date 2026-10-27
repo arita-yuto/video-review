@@ -7,6 +7,7 @@ import { byIdRouter } from "@/server/routes/comments/[id]";
 import { lastUpdatedRouter } from "@/server/routes/comments/last-updated";
 import { usersRouter } from "@/server/routes/comments/users";
 import { issueTypesRouter } from "@/server/routes/comments/issue-types";
+import { issueLookupRouter } from "@/server/routes/comments/issue-lookup";
 import { z } from "zod";
 import { toDateRange } from "@/lib/utils/date-helper";
 import { VideoCommentSchema } from "@/schema/zod";
@@ -19,6 +20,7 @@ import { canEditComment } from "@/lib/role";
 import { v4 as uuidv4 } from "uuid";
 import { VideoReviewStorage } from "@/server/lib/storage";
 import { broadcastComments } from "@/server/lib/video-stream";
+import { issueTracker } from "@/server/lib/issue-tracker";
 
 const QuerySchema = z.object({
     videoId: z.string().optional(),
@@ -166,7 +168,7 @@ export const commentsRouter = router
             },
             401: errorResponse("Unauthorized"),
             403: errorResponse("Forbidden"),
-            400: errorResponse("Invalid parameters"),
+            400: errorResponse("Invalid parameters, or an issue key the tracker could not confirm"),
             500: errorResponse("Failed to create comment"),
         },
     }), async (c) => {
@@ -180,6 +182,10 @@ export const commentsRouter = router
             userEmail,
         } = c.req.valid("json");
         const auth = await authorizeVideo(c.req.raw, ["guest", "viewer", "admin"], videoId);
+        const issueKey = issueId?.trim();
+        if (issueKey) {
+            await assertIssueExists(issueKey);
+        }
 
         const userId = userIdOrNull(auth);
 
@@ -197,7 +203,7 @@ export const commentsRouter = router
                     userName,
                     comment,
                     time,
-                    issueId,
+                    issueId: issueKey,
                     userEmail,
                 },
             });
@@ -233,7 +239,7 @@ export const commentsRouter = router
             401: errorResponse("Unauthorized"),
             403: errorResponse("Forbidden"),
             404: errorResponse("Comment not found"),
-            400: errorResponse("Invalid parameters"),
+            400: errorResponse("Invalid parameters, or an issue key the tracker could not confirm"),
             500: errorResponse("Failed to update comment"),
         },
     }), async (c) => {
@@ -245,6 +251,11 @@ export const commentsRouter = router
         if (editsAuthorFields && !canEditComment(target, roleOf(auth), userIdOrNull(auth))) {
             throw new ServerError("forbidden", 403);
         }
+        // A key the comment already has is never re-checked, so a comment whose issue is gone stays editable.
+        const issueKey = issueId?.trim();
+        if (issueKey && issueKey !== target.issueId) {
+            await assertIssueExists(issueKey);
+        }
 
         try {
             const updateData: PrismaTypes.VideoCommentUpdateInput = {
@@ -254,8 +265,8 @@ export const commentsRouter = router
             if (typeof comment === "string") {
                 updateData.comment = comment;
             }
-            if (typeof issueId === "string") {
-                updateData.issueId = issueId;
+            if (typeof issueKey === "string") {
+                updateData.issueId = issueKey;
             }
             if (typeof deleted === "boolean") {
                 updateData.deleted = deleted;
@@ -289,4 +300,21 @@ export const commentsRouter = router
     .route("/last-updated", lastUpdatedRouter)
     .route("/users", usersRouter)
     .route("/issue-types", issueTypesRouter)
+    .route("/issue-lookup", issueLookupRouter)
     .route("/:id", byIdRouter);
+
+// Fails unless the tracker confirms the key; an unreachable tracker counts as unconfirmed.
+async function assertIssueExists(key: string): Promise<void> {
+    const tracker = await issueTracker();
+    if (!tracker) {
+        return;
+    }
+
+    const issue = await tracker.getIssue(key).catch(() => undefined);
+    if (issue === null) {
+        throw new ServerError(`issue ${key} was not found`, 400);
+    }
+    if (issue === undefined) {
+        throw new ServerError(`issue ${key} could not be checked: the issue tracker did not answer`, 400);
+    }
+}

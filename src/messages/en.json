@@ -155,6 +155,7 @@
         "commentItemCopyLink": "Copy link",
         "commentItemTask": "Convert to task",
         "commentItemBug": "Convert to Bug",
+        "commentItemTransitionIssue": "Change status",
         "commentItemEdit": "Edit",
         "commentItemRemove": "Remove"
     },

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { api } from "@/lib/api-client";
 import { VideoComment } from "@/lib/db-types";
 import { useCommentStore } from "@/stores/comment-store";
+import { toast } from "sonner";
 
 interface CommentEditState {
     editingComment: VideoComment | null;
@@ -31,12 +32,15 @@ export const useCommentEditStore = create<CommentEditState>((set, get) => ({
                     issueId: editing.issueId,
                 },
             });
-            if (res.status !== 200) throw new Error("Failed to update comment");
+            if (res.status !== 200) {
+                const body = await res.json().catch(() => null);
+                throw new Error(body && "error" in body ? body.error : "Failed to update comment");
+            }
 
             useCommentStore.getState().updateComment(get().editingComment!);
             set({ editingComment: null });
         } catch (e) {
-            console.error("Failed to save comment:", e);
+            toast.error(e instanceof Error ? e.message : "Failed to update comment");
         }
     },
     editCancel: () => set({ editingComment: null }),

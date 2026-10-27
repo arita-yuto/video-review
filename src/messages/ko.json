@@ -155,6 +155,7 @@
         "commentItemCopyLink": "링크 복사",
         "commentItemTask": "태스크로 전환",
         "commentItemBug": "버그로 전환",
+        "commentItemTransitionIssue": "상태 변경",
         "commentItemEdit": "편집",
         "commentItemRemove": "삭제"
     },

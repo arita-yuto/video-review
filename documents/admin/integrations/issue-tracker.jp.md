@@ -1,8 +1,9 @@
 # Jira
 
-Jira に接続すると、次の 2 つが使えます
+Jira に接続すると、次の 3 つが使えます
 
-- コメントから Jira の issue を作る
+- コメントから Jira の issue を作る、または既存の issue を結びつける
+- issue のステータスをコメントから見る・変える
 - Jira のメールアドレスでログインする（ログイン画面の JIRA タブ）
 
 <img src="https://github.com/user-attachments/assets/c14c6896-8e6a-416c-a44f-b94e823f17a7" />
@@ -27,19 +28,33 @@ Test & save を押し、Jira に接続して project と issue type を確かめ
 
 
 ※ issue type の名前は、その project にあるものと同じ文字で書きます（無い名前だと Test & save が通りません）  
-※ Token を保存すると URL と Token は変えられなくなるので、変えるときは Reset で保存した Token を消してから入れ直します
-※ Cloud の API token は最長 1 年で切れるので、切れたら Reset して新しい token を入れ直します
+※ Token を保存すると URL と Token は変えられなくなるので、変えるときは Reset で保存した Token を消してから入れ直します  
+※ Cloud の API token は最長 1 年で切れるので、切れたら Reset して新しい token を入れ直します  
 
 ---
 
-## 3. 使う
+## 3. コメントを活用する
 
 ### コメントから issue を作る
 
 Comments パネルで、コメントのメニューから Create issue を選びます  
-Task と Bug の issue type を設定していると、それぞれの種類で作れます
+Task と Bug の issue type を設定していると、それぞれの種類で作れます  
+コメントの 1 行目が issue のタイトルになり、本文全体と動画・時間・書いた人・コメントへのリンクが説明に入ります
 
 <img src="https://github.com/user-attachments/assets/b6543793-3244-4284-a997-d6f057e9424c" />
+
+### 既存の issue を結びつける
+
+コメントの下の issue 欄にキーを入れると Jira で作成済みチケットと紐づけを後からすることができます  
+
+<img src="https://github.com/user-attachments/assets/0986dfc3-c417-4e7c-b922-0aae32a09e81" />
+
+### ステータスを見る・変える
+
+コメントの issue には、ステータスアイコンが付きます  
+コメントのメニューの Change status で issue ステータスを更新も可能です
+
+<img  src="https://github.com/user-attachments/assets/aab3530d-ad58-411a-99ec-475c1a091f9f" />
 
 ### Jira のメールアドレスでログインする
 

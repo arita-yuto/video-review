@@ -2,7 +2,7 @@ import { createVideoCommentLink } from "@/lib/url";
 import { prisma } from "@/server/lib/db";
 import { authorize } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
-import { createJiraIssue } from "@/server/lib/issue-tracker/jira";
+import { issueTracker } from "@/server/lib/issue-tracker";
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { VideoCommentSchema } from "@/schema/zod";
@@ -62,7 +62,7 @@ export const issueRouter = createRouter()
             const id = c.req.param("id");
             const { baseURL, issueType, file } = c.req.valid("form");
 
-            const comment = await prisma.videoComment.findUnique({ where: { id } });
+            const comment = await prisma.videoComment.findUnique({ where: { id }, include: { video: { select: { title: true } } } });
             if (!comment) {
                 return c.json({ error: "comment not found" }, 404);
             }
@@ -72,10 +72,19 @@ export const issueRouter = createRouter()
                 ? await prisma.user.findUnique({ where: { id: auth.decoded.id }, select: { email: true } })
                 : null;
 
-            const videoReviewURL = createVideoCommentLink(baseURL, comment.videoId, comment.id);
-            const issueKey = await createJiraIssue({
-                summary: comment.comment,
-                description: `Video Review LINK\n${videoReviewURL}`,
+            const tracker = await issueTracker();
+            if (!tracker) {
+                throw new ServerError("issue tracker is not configured", 500);
+            }
+
+            const issueKey = await tracker.createIssue({
+                source: {
+                    comment: comment.comment,
+                    videoTitle: comment.video.title,
+                    time: comment.time,
+                    author: comment.userName,
+                    link: createVideoCommentLink(baseURL, comment.videoId, comment.id),
+                },
                 issueType,
                 reporterEmail: reporter?.email ?? undefined,
                 attachment: file,
