@@ -109,13 +109,19 @@ export function issueText(source: IssueSource): { summary: string; description: 
     return { summary, description };
 }
 
+// Jira counts UTF-16 units, so the budget is line.length; the cut only steps back off a split emoji.
 function cutSummary(line: string): string {
     const SUMMARY_MAX_LENGTH = 255;
     if (line.length <= SUMMARY_MAX_LENGTH) {
         return line;
     }
 
-    return `${line.slice(0, SUMMARY_MAX_LENGTH - 1)}…`;
+    let cut = line.slice(0, SUMMARY_MAX_LENGTH - 1);
+    if (/[\uD800-\uDBFF]$/.test(cut)) {
+        cut = cut.slice(0, -1);
+    }
+
+    return `${cut}…`;
 }
 
 const JiraIssueSchema = z.object({
@@ -171,7 +177,12 @@ async function listTransitions({ base, authorization }: JiraConnection, key: str
         throw new ServerError(`failed to list jira transitions of ${key}: ${res.status}`, 500);
     }
 
-    return TransitionsSchema.parse(await res.json()).transitions.map(({ id, to }) => ({ id, name: to.name }));
+    const parsed = TransitionsSchema.safeParse(await res.json());
+    if (!parsed.success) {
+        throw new ServerError(`jira sent unexpected transitions for ${key}`, 500);
+    }
+
+    return parsed.data.transitions.map(({ id, to }) => ({ id, name: to.name }));
 }
 
 // Jira's refusal, such as a required field on the transition screen, is passed on as a 400 so its message reaches the user.

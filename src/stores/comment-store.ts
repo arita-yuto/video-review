@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api, readError } from "@/lib/api-client";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import type { Issue } from "@/server/lib/issue-tracker/tracker";
 import { useAuthStore } from "@/stores/auth-store";
@@ -98,8 +98,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
 
         const res = await api.comments[":id"].transitions.$post({ param: { id: commentId }, json: { transitionId } });
         if (res.status !== 200) {
-            const body = await res.json().catch(() => null);
-            throw new Error(body && "error" in body ? body.error : "Failed to move the issue");
+            throw new Error(await readError(res));
         }
         const status = await res.json();
         const issues = get().issues;
@@ -109,8 +108,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
     addComment: async (c) => {
         const res = await api.comments.index.$post({ json: c });
         if (res.status !== 201) {
-            const body = await res.json().catch(() => null);
-            throw new Error(body && "error" in body ? body.error : "Failed to create comment");
+            throw new Error(await readError(res));
         }
         const newComment = await res.json();
         set({ comments: [...get().comments, newComment].sort((a, b) => a.time - b.time) });

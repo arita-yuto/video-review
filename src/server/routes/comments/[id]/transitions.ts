@@ -70,13 +70,13 @@ export const transitionsRouter = createRouter()
         }
 
         await tracker.transition(comment.issueId, transitionId);
+        // So other viewers' chips pick up the new status, even if the read below fails.
+        broadcastComments(comment.videoId);
 
         const issue = await tracker.getIssue(comment.issueId);
         if (!issue) {
             throw new ServerError(`issue ${comment.issueId} was not found after the transition`, 500);
         }
 
-        // So other viewers' chips pick up the new status.
-        broadcastComments(comment.videoId);
         return c.json(issue.status, 200);
     });

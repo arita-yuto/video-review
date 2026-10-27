@@ -1,3 +1,4 @@
+import "server-only";
 import { z } from "@hono/zod-openapi";
 
 // What the comment routes need from an issue tracker.

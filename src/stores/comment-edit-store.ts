@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api, readError } from "@/lib/api-client";
 import { VideoComment } from "@/lib/db-types";
 import { useCommentStore } from "@/stores/comment-store";
 import { toast } from "sonner";
@@ -33,11 +33,13 @@ export const useCommentEditStore = create<CommentEditState>((set, get) => ({
                 },
             });
             if (res.status !== 200) {
-                const body = await res.json().catch(() => null);
-                throw new Error(body && "error" in body ? body.error : "Failed to update comment");
+                throw new Error(await readError(res));
             }
 
-            useCommentStore.getState().updateComment(get().editingComment!);
+            // The server's copy, so a key it trimmed is the one the chip looks up.
+            const saved = await res.json();
+            useCommentStore.getState().updateComment(saved);
+            void useCommentStore.getState().fetchIssues(saved.videoId);
             set({ editingComment: null });
         } catch (e) {
             toast.error(e instanceof Error ? e.message : "Failed to update comment");

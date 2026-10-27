@@ -126,6 +126,7 @@ function DropdownMenu_TransitionIssue(props: { comment: VideoComment }) {
         if (!open) {
             return;
         }
+        setTransitions(null);
         const res = await api.comments[":id"].transitions.$get({ param: { id: props.comment.id } });
         setTransitions(res.status === 200 ? await res.json() : []);
     };
