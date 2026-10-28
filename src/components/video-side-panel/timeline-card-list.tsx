@@ -2,6 +2,24 @@
 
 import React from "react";
 import { TimelineCard, type TimelineCardState } from "@/components/video-side-panel/timeline-card";
+import type { FlowAnchor } from "@/lib/list-flow";
+
+// Both offsets are from the same offset parent, so the difference is the card's position in the list.
+export function cardEdges(list: HTMLElement, el: HTMLElement): { top: number; bottom: number } {
+    const top = el.offsetTop - list.offsetTop;
+    return { top, bottom: top + el.offsetHeight };
+}
+
+// Where the list should sit for a card: the card low in the view, with room under it so the next one already shows.
+export function cardAnchorTop(list: HTMLElement, el: HTMLElement): number {
+    const peek = list.clientHeight * 0.3;
+    const limit = list.scrollHeight - list.clientHeight;
+    return Math.min(limit, Math.max(0, cardEdges(list, el).bottom + peek - list.clientHeight));
+}
+
+export function cardAnchors(list: HTMLElement, cards: { el: HTMLElement; time: number }[]): FlowAnchor[] {
+    return cards.map(({ el, time }) => ({ time, top: cardAnchorTop(list, el) }));
+}
 
 export default function TimelineCardList<T>(props: {
     items: T[];

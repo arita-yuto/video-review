@@ -152,6 +152,7 @@
     "video-comment-panel": {
         "title": "댓글",
         "newBadge": "NEW",
+        "followPlayback": "따라가기",
         "commentItemCopyLink": "링크 복사",
         "commentItemTask": "태스크로 전환",
         "commentItemBug": "버그로 전환",

@@ -87,7 +87,7 @@ export default function VideoReviewPage() {
                 if (res.status !== 200) throw new Error("Failed to fetch comment");
                 const comment = await res.json();
                 setTimelineTime(comment.time);
-                setSelectComment(comment);
+                setSelectComment(comment, "link");
             }, 100);
         } else {
             setTimelineTime(null);
