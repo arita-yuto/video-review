@@ -65,14 +65,24 @@ export function SeekBar({ markers, onMarkerClick }: {
     );
 }
 
-// Comment times are quantized to 0.01s to avoid near-duplicate markers.
-export const commentMarkers = (comments: { time: number }[], className: string): SeekBarMarker[] =>
-    [...new Set(comments.map((c) => Number(c.time.toFixed(2))))].map((time) => ({ time, className }));
+// Comments within 0.01s share one marker, which carries the first comment's exact time so a click lands on it.
+export const commentMarkers = (comments: { time: number }[], className: string): SeekBarMarker[] => {
+    const byHundredth = new Map<string, number>();
+    for (const { time } of comments) {
+        const key = time.toFixed(2);
+        if (!byHundredth.has(key)) {
+            byHundredth.set(key, time);
+        }
+    }
+
+    return [...byHundredth.values()].map((time) => ({ time, className }));
+};
 
 export default function VideoTimelineBar() {
     const { displayComments } = useCommentStore();
-    const setCurrentTime = usePlayback((s) => s.setCurrentTime);
+    // A marker is a jump request like a card click, so the player seeks and the comment list follows.
+    const setTimelineTime = usePlayback((s) => s.setTimelineTime);
     const markers = useMemo(() => commentMarkers(displayComments, "bg-primary"), [displayComments]);
 
-    return <SeekBar markers={markers} onMarkerClick={setCurrentTime} />;
+    return <SeekBar markers={markers} onMarkerClick={setTimelineTime} />;
 }
