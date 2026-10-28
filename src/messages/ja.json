@@ -152,6 +152,7 @@
     "video-comment-panel": {
         "title": "Comments",
         "newBadge": "NEW",
+        "followPlayback": "追従",
         "commentItemCopyLink": "リンクコピー",
         "commentItemTask": "タスク化",
         "commentItemBug": "バグ化",
