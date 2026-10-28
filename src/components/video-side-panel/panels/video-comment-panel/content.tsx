@@ -135,7 +135,7 @@ export default function VideoCommentContent() {
     const scrolledAt = useRef<number | null>(null);
 
     useEffect(() => {
-        // While playing the list flows with the time instead; this only answers seeks and refreshes while paused, and not once the reader took over.
+        // Seeks and refreshes while paused; the flow handles playing, and a reader who took over is left alone.
         if (isPlaying || !following) {
             return;
         }
