@@ -3,6 +3,7 @@ import { createRouter } from "@/server/lib/openapi/router";
 import { externalLinksRouter } from "@/server/routes/comments/[id]/external-links";
 import { issueRouter } from "@/server/routes/comments/[id]/issue";
 import { drawingRouter } from "@/server/routes/comments/[id]/drawing";
+import { transitionsRouter } from "@/server/routes/comments/[id]/transitions";
 import { VideoCommentSchema } from "@/schema/zod";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorizeComment } from "@/server/lib/videos/guest-access";
@@ -34,4 +35,5 @@ export const byIdRouter = createRouter()
     })
     .route("external-links", externalLinksRouter)
     .route("issue", issueRouter)
-    .route("drawing", drawingRouter);
+    .route("drawing", drawingRouter)
+    .route("transitions", transitionsRouter);

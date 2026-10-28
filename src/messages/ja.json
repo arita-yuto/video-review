@@ -156,6 +156,7 @@
         "commentItemCopyLink": "リンクコピー",
         "commentItemTask": "タスク化",
         "commentItemBug": "バグ化",
+        "commentItemTransitionIssue": "ステータス変更",
         "commentItemEdit": "編集",
         "commentItemRemove": "削除"
     },

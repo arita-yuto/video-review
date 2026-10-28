@@ -6,6 +6,9 @@ import {
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from "@/ui/dropdown-menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,6 +18,7 @@ import {
     faTrash,
     faPen,
     faLink,
+    faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import { formatDateTime, formatTime } from "@/lib/utils";
@@ -34,6 +38,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/lib/api-client";
 import { canEditComment, isGuest } from "@/lib/role";
 import { useAvatarStore } from "@/stores/avatar-store";
+import { toast } from "sonner";
 
 // Dropdown menu item for copying a shareable link to the selected comment.
 function DropdownMenu_SharedLink() {
@@ -109,6 +114,43 @@ function DropdownMenu_CreateIssue(props: { disabled: boolean, comment: VideoComm
     );
 }
 
+type Transition = { id: string; name: string };
+
+// The transitions are asked for when the submenu opens, since they depend on the current status.
+function DropdownMenu_TransitionIssue(props: { comment: VideoComment }) {
+    const t = useTranslations("video-comment-panel");
+    const { transitionIssue } = useCommentStore();
+    const [transitions, setTransitions] = useState<Transition[] | null>(null);
+
+    const load = async (open: boolean) => {
+        if (!open) {
+            return;
+        }
+        setTransitions(null);
+        const res = await api.comments[":id"].transitions.$get({ param: { id: props.comment.id } });
+        setTransitions(res.status === 200 ? await res.json() : []);
+    };
+
+    return (
+        <DropdownMenuSub onOpenChange={load}>
+            <DropdownMenuSubTrigger>
+                <FontAwesomeIcon icon={faArrowRight} />
+                {t("commentItemTransitionIssue")}
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+                {transitions === null && <DropdownMenuItem disabled>…</DropdownMenuItem>}
+                {transitions?.map((transition) => (
+                    <DropdownMenuItem key={transition.id} onClick={async () => {
+                        await transitionIssue(props.comment.id, transition.id).catch((e: Error) => toast.error(e.message));
+                    }}>
+                        {transition.name}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuSubContent>
+        </DropdownMenuSub>
+    );
+}
+
 // Dropdown menu item for entering comment edit mode.
 function DropdownMenu_Edit(props: { comment: VideoComment }) {
     const t = useTranslations("video-comment-panel");
@@ -166,6 +208,7 @@ export function CommentAuthor(props: { comment: VideoComment }) {
 
 export default function CommentCardHeader(props: { comment: VideoComment }) {
     const { role, userId } = useAuthStore();
+    const hasIssue = useCommentStore((s) => !!props.comment.issueId && props.comment.issueId in s.issues);
 
     return (
         <TimelineCardHeader>
@@ -181,6 +224,7 @@ export default function CommentCardHeader(props: { comment: VideoComment }) {
                     <DropdownMenu_SharedLink />
                     <DropdownMenu_CreateIssue disabled={(props.comment.issueId !== "" && props.comment.issueId !== null) || isGuest(role)} comment={props.comment} translateID="commentItemTask" />
                     <DropdownMenu_CreateIssue disabled={(props.comment.issueId !== "" && props.comment.issueId !== null) || isGuest(role)} comment={props.comment} translateID="commentItemBug" />
+                    {hasIssue && !isGuest(role) && <DropdownMenu_TransitionIssue comment={props.comment} />}
                     <DropdownMenu_Edit comment={props.comment} />
                     {canEditComment(props.comment, role, userId) && <DropdownMenu_Delete comment={props.comment} />}
                 </DropdownMenuContent>

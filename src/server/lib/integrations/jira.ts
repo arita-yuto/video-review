@@ -104,9 +104,6 @@ export function jiraAccountId(deployment: JiraDeployment, account: JiraAccount) 
     return deployment === "cloud" ? account.accountId : account.key;
 }
 
-// For callers that only build links, so they do not need the token decrypted.
-export const getJiraBaseUrl = () => getPlainField(jira, "baseUrl");
-
 // For the comment menu; neither value is a secret.
 export async function getJiraIssueTypes() {
     return {
