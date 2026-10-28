@@ -41,7 +41,7 @@ export default function CommentCard(props: {
             return;
         }
         setTimelineTime(comment.time);
-        setSelectComment(comment);
+        setSelectComment(comment, "card");
     }
 
     useEffect(() => {

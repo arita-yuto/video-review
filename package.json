@@ -100,7 +100,7 @@
     },
     "devDependencies": {
         "@playwright/test": "^1.62.0",
-        "@shadcn/lint": "0.2.0",
+        "@shadcn/lint": "0.2.1",
         "@tailwindcss/postcss": "^4",
         "@types/bcrypt": "^6.0.0",
         "@types/busboy": "^1.5.4",

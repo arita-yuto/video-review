@@ -83,6 +83,7 @@ export default function VideoReview() {
         isPlaying,
         currentTime,
         timelineTime,
+        scrubbing,
         togglePlay,
         setIsPlaying,
         setTimelineTime,
@@ -98,6 +99,7 @@ export default function VideoReview() {
 
     const playModeRef = useRef<EPlayMode>(playMode);
     const timelineTimeRef = useRef<number>(timelineTime);
+    const scrubbingRef = useRef(scrubbing);
 
     // A callback ref keeps the store's element current across remounts of the player.
     const attachVideo = useCallback((el: HTMLVideoElement | null) => {
@@ -293,6 +295,13 @@ export default function VideoReview() {
             }
             setCurrentTime(v.currentTime);
         };
+        // A requested jump is done once the player has seeked; left set, it would keep timeupdate out of the store.
+        // A held seek bar keeps its request, so the thumb stays under the pointer while the video plays on.
+        const onSeeked = () => {
+            if (!scrubbingRef.current) {
+                setTimelineTime(null);
+            }
+        };
         const onEnded = () => {
             switch (playModeRef.current) {
                 case "normal": break;
@@ -320,6 +329,7 @@ export default function VideoReview() {
         v.addEventListener("waiting", onWaiting);
         v.addEventListener("playing", onPlaying);
         v.addEventListener("timeupdate", onTimeUpdate);
+        v.addEventListener("seeked", onSeeked);
         v.addEventListener("ended", onEnded);
 
         return () => {
@@ -331,6 +341,7 @@ export default function VideoReview() {
             v.removeEventListener("loadedmetadata", onMeta);
             v.removeEventListener("error", onError);
             v.removeEventListener("timeupdate", onTimeUpdate);
+            v.removeEventListener("seeked", onSeeked);
             v.removeEventListener("ended", onEnded);
         };
     }, [selectedRevision, playbackWidth]);
@@ -374,6 +385,10 @@ export default function VideoReview() {
             v.volume = 0.0;
         }
     }, [volume, volumeEnabled]);
+
+    useEffect(() => {
+        scrubbingRef.current = scrubbing;
+    }, [scrubbing]);
 
     useEffect(() => {
         timelineTimeRef.current = timelineTime;

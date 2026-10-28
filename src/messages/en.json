@@ -152,6 +152,7 @@
     "video-comment-panel": {
         "title": "Comments",
         "newBadge": "NEW",
+        "followPlayback": "Follow",
         "commentItemCopyLink": "Copy link",
         "commentItemTask": "Convert to task",
         "commentItemBug": "Convert to Bug",
