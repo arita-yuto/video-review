@@ -12,6 +12,8 @@ import CommentConfirmed from "@/components/video-side-panel/panels/video-comment
 import { useDrawingStore } from "@/stores/drawing-store";
 import { useEffect, useRef } from "react";
 import CommentCard from "@/components/video-side-panel/panels/video-comment-panel/comment-card";
+import { cardAnchors, cardAnchorTop, cardEdges } from "@/components/video-side-panel/timeline-card-list";
+import { flowTarget, followStep, type FollowState } from "@/lib/list-flow";
 import { useCommentSearchStore } from "@/stores/comment-search-store";
 import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
 import { chatToast } from "@/components/chat-notice";
@@ -108,6 +110,10 @@ export default function VideoCommentContent() {
     const scrolledAt = useRef<number | null>(null);
 
     useEffect(() => {
+        // While playing the list flows with the time instead; this only answers seeks and refreshes while paused.
+        if (isPlaying) {
+            return;
+        }
         if (comments === liveComments && scrolledAt.current === currentTime) {
             return;
         }
@@ -138,20 +144,67 @@ export default function VideoCommentContent() {
         if (!el || !list) return;
         scrolledAt.current = currentTime;
 
-        // Both offsets are from the same offset parent, so the difference is the card's position in the list.
-        const top = el.offsetTop - list.offsetTop;
-        const bottom = top + el.offsetHeight;
+        const { top, bottom } = cardEdges(list, el);
 
-        // Like a chat: a card in view is left alone, one below slides up to the bottom edge, one above comes down to the top.
-        // The 5px keeps the card clear of the list's edge.
+        // Like a chat: a card in view is left alone, one above comes down to the top edge, one below lands where playback would hold it.
         if (top >= list.scrollTop && bottom <= list.scrollTop + list.clientHeight) {
             return;
         }
         list.scrollTo({
-            top: top < list.scrollTop ? top - 5 : bottom + 5 - list.clientHeight,
+            top: top < list.scrollTop ? top - 5 : cardAnchorTop(list, el),
             behavior: "smooth",
         });
     }, [currentTime, comments]);
+
+    // The reader's pointer over the list means they are reading or scrolling it themselves, so the flow lets go until it leaves.
+    const pointerOverList = useRef(false);
+    useEffect(() => {
+        const list = containerRef.current;
+        if (!list) {
+            return;
+        }
+
+        const enter = () => { pointerOverList.current = true; };
+        const leave = () => { pointerOverList.current = false; };
+        list.addEventListener("pointerenter", enter);
+        list.addEventListener("pointerleave", leave);
+        return () => {
+            list.removeEventListener("pointerenter", enter);
+            list.removeEventListener("pointerleave", leave);
+        };
+    }, []);
+
+    // Playing, the list flows with the video like a comment ticker: steady between comments, never a jump.
+    const videoElement = useVideoReviewStore((s) => s.videoRefElement);
+    useEffect(() => {
+        const list = containerRef.current;
+        if (!isPlaying || !videoElement || !list || comments.length === 0) {
+            return;
+        }
+
+        const cards = comments.flatMap((comment) => {
+            const el = commentCardRefs.current[comment.id];
+            return el ? [{ el, time: comment.time }] : [];
+        });
+
+        let state: FollowState = { top: list.scrollTop, catchingUp: false };
+        let last = performance.now();
+
+        const flow = (now: number) => {
+            const elapsed = now - last;
+            last = now;
+            if (pointerOverList.current) {
+                state = { top: list.scrollTop, catchingUp: false };
+            } else {
+                // Anchors are read every frame, since a card can change height while it is in view.
+                state = followStep(state, flowTarget(cardAnchors(list, cards), videoElement.currentTime), elapsed);
+                list.scrollTop = state.top;
+            }
+            frame = requestAnimationFrame(flow);
+        };
+        let frame = requestAnimationFrame(flow);
+        return () => cancelAnimationFrame(frame);
+    }, [isPlaying, videoElement, comments]);
 
     useEffect(() => {
         setDisplayComments(comments);
