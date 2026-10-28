@@ -133,14 +133,22 @@ export default function VideoCommentContent() {
         }
 
         const el = commentCardRefs.current[target.id];
+        const list = containerRef.current;
 
-        if (!el || !containerRef.current) return;
+        if (!el || !list) return;
         scrolledAt.current = currentTime;
 
         // Both offsets are from the same offset parent, so the difference is the card's position in the list.
+        const top = el.offsetTop - list.offsetTop;
+        const bottom = top + el.offsetHeight;
+
+        // Like a chat: a card in view is left alone, one below slides up to the bottom edge, one above comes down to the top.
         // The 5px keeps the card clear of the list's edge.
-        containerRef.current.scrollTo({
-            top: el.offsetTop - containerRef.current.offsetTop - 5,
+        if (top >= list.scrollTop && bottom <= list.scrollTop + list.clientHeight) {
+            return;
+        }
+        list.scrollTo({
+            top: top < list.scrollTop ? top - 5 : bottom + 5 - list.clientHeight,
             behavior: "smooth",
         });
     }, [currentTime, comments]);
