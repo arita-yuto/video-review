@@ -293,6 +293,8 @@ export default function VideoReview() {
             }
             setCurrentTime(v.currentTime);
         };
+        // A requested jump is done once the player has seeked; left set, it would keep timeupdate out of the store.
+        const onSeeked = () => setTimelineTime(null);
         const onEnded = () => {
             switch (playModeRef.current) {
                 case "normal": break;
@@ -320,6 +322,7 @@ export default function VideoReview() {
         v.addEventListener("waiting", onWaiting);
         v.addEventListener("playing", onPlaying);
         v.addEventListener("timeupdate", onTimeUpdate);
+        v.addEventListener("seeked", onSeeked);
         v.addEventListener("ended", onEnded);
 
         return () => {
@@ -331,6 +334,7 @@ export default function VideoReview() {
             v.removeEventListener("loadedmetadata", onMeta);
             v.removeEventListener("error", onError);
             v.removeEventListener("timeupdate", onTimeUpdate);
+            v.removeEventListener("seeked", onSeeked);
             v.removeEventListener("ended", onEnded);
         };
     }, [selectedRevision, playbackWidth]);
