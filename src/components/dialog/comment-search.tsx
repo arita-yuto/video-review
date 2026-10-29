@@ -6,11 +6,9 @@ import { FormDialog } from "@/components/dialog/form-dialog";
 import { ClearableComboBox, ClearableTextField } from "@/components/controls/clearable-fields";
 import { ControlRow } from "@/components/controls/control-row";
 import { useCommentSearchStore } from "@/stores/comment-search-store";
-import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
 import { Checkbox } from "@/ui/checkbox";
 import { useVideoStore } from "@/stores/video-store";
 import { api } from "@/lib/api-client";
-import CalendarDateRadio from "@/components/controls/calendar-date-radio";
 import { useCommentStore } from "@/stores/comment-store";
 
 
@@ -22,17 +20,14 @@ export function CommentSearchDialog({ open, onClose }: { open: boolean; onClose:
     const {
         hasDrawing,
         hasIssue,
-        fetchAllComments,
         user,
         filterText,
 
         setHasDrawing,
         setHasIssue,
-        setFetchAllComments,
         setCommentUser,
         setFilterText,
     } = useCommentSearchStore();
-    const dateFilter = useCommentSearchDateFilterStore();
 
     useEffect(() => {
         void (async () => {
@@ -63,22 +58,6 @@ export function CommentSearchDialog({ open, onClose }: { open: boolean; onClose:
                         );
                     })}
 
-                    {ControlRow(t("dateRange"), () => {
-                        return (
-                            <div className="flex justify-between">
-                                <CalendarDateRadio
-                                    mode={dateFilter.mode}
-                                    range={dateFilter.mode === "range" && dateFilter.from && dateFilter.to
-                                        ? { from: new Date(dateFilter.from), to: new Date(dateFilter.to) }
-                                        : undefined}
-                                    onToday={dateFilter.setToday}
-                                    onRecent={dateFilter.setRecent}
-                                    onSetRange={dateFilter.setRange}
-                                    onClear={dateFilter.clear} />
-                            </div>
-                        );
-                    })}
-
                     {ControlRow(t("hasDrawing"), () => {
                         return (
                             <Checkbox
@@ -94,16 +73,6 @@ export function CommentSearchDialog({ open, onClose }: { open: boolean; onClose:
                             <Checkbox
                                 defaultChecked={hasIssue}
                                 onCheckedChange={(x) => { setHasIssue(x as boolean) }}
-                                size="lg"
-                            />
-                        );
-                    })}
-
-                    {ControlRow(t("fetchAllComments"), () => {
-                        return (
-                            <Checkbox
-                                defaultChecked={fetchAllComments}
-                                onCheckedChange={(x) => { setFetchAllComments(x as boolean) }}
                                 size="lg"
                             />
                         );
