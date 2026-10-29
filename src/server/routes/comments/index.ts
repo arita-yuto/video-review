@@ -28,8 +28,9 @@ const QuerySchema = z.object({
     to: z.string().optional(),
     hasDrawing: z.string().transform(v => v === "true").optional(),
     hasIssue: z.string().transform(v => v === "true").optional(),
-    fetchAllComments: z.string().transform(v => v === "true").optional(),
-    selectRevision: z.string().transform(v => parseInt(v)).optional(),
+    selectRevision: z.coerce.number().int().optional(),
+    revisionFrom: z.coerce.number().int().optional(),
+    revisionTo: z.coerce.number().int().optional(),
     user: z.string().optional(),
     filterText: z.string().optional(),
 });
@@ -88,8 +89,9 @@ export const commentsRouter = router
                 to,
                 hasDrawing,
                 hasIssue,
-                fetchAllComments,
                 selectRevision,
+                revisionFrom,
+                revisionTo,
                 user,
                 filterText,
             } = query;
@@ -112,10 +114,15 @@ export const commentsRouter = router
                 where.createdAt = { gte: dateRange.from, lte: dateRange.to };
             }
 
-            if (fetchAllComments) {
-                where.videoRevNum = {};
-            } else if (selectRevision) {
+            if (selectRevision) {
                 where.videoRevNum = selectRevision;
+            } else if (videoId) {
+                // Comments outlive a purged revision; the list shows them only while it exists.
+                const liveRevisions = await prisma.videoRevision.findMany({
+                    where: { videoId, deleted: false },
+                    select: { revision: true },
+                });
+                where.videoRevNum = { in: liveRevisions.map((r) => r.revision), gte: revisionFrom, lte: revisionTo };
             }
 
             if (hasIssue) {

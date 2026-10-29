@@ -19,7 +19,6 @@ import CommentCard from "@/components/video-side-panel/panels/video-comment-pane
 import { cardAnchors, cardAnchorTop, cardEdges } from "@/components/video-side-panel/timeline-card-list";
 import { flowTarget, followStep, type FollowState } from "@/lib/list-flow";
 import { useCommentSearchStore } from "@/stores/comment-search-store";
-import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
 import { chatToast } from "@/components/chat-notice";
 import { toast } from "sonner";
 import { canEditComment, isGuest } from "@/lib/role";
@@ -32,8 +31,7 @@ export default function VideoCommentContent() {
     const { displayName, email, userId, role } = useAuthStore();
     const { selectedVideo, selectedRevision } = useVideoStore();
     const { setDisplayComments, comments, liveComments, addComment, updateComment, fetchComments, markRead } = useCommentStore();
-    const { filterText } = useCommentSearchStore();
-    const dateFilter = useCommentSearchDateFilterStore();
+    const { filterText, revisionFilter } = useCommentSearchStore();
     const { canvasSave } = useDrawingStore();
     const currentTime = usePlayback((s) => s.currentTime);
     const isPlaying = usePlayback((s) => s.isPlaying);
@@ -233,7 +231,7 @@ export default function VideoCommentContent() {
         if (selectedRevision) {
             fetchComments(selectedRevision);
         }
-    }, [dateFilter.mode, dateFilter.from, dateFilter.to, dateFilter.days, filterText]);
+    }, [revisionFilter, filterText]);
 
     return (
         <div className="bg-sidebar w-full h-full flex flex-col border-r">

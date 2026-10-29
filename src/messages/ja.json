@@ -153,6 +153,11 @@
         "title": "Comments",
         "newBadge": "NEW",
         "followPlayback": "追従",
+        "revisionPlaying": "再生中の Rev",
+        "revisionRange": "Range",
+        "revisionAll": "All",
+        "revisionFrom": "From",
+        "revisionTo": "To",
         "commentItemCopyLink": "リンクコピー",
         "commentItemTask": "タスク化",
         "commentItemBug": "バグ化",
@@ -209,10 +214,8 @@
     "comment-search": {
         "title": "コメント検索",
         "searchFilter": "テキストフィルター",
-        "dateRange": "コメント日時",
         "hasDrawing": "お絵かき付きコメント",
         "hasIssue": "チケット付きコメント",
-        "fetchAllComments": "全てのRevのコメント取得",
         "userFilter": "コメントユーザー",
         "ok": "検索",
         "cancel": "キャンセル"

@@ -84,4 +84,3 @@ export const createDateFilterStore = (name: string) =>
 
 export const useVideoDateFilterStore = createDateFilterStore("video-date-filter");
 export const useVideoCommentsDateFilterStore = createDateFilterStore("video-comments-date-filter");
-export const useCommentSearchDateFilterStore = createDateFilterStore("comment-search-date-filter");

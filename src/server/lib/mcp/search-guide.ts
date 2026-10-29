@@ -32,7 +32,7 @@ answer format and frequently asked questions. Read it before choosing tool argum
   Resolve vague words yourself from today's date ("recently" = last 30 days, "this week" =
   Monday to today, "last month" = the whole previous month) and call the tool without asking.
 - Tags apply to the latest revision. Comments belong to a revision number; \`list_comments\`
-  without \`selectRevision\` returns comments from every revision.
+  without \`selectRevision\` returns comments from every live revision of that video.
 - \`list_vcs_changes\` needs a revision to compare with. For a video's first revision it can only
   answer from cache; if it reports that, say the changes for that revision have not been fetched.
 - Relevance on code changes: "high" means the change touched a path the video watches;

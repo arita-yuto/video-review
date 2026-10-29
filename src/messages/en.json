@@ -153,6 +153,11 @@
         "title": "Comments",
         "newBadge": "NEW",
         "followPlayback": "Follow",
+        "revisionPlaying": "Playing Rev",
+        "revisionRange": "Range",
+        "revisionAll": "All",
+        "revisionFrom": "From",
+        "revisionTo": "To",
         "commentItemCopyLink": "Copy link",
         "commentItemTask": "Convert to task",
         "commentItemBug": "Convert to Bug",
@@ -209,10 +214,8 @@
     "comment-search": {
         "title": "Comment search",
         "searchFilter": "Filter text",
-        "dateRange": "Comment date",
         "hasDrawing": "Has drawing",
         "hasIssue": "Has issue",
-        "fetchAllComments": "Show all comments",
         "userFilter": "Comment author",
         "ok": "Search",
         "cancel": "Cancel"

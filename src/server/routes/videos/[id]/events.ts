@@ -7,7 +7,7 @@ import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorizeVideo } from "@/server/lib/videos/guest-access";
 
 const QuerySchema = z.object({
-    selectRevision: z.string().transform(v => parseInt(v)).optional(),
+    selectRevision: z.coerce.number().int().optional(),
     filterText: z.string().optional(),
     kind: z.string().optional(),
     hasLink: z.string().transform(v => v === "true").optional(),

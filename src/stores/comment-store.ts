@@ -5,8 +5,7 @@ import type { Issue } from "@/server/lib/issue-tracker/tracker";
 import { useAuthStore } from "@/stores/auth-store";
 import { useVideoStore } from "@/stores/video-store";
 import { useVideoReviewStore } from "@/stores/video-review-store";
-import { useCommentSearchStore } from "@/stores/comment-search-store";
-import { useCommentSearchDateFilterStore } from "@/stores/date-filter-store";
+import { revisionQuery, useCommentSearchStore } from "@/stores/comment-search-store";
 
 interface CommentState {
     comments: VideoComment[];
@@ -52,17 +51,13 @@ export const useCommentStore = create<CommentState>((set, get) => ({
         }
 
         const s = useCommentSearchStore.getState();
-        const dateRange = useCommentSearchDateFilterStore.getState().resolve();
         const res = await api.comments.index.$get({
             query: {
                 videoId: videoRevision.videoId,
-                selectRevision: String(videoRevision.revision),
+                ...revisionQuery(s.revisionFilter, videoRevision),
                 user: s.user || undefined,
-                from: dateRange?.from?.toISOString(),
-                to: dateRange?.to?.toISOString(),
                 hasDrawing: s.hasDrawing ? "true" : undefined,
                 hasIssue: s.hasIssue ? "true" : undefined,
-                fetchAllComments: s.fetchAllComments ? "true" : undefined,
                 filterText: s.filterText || undefined,
             },
         });

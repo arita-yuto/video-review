@@ -153,6 +153,11 @@
         "title": "댓글",
         "newBadge": "NEW",
         "followPlayback": "따라가기",
+        "revisionPlaying": "재생 중인 리비전",
+        "revisionRange": "범위",
+        "revisionAll": "전체",
+        "revisionFrom": "시작",
+        "revisionTo": "끝",
         "commentItemCopyLink": "링크 복사",
         "commentItemTask": "태스크로 전환",
         "commentItemBug": "버그로 전환",
@@ -209,10 +214,8 @@
     "comment-search": {
         "title": "댓글 검색",
         "searchFilter": "텍스트 필터",
-        "dateRange": "댓글 작성일",
         "hasDrawing": "그림이 있는 댓글",
         "hasIssue": "티켓이 연결된 댓글",
-        "fetchAllComments": "모든 리비전의 댓글 가져오기",
         "userFilter": "댓글 작성자",
         "ok": "검색",
         "cancel": "취소"
