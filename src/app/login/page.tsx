@@ -1,6 +1,6 @@
 "use client"
-import Login from "@/components/login";
-import { LanguageMenu } from "@/components/setting";
+import Login from "@/components/auth/login";
+import { LanguageMenu } from "@/components/account/setting";
 
 export default function LoginPage() {
     return (

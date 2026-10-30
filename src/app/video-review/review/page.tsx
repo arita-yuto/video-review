@@ -1,5 +1,5 @@
 "use client"
-import VideoReview from "@/components/video-review";
+import VideoReview from "@/components/review/player";
 import { useAuthStore } from "@/stores/auth-store";
 import { useConfigStore } from "@/stores/config-store";
 import { useRouter } from "next/navigation";

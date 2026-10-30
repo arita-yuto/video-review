@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { readError } from "@/lib/api-client";
-import { FormDialog } from "@/components/dialog/form-dialog";
+import { FormDialog } from "@/components/controls/form-dialog";
 import { FilePicker } from "@/components/controls/file-picker";
 import { CsvErrorTable, type CsvImportError } from "@/components/controls/csv-error-table";
 

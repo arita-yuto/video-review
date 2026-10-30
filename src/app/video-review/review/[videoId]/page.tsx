@@ -1,5 +1,5 @@
 "use client"
-import VideoReview from "@/components/video-review";
+import VideoReview from "@/components/review/player";
 import { useVideoReviewStore } from "@/stores/video-review-store";
 import { usePlayback } from "@/stores/playback-store";
 import { useVideoStore } from "@/stores/video-store";

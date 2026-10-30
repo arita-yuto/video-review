@@ -1,7 +1,7 @@
 "use client"
 
-import Bootstrap from "@/components/bootstrap";
-import { LanguageMenu } from "@/components/setting";
+import Bootstrap from "@/components/auth/bootstrap";
+import { LanguageMenu } from "@/components/account/setting";
 
 export default function BootstrapPage() {
 

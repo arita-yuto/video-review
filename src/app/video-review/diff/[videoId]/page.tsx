@@ -1,5 +1,5 @@
 "use client"
-import RevisionDiffView from "@/components/revision-diff-view";
+import RevisionDiffView from "@/components/review/diff";
 import { useAuthStore } from "@/stores/auth-store";
 import { useConfigStore } from "@/stores/config-store";
 import { useParams, useRouter } from "next/navigation";
