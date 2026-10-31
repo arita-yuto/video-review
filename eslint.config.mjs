@@ -2,13 +2,17 @@ import { plugin as shadcn } from "@shadcn/lint";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const repoRoot = path.dirname(fileURLToPath(import.meta.url));
 
 // A store or hook is read only from inside the directory that holds its stores/ or hooks/ folder,
 // so state sits at the lowest height that covers every reader (see CLAUDE.md, Frontend).
 const storeHeight = {
     meta: { type: "problem", schema: [] },
     create(context) {
-        const file = path.relative(context.cwd, context.filename).replaceAll("\\", "/");
+        // Relative to this file, not the cwd: editors lint with a workspace folder such as src/components as cwd.
+        const file = path.relative(repoRoot, context.filename).replaceAll("\\", "/");
         const rel = file.replace(/^src\//, "");
         return {
             ImportDeclaration(node) {
