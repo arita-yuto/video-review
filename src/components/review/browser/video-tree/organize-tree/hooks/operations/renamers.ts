@@ -5,7 +5,7 @@ import { childPath, folderName, parentPath } from "@/lib/folder-path";
 import { isMac } from "@/lib/platform";
 import type { Renamer } from "@/components/controls/rename-input";
 import type { FolderNode } from "@/components/review/browser/video-tree/folder-tree";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 // The key that starts renaming the focused node: F2 as in Explorer, or Return on a Mac as in Finder.
 export function isRenameShortcut(e: { key: string }): boolean {

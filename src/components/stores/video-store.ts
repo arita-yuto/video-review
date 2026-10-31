@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Video, VideoRevision, VideoWithRevision } from "@/lib/db-types";
-import { useVideoSearchStore } from "@/stores/video-search-store";
-import { useVideoDateFilterStore, useVideoCommentsDateFilterStore } from "@/stores/date-filter-store";
+import { useVideoSearchStore } from "@/components/stores/video-search-store";
+import { useVideoDateFilterStore, useVideoCommentsDateFilterStore } from "@/components/stores/date-filter-store";
 import { api } from "@/lib/api-client";
 
 interface VideoState {

@@ -5,11 +5,11 @@ import { useTranslations } from "next-intl";
 import { FormDialog } from "@/components/controls/form-dialog";
 import { ClearableComboBox, ClearableTextField } from "@/components/controls/clearable-fields";
 import { ControlRow } from "@/components/controls/control-row";
-import { useCommentSearchStore } from "@/stores/comment-search-store";
+import { useCommentSearchStore } from "@/components/review/stores/comment-search-store";
 import { Checkbox } from "@/ui/checkbox";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import { api } from "@/lib/api-client";
-import { useCommentStore } from "@/stores/comment-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
 
 
 export function CommentSearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

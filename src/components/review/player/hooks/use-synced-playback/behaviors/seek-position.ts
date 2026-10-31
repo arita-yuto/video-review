@@ -1,7 +1,7 @@
 import {
     expectedPosition, FAR_DRIFT_SEC, othersState, PAUSED_DRIFT_SEC, PLAYING_DRIFT_SEC, watchSession,
     type SyncBehavior, type SyncContext,
-} from "@/lib/hooks/use-synced-playback/behaviors/behavior";
+} from "@/components/review/player/hooks/use-synced-playback/behaviors/behavior";
 
 /** Every seek the sync makes: to a received position, and back to the session when far off. */
 export class SeekPosition implements SyncBehavior {

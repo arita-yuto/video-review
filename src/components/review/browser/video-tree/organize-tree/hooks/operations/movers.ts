@@ -3,7 +3,7 @@ import { api, readError } from "@/lib/api-client";
 import type { VideoWithRevision } from "@/lib/db-types";
 import { childPath, folderName, isInFolder, parentPath } from "@/lib/folder-path";
 import { folderAncestors } from "@/components/review/browser/video-tree/folder-tree";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 // What is being dragged: a video, or a folder by its path.
 export type MoveSource = { video: VideoWithRevision } | { folderPath: string };

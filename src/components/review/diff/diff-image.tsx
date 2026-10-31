@@ -11,9 +11,9 @@ import { Switch } from "@/ui/switch";
 import { Spinner } from "@/ui/spinner";
 import { cn, formatTime } from "@/lib/utils";
 import { isGuest } from "@/lib/role";
-import { useAuthStore } from "@/stores/auth-store";
-import { usePlayback, usePlaybackStoreApi } from "@/stores/playback-store";
-import { useDiffViewStore } from "@/stores/diff-view-store";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { usePlayback, usePlaybackStoreApi } from "@/components/review/stores/playback-store";
+import { useDiffViewStore } from "@/components/review/diff/stores/diff-view-store";
 import { useDiffImage } from "./use-diff-image";
 
 export function DiffImageSwitch() {

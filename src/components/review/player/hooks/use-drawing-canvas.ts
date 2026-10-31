@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
-import { drawingCacheKey, useDrawingStore } from "@/stores/drawing-store";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { useCommentEditStore } from "@/stores/comment-edit-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { drawingCacheKey, useDrawingStore } from "@/components/review/stores/drawing-store";
+import { useDrawingSettingsStore } from "@/components/review/stores/drawing-settings-store";
+import { useCommentEditStore } from "@/components/review/stores/comment-edit-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { renderLayers } from "@/lib/drawing/render";
 import { canvasScale, isEraserButton } from "@/lib/drawing/pointer";
 import { TOOLS } from "@/lib/drawing/tools";

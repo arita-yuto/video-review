@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, readError } from "@/lib/api-client";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { AdminSection } from "@/components/admin/admin-section";
 import { UserRow } from "@/components/admin/users-section/user-row";
 import type { AssignableRole } from "@/lib/role";

@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import { api } from "@/lib/api-client";
-import { usePlaybackStoreApi, type Participant, type ReceivedSyncState } from "@/stores/playback-store";
-import { useSyncing } from "@/lib/sync-session";
-import { useCommentStore } from "@/stores/comment-store";
-import { useVideoStore } from "@/stores/video-store";
+import { usePlaybackStoreApi, type Participant, type ReceivedSyncState } from "@/components/review/stores/playback-store";
+import { useSyncing } from "@/components/review/sync-session";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 const PING_MS = 20_000;
 

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faThumbsUp, faComment, faPalette, faClipboardList, faHammer, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import type { IssueStatusCategory } from "@/server/lib/issue-tracker/tracker";
-import { useCommentStore } from "@/stores/comment-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
 import { VideoComment } from "@/lib/db-types";
 import { TimelineCardFooter } from "@/components/review/side-panel/timeline-card";
 import { api } from "@/lib/api-client";

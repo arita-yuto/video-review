@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCodeCompare } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/ui/button";
 import { VideoRevision } from "@/lib/db-types";
-import { usePlaybackStoreApi } from "@/stores/playback-store";
+import { usePlaybackStoreApi } from "@/components/review/stores/playback-store";
 
 export function CompareButton({ revisions, selected, className }: { revisions: VideoRevision[], selected: VideoRevision, className?: string }) {
     const t = useTranslations("revision-diff-view");

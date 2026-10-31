@@ -1,7 +1,7 @@
 import { captureFrame } from "@/lib/utils";
-import { useDrawingStore } from "@/stores/drawing-store";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { useDrawingStore } from "@/components/review/stores/drawing-store";
+import { useDrawingSettingsStore } from "@/components/review/stores/drawing-settings-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 
 /**
  * The frame as the player shows it, with the drawing on top when the switch is on.

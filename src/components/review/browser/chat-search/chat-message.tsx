@@ -3,7 +3,7 @@
 import Markdown from "react-markdown";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { ChatTurn, useChatSearchStore } from "@/stores/chat-search-store";
+import { ChatTurn, useChatSearchStore } from "@/components/review/browser/stores/chat-search-store";
 import { useSidebar } from "@/ui/sidebar";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 

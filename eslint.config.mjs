@@ -1,6 +1,39 @@
 import { plugin as shadcn } from "@shadcn/lint";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
+import path from "node:path";
+
+// A store or hook is read only from inside the directory that holds its stores/ or hooks/ folder,
+// so state sits at the lowest height that covers every reader (see CLAUDE.md, Frontend).
+const storeHeight = {
+    meta: { type: "problem", schema: [] },
+    create(context) {
+        const file = path.relative(context.cwd, context.filename).replaceAll("\\", "/");
+        const rel = file.replace(/^src\//, "");
+        return {
+            ImportDeclaration(node) {
+                const match = /^@\/components\/((?:.*\/)?)(?:stores|hooks)\//.exec(node.source.value);
+                if (!match) {
+                    return;
+                }
+                const owner = "components/" + match[1];
+                if (rel.startsWith(owner)) {
+                    return;
+                }
+                // lib reads app-wide state only through components/stores/index.ts, which lists it.
+                if (rel.startsWith("lib/")) {
+                    context.report({ node, message: `lib imports stores from "@/components/stores" only` });
+                    return;
+                }
+                // Pages mount the screens: they may read app-wide state and the screen they mount.
+                if (rel.startsWith("app/") && (owner === "components/" || owner === "components/review/")) {
+                    return;
+                }
+                context.report({ node, message: `${node.source.value} is read only from inside src/${owner}` });
+            },
+        };
+    },
+};
 
 export default defineConfig([
     {
@@ -9,10 +42,11 @@ export default defineConfig([
             parser: tsParser,
             parserOptions: { ecmaFeatures: { jsx: true } },
         },
-        plugins: { shadcn },
+        plugins: { shadcn, local: { rules: { "store-height": storeHeight } } },
         // Colours, spacing and shapes come from the tokens in src/styles/globals.css and the
         // wrappers in src/components/ui; a finding means a hand-written exception crept back in.
         rules: {
+            "local/store-height": "error",
             "shadcn/no-restyle": ["error", {
                 allow: ["layout", "typography"],
                 // A popover that wraps a Command list has no padding of its own.

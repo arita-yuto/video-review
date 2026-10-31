@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { VideoWithRevision } from "@/lib/db-types";
-import { useDragDrop } from "@/lib/hooks/use-drag-drop";
+import { useDragDrop } from "@/components/review/browser/video-tree/organize-tree/hooks/use-drag-drop";
 import { emptiedFolders, planMove, TOP, useMovers, type MoveRequest, type MoveSource } from "@/components/review/browser/video-tree/organize-tree/hooks/operations/movers";
 
 type Options = {

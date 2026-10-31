@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { LoginType, OAUTH_PATH } from "@/lib/auth-types";
@@ -11,7 +11,7 @@ import { Label } from "@/ui/label";
 import { Input } from "@/ui/input";
 import { Button } from "@/ui/button";
 import { env } from "@/lib/env";
-import { useConfigStore } from "@/stores/config-store";
+import { useConfigStore } from "@/components/stores/config-store";
 import { AuthCard, AuthLayout } from "@/components/auth/auth-layout";
 import { createLoginLink, parseLoginReturnUrl } from "@/lib/url";
 

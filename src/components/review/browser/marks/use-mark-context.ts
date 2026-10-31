@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useCommentStore } from "@/stores/comment-store";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 // Everything the marks' conditions need beyond the video itself.
 export type MarkContext = {

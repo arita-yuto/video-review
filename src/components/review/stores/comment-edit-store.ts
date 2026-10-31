@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { api, readError } from "@/lib/api-client";
 import { VideoComment } from "@/lib/db-types";
-import { useCommentStore } from "@/stores/comment-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
 import { toast } from "sonner";
 
 interface CommentEditState {

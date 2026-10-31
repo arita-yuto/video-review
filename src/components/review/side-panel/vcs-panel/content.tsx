@@ -4,8 +4,8 @@ import { RefObject, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/ui/button";
-import { useVideoStore } from "@/stores/video-store";
-import { useVcsChangesStore } from "@/stores/vcs-changes-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useVcsChangesStore } from "@/components/review/side-panel/vcs-panel/stores/vcs-changes-store";
 import { CommitCard, PrCard } from "@/components/review/side-panel/vcs-panel/change-card";
 import type { VcsCommit, VcsPullRequest } from "@/lib/vcs-types";
 

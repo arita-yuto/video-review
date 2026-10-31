@@ -1,7 +1,7 @@
 "use client"
 import { RefObject, useEffect } from "react";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
-import { usePlayback, usePlaybackStoreApi } from "@/stores/playback-store";
+import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
+import { usePlayback, usePlaybackStoreApi } from "@/components/review/stores/playback-store";
 
 // Past this gap the compare side is sought back to the primary. Smaller gaps are left alone
 // because every forced seek makes the compare side stutter.

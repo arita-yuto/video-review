@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
-import { useVideoStore } from "@/stores/video-store";
-import { useAuthStore } from "@/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { useLocale } from "@/app/locale-provider";
 import { isAdmin } from "@/lib/role";
 import { useTranslations } from "next-intl";
@@ -15,8 +15,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { formatDateTime } from "@/lib/utils";
 import { CompareButton } from "@/components/review/diff/compare-button";
-import { SidePanelTrigger } from "@/components/controls/side-panel-trigger";
-import { usePresenterLock } from "@/lib/sync-session";
+import { SidePanelTrigger } from "@/components/review/player/side-panel-trigger";
+import { usePresenterLock } from "@/components/review/sync-session";
 
 export default function VideoTitle() {
     const t = useTranslations("video-title");

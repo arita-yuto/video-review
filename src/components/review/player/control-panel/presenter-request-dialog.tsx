@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Button } from "@/ui/button";
-import type { Participant } from "@/stores/playback-store";
+import type { Participant } from "@/components/review/stores/playback-store";
 
 // Shown to the presenter while a participant requests to take over; `onAnswer(false)` hands over.
 export function PresenterRequestDialog({ requester, onAnswer }: {

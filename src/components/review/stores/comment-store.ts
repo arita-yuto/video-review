@@ -2,10 +2,10 @@ import { create } from "zustand";
 import { api, readError } from "@/lib/api-client";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import type { Issue } from "@/server/lib/issue-tracker/tracker";
-import { useAuthStore } from "@/stores/auth-store";
-import { useVideoStore } from "@/stores/video-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { revisionQuery, useCommentSearchStore } from "@/stores/comment-search-store";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { revisionQuery, useCommentSearchStore } from "@/components/review/stores/comment-search-store";
 
 interface CommentState {
     comments: VideoComment[];

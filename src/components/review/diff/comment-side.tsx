@@ -9,7 +9,7 @@ import { VideoComment, VideoRevision } from "@/lib/db-types";
 import { createVideoTimeLink } from "@/lib/url";
 import { Button } from "@/ui/button";
 import { cn } from "@/lib/utils";
-import { usePlayback } from "@/stores/playback-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import TimelineCardList from "@/components/review/side-panel/timeline-card-list";
 import { TimelineCardHeader } from "@/components/review/side-panel/timeline-card";
 import { CommentAuthor } from "@/components/review/side-panel/comment-panel/comment-card/header";

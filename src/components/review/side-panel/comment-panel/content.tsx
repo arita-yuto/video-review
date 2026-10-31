@@ -1,15 +1,15 @@
 "use client";
 
 import { Separator } from "@/ui/separator";
-import { usePlayback } from "@/stores/playback-store";
-import { captureView } from "@/lib/drawing/capture-view";
-import { useCommentStore } from "@/stores/comment-store";
-import { useAuthStore } from "@/stores/auth-store";
-import { useVideoStore } from "@/stores/video-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { useCommentEditStore } from "@/stores/comment-edit-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
+import { captureView } from "@/components/review/capture-view";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { useCommentEditStore } from "@/components/review/stores/comment-edit-store";
 import CommentConfirmed from "@/components/review/side-panel/comment-panel/comment-confirmed";
-import { useDrawingStore } from "@/stores/drawing-store";
+import { useDrawingStore } from "@/components/review/stores/drawing-store";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
@@ -18,11 +18,11 @@ import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 import CommentCard from "@/components/review/side-panel/comment-panel/comment-card";
 import { cardAnchors, cardAnchorTop, cardEdges } from "@/components/review/side-panel/timeline-card-list";
 import { flowTarget, followStep, type FollowState } from "@/lib/list-flow";
-import { useCommentSearchStore } from "@/stores/comment-search-store";
+import { useCommentSearchStore } from "@/components/review/stores/comment-search-store";
 import { chatToast } from "@/components/review/side-panel/comment-panel/chat-notice";
 import { toast } from "sonner";
 import { canEditComment, isGuest } from "@/lib/role";
-import { useSyncing } from "@/lib/sync-session";
+import { useSyncing } from "@/components/review/sync-session";
 
 export default function VideoCommentContent() {
     const t = useTranslations("video-comment-panel");

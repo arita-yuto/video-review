@@ -13,7 +13,7 @@ import type { chatRouter } from "@/server/routes/chat";
 import type { chatSearchRouter } from "@/server/routes/chat/search";
 import type { thumbnailRouter } from "@/server/routes/thumbnail";
 import type { configRouter } from "@/server/routes/config";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores";
 
 const options = {
     headers: (): Record<string, string> => {

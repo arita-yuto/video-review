@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ShareLinkDialog } from "@/components/controls/share-link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import { createVideoEventLink } from "@/lib/url";
 
 // Dropdown menu item for copying a shareable link to the selected comment.

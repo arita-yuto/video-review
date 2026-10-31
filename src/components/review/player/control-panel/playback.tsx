@@ -20,17 +20,17 @@ import { Separator } from "@/ui/separator";
 import { ArrowRightToLine, ListVideo, Pin, Presentation, Repeat1, Settings, Users, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatTime } from "@/lib/utils";
-import { usePlayback } from "@/stores/playback-store";
-import { joinSync, leaveSync, putPresenter, useJoining, usePresenterLock, useSyncing } from "@/lib/sync-session";
+import { usePlayback } from "@/components/review/stores/playback-store";
+import { joinSync, leaveSync, putPresenter, useJoining, usePresenterLock, useSyncing } from "@/components/review/sync-session";
 import { createVideoJoinLink } from "@/lib/url";
 import { useRouter } from "next/navigation";
 import { ShareLinkDialog } from "@/components/controls/share-link";
 import { PresenterRequestDialog } from "@/components/review/player/control-panel/presenter-request-dialog";
 import { SyncJoinDialog } from "@/components/review/player/control-panel/sync-join-dialog";
 import { Spinner } from "@/ui/spinner";
-import { EPlayMode, useVideoPlayerStore, type PlaybackSettingId } from "@/stores/video-player-store";
-import { useConfigStore } from "@/stores/config-store";
-import { usePlaybackWidth } from "@/lib/hooks/use-playback-width";
+import { EPlayMode, useVideoPlayerStore, type PlaybackSettingId } from "@/components/review/stores/video-player-store";
+import { useConfigStore } from "@/components/stores/config-store";
+import { usePlaybackWidth } from "@/components/review/player/hooks/use-playback-width";
 import { AccountAvatar } from "@/components/controls/account-avatar";
 
 export function PlayButton() {

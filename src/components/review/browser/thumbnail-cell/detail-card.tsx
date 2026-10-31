@@ -6,7 +6,7 @@ import { formatTime } from "@/lib/utils";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { PreviewVideo } from "@/components/review/browser/thumbnail-cell/preview-video";
 import { thumbnailKey } from "@/components/review/browser/thumbnail-cell/lazy-loader";
-import { useThumbnailGridStore } from "@/stores/thumbnail-grid-store";
+import { useThumbnailGridStore } from "@/components/review/browser/stores/thumbnail-grid-store";
 
 const MAX_TAGS = 6;
 

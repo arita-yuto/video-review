@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { api } from "@/lib/api-client";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 
 export type ChatTurn = {
     role: "user" | "assistant";

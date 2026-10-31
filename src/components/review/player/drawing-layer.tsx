@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { drawingCacheKey, useDrawingStore } from "@/stores/drawing-store";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { useCommentEditStore } from "@/stores/comment-edit-store";
-import { useCommentStore } from "@/stores/comment-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { usePlayback } from "@/stores/playback-store";
-import { useDrawingCanvas } from "@/lib/hooks/use-drawing-canvas";
+import { drawingCacheKey, useDrawingStore } from "@/components/review/stores/drawing-store";
+import { useDrawingSettingsStore } from "@/components/review/stores/drawing-settings-store";
+import { useCommentEditStore } from "@/components/review/stores/comment-edit-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
+import { useDrawingCanvas } from "@/components/review/player/hooks/use-drawing-canvas";
 import { toolClass } from "@/lib/drawing/tools";
 import { EyedropperPreview } from "@/components/review/drawing-tool-panel/eyedropper-preview";
 import { cn } from "@/lib/utils";

@@ -7,8 +7,8 @@ import VideoCommentContent from "@/components/review/side-panel/comment-panel/co
 import VideoListPanel from "@/components/review/browser";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { PlaybackStoreProvider } from "@/stores/playback-store";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { PlaybackStoreProvider } from "@/components/review/stores/playback-store";
+import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 
 export function ReviewFrame({ children }: { children: ReactNode }) {
     const listPanelOpen = useVideoPlayerStore((s) => s.listPanelOpen);

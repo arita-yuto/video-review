@@ -6,7 +6,7 @@ import {
     folderAncestors,
     visibleVideos,
 } from "@/components/review/browser/video-tree/folder-tree";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 export type FolderList = ReturnType<typeof useFolderList>;
 

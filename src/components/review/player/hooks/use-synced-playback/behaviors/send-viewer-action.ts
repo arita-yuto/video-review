@@ -1,11 +1,11 @@
-import { postSyncState, type PlayerState } from "@/lib/sync-session";
-import type { ReceivedSyncState } from "@/stores/playback-store";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
-import { useVideoStore } from "@/stores/video-store";
+import { postSyncState, type PlayerState } from "@/components/review/sync-session";
+import type { ReceivedSyncState } from "@/components/review/stores/playback-store";
+import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import {
     expectedPosition, PAUSED_DRIFT_SEC, PLAYING_DRIFT_SEC,
     type SyncBehavior, type SyncContext,
-} from "@/lib/hooks/use-synced-playback/behaviors/behavior";
+} from "@/components/review/player/hooks/use-synced-playback/behaviors/behavior";
 
 /** Sends this viewer's play, pause, seek, speed and revision changes to the session as they happen. */
 export class SendViewerAction implements SyncBehavior {

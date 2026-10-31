@@ -7,9 +7,9 @@ import { SidebarGroup } from "@/ui/sidebar";
 import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
 import { PanelSearchActions } from "@/components/review/side-panel/panel-search-actions";
 import VideoCommentContent from "@/components/review/side-panel/comment-panel/content";
-import { useCommentSearchStore } from "@/stores/comment-search-store";
-import { useCommentStore } from "@/stores/comment-store";
-import { useVideoStore } from "@/stores/video-store";
+import { useCommentSearchStore } from "@/components/review/stores/comment-search-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import { VideoSidePanelDefinition } from "@/components/review/side-panel/types";
 
 export function useVideoCommentPanelDefinition(): VideoSidePanelDefinition {

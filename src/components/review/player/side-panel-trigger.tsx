@@ -1,7 +1,7 @@
 import { PanelRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 
 // The right-hand counterpart of SidebarTrigger, for the side panel.
 export function SidePanelTrigger({ className }: { className?: string }) {

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
-import { useAvatarStore } from "@/stores/avatar-store";
+import { useAvatarStore } from "@/components/stores/avatar-store";
 
 // The signed-in user's picture; a guest has no email, so the fallback shows.
 export function AccountAvatar({ email, className }: { email: string | null; className?: string }) {

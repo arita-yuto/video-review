@@ -38,9 +38,6 @@
       "@/styles/*": [
         "./src/styles/*"
       ],
-      "@/stores/*": [
-        "./src/stores/*"
-      ],
       "@/components/*": [
         "./src/components/*"
       ],

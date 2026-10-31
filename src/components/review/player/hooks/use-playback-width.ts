@@ -1,5 +1,5 @@
-import { useConfigStore } from "@/stores/config-store";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { useConfigStore } from "@/components/stores/config-store";
+import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 
 // The width to play at, or null for the original. A saved width that is no longer a preset
 // (changed on the admin screen) counts as the original rather than a missing file.

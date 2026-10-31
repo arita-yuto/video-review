@@ -6,7 +6,7 @@ import { api } from "@/lib/api-client";
 import { AdminSection } from "@/components/admin/admin-section";
 import { VideosTable } from "@/components/admin/videos-section/videos-table";
 import { CsvActions } from "@/components/controls/csv-actions";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 export function VideosSection() {
     const t = useTranslations("admin-settings");

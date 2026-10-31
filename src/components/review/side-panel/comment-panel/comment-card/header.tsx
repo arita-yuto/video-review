@@ -20,16 +20,16 @@ import {
     faLink,
     faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { formatDateTime, formatTime } from "@/lib/utils";
 import { useLocale } from "@/app/locale-provider";
-import { captureView } from "@/lib/drawing/capture-view";
+import { captureView } from "@/components/review/capture-view";
 import { createVideoCommentLink } from "@/lib/url";
-import { useCommentStore } from "@/stores/comment-store";
-import { useAuthStore } from "@/stores/auth-store";
-import { useVideoStore } from "@/stores/video-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import { VideoComment } from "@/lib/db-types";
-import { useCommentEditStore } from "@/stores/comment-edit-store";
+import { useCommentEditStore } from "@/components/review/stores/comment-edit-store";
 import { ShareLinkDialog } from "@/components/controls/share-link";
 import { useEffect, useMemo, useState } from "react";
 import { TimelineCardHeader } from "@/components/review/side-panel/timeline-card";
@@ -37,7 +37,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api-client";
 import { canEditComment, isGuest } from "@/lib/role";
-import { useAvatarStore } from "@/stores/avatar-store";
+import { useAvatarStore } from "@/components/stores/avatar-store";
 import { toast } from "sonner";
 
 // Dropdown menu item for copying a shareable link to the selected comment.

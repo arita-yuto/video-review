@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Globe, LogOut, Settings, ShieldUser, UserPen } from "lucide-react";
 import { Locales, useLocale } from "@/app/locale-provider";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { isAdmin, isGuest } from "@/lib/role";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import {

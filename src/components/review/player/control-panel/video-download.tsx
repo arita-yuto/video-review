@@ -7,9 +7,9 @@ import ComboBox from "@/components/controls/combo-box";
 import { ControlRow } from "@/components/controls/control-row";
 import { FormDialog } from "@/components/controls/form-dialog";
 import { api } from "@/lib/api-client";
-import { useAuthStore } from "@/stores/auth-store";
-import { useVideoStore } from "@/stores/video-store";
-import { useConfigStore } from "@/stores/config-store";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useConfigStore } from "@/components/stores/config-store";
 
 async function downloadVideo(videoId: string, videoRevId: string, width?: number): Promise<string> {
     const res = await api.media.download.$get({

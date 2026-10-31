@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useVideoReviewStore } from "@/stores/video-review-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 
 // Syncs the store with fullscreenchange events.
 // Browser F11 fullscreen is not tracked.

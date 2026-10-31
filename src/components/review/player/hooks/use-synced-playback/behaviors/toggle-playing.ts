@@ -1,7 +1,7 @@
 import {
     expectedPosition, FAR_DRIFT_SEC, isOwn, othersState, watchSession,
     type SyncBehavior, type SyncContext,
-} from "@/lib/hooks/use-synced-playback/behaviors/behavior";
+} from "@/components/review/player/hooks/use-synced-playback/behaviors/behavior";
 
 /** Plays or pauses with the session; a screen slightly behind a pause plays on to the paused frame. */
 export class TogglePlaying implements SyncBehavior {

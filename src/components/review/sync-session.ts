@@ -2,7 +2,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { createVideoSyncLink, JOIN_PARAM, SYNC_PARAM } from "@/lib/url";
-import { usePlayback } from "@/stores/playback-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 
 type Router = ReturnType<typeof useRouter>;
 

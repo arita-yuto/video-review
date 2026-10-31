@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { VideoWithRevision } from "@/lib/db-types";
 import { useCreators } from "@/components/review/browser/video-tree/organize-tree/hooks/operations/creators";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 // Folders made with New folder, until something is moved in.
 export function useNewFolders(videos: VideoWithRevision[]) {

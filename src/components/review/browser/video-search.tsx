@@ -8,9 +8,9 @@ import { api } from "@/lib/api-client";
 import { ControlRow } from "@/components/controls/control-row";
 import { Checkbox } from "@/ui/checkbox";
 import { Input } from "@/ui/input";
-import { useVideoSearchStore } from "@/stores/video-search-store";
-import { useVideoDateFilterStore, useVideoCommentsDateFilterStore } from "@/stores/date-filter-store";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoSearchStore } from "@/components/stores/video-search-store";
+import { useVideoDateFilterStore, useVideoCommentsDateFilterStore } from "@/components/stores/date-filter-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import CalendarDateRadio from "@/components/controls/calendar-date-radio";
 import MultiComboBox from "@/components/controls/multi-combobox";
 

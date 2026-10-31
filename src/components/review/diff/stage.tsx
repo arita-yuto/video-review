@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 import { useLocale } from "@/app/locale-provider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/tabs";
-import { usePlayback } from "@/stores/playback-store";
-import { DiffViewMode, useDiffViewStore } from "@/stores/diff-view-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
+import { DiffViewMode, useDiffViewStore } from "@/components/review/diff/stores/diff-view-store";
 
 export function RevisionSelect({ label, revisions, revision, onChange }: {
     label: string,

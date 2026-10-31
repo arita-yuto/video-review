@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api-client";
 import { useState } from "react";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { AuthCard, AuthLayout } from "@/components/auth/auth-layout";
 
 export default function Bootstrap() {

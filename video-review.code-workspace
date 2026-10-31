@@ -17,10 +17,6 @@
       "path": "./src/lib"
     },
     {
-      "name": "stores",
-      "path": "./src/stores"
-    },
-    {
       "name": "messages",
       "path": "./src/messages"
     },

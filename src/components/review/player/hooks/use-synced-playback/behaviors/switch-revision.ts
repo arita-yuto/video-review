@@ -1,8 +1,8 @@
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import {
     isOwn, watchSession,
     type SyncBehavior, type SyncContext,
-} from "@/lib/hooks/use-synced-playback/behaviors/behavior";
+} from "@/components/review/player/hooks/use-synced-playback/behaviors/behavior";
 
 /** Shows the revision the session is on. */
 export class SwitchRevision implements SyncBehavior {

@@ -1,10 +1,10 @@
 "use client";
-import { useCommentStore } from "@/stores/comment-store";
-import { usePlayback } from "@/stores/playback-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import { useMemo } from "react";
 import { Slider } from "@/ui/slider";
 import { cn } from "@/lib/utils";
-import { usePresenterLock } from "@/lib/sync-session";
+import { usePresenterLock } from "@/components/review/sync-session";
 
 export type SeekBarMarker = { time: number; className: string };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCommentStore } from "@/stores/comment-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
 import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 

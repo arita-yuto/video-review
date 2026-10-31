@@ -10,18 +10,18 @@ import { VideoSearchDialog } from "@/components/review/browser/video-search";
 import VideoThumbnailsPanel from "@/components/review/browser/video-thumbnails-panel";
 import { BrowseTree } from "@/components/review/browser/video-tree/browse-tree";
 import { OrganizeTree } from "@/components/review/browser/video-tree/organize-tree";
-import { useOrganizing } from "@/components/review/browser/video-tree/organize-tree/hooks/use-organizing";
+import { useOrganizing } from "@/components/review/browser/hooks/use-organizing";
 import { useFolderList } from "@/components/review/browser/video-tree/use-folder-list";
 import { useMarkContext } from "@/components/review/browser/marks/use-mark-context";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useVideoStore } from "@/stores/video-store";
-import { useAuthStore } from "@/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { isGuest } from "@/lib/role";
-import { useCommentStore } from "@/stores/comment-store";
-import { useVideoListStore } from "@/stores/video-list-store";
-import { useVideoSearchStore } from "@/stores/video-search-store";
-import { useVideoDateFilterStore } from "@/stores/date-filter-store";
-import { useDrawingStore } from "@/stores/drawing-store";
+import { useCommentStore } from "@/components/review/stores/comment-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
+import { useVideoSearchStore } from "@/components/stores/video-search-store";
+import { useVideoDateFilterStore } from "@/components/stores/date-filter-store";
+import { useDrawingStore } from "@/components/review/stores/drawing-store";
 import DrawingToolPanel from "@/components/review/drawing-tool-panel";
 
 export default function VideoListPanel() {

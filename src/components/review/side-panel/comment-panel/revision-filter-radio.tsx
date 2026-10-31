@@ -6,8 +6,8 @@ import { Button } from "@/ui/button";
 import { ButtonGroup } from "@/ui/button-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { useVideoStore } from "@/stores/video-store";
-import { resolveRevisionFilter, type RevisionFilter } from "@/stores/comment-search-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { resolveRevisionFilter, type RevisionFilter } from "@/components/review/stores/comment-search-store";
 
 export function RevisionFilterRadio({ value, onChange }: {
     value: RevisionFilter;

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { downscaledVideoKey } from "@/lib/storage-key";
-import { useConfigStore } from "@/stores/config-store";
-import { useThumbnailGridStore } from "@/stores/thumbnail-grid-store";
+import { useConfigStore } from "@/components/stores/config-store";
+import { useThumbnailGridStore } from "@/components/review/browser/stores/thumbnail-grid-store";
 
 // The smallest preset is enough for a preview.
 const previewKey = (filePath: string, presets: number[]) =>

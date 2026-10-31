@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { hexToHsva, hsvaToHex, type HsvaColor } from "@uiw/color-convert";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
+import { useDrawingSettingsStore } from "@/components/review/stores/drawing-settings-store";
 
 /**
  * The brush colour as the palette sees it, in HSV. Re-derived from the store's hex only

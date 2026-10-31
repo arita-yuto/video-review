@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-import { usePlayback } from "@/stores/playback-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import { createVideoTimeLink } from "@/lib/url";
-import { useVideoStore } from "@/stores/video-store";
-import { useAuthStore } from "@/stores/auth-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { isGuest } from "@/lib/role";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackSettingsMenu, PresentButton, SyncButton, usePlaybackSettings } from "./playback";
-import { useVideoPlayerStore } from "@/stores/video-player-store";
+import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 import { Popover, PopoverAnchor } from "@/ui/popover";
 import { ButtonGroup } from "@/ui/button-group";
 import { ScreenshotButton, ShareLinkButton, DownloadButton, OpenSceneButton, FullscreenButton } from "./actions";

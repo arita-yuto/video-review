@@ -6,7 +6,7 @@ import { Slider } from "@/ui/slider";
 import { ZoomInIcon } from "lucide-react";
 import { ThumbnailCell } from "@/components/review/browser/thumbnail-cell";
 import { ThumbnailLazyLoader } from "@/components/review/browser/thumbnail-cell/lazy-loader";
-import { useThumbnailGridStore } from "@/stores/thumbnail-grid-store";
+import { useThumbnailGridStore } from "@/components/review/browser/stores/thumbnail-grid-store";
 import { Marks } from "@/components/review/browser/marks/marks";
 import type { MarkContext } from "@/components/review/browser/marks/use-mark-context";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { usePlayback } from "@/stores/playback-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import TimelineCardList from "@/components/review/side-panel/timeline-card-list";
 import EventCardHeader from "@/components/review/side-panel/event-panel/event-card/header";
 import EventCardContent from "@/components/review/side-panel/event-panel/event-card/content";

@@ -1,6 +1,6 @@
 import * as tus from "tus-js-client";
 
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores";
 import { UploadSession, UploadStorageType } from "@/lib/db-types";
 
 /** Path init hands back when the server is set up for chunked uploads. */

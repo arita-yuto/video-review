@@ -1,10 +1,10 @@
 "use client";
 
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { usePlayback } from "@/stores/playback-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import { VideoComment } from "@/lib/db-types";
-import { useCommentEditStore } from "@/stores/comment-edit-store";
-import { usePresenterLock } from "@/lib/sync-session";
+import { useCommentEditStore } from "@/components/review/stores/comment-edit-store";
+import { usePresenterLock } from "@/components/review/sync-session";
 import React, { useEffect } from "react";
 import TimelineCardList from "@/components/review/side-panel/timeline-card-list";
 import type { TimelineCardState } from "@/components/review/side-panel/timeline-card";

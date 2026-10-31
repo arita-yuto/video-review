@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/ui/button";
 import { useTranslations } from "next-intl";
-import { useChatSearchStore } from "@/stores/chat-search-store";
+import { useChatSearchStore } from "@/components/review/browser/stores/chat-search-store";
 import { ChatMessage } from "@/components/review/browser/chat-search/chat-message";
 import { ChatInput } from "@/components/review/browser/chat-search/chat-input";
 import {

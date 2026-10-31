@@ -2,8 +2,8 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
 import { SidebarHeader } from "@/ui/sidebar";
 import { Separator } from "@/ui/separator";
-import { useVideoListStore } from "@/stores/video-list-store";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 export function OrganizeHeader() {
     const t = useTranslations("video-list-panel.organize");

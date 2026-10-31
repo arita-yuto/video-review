@@ -1,5 +1,5 @@
-import type { ReceivedSyncState, usePlaybackStoreApi } from "@/stores/playback-store";
-import { useVideoStore } from "@/stores/video-store";
+import type { ReceivedSyncState, usePlaybackStoreApi } from "@/components/review/stores/playback-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 // While playing, closer than this counts as the same position, for a sent seek and a received one alike.
 export const PLAYING_DRIFT_SEC = 0.5;

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { VideoWithRevision } from "@/lib/db-types";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { Spinner } from "@/components/ui/spinner";
-import { useThumbnailGridStore } from "@/stores/thumbnail-grid-store";
+import { useThumbnailGridStore } from "@/components/review/browser/stores/thumbnail-grid-store";
 
 export const thumbnailKey = (videoId: string) => `thumbnails/${videoId}/thumb.png`;
 

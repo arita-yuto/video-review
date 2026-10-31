@@ -2,12 +2,12 @@
 
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useVideoStore } from "@/stores/video-store";
-import { useVideoEventStore } from "@/stores/video-event-store";
-import { usePlayback } from "@/stores/playback-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useVideoEventStore } from "@/components/review/side-panel/event-panel/stores/video-event-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import EventCard from "@/components/review/side-panel/event-panel/event-card";
-import { useVideoEventSearchStore } from "@/stores/video-event-search-store";
-import { usePresenterLock } from "@/lib/sync-session";
+import { useVideoEventSearchStore } from "@/components/review/side-panel/event-panel/stores/video-event-search-store";
+import { usePresenterLock } from "@/components/review/sync-session";
 
 export default function VideoEventContent(props: {
     topAreaRef: RefObject<HTMLDivElement | null>,

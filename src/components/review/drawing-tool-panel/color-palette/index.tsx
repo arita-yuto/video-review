@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
+import { useDrawingSettingsStore } from "@/components/review/stores/drawing-settings-store";
 import { ColorCircle } from "@/components/review/drawing-tool-panel/color-palette/color-circle";
 import { usePaletteColor } from "@/components/review/drawing-tool-panel/color-palette/use-palette-color";
 import { ColorPaletteTools } from "@/components/review/drawing-tool-panel/color-palette/color-palette-tools";

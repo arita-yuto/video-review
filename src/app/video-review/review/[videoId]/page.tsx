@@ -1,14 +1,13 @@
 "use client"
 import VideoReview from "@/components/review/player";
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { usePlayback } from "@/stores/playback-store";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import { api } from "@/lib/api-client";
-import { fetchVideoEvents } from "@/stores/video-event-store";
-import { useAuthStore } from "@/stores/auth-store";
-import { useConfigStore } from "@/stores/config-store";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useConfigStore } from "@/components/stores/config-store";
 import { useRouter } from "next/navigation";
 import { createLoginLink } from "@/lib/url";
 
@@ -60,10 +59,11 @@ export default function VideoReviewPage() {
                 if (eventContentId) {
                     const { selectedRevision } = useVideoStore.getState();
                     if (selectedRevision) {
-                        const events = await fetchVideoEvents({
-                            videoId: selectedRevision.videoId,
-                            selectRevision: selectedRevision.revision,
+                        const eventsRes = await api.videos[":id"].events.$get({
+                            param: { id: selectedRevision.videoId },
+                            query: { selectRevision: String(selectedRevision.revision) },
                         });
+                        const events = eventsRes.status === 200 ? await eventsRes.json() : [];
                         const target = events.find((e) => e.contentId === eventContentId);
                         if (target) setTimelineTime(target.startMs / 1000);
                     }

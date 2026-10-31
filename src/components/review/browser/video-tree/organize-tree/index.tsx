@@ -19,8 +19,8 @@ import { useNewFolders } from "@/components/review/browser/video-tree/organize-t
 import { useRenaming } from "@/components/review/browser/video-tree/organize-tree/hooks/use-renaming";
 import { TOP, type MoveSource } from "@/components/review/browser/video-tree/organize-tree/hooks/operations/movers";
 import { useSelection } from "@/components/review/browser/video-tree/organize-tree/hooks/use-selection";
-import { useVideoListStore } from "@/stores/video-list-store";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 // The tree in organize mode: every folder as its own node, under the Top node.
 export function OrganizeTree() {

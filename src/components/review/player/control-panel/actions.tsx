@@ -9,10 +9,10 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { formatTime } from "@/lib/utils";
 import { createOpenSceneLink } from "@/lib/url";
-import { useConfigStore } from "@/stores/config-store";
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { useDrawingSettingsStore } from "@/stores/drawing-settings-store";
-import { captureView } from "@/lib/drawing/capture-view";
+import { useConfigStore } from "@/components/stores/config-store";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { useDrawingSettingsStore } from "@/components/review/stores/drawing-settings-store";
+import { captureView } from "@/components/review/capture-view";
 import { ShareLinkDialog } from "@/components/controls/share-link";
 import { VideoDownloadDialog } from "@/components/review/player/control-panel/video-download";
 

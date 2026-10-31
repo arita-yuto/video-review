@@ -5,12 +5,12 @@ import { Textarea } from "@/ui/textarea";
 import { Input } from "@/ui/input";
 import { Spinner } from "@/ui/spinner";
 import { useEffect, useState, useSyncExternalStore, type KeyboardEvent } from "react";
-import { usePlayback } from "@/stores/playback-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
 import { useTranslations } from "next-intl";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { isGuest } from "@/lib/role";
-import { useVideoStore } from "@/stores/video-store";
-import { useSyncing } from "@/lib/sync-session";
+import { useVideoStore } from "@/components/stores/video-store";
+import { useSyncing } from "@/components/review/sync-session";
 import { isMac } from "@/lib/platform";
 import { api } from "@/lib/api-client";
 

@@ -4,24 +4,24 @@ import React, { useEffect } from "react";
 import { X, Plus, LayoutGrid, MessageSquare, FolderTree } from "lucide-react";
 import { Button } from "@/ui/button";
 import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { useTranslations } from "next-intl";
 import { isAdmin, isGuest } from "@/lib/role";
 import { SidebarGroup, SidebarHeader, useSidebar } from "@/ui/sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { useVideoSearchStore } from "@/stores/video-search-store";
-import { useVideoDateFilterStore } from "@/stores/date-filter-store";
+import { useVideoSearchStore } from "@/components/stores/video-search-store";
+import { useVideoDateFilterStore } from "@/components/stores/date-filter-store";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoStore } from "@/components/stores/video-store";
 import CalendarDateRadio from "@/components/controls/calendar-date-radio";
 import { Separator } from "@/components/ui/separator";
-import { useChatSearchStore } from "@/stores/chat-search-store";
+import { useChatSearchStore } from "@/components/review/browser/stores/chat-search-store";
 import { ChatSearchPanel } from "@/components/review/browser/chat-search";
 import { AccountMenu } from "@/components/account/setting";
 import { OrganizeHeader } from "@/components/review/browser/video-tree/organize-tree/organize-header";
-import { useOrganizing } from "@/components/review/browser/video-tree/organize-tree/hooks/use-organizing";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useOrganizing } from "@/components/review/browser/hooks/use-organizing";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 export default function VideoListPanelHeader(
 { onSearchDialogShow, onUploadDialogShow, onThumbnailsToggle, thumbnailsOpen }: {
