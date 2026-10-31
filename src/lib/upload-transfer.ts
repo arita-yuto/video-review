@@ -1,6 +1,6 @@
 import * as tus from "tus-js-client";
 
-import { useAuthStore } from "@/components/stores";
+import { authHeaders } from "@/lib/api-client";
 import { UploadSession, UploadStorageType } from "@/lib/db-types";
 
 /** Path init hands back when the server is set up for chunked uploads. */
@@ -46,13 +46,12 @@ export async function uploadToSession(data: TransferRequest): Promise<void> {
         return uploadInChunks(data);
     }
 
-    const token = useAuthStore.getState().token;
     const form = new FormData();
     form.append("file", data.file);
     const res = await fetch(data.url, {
         method: "PUT",
         body: form,
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders(),
     });
     if (!res.ok) throw new UploadTransferError(res.status);
 }
@@ -60,13 +59,11 @@ export async function uploadToSession(data: TransferRequest): Promise<void> {
 // Chunked upload, so a file larger than an upstream body limit still gets through and an
 // interrupted transfer resumes where it stopped.
 function uploadInChunks(data: TransferRequest): Promise<void> {
-    const token = useAuthStore.getState().token;
-
     return new Promise<void>((resolve, reject) => {
         const upload = new tus.Upload(data.file, {
             endpoint: data.url,
             chunkSize: data.chunkSize ?? FALLBACK_CHUNK_SIZE,
-            headers: { Authorization: `Bearer ${token}` },
+            headers: authHeaders(),
             // Where the bytes are stored is read from this session on the server, never sent by us.
             metadata: { sessionId: data.session.id },
             onProgress: (sent, total) => data.onProgress?.(sent, total),

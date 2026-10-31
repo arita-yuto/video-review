@@ -20,11 +20,6 @@ const storeHeight = {
                 if (rel.startsWith(owner)) {
                     return;
                 }
-                // lib reads app-wide state only through components/stores/index.ts, which lists it.
-                if (rel.startsWith("lib/")) {
-                    context.report({ node, message: `lib imports stores from "@/components/stores" only` });
-                    return;
-                }
                 // Pages mount the screens: they may read app-wide state and the screen they mount.
                 if (rel.startsWith("app/") && (owner === "components/" || owner === "components/review/")) {
                     return;
@@ -34,6 +29,9 @@ const storeHeight = {
         };
     },
 };
+
+const uiAliases = ["@/components/*", "@/ui/*", "@/app/*", "@/web/*", "@/api/*"];
+const serverAliases = ["@/server", "@/server/*"];
 
 export default defineConfig([
     {
@@ -69,6 +67,40 @@ export default defineConfig([
             "shadcn/no-inline-styles": "error",
             "shadcn/no-unknown-classes": "error",
             "shadcn/require-static-classes": "error",
+        },
+    },
+    {
+        // Layers: lib sits below both the UI and the server, and the server never reaches the UI.
+        files: ["src/lib/**/*.{ts,tsx}"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: uiAliases, message: "lib does not import the UI" },
+                    { group: serverAliases, message: "lib does not import the server" },
+                ],
+            }],
+        },
+    },
+    {
+        // The API client is typed by the routers; a type import leaves nothing in the bundle.
+        files: ["src/lib/api-client.ts"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: uiAliases, message: "lib does not import the UI" },
+                    { group: serverAliases, message: "lib does not import the server", allowTypeImports: true },
+                ],
+            }],
+        },
+    },
+    {
+        files: ["src/server/**/*.{ts,tsx}"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: uiAliases, message: "the server does not import the UI" },
+                ],
+            }],
         },
     },
     {

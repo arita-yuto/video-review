@@ -13,14 +13,20 @@ import type { chatRouter } from "@/server/routes/chat";
 import type { chatSearchRouter } from "@/server/routes/chat/search";
 import type { thumbnailRouter } from "@/server/routes/thumbnail";
 import type { configRouter } from "@/server/routes/config";
-import { useAuthStore } from "@/components/stores";
 
-const options = {
-    headers: (): Record<string, string> => {
-        const token = useAuthStore.getState().token;
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    },
-};
+// The token lives in UI state; the auth store hands a reader in, so lib never imports components.
+let tokenSource: () => string | null = () => null;
+
+export function setTokenSource(source: () => string | null) {
+    tokenSource = source;
+}
+
+export function authHeaders(): Record<string, string> {
+    const token = tokenSource();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+const options = { headers: authHeaders };
 
 const v1 = <T extends Hono<any, any, any>>(path: string) => hc<T>(`/api/v1${path}`, options);
 

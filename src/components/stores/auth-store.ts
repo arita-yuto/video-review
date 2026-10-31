@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { api } from "@/lib/api-client";
+import { api, setTokenSource } from "@/lib/api-client";
 import { Role } from "@/lib/role";
 import { LoginType } from "@/lib/auth-types";
 
@@ -71,3 +71,5 @@ export const useAuthStore = create<AuthState>()(
         },
     ),
 );
+
+setTokenSource(() => useAuthStore.getState().token);
