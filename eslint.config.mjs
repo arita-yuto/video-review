@@ -94,6 +94,18 @@ export default defineConfig([
         },
     },
     {
+        // The UI talks to the server over HTTP through lib/api-client; the Hono bridge is the one mount point.
+        files: ["src/components/**/*.{ts,tsx}", "src/app/**/*.{ts,tsx}"],
+        ignores: ["src/app/api/**"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: serverAliases, message: "the UI does not import the server" },
+                ],
+            }],
+        },
+    },
+    {
         files: ["src/server/**/*.{ts,tsx}"],
         rules: {
             "no-restricted-imports": ["error", {

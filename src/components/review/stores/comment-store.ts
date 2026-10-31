@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { api, readError } from "@/lib/api-client";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
-import type { Issue } from "@/server/lib/issue-tracker/tracker";
+import type { Issue } from "@/lib/issue-types";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { useVideoStore } from "@/components/stores/video-store";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";

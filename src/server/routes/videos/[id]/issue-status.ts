@@ -5,7 +5,7 @@ import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorizeVideo } from "@/server/lib/videos/guest-access";
 import { roleOf } from "@/server/lib/token";
 import { issueTracker } from "@/server/lib/issue-tracker";
-import { IssueSchema, type Issue } from "@/server/lib/issue-tracker/tracker";
+import { IssueSchema, type Issue } from "@/lib/issue-types";
 
 export const issueStatusRouter = createRouter()
     .openapi(createRoute({
