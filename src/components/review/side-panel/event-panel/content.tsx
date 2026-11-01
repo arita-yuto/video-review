@@ -8,6 +8,7 @@ import { usePlayback } from "@/components/review/stores/playback-store";
 import EventCard from "@/components/review/side-panel/event-panel/event-card";
 import { useVideoEventSearchStore } from "@/components/review/stores/video-event-search-store";
 import { usePresenterLock } from "@/components/review/sync-session";
+import { Panel } from "@/components/controls/panel";
 
 export default function VideoEventContent(props: {
     topAreaRef: RefObject<HTMLDivElement | null>,
@@ -64,7 +65,7 @@ export default function VideoEventContent(props: {
     }, [activeEvent]);
 
     return (
-        <div className="bg-sidebar w-full h-full flex flex-col border-r">
+        <Panel>
             {events.length > 0
                 ? (
                     <EventCard
@@ -86,6 +87,6 @@ export default function VideoEventContent(props: {
                         {t("empty")}
                     </div>
                 )}
-        </div>
+        </Panel>
     );
 }

@@ -8,6 +8,7 @@ import { useVideoStore } from "@/components/stores/video-store";
 import { useVcsChangesStore } from "@/components/review/side-panel/vcs-panel/stores/vcs-changes-store";
 import { CommitCard, PrCard } from "@/components/review/side-panel/vcs-panel/change-card";
 import type { VcsCommit, VcsPullRequest } from "@/lib/vcs-types";
+import { Panel } from "@/components/controls/panel";
 
 function diffDays(from: Date | null, to: Date): number {
     if (!from) return 0;
@@ -102,7 +103,7 @@ export default function VcsChangesContent(props: {
     const days = toDate ? diffDays(fromDate, toDate) : null;
 
     return (
-        <div className="bg-sidebar w-full h-full flex flex-col border-r overflow-y-auto overflow-x-hidden">
+        <Panel className="overflow-y-auto overflow-x-hidden">
             <div className="px-3 pt-3 pb-2 border-b">
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -193,6 +194,6 @@ export default function VcsChangesContent(props: {
                     </>
                 )}
             </div>
-        </div>
+        </Panel>
     );
 }

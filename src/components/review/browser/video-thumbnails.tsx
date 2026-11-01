@@ -49,7 +49,7 @@ export default function VideoThumbnails({ videos, markContext, selectedVideoId, 
     return (
         <div
             ref={containerRef}
-            className="bg-sidebar w-full h-full flex flex-col"
+            className="w-full h-full flex flex-col"
         >
             {/* Grid */}
             <div className="flex-1 overflow-auto px-3 pb-3">

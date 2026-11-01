@@ -9,6 +9,7 @@ import { useSidebar } from "@/ui/sidebar";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import VideoThumbnails from "@/components/review/browser/video-thumbnails";
 import type { MarkContext } from "@/components/review/browser/marks/use-mark-context";
+import { Panel } from "@/components/controls/panel";
 
 // Radix layers that own Escape while open: dialogs, and anything in the popper wrapper.
 const OTHER_LAYERS = '[role="dialog"], [data-radix-popper-content-wrapper]';
@@ -69,11 +70,12 @@ export default function VideoThumbnailsPanel({
     if (!open || isMobile) return null;
 
     return (
-        <div
+        <Panel
+            variant="floating"
             ref={panelRef}
             data-slot="thumbnails-panel"
             style={{ "--panel-offset": offset } as React.CSSProperties}
-            className="thumbnails-panel fixed top-0 bottom-0 z-40 w-184 flex flex-col bg-sidebar border-r shadow-2xl"
+            className="thumbnails-panel fixed top-0 bottom-0 z-40 w-184"
         >
             <div className="flex items-center justify-between px-3 py-2 border-b text-sm font-semibold text-primary">
                 <span>{t("thumbnails")}</span>
@@ -93,6 +95,6 @@ export default function VideoThumbnailsPanel({
                     }}
                 />
             </div>
-        </div>
+        </Panel>
     );
 }

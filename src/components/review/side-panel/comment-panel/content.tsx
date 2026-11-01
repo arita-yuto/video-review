@@ -23,6 +23,7 @@ import { chatToast } from "@/components/review/side-panel/comment-panel/chat-not
 import { toast } from "sonner";
 import { canEditComment, isGuest } from "@/lib/role";
 import { useSyncing } from "@/components/review/sync-session";
+import { Panel } from "@/components/controls/panel";
 
 export default function VideoCommentContent() {
     const t = useTranslations("video-comment-panel");
@@ -234,7 +235,7 @@ export default function VideoCommentContent() {
     }, [revisionFilter, filterText]);
 
     return (
-        <div className="bg-sidebar w-full h-full flex flex-col border-r">
+        <Panel>
             <div className="relative flex-1 min-h-0 flex flex-col">
                 <CommentCard comments={comments} containerRef={containerRef} commentCardRef={commentCardRefs} />
                 {!following && (
@@ -254,6 +255,6 @@ export default function VideoCommentContent() {
                 onCancel={() => setEditing(null)}
                 onConfirmed={async (comment, issueId) => { await handleCommentConfirmed(comment, issueId) }}
             />
-        </div>
+        </Panel>
     );
 }
