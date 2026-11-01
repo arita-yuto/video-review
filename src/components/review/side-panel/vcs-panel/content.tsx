@@ -152,14 +152,11 @@ export default function VcsChangesContent(props: {
                 {!loading && !error && data && (
                     <>
                         {unlikelyCount > 0 && !allHigh && (
-                            <button
-                                onClick={() => setShowUnlikely((v) => !v)}
-                                className="mt-3 text-xs text-muted-foreground cursor-pointer hover:text-foreground"
-                            >
+                            <Button variant="inline" size="xs" className="mt-3" onClick={() => setShowUnlikely((v) => !v)}>
                                 {showUnlikely
                                     ? t("hide-unlikely")
                                     : `${t("show-unlikely")} (${unlikelyCount}${t("unit-items")})`}
-                            </button>
+                            </Button>
                         )}
 
                         {(prs.high.length > 0 || prs.maybe.length > 0 || (showUnlikely && prs.unlikely.length > 0)) && (

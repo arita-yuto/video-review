@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { SidebarTrigger } from "@/ui/sidebar";
 import { Separator } from "@/ui/separator";
 import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
 import { Switch } from "@/ui/switch";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -123,12 +124,9 @@ export default function VideoTitle() {
                                 <Badge key={tag} variant="outline">
                                     {tag}
                                     {canEditTags && (
-                                        <button
-                                            onClick={() => void removeTag(tag)}
-                                            className="text-muted-foreground hover:text-destructive transition"
-                                        >
-                                            <FontAwesomeIcon icon={faXmark} className="text-2xs" />
-                                        </button>
+                                        <Button variant="inline-destructive" size="icon-xs" onClick={() => void removeTag(tag)}>
+                                            <FontAwesomeIcon icon={faXmark} />
+                                        </Button>
                                     )}
                                 </Badge>
                             ))}
@@ -170,13 +168,9 @@ export default function VideoTitle() {
                                     )}
                                 </div>
                             ) : (
-                                <button
-                                    onClick={() => setInputVisible(true)}
-                                    className="text-muted-foreground hover:text-primary transition"
-                                    title={t("addTag")}
-                                >
-                                    <FontAwesomeIcon icon={faPlus} className="text-2xs" />
-                                </button>
+                                <Button variant="inline" size="icon-xs" onClick={() => setInputVisible(true)} title={t("addTag")}>
+                                    <FontAwesomeIcon icon={faPlus} />
+                                </Button>
                             ))}
                         </div>
                     </div>
