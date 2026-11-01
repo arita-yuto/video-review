@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import type { VideoWithRevision } from "@/lib/db-types";
 
 // Every video, unfiltered, kept apart so the browsing list's filtered videos survive the mode.

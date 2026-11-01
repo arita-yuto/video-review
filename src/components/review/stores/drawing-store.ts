@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { uploadToSession } from "@/lib/upload-transfer";
 import { resolveMediaUrl } from "@/lib/media-url";
 import { DrawingHistory, commitSnapshot, initialHistory, pushMark, redo, undo } from "@/lib/drawing/history";

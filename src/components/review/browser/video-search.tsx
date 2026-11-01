@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FormDialog } from "@/components/controls/form-dialog";
 import { ClearableComboBox, ClearableTextField } from "@/components/controls/clearable-fields";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { ControlRow } from "@/components/controls/control-row";
 import { Checkbox } from "@/ui/checkbox";
 import { Input } from "@/ui/input";

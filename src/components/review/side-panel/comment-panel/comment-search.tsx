@@ -8,7 +8,7 @@ import { ControlRow } from "@/components/controls/control-row";
 import { useCommentSearchStore } from "@/components/review/stores/comment-search-store";
 import { Checkbox } from "@/ui/checkbox";
 import { useVideoStore } from "@/components/stores/video-store";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { useCommentStore } from "@/components/review/stores/comment-store";
 
 

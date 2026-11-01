@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { VideoRevision, VideoEventWithKind } from "@/lib/db-types";
 import { useVideoEventSearchStore } from "@/components/review/side-panel/event-panel/stores/video-event-search-store";
 

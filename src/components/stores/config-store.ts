@@ -1,6 +1,6 @@
 "use client";
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import type { LoginType } from "@/lib/auth-types";
 
 // The General settings the screens need, each fetched from its own route at runtime, so a

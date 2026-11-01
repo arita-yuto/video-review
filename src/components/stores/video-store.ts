@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Video, VideoRevision, VideoWithRevision } from "@/lib/db-types";
 import { useVideoSearchStore } from "@/components/stores/video-search-store";
 import { useVideoDateFilterStore, useVideoCommentsDateFilterStore } from "@/components/stores/date-filter-store";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 
 interface VideoState {
     videos: VideoWithRevision[];

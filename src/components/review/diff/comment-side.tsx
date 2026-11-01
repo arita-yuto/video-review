@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import { createVideoTimeLink } from "@/lib/url";
 import { Button } from "@/ui/button";

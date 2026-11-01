@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { LoginType, OAUTH_PATH } from "@/lib/auth-types";
 import { useTranslations } from "next-intl";
 import { Tabs } from "@/ui/tabs";

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import type { VcsChangeSet } from "@/lib/vcs-types";
 import type { VideoRevision } from "@/lib/db-types";
 

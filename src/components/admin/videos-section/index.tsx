@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { AdminSection } from "@/components/admin/admin-section";
 import { VideosTable } from "@/components/admin/videos-section/videos-table";
 import { CsvActions } from "@/components/controls/csv-actions";

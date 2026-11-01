@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 
 export async function resolveMediaUrl(filePath: string): Promise<string | undefined> {
     // hc substitutes the :path{.*} param verbatim, so keys with spaces or "#" must be encoded here.

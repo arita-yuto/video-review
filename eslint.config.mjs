@@ -34,7 +34,8 @@ const storeHeight = {
     },
 };
 
-const uiAliases = ["@/components/*", "@/ui/*", "@/app/*", "@/web/*", "@/api/*"];
+const uiAliases = ["@/components/*", "@/ui/*", "@/app/*", "@/web/*"];
+const apiAliases = ["@/api", "@/api/*"];
 const serverAliases = ["@/server", "@/server/*"];
 
 export default defineConfig([
@@ -74,7 +75,7 @@ export default defineConfig([
         },
     },
     {
-        // Layers: lib sits below both the UI and the server, and the server never reaches the UI.
+        // Layers: lib sits below the UI and never sees the server.
         files: ["src/lib/**/*.{ts,tsx}"],
         rules: {
             "no-restricted-imports": ["error", {
@@ -86,19 +87,20 @@ export default defineConfig([
         },
     },
     {
-        // The API client is typed by the routers; a type import leaves nothing in the bundle.
-        files: ["src/lib/api-client.ts"],
+        // The client is typed by the routers; a type import leaves nothing in the bundle.
+        files: ["src/api/**/*.{ts,tsx}"],
         rules: {
             "no-restricted-imports": ["error", {
                 patterns: [
-                    { group: uiAliases, message: "lib does not import the UI" },
-                    { group: serverAliases, message: "lib does not import the server", allowTypeImports: true },
+                    { group: uiAliases, message: "api does not import the UI" },
+                    { group: ["@/lib/*"], message: "api does not import lib" },
+                    { group: serverAliases, message: "api reads the server's types only", allowTypeImports: true },
                 ],
             }],
         },
     },
     {
-        // The UI talks to the server over HTTP through lib/api-client; the Hono bridge is the one mount point.
+        // The UI talks to the server over HTTP through src/api; the Hono bridge is the one mount point.
         files: ["src/components/**/*.{ts,tsx}", "src/app/**/*.{ts,tsx}"],
         ignores: ["src/app/api/**"],
         rules: {
@@ -115,6 +117,7 @@ export default defineConfig([
             "no-restricted-imports": ["error", {
                 patterns: [
                     { group: uiAliases, message: "the server does not import the UI" },
+                    { group: apiAliases, message: "the server does not import api" },
                 ],
             }],
         },

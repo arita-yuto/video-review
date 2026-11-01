@@ -11,7 +11,7 @@
  * interface to consumers.
  */
 "use client";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

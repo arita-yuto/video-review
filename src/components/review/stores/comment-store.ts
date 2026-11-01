@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import type { Issue } from "@/lib/issue-types";
 import { useAuthStore } from "@/components/stores/auth-store";

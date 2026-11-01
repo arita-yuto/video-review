@@ -14,7 +14,7 @@ import type { chatSearchRouter } from "@/server/routes/chat/search";
 import type { thumbnailRouter } from "@/server/routes/thumbnail";
 import type { configRouter } from "@/server/routes/config";
 
-// The token lives in UI state; the auth store hands a reader in, so lib never imports components.
+// The token lives in UI state; the auth store hands a reader in, so api never imports components.
 let tokenSource: () => string | null = () => null;
 
 export function setTokenSource(source: () => string | null) {

@@ -2,7 +2,7 @@
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { Video, VideoComment, VideoRevision } from "@/lib/db-types";
 import { LoadingBadge } from "@/components/controls/loading-badge";
 import { SeekBar, commentMarkers } from "@/components/review/video-timeline-bar";

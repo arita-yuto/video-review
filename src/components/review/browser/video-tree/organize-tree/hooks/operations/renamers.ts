@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 import type { VideoWithRevision } from "@/lib/db-types";
 import { childPath, folderName, parentPath } from "@/lib/folder-path";
 import { isMac } from "@/lib/platform";

@@ -15,7 +15,7 @@ import { thumbnailRouter } from "@/server/routes/thumbnail";
 import { mcpRouter } from "@/server/routes/mcp";
 import { configRouter } from "@/server/routes/config";
 
-// One router per API version; the client in src/lib/api-client.ts mirrors these mounts.
+// One router per API version; the client in src/api/index.ts mirrors these mounts.
 export const v1Router = new Hono();
 v1Router.route("/media", mediaRouter);
 v1Router.route("/read-status", readStatusRouter);

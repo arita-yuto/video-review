@@ -2,7 +2,7 @@
 
 import { useCommentStore } from "@/components/review/stores/comment-store";
 import { toast } from "sonner";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 
 async function postToChat(commentId: string, screenshot: Blob) {
     const comment = useCommentStore.getState().comments.find(c => c.id === commentId);

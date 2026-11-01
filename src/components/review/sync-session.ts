@@ -1,6 +1,6 @@
 "use client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { createVideoSyncLink, JOIN_PARAM, SYNC_PARAM } from "@/lib/url";
 import { usePlayback } from "@/components/review/stores/playback-store";
 

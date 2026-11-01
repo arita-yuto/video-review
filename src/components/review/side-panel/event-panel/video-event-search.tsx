@@ -8,7 +8,7 @@ import { ControlRow } from "@/components/controls/control-row";
 import { useVideoEventSearchStore } from "@/components/review/side-panel/event-panel/stores/video-event-search-store";
 import { Checkbox } from "@/ui/checkbox";
 import { useVideoStore } from "@/components/stores/video-store";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { useVideoEventStore } from "@/components/review/side-panel/event-panel/stores/video-event-store";
 
 export function VideoEventSearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

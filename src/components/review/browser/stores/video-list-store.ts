@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { isInFolder } from "@/lib/folder-path";
 
 interface VideoListState {

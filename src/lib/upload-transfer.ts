@@ -1,6 +1,6 @@
 import * as tus from "tus-js-client";
 
-import { authHeaders } from "@/lib/api-client";
+import { authHeaders } from "@/api";
 import { UploadSession, UploadStorageType } from "@/lib/db-types";
 
 /** Path init hands back when the server is set up for chunked uploads. */

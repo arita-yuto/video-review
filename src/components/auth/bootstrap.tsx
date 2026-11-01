@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslations } from "next-intl";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { useState } from "react";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { AuthCard, AuthLayout } from "@/components/auth/auth-layout";

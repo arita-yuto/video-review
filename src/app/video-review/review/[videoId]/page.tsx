@@ -5,7 +5,7 @@ import { usePlayback } from "@/components/review/stores/playback-store";
 import { useVideoStore } from "@/components/stores/video-store";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { useConfigStore } from "@/components/stores/config-store";
 import { useRouter } from "next/navigation";

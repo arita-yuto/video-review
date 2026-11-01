@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { usePlaybackStoreApi, type Participant, type ReceivedSyncState } from "@/components/review/stores/playback-store";
 import { useSyncing } from "@/components/review/sync-session";
 import { useCommentStore } from "@/components/review/stores/comment-store";

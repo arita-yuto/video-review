@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { DeleteConfirmDialog, type DeleteTarget } from "@/components/admin/videos-section/delete-confirm-dialog";

@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { useAvatarStore } from "@/components/stores/avatar-store";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Separator } from "@/ui/separator";

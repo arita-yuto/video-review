@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import ComboBox from "@/components/controls/combo-box";
 import { ControlRow } from "@/components/controls/control-row";
 import { FormDialog } from "@/components/controls/form-dialog";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { useVideoStore } from "@/components/stores/video-store";
 import { useConfigStore } from "@/components/stores/config-store";

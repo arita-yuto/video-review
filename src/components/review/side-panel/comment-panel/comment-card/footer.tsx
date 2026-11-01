@@ -7,7 +7,7 @@ import type { IssueStatusCategory } from "@/lib/issue-types";
 import { useCommentStore } from "@/components/review/stores/comment-store";
 import { VideoComment } from "@/lib/db-types";
 import { TimelineCardFooter } from "@/components/review/side-panel/timeline-card";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 

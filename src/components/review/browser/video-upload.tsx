@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/ui/input";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { UploadTransferError, uploadToSession } from "@/lib/upload-transfer";
 import { FormDialog } from "@/components/controls/form-dialog";
 import { FilePicker } from "@/components/controls/file-picker";

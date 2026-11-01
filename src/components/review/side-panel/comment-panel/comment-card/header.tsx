@@ -35,7 +35,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TimelineCardHeader } from "@/components/review/side-panel/timeline-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { useTranslations } from "next-intl";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 import { canEditComment, isGuest } from "@/lib/role";
 import { useAvatarStore } from "@/components/stores/avatar-store";
 import { toast } from "sonner";

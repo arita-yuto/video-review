@@ -12,7 +12,7 @@ import { isGuest } from "@/lib/role";
 import { useVideoStore } from "@/components/stores/video-store";
 import { useSyncing } from "@/components/review/sync-session";
 import { isMac } from "@/lib/platform";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 
 // The OS never changes while the page is open, so there is nothing to subscribe to.
 const subscribeNever = () => () => {};
