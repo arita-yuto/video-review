@@ -139,7 +139,6 @@ export default function EditUserProfileDialog({
                 </DialogHeader>
 
                 <div className="flex flex-col items-center gap-4 py-4">
-                    {/* Avatar preview */}
                     <label className="relative cursor-pointer group">
                         <Avatar className="h-24 w-24">
                             <AvatarImage src={previewUrl} />
@@ -148,7 +147,6 @@ export default function EditUserProfileDialog({
                             </AvatarFallback>
                         </Avatar>
 
-                        {/* Hover overlay */}
                         <div className="absolute inset-0 flex items-center justify-center rounded-full bg-background/60 opacity-0 group-hover:opacity-100 transition">
                             <span className="text-xs text-foreground">
                                 {t("change")}
@@ -163,12 +161,10 @@ export default function EditUserProfileDialog({
                         />
                     </label>
 
-                    {/* Hint */}
                     <div className="text-xs text-muted-foreground text-center">
                         {t("avatarHint", { max: "1MB" })}
                     </div>
 
-                    {/* Error */}
                     {error && (
                         <div className="text-sm text-destructive">
                             {error}
