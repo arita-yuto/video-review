@@ -41,7 +41,7 @@ export function RevisionFilterRadio({ value, onChange }: {
                 Rev.{playing}
             </Button>
             <Popover open={open} onOpenChange={(next) => {
-                // Opening the picker is already choosing a range; the ends start wide.
+                // Opening the popover already selects range mode, starting with the widest range.
                 if (next && resolved.mode !== "range") {
                     setRange(first, last);
                 }

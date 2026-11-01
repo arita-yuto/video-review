@@ -6,7 +6,7 @@ import { useLocale } from "@/app/locale-provider";
 
 // One pull request or commit. The left edge marks relevance to the video's watched paths.
 function ChangeCard({ id, title, url, author, date, relevance, children }: {
-    /** PR number or short hash, shown in monospace before the title. */
+    /** PR number or short commit hash. */
     id: string;
     title: string;
     url?: string | null;

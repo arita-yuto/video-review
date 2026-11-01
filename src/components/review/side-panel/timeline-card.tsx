@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// Cards in the comment and event panels. The border colour tells the card's state at a glance:
-// selected by the user, active at the current playback time, or what the item carries.
+// The border colour shows the card's state: selected, active at the current time, or what the item carries.
 const timelineCardVariants = cva(
     "bg-card text-card-foreground flex flex-col gap-2 rounded-xl border py-3 shadow-sm cursor-pointer transition-colors hover:bg-card/80",
     {

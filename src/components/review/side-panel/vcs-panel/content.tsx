@@ -67,10 +67,7 @@ export default function VcsChangesContent(props: {
         void fetchChanges(selectedVideo.id, prevRevision, selectedRevision);
     }, [selectedVideo?.id, prevRevision?.id]);
 
-    /*
-     * Summary is fetched independently after vcs-changes loads.
-     * 503 (LLM not configured) and 404 (no cache) both resolve to null silently.
-     */
+    // The summary is built from the change list, so it waits for data.
     useEffect(() => {
         if (!selectedVideo || !data) return;
         void fetchSummary(selectedVideo.id, selectedRevision);
@@ -87,10 +84,7 @@ export default function VcsChangesContent(props: {
 
     const unlikelyCount = prs.unlikely.length + commits.unlikely.length;
 
-    /*
-     * When vcsWatchPaths is empty, all items score "high" by design.
-     * In that case the unlikely toggle is not meaningful, so we hide it.
-     */
+    // With no watch paths every item scores high, so the unlikely toggle has nothing to show.
     const allHigh =
         data != null &&
         prs.maybe.length === 0 &&

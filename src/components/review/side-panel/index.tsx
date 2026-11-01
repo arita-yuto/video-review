@@ -11,8 +11,6 @@ export default function VideoSidePanel() {
     const commentPanel = useVideoCommentPanelDefinition();
     const eventPanel = useVideoEventPanelDefinition();
     const vcsChangesPanel = useVcsChangesPanelDefinition();
-    // Add new tabs by appending another panel definition here.
-    // The shell will automatically render its tab, body, and optional dialog slots.
     const panels = [commentPanel, eventPanel, vcsChangesPanel];
     const [tab, setTab] = useState("comments");
     const [searchDialogOpen, setSearchDialogOpen] = useState(false);

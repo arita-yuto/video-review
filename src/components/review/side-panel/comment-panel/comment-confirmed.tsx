@@ -19,7 +19,7 @@ const subscribeNever = () => () => {};
 
 export type ECommentConfirmedType = "commentUpdate" | "commentAdd";
 
-// What the issue field found out about the typed key; null when there is no key to look up.
+// Result of looking up the typed issue key; null while there is no key.
 type IssueLookup = "checking" | { key: string; summary: string } | { key: string; error: string } | null;
 
 export default function CommentConfirmed(props: {
@@ -39,8 +39,8 @@ export default function CommentConfirmed(props: {
     const { role } = useAuthStore();
     const syncing = useSyncing(useVideoStore((s) => s.selectedVideo?.id ?? null));
 
-    // Writing pauses so the comment lands on the frame in view; a sync session watches on, like a chat.
     const pauseToWrite = () => {
+        // Pause so the comment lands on the frame in view. A sync session shares playback and keeps running.
         if (!syncing) {
             setIsPlaying(false);
         }
@@ -84,9 +84,9 @@ export default function CommentConfirmed(props: {
     // A key already saved on the comment stays editable even if the tracker lost the issue.
     const rejectedKey = lookupFailed && answer.key === key && key !== (props.issueId?.trim() ?? "");
 
-    // An edit is cleared by its props once it closes; an add must clear itself.
     const handleConfirmed = () => {
         props.onConfirmed(comment, issueId);
+        // After an edit the parent resets the fields through props; an add resets them here.
         if (!editing) {
             setIssueId(null);
             setComment("");

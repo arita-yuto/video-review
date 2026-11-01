@@ -10,7 +10,7 @@ export function cardEdges(list: HTMLElement, el: HTMLElement): { top: number; bo
     return { top, bottom: top + el.offsetHeight };
 }
 
-// Where the list should sit for a card: the card low in the view, with room under it so the next one already shows.
+// Scroll position that puts the card low in the view, with room under it for the next card.
 export function cardAnchorTop(list: HTMLElement, el: HTMLElement): number {
     const peek = list.clientHeight * 0.3;
     const limit = list.scrollHeight - list.clientHeight;
@@ -25,7 +25,6 @@ export default function TimelineCardList<T>(props: {
     items: T[];
     containerRef: React.RefObject<HTMLDivElement | null>;
     itemCardRef: React.RefObject<Record<string, HTMLDivElement | null>>;
-    // The key must be stable because panel content uses refs for timeline sync scrolling.
     getKey: (item: T) => string;
     getCardState?: (item: T) => TimelineCardState;
     onClick?: (item: T) => void;
@@ -41,7 +40,6 @@ export default function TimelineCardList<T>(props: {
                 return (
                     <TimelineCard
                         ref={el => {
-                            // Panels read back these refs to scroll the active/selected card into view.
                             props.itemCardRef.current[key] = el;
                         }}
                         key={key}

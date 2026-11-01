@@ -18,7 +18,6 @@ import { useState } from "react";
 import { useVideoStore } from "@/components/stores/video-store";
 import { createVideoEventLink } from "@/lib/url";
 
-// Dropdown menu item for copying a shareable link to the selected comment.
 function DropdownMenu_SharedLink(props: { eventContentId: string }) {
     const t = useTranslations("video-comment-panel");
     const [open, setOpen] = useState(false);

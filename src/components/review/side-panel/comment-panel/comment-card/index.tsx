@@ -12,7 +12,6 @@ import CommentCardHeader from "@/components/review/side-panel/comment-panel/comm
 import CommentCardContent from "@/components/review/side-panel/comment-panel/comment-card/content";
 import CommentCardFooter from "@/components/review/side-panel/comment-panel/comment-card/footer";
 
-// Priority: user selection, then playback position, then what the comment carries.
 export function commentCardState(comment: VideoComment, selected: boolean, active: boolean): TimelineCardState {
     const hasDrawing = comment.hasDrawing;
     const hasIssue = comment.issueId !== "" && comment.issueId !== null;
@@ -35,8 +34,8 @@ export default function CommentCard(props: {
     const setTimelineTime = usePlayback((s) => s.setTimelineTime);
     const locked = usePresenterLock();
 
-    // Under a presenter the screen stays where the presenter is, and a selection would draw on that frame.
     const handleSelectComment = (comment: VideoComment) => {
+        // Under a presenter the frame is theirs: a click must not seek, and a selection would draw on their frame.
         if (locked) {
             return;
         }

@@ -40,7 +40,6 @@ import { canEditComment, isGuest } from "@/lib/role";
 import { useAvatarStore } from "@/components/stores/avatar-store";
 import { toast } from "sonner";
 
-// Dropdown menu item for copying a shareable link to the selected comment.
 function DropdownMenu_SharedLink() {
     const t = useTranslations("video-comment-panel");
     const [open, setOpen] = useState(false);
@@ -89,15 +88,10 @@ function useJiraIssueTypes() {
     return types;
 }
 
-// Dropdown menu item for creating a Jira issue from a comment.
 function DropdownMenu_CreateIssue(props: { disabled: boolean, comment: VideoComment, translateID: string }) {
     const t = useTranslations("video-comment-panel");
     const { issueLinkedComment } = useCommentStore();
 
-    // NOTE:
-    // Issue type and icon are currently derived from translation IDs.
-    // This couples UI text with logic, but keeps the menu definition simple for now.
-    // Intended to be refactored to an explicit enum or prop-based issue type in the future.
     const issueTypes = useJiraIssueTypes();
     const issueType = (props.translateID === "commentItemTask" ? issueTypes?.task : issueTypes?.bug) ?? undefined;
     const icon = props.translateID === "commentItemTask" ? faListCheck : faBug;
@@ -151,7 +145,6 @@ function DropdownMenu_TransitionIssue(props: { comment: VideoComment }) {
     );
 }
 
-// Dropdown menu item for entering comment edit mode.
 function DropdownMenu_Edit(props: { comment: VideoComment }) {
     const t = useTranslations("video-comment-panel");
     const { setEditing } = useCommentEditStore();
@@ -164,7 +157,6 @@ function DropdownMenu_Edit(props: { comment: VideoComment }) {
     );
 }
 
-// Dropdown menu item for deleting a comment.
 function DropdownMenu_Delete(props: { comment: VideoComment }) {
     const t = useTranslations("video-comment-panel");
     const { deleteComment } = useCommentStore();

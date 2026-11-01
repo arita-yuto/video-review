@@ -12,7 +12,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function CommentCardFooter(props: { comment: VideoComment }) {
-    // The status name itself varies by workflow, so the chip shows the tracker's category and keeps the name for hover.
+    // Status names differ per workflow, so the icon shows the tracker's category and the name goes in the hover title.
     const STATUS_ICON: Record<IssueStatusCategory, { icon: IconDefinition; tone: string }> = {
         new: { icon: faClipboardList, tone: "text-background" },
         indeterminate: { icon: faHammer, tone: "text-warning-strong" },
@@ -28,7 +28,6 @@ export default function CommentCardFooter(props: { comment: VideoComment }) {
     }
 
     const openExternalLink = async (type: "slack" | "jira") => {
-        // jump from cache
         if (externalLinks?.[type]) {
             window.open(externalLinks[type], "_blank", "noreferrer");
             return;

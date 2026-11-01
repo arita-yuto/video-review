@@ -39,9 +39,9 @@ export default function VideoCommentContent() {
     const selectedComment = useVideoReviewStore((s) => s.selectedComment);
     const selectionSource = useVideoReviewStore((s) => s.selectionSource);
     const videoElement = useVideoReviewStore((s) => s.videoRefElement);
-    // Once the reader scrolls the list themselves, the flow stops until they ask for it back with the button.
+    // Following stops once the viewer scrolls the list themselves, until they press the button.
     const [following, setFollowing] = useState(true);
-    // What the flow last wrote, so its own scroll events are told apart from the reader's.
+    // The scrollTop the flow last set, to tell its own scroll events from the viewer's.
     const flowTop = useRef<number | null>(null);
     const syncing = useSyncing(selectedVideo?.id ?? null);
     const {
@@ -54,7 +54,7 @@ export default function VideoCommentContent() {
     } = useCommentEditStore();
 
     useEffect(() => {
-        // Someone else's comment arriving live is not read until the viewer opens the video again.
+        // A comment arriving live may not have been seen yet, so only the viewer's own fetch marks the video read.
         if (!userId || isGuest(role) || !selectedVideo || comments === liveComments) {
             return;
         }
@@ -64,14 +64,6 @@ export default function VideoCommentContent() {
     const canEditText = !editingComment || canEditComment(editingComment, role, userId);
 
     const handleCommentConfirmed = async (comment: string, issueId: string | null) => {
-        // This handler is responsible for both creating new comments
-        // and updating existing ones.
-        // Currently, these two flows are intentionally separated:
-        // - New comments are posted to Slack
-        // - Edited comments stay local and are not re-sent
-        //
-        // This is a temporary design and may be refactored in the future
-        // to unify comment creation / update logic.
         if (!editingComment) {
             if (selectedRevision) {
                 const id = await addComment({
@@ -89,14 +81,13 @@ export default function VideoCommentContent() {
                 if (!id) {
                     return;
                 }
-                // A sync session's comments flow like a chat, so they send no notices.
+                // A sync session already shows comments live, so it posts nothing to the chat.
                 if (!syncing) {
                     await handlePostCommentToChat(id);
                 }
             }
         } else {
-            // Update flow for an existing comment.
-            // Edited comments are not sent to Slack to avoid duplicate or noisy notifications.
+            // An edit sends no chat notice; the thread already has the comment.
             const saved = await canvasSave(editingComment.id);
             if (saved) {
                 setEditDrawing(saved);
@@ -137,11 +128,11 @@ export default function VideoCommentContent() {
         return () => list.removeEventListener("scroll", onScroll);
     }, []);
 
-    // A live refresh, as when someone else comments, leaves a still reader where they were.
+    // The currentTime the list was last placed for, so a live refresh does not move a paused viewer again.
     const scrolledAt = useRef<number | null>(null);
 
     useEffect(() => {
-        // Seeks and refreshes while paused; the flow handles playing, and a reader who took over is left alone.
+        // While paused, a seek or a list refresh scrolls to the target card; the flow handles playing.
         if (isPlaying || !following) {
             return;
         }
@@ -149,8 +140,7 @@ export default function VideoCommentContent() {
             return;
         }
 
-        // Find the latest comment whose timestamp is <= current playback time.
-        // We assume `comments` is sorted by time in ascending order.
+        // Comments are sorted by time, so the target is the last one at or before the current time.
         let target = comments[0];
         if (target === undefined) {
             return;
@@ -164,7 +154,7 @@ export default function VideoCommentContent() {
             }
         }
 
-        // Keep the list still on the card the reader clicked; once the time moves off that card, any change scrolls again.
+        // A card the viewer clicked stays put until the time moves off it.
         if (selectionSource === "card" && selectedComment?.time === currentTime) {
             return;
         }
@@ -177,7 +167,7 @@ export default function VideoCommentContent() {
 
         const { top, bottom } = cardEdges(list, el);
 
-        // Like a chat: a card in view is left alone, one above comes down to the top edge, one below lands where playback would hold it.
+        // Scroll only when the card is out of view: up to the top edge, or down to where playback would hold it.
         if (top >= list.scrollTop && bottom <= list.scrollTop + list.clientHeight) {
             return;
         }
@@ -187,7 +177,7 @@ export default function VideoCommentContent() {
         });
     }, [currentTime, comments, isPlaying, following]);
 
-    // Playing, the list flows with the video like a comment ticker: steady between comments, never a jump.
+    // While playing, the flow scrolls the list with the video so it never jumps between comments.
     useEffect(() => {
         const list = containerRef.current;
         if (!isPlaying || !following || !videoElement || !list || comments.length === 0) {
