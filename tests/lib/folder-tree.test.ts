@@ -4,7 +4,7 @@ import {
     buildFlatFolders,
     buildNestedFolders,
     folderAncestors,
-} from "@/components/video-browser/video-tree/folder-tree";
+} from "@/components/review/browser/video-tree/folder-tree";
 
 const video = (folderKey: string, title = "Cut") =>
     ({ id: `${folderKey}/${title}`, title, folderKey, latestRevision: null }) as VideoWithRevision;

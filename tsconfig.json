@@ -30,16 +30,13 @@
         "./src/app/*"
       ],
       "@/api/*": [
-        "./src/app/api/*"
+        "./src/api/*"
       ],
       "@/web/*": [
         "./src/app/video-review/*"
       ],
       "@/styles/*": [
         "./src/styles/*"
-      ],
-      "@/stores/*": [
-        "./src/stores/*"
       ],
       "@/components/*": [
         "./src/components/*"

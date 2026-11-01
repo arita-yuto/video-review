@@ -1,5 +1,6 @@
 import { getJiraConfig, getJiraIssueTypes, type JiraDeployment, jiraDeployment, jiraAuthorization, searchJiraAccount } from "@/server/lib/integrations/jira";
-import { ISSUE_STATUS_CATEGORIES, type CreateIssueInput, type Issue, type IssueSource, type IssueTracker, type IssueTransition } from "@/server/lib/issue-tracker/tracker";
+import { ISSUE_STATUS_CATEGORIES, type Issue } from "@/lib/issue-types";
+import type { CreateIssueInput, IssueSource, IssueTracker, IssueTransition } from "@/server/lib/issue-tracker/tracker";
 import { ServerError } from "@/server/lib/server-error";
 import { z } from "@hono/zod-openapi";
 import { formatTime } from "@/lib/utils";

@@ -1,14 +1,14 @@
 "use client"
-import VideoReview from "@/components/video-review";
-import { useVideoReviewStore } from "@/stores/video-review-store";
-import { usePlayback } from "@/stores/playback-store";
-import { useVideoStore } from "@/stores/video-store";
+import VideoReview from "@/components/review/player";
+import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
+import { usePlayback } from "@/components/review/stores/playback-store";
+import { useVideoStore } from "@/components/stores/video-store";
+import { fetchVideoEvents } from "@/components/review/stores/video-event-store";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
-import { api } from "@/lib/api-client";
-import { fetchVideoEvents } from "@/stores/video-event-store";
-import { useAuthStore } from "@/stores/auth-store";
-import { useConfigStore } from "@/stores/config-store";
+import { api } from "@/api";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useConfigStore } from "@/components/stores/config-store";
 import { useRouter } from "next/navigation";
 import { createLoginLink } from "@/lib/url";
 

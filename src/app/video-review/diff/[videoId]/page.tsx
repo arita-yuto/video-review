@@ -1,7 +1,7 @@
 "use client"
-import RevisionDiffView from "@/components/revision-diff-view";
-import { useAuthStore } from "@/stores/auth-store";
-import { useConfigStore } from "@/stores/config-store";
+import RevisionDiffView from "@/components/review/diff";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useConfigStore } from "@/components/stores/config-store";
 import { useParams, useRouter } from "next/navigation";
 import { createLoginLink } from "@/lib/url";
 import React, { useEffect } from "react";

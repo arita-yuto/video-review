@@ -71,7 +71,8 @@ UI に変更がある場合は、
 
 ## Code Style
 
-基本的には、既存の書き方・構成に合わせてください
+基本的には、既存の書き方・構成に合わせてください  
+frontend のファイルの置き場所と import の向きは [frontend の依存マップ](./documents/development/frontend-map.jp.md) にあります
 
 * 複雑な処理
 * 意図が読み取りづらい実装

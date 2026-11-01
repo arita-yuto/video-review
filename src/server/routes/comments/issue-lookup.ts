@@ -3,7 +3,7 @@ import { createRouter } from "@/server/lib/openapi/router";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorize } from "@/server/lib/token";
 import { issueTracker } from "@/server/lib/issue-tracker";
-import { IssueSchema } from "@/server/lib/issue-tracker/tracker";
+import { IssueSchema } from "@/lib/issue-types";
 import { ServerError } from "@/server/lib/server-error";
 
 export const issueLookupRouter = createRouter()

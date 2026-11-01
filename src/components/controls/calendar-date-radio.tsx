@@ -7,9 +7,7 @@ import { useTranslations } from 'next-intl';
 import CalendarPopover from '@/components/controls/calendar-popover';
 import { X } from 'lucide-react';
 
-// Prop-driven and store-agnostic: the current mode drives the active highlight,
-// `range` feeds the popover calendar, and each control reports intent via a
-// callback so any date-filter store can back it.
+// Any date-filter store can back it: mode and range come in as props, and each control reports through a callback.
 interface CalendarDateRadioProps extends React.ComponentProps<"div"> {
     mode: "none" | "today" | "recent" | "range";
     range: DateRange | undefined;

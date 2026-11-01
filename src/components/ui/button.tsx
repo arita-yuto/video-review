@@ -25,13 +25,17 @@ const buttonVariants = cva(
         toolbar: "text-primary hover:text-primary-strong data-[active=true]:text-success",
         // Small clickable chips under a comment (issue, Slack, like).
         chip: "bg-foreground text-background hover:bg-secondary hover:text-primary",
+        inline: "text-muted-foreground hover:text-primary",
+        "inline-destructive": "text-muted-foreground hover:text-destructive",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        xs: "h-auto p-0 text-xs font-normal",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
         "icon-sm": "size-8",
+        "icon-xs": "h-auto p-0 text-2xs",
         "icon-lg": "size-10",
         "icon-round": "size-8 rounded-full",
         chip: "h-6 rounded-full px-2 text-xs gap-1 has-[>svg]:px-2",
