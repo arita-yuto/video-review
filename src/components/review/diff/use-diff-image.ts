@@ -23,9 +23,7 @@ const tokenRgb = (name: string): Rgb => {
     return { r, g, b };
 };
 
-// A video paused during playback can keep showing a frame past its currentTime, while the compare
-// side is seeked to exactly that time. Assigning currentTime seeks even to the same position, so
-// both end up on the frame a seek to that time lands on.
+// Assigning currentTime seeks even to the same position, so a paused primary shows the frame the compare side's seek lands on.
 const seekInPlace = (video: HTMLVideoElement) => { video.currentTime = video.currentTime; };
 
 // A VideoFrame only references the decoded frame, where createImageBitmap copies it on the page's
@@ -33,8 +31,6 @@ const seekInPlace = (video: HTMLVideoElement) => { video.currentTime = video.cur
 const grabFrame = async (video: HTMLVideoElement): Promise<VideoFrame | ImageBitmap> =>
     typeof VideoFrame === "undefined" ? createImageBitmap(video) : new VideoFrame(video);
 
-// The diff of the two frames at the paused position: decides when both frames are ready to take,
-// hands them to a diff engine, and keeps only the newest request's result.
 export function useDiffImage(
     primaryRef: RefObject<HTMLVideoElement | null>,
     compareRef: RefObject<HTMLVideoElement | null>,
