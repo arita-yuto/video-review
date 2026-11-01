@@ -14,8 +14,7 @@ export const HIGHLIGHT_MIX = 0.6;
 // Rec. 601; the GPU engine's shader gets the same weights.
 export const LUMA = { r: 0.299, g: 0.587, b: 0.114 };
 
-// Absorbs float32 error on the GPU, so a difference exactly at the threshold counts as changed
-// on both engines.
+// Absorbs float32 error on the GPU, so a difference exactly at the threshold counts as changed on both engines.
 export const THRESHOLD_SLACK = 5e-4;
 
 export type DiffFrame = VideoFrame | ImageBitmap;

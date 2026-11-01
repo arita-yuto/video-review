@@ -28,8 +28,7 @@ export function VideoItemButton({ video, children, ...props }: ButtonProps) {
     );
 }
 
-// The item with a field in place of the title, as a plain element since a field can't sit inside
-// a button.
+// The item with a field in place of the title, as a plain element since a field can't sit inside a button.
 export function VideoItemField({ video, children }: { video: VideoWithRevision; children: ReactNode }) {
     return (
         <SidebarMenuButton asChild size="auto">

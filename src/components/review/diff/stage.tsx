@@ -55,8 +55,7 @@ export function ModeTabs() {
     );
 }
 
-// Both layouts render the same two <video> elements in the same order, so switching modes
-// only restyles them and playback carries on without reloading.
+// Both layouts render the same two <video> elements in the same order, so switching modes only restyles them and playback carries on.
 export function DiffStage({ left, right, leftRef, rightRef }: {
     left: VideoRevision,
     right: VideoRevision,

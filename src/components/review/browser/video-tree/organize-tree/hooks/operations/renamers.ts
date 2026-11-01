@@ -12,8 +12,7 @@ export function isRenameShortcut(e: { key: string }): boolean {
     return e.key === "F2" || (e.key === "Enter" && isMac());
 }
 
-// How organize mode renames videos and folders: what a name may not be, where it is saved, and
-// how a refusal reads.
+// How organize mode renames videos and folders: what a name may not be, where it is saved, and how a refusal reads.
 export function useRenamers(videos: VideoWithRevision[]) {
     const t = useTranslations("video-list-panel.organize.rename");
     const renameFolderPaths = useVideoListStore((s) => s.renameFolderPaths);
@@ -56,8 +55,7 @@ export function useRenamers(videos: VideoWithRevision[]) {
             check: checkFolderName(folder, siblings),
             commit: async (name) => {
                 const to = childPath(parentPath(folder.path), name);
-                // Sibling folders are checked as the name is typed, so a 409 here means a video
-                // already in the destination, deleted ones included, has the same title.
+                // Sibling folders are checked while typing, so a 409 here means a video in the destination, deleted ones included, has the same title.
                 const refused = await save(api.videos.folders.$patch({ json: { from: folder.path, to } }), t("videoClash"));
                 if (!refused) {
                     renameFolderPaths(folder.path, to);

@@ -17,8 +17,7 @@ interface VideoListState {
     previousVisitAt: number | null;
     // The newest revision this user has opened of each video, from the server.
     seenRevisions: Record<string, number>;
-    // The admin's organize mode, which shows the list for moving and renaming instead. Not kept
-    // across reloads.
+    // The admin's organize mode, which shows the list for moving and renaming instead. Not kept across reloads.
     organizing: boolean;
     // Folders made in the mode that nothing has been moved into yet, so they exist only here.
     newFolders: string[];

@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { SidebarMenuHeader, SidebarMenuItem, SidebarMenuSub } from "@/components/ui/sidebar";
 
-// The header's height (SidebarMenuButton's default h-8), so nested headers can stick one
-// header below their parent and items can scroll clear of the stacked headers.
+// The header's height (SidebarMenuButton's h-8), so nested headers stick one header below their parent and items scroll clear of them.
 const FOLDER_HEADER_REM = 2;
 
 type Props = {

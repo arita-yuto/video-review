@@ -46,8 +46,8 @@ export function VideosTable({ actions }: { actions: ReactNode }) {
                 const rows = await res.json();
                 if (cancelled) return;
 
-                // The query asks for revisions, but the route builds the field conditionally,
-                // so the response type leaves it optional. Settle it here instead of casting.
+                // The query asks for revisions, but the route builds the field conditionally, so the response type leaves it optional.
+                // Settle it here instead of casting.
                 setVideos(rows.map(row => ({ ...row, revisions: row.revisions ?? [] })));
             } catch (e) {
                 if (!cancelled) setError(`${t("videos.loadFailed")}: ${e instanceof Error ? e.message : String(e)}`);

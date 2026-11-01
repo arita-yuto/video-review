@@ -7,8 +7,8 @@ type DragProps = Pick<
 
 // Long enough that dragging across a target on the way elsewhere doesn't count as lingering.
 const LINGER_MS = 700;
-// A drag that leaves for the button's own icon or text, or another button with the same target,
-// comes back within this time (dragover repeats about every 350 ms), so the highlight holds.
+// A drag that leaves for the button's own icon or text, or another button with the same target, comes back within this time, so the highlight holds.
+// dragover repeats about every 350 ms.
 const LEAVE_DELAY_MS = 400;
 
 type Options<Source> = {

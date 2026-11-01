@@ -1,5 +1,4 @@
-// Names an item or a folder wherever organize mode keeps track of one, such as the
-// one being renamed or those picked.
+// Names an item or a folder wherever organize mode keeps track of one, such as the one being renamed or those picked.
 export type NodeKey = `video:${string}` | `folder:${string}`;
 
 export const itemNodeKey = (id: string): NodeKey => `video:${id}`;

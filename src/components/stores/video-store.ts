@@ -29,17 +29,15 @@ export const useVideoStore = create<VideoState>((set, get) => ({
     selectedRevision: null,
     loading: false,
 
-    // When what the list shows changes (first load, search, filters): reload the list, with the
-    // loading state on screen.
+    // When what the list shows changes (first load, search, filters): reload the list, with the loading state on screen.
     async reloadOnViewChange() {
         set({ loading: true });
         const { videos, tags } = await queryVideos();
         set({ videos, loading: false, allVideoTags: tags });
     },
 
-    // When videos change on the server (upload, delete, move, rename): bring the list and the open
-    // video up to date in the background. The loading flag and the open video's objects stay as
-    // they are where nothing changed, so the player keeps playing.
+    // When videos change on the server (upload, delete, move, rename): bring the list and the open video up to date in the background.
+    // The loading flag and the open video's objects stay as they are where nothing changed, so the player keeps playing.
     async reloadOnDataChange() {
         try {
             const { videos, tags } = await queryVideos();

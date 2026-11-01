@@ -34,8 +34,8 @@ export function DrawingLayer() {
 
     useDrawingCanvas();
 
-    // Only on a real change: starting a session resets the history, and this layer
-    // remounts with the player (the comment object also churns while saving).
+    // Only on a real change: starting a session resets the history, and this layer remounts with the player.
+    // The comment object also churns while saving.
     useEffect(() => {
         if (useDrawingStore.getState().canvasEditing !== editing) setCanvasEditing(editing);
     }, [editing]);
@@ -61,8 +61,7 @@ export function DrawingLayer() {
         }
     }, [canvas, activeComments, selectedComment, comments, isPlaying, canvasEditing, canvasSize, drawings]);
 
-    // Backing store = on-screen size × device pixel ratio; both change when the window
-    // moves to another display.
+    // Backing store = on-screen size × device pixel ratio; both change when the window moves to another display.
     useEffect(() => {
         if (!video || !canvas) return;
 
@@ -81,8 +80,7 @@ export function DrawingLayer() {
         const observer = new ResizeObserver(fit);
         observer.observe(video);
 
-        // No "ratio changed" event exists: a query matching the current ratio flips
-        // when it changes, then is re-armed.
+        // No "ratio changed" event exists: a query matching the current ratio flips when it changes, then is re-armed.
         let ratioQuery: MediaQueryList | null = null;
         const watchRatio = () => {
             ratioQuery?.removeEventListener("change", onRatioChange);

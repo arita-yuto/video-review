@@ -10,8 +10,7 @@ import { CsvErrorTable, type CsvImportError } from "@/components/controls/csv-er
 
 type ImportResponse = { status: number; json: () => Promise<unknown> };
 
-// The texts live under `admin-settings.<messages>`: title, file, submit, cancel, failed, done,
-// and errors.<code> for the reasons the route adds to the shared CSV ones.
+// The texts live under `admin-settings.<messages>`: title, file, submit, cancel, failed, done, and errors.<code> for the route's own reasons.
 export function CsvImportDialog({ messages, send, onImported, onClose }: {
     messages: "users.import" | "videos.import";
     send: (csv: string) => Promise<ImportResponse>;

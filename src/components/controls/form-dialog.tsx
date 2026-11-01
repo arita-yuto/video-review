@@ -3,8 +3,7 @@ import type { ReactNode } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Button } from "@/ui/button";
 
-// The frame shared by form dialogs: a titled dialog whose body is a column of fields,
-// closed by a cancel button and one primary action.
+// The frame shared by form dialogs: a titled dialog whose body is a column of fields, closed by a cancel button and one primary action.
 export function FormDialog({ open, onClose, title, onSubmit, submitLabel, cancelLabel, destructive, submitDisabled, cancelDisabled, message, children }: {
     open: boolean;
     onClose: () => void;

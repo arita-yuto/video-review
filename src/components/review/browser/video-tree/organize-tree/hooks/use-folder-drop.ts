@@ -11,8 +11,7 @@ type Options = {
     onMoved: (folderKey: string) => void;
 };
 
-// Items and folder headers are dragged onto folder headers, the Top node, or an item,
-// which stands for the folder it is in, as in Finder.
+// Items and folder headers are dragged onto folder headers, the Top node, or an item, which stands for the folder it is in, as in Finder.
 export function useFolderDrop({ videos, reveal, onMoved }: Options) {
     const { move, emptiedMessage } = useMovers();
     // What the dialog says: a move waiting for a yes before it empties folders, or why one was refused.

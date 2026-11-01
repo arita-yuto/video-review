@@ -17,8 +17,7 @@ type Options = {
     emptyFolders?: string[];
 };
 
-// The folders of a video list and which of them are open. The browsing list shares one with the
-// thumbnail panel so both show the same videos.
+// The folders of a video list and which of them are open. The browsing list shares one with the thumbnail panel so both show the same videos.
 export function useFolderList(videos: VideoWithRevision[], { filtering = false, compact = true, emptyFolders }: Options = {}) {
     const openPaths = useVideoListStore((s) => s.openPaths);
     const closedWhileFiltering = useVideoListStore((s) => s.closedWhileFiltering);

@@ -143,8 +143,7 @@ export const useDrawingCanvas = () => {
         };
     }, [canvas, canvasEditing, commitMark, setPicking, schedulePaint]);
 
-    // Shortcuts while editing, except inside text fields where typing and the browser's
-    // own undo must keep working (the comment body is a textarea).
+    // Shortcuts while editing, except in text fields such as the comment body, where typing and the browser's undo must keep working.
     useEffect(() => {
         if (!canvasEditing) return;
 

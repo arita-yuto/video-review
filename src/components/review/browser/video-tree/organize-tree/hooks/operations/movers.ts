@@ -14,8 +14,8 @@ export type MoveRequest = { videos: { id: string; folderKey: string }[]; folders
 // The folder path for the top level, where only folders can go: videos always live in a folder.
 export const TOP = "";
 
-// The request for dropping the sources on `path`, or null to refuse the drop. The move is all or
-// nothing, so one source that can't go there refuses them all.
+// The request for dropping the sources on `path`, or null to refuse the drop.
+// The move is all or nothing, so one source that can't go there refuses them all.
 export function planMove(sources: MoveSource[], path: string): MoveRequest | null {
     const request: MoveRequest = { videos: [], folders: [] };
 
@@ -51,8 +51,7 @@ export function planMove(sources: MoveSource[], path: string): MoveRequest | nul
     return request.videos.length + request.folders.length === 0 ? null : request;
 }
 
-// The outermost folders a move leaves without a video. A folder is only a path in videos' folder
-// keys, so these leave the list.
+// The outermost folders a move leaves without a video. A folder is only a path in videos' folder keys, so these leave the list.
 export function emptiedFolders(videos: VideoWithRevision[], request: MoveRequest): string[] {
     const movedVideos = new Map(request.videos.map((v) => [v.id, v.folderKey]));
 

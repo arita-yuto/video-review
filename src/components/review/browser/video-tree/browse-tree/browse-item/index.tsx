@@ -38,11 +38,10 @@ export function BrowseItem({ video, selected, marks, onSelect }: Props) {
                             select();
                         }
                     }}
-                    // A clicked item keeps focus; opening the card on focus would leave it covering the
-                    // player after switching windows or tabbing down the list.
+                    // A clicked item keeps focus; opening the card on focus would leave it covering the player after switching windows or tabbing down the list.
                     onFocus={(e) => e.preventDefault()}
-                    // Clears the stacked sticky headers when scrolled into view. The folder's FolderSection
-                    // sets the margin; top-level items have no headers above them.
+                    // Clears the stacked sticky headers when scrolled into view.
+                    // The folder's FolderSection sets the margin; top-level items have no headers above them.
                     className="scroll-mt-(--item-scroll-margin)"
                 >
                     <VideoSummary video={video} />

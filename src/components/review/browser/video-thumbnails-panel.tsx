@@ -50,8 +50,7 @@ export default function VideoThumbnailsPanel({
         const onPointerDown = (e: PointerEvent) => {
             const target = e.target as Element | null;
             if (panelRef.current?.contains(target as Node)) return;
-            // Only the review area counts as outside: dialogs and popovers are portaled
-            // to the document root and must not dismiss the panel.
+            // Only the review area counts as outside: dialogs and popovers are portaled to the document root and must not dismiss the panel.
             if (!target?.closest('[data-slot="review-main"]')) return;
             onClose();
         };

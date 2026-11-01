@@ -17,8 +17,7 @@ type ButtonProps = ComponentProps<"button"> & {
     marks?: ReactNode;
 };
 
-// The header that opens and closes its folder. Other button props, such as key handlers, pass
-// through to the button.
+// The header that opens and closes its folder. Other button props, such as key handlers, pass through to the button.
 export function FolderHeaderButton({ names, path, open, total, marks, ...props }: ButtonProps) {
     return (
         <CollapsibleTrigger asChild>
@@ -32,8 +31,7 @@ export function FolderHeaderButton({ names, path, open, total, marks, ...props }
     );
 }
 
-// The header with a field in place of the name, as a plain element since a field can't sit
-// inside a button.
+// The header with a field in place of the name, as a plain element since a field can't sit inside a button.
 export function FolderHeaderField({ open, children }: { open: boolean; children: ReactNode }) {
     return (
         <SidebarMenuButton asChild size="auto">

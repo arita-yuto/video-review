@@ -7,8 +7,8 @@ export type WorkerResponse =
     | { id: number, unreadable: true }
     | { id: number, error: string };
 
-// A DiffEngine backed by a worker that answers through worker-host; requests and responses are
-// matched by id. The worker is created by each engine, where the bundler can see its URL.
+// A DiffEngine backed by a worker that answers through worker-host; requests and responses are matched by id.
+// The worker is created by each engine, where the bundler can see its URL.
 export const createWorkerEngine = (name: string, worker: Worker): DiffEngine => {
     const pending = new Map<number, { resolve: (image: ImageBitmap) => void, reject: (e: unknown) => void }>();
     let nextId = 0;
@@ -28,8 +28,8 @@ export const createWorkerEngine = (name: string, worker: Worker): DiffEngine => 
         else waiting.reject(new Error(res.error));
     });
 
-    // The worker answers every request, failed or not; an error event means it can't run at all,
-    // e.g. its script failed to load, and requests after it would never be answered either.
+    // The worker answers every request, failed or not;
+    // an error event means it can't run at all, e.g. its script failed to load, and requests after it would never be answered either.
     worker.addEventListener("error", (e) => {
         broken = new Error(e.message || "The diff worker failed to start.");
         for (const waiting of pending.values()) waiting.reject(broken);

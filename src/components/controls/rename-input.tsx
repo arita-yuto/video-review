@@ -16,8 +16,8 @@ type Props = {
     onCancelled: () => void;
 };
 
-// Behaves like renaming in Explorer and Finder: the whole name starts selected, Enter or clicking
-// away commits, Esc cancels, and an emptied name falls back to the old one.
+// Behaves like renaming in Explorer and Finder: the whole name starts selected, Enter or clicking away commits, Esc cancels.
+// An emptied name falls back to the old one.
 export function RenameInput({ renamer, onRenamed, onCancelled }: Props) {
     const { name } = renamer;
     const ref = useRef<HTMLInputElement>(null);
@@ -91,11 +91,9 @@ export function RenameInput({ renamer, onRenamed, onCancelled }: Props) {
                     setRefused(null);
                 }}
                 onKeyDown={(e) => {
-                    // Keeps the page's own key listeners, such as the drawing and panel shortcuts,
-                    // from reacting to typing.
+                    // Keeps the page's own key listeners, such as the drawing and panel shortcuts, from reacting to typing.
                     e.stopPropagation();
-                    // Enter and Esc also confirm and cancel an IME conversion (Safari reports
-                    // keyCode 229 instead of isComposing).
+                    // Enter and Esc also confirm and cancel an IME conversion (Safari reports keyCode 229 instead of isComposing).
                     if (e.nativeEvent.isComposing || e.keyCode === 229) {
                         return;
                     }

@@ -60,8 +60,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
     setCanvasEditing: (r) => set({ canvasEditing: r, history: initialHistory, needSave: false }),
     setCanvasRefElement: (canvas) => set({ canvasRefElement: canvas }),
     setCanvasSize: (size) => set({ canvasSize: size }),
-    // Saves the canvas as the comment's drawing and returns the comment as the server now has it,
-    // or null when nothing was saved.
+    // Saves the canvas as the comment's drawing and returns the comment as the server now has it, or null when nothing was saved.
     canvasSave: async (commentId) => {
         if (!get().needSave) {
             return null;

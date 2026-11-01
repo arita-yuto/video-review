@@ -4,8 +4,8 @@ import { useRef } from "react";
 import { FileUp } from "lucide-react";
 import { Button } from "@/ui/button";
 
-// The native file input keeps its own "Choose file" caption next to the chosen name, in the
-// browser's language. This shows only the placeholder or the chosen name.
+// The native file input keeps its own "Choose file" caption next to the chosen name, in the browser's language.
+// This shows only the placeholder or the chosen name.
 export function FilePicker({ accept, file, placeholder, onChange }: {
     accept: string;
     file: File | null;

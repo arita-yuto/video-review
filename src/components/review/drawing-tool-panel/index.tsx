@@ -14,8 +14,7 @@ import { TOOLS } from "@/lib/drawing/tools";
 import { ColorPalette } from "@/components/review/drawing-tool-panel/color-palette";
 import { ColorHistory } from "@/components/review/drawing-tool-panel/color-history";
 
-// Replaces the video list while a comment's drawing is being edited, laid out like a
-// paint app's tool palette so every brush control is one click away.
+// Replaces the video list while a drawing is edited, laid out like a paint app's palette so every brush control is one click away.
 export default function DrawingToolPanel() {
     const t = useTranslations("drawing-tool-panel");
     const settings = useDrawingSettingsStore();

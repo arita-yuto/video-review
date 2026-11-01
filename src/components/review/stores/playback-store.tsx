@@ -89,8 +89,7 @@ const createPlaybackStore = () => createStore<PlaybackState>()((set) => ({
 
 const PlaybackStoreContext = createContext<StoreApi<PlaybackState> | null>(null);
 
-// Each screen gets its own playback state, so the review page and the diff-view never
-// see each other's position or play state.
+// Each screen gets its own playback state, so the review page and the diff-view never see each other's position or play state.
 export function PlaybackStoreProvider({ children }: { children: ReactNode }) {
     const [store] = useState(createPlaybackStore);
 

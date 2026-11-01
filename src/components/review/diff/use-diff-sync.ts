@@ -3,17 +3,15 @@ import { RefObject, useEffect } from "react";
 import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 import { usePlayback, usePlaybackStoreApi } from "@/components/review/stores/playback-store";
 
-// Past this gap the compare side is sought back to the primary. Smaller gaps are left alone
-// because every forced seek makes the compare side stutter.
+// Past this gap the compare side is sought back to the primary.
+// Smaller gaps are left alone because every forced seek makes the compare side stutter.
 const DRIFT_TOLERANCE_SEC = 0.15;
 
-// Where the compare side should be for a primary position. A shorter compare revision holds
-// its last frame instead of looping or erroring.
+// Where the compare side should be for a primary position. A shorter compare revision holds its last frame instead of looping or erroring.
 export const compareTimeFor = (primaryTime: number, compareDuration: number) =>
     Number.isFinite(compareDuration) ? Math.min(primaryTime, compareDuration) : primaryTime;
 
-// The primary video is the only clock: it drives the playback store the controls read,
-// and the compare video just follows it, muted.
+// The primary video is the only clock: it drives the playback store the controls read, and the compare video just follows it, muted.
 export function useDiffSync(
     primaryRef: RefObject<HTMLVideoElement | null>,
     compareRef: RefObject<HTMLVideoElement | null>,

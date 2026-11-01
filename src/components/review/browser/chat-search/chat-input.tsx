@@ -31,8 +31,8 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        // Enter sends, Shift+Enter keeps the newline. The Enter that confirms an IME
-        // conversion reports isComposing (Safari reports keyCode 229 instead) and is ignored.
+        // Enter sends, Shift+Enter keeps the newline.
+        // The Enter that confirms an IME conversion reports isComposing (Safari reports keyCode 229 instead) and is ignored.
         if (e.nativeEvent.isComposing || e.keyCode === 229) return;
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();

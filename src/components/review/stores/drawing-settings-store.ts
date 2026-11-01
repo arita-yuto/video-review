@@ -46,8 +46,7 @@ const updateParams = ({ tool, params }: DrawingSettingsStore, change: Partial<To
     params: { ...params, [tool]: { ...params[tool], ...change } },
 });
 
-// Brush settings outlive the editing session and the page: the same pen setup should
-// be there on the next comment and after a reload.
+// Brush settings outlive the editing session and the page: the same pen setup should be there on the next comment and after a reload.
 export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
     persist(
         (set) => ({
@@ -83,8 +82,7 @@ export const useDrawingSettingsStore = create<DrawingSettingsStore>()(
         }),
         {
             name: "drawing-settings",
-            // Only what the store still has is taken from the saved copy, and a tool that did
-            // not exist when it was saved starts from its class.
+            // Only what the store still has is taken from the saved copy, and a tool that did not exist when it was saved starts from its class.
             merge: (persisted, current) => {
                 const saved = (persisted ?? {}) as Partial<DrawingSettingsStore>;
                 const merged = { ...current };

@@ -1,9 +1,7 @@
 "use client";
 import type { CSSProperties, ReactNode } from "react";
 
-// The login and bootstrap screens share this frame: a full-screen backdrop, a translucent
-// panel with a title, and one or more cards holding the fields.
-
+// The login and bootstrap screens share this frame: a full-screen backdrop, a translucent panel with a title, and one or more cards holding the fields.
 export function AuthLayout({ title, backgroundImageUrl, children }: {
     title: ReactNode;
     backgroundImageUrl?: string;

@@ -1,8 +1,8 @@
 import { DiffEngine } from "../types";
 import { createWorkerEngine } from "../worker-client";
 
-// Draws in a worker, so even a GPU emulated in software never freezes the page. Null where WebGL2
-// is missing or flagged as a major performance caveat, checked with a throwaway page context.
+// Draws in a worker, so even a GPU emulated in software never freezes the page.
+// Null where WebGL2 is missing or flagged as a major performance caveat, checked with a throwaway page context.
 export const createGpuEngine = (): DiffEngine | null => {
     if (typeof OffscreenCanvas === "undefined") return null;
 

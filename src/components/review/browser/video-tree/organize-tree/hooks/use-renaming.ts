@@ -7,15 +7,13 @@ import { isRenameShortcut, useRenamers } from "@/components/review/browser/video
 import type { NewFolders } from "@/components/review/browser/video-tree/organize-tree/hooks/use-new-folders";
 import { folderNodeKey, itemNodeKey, type NodeKey } from "@/components/review/browser/video-tree/organize-tree/node-keys";
 
-// Which node is being renamed. The field stays until `afterRename` settles, so the old name
-// doesn't flash back.
+// Which node is being renamed. The field stays until `afterRename` settles, so the old name doesn't flash back.
 export function useRenaming(videos: VideoWithRevision[], afterRename: () => Promise<unknown>) {
     const { videoRenamer, folderRenamer } = useRenamers(videos);
     const { newFolderRenamer } = useCreators(videos);
     const [renaming, setRenaming] = useState<NodeKey | null>(null);
 
-    // Closes only the rename it was given: clicking another node's pencil commits the first rename,
-    // whose save may end after the second one has opened.
+    // Closes only the rename it was given: another node's pencil commits the first rename, whose save may end after the second one opened.
     const close = (key: NodeKey) => setRenaming((current) => current === key ? null : current);
 
     const editing = (key: NodeKey) => renaming === key;

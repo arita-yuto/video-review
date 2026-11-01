@@ -5,8 +5,8 @@ import { createDiffEngine } from "./diff-engine/select-engine";
 import { isSecurityError, Rgb } from "./diff-engine/types";
 import { diffImageReducer, initialDiffImageState } from "./diff-image-state";
 
-// A compare side seeked to its target lands on it exactly; anything further off is still on the
-// way there, e.g. right after the primary moved and before the sync has sent it along.
+// A compare side seeked to its target lands on it exactly;
+// anything further off is still on the way there, e.g. right after the primary moved and before the sync has sent it along.
 const ALIGNED_SEC = 0.02;
 
 // A colour no other part of the diff-view uses, so it reads only as "changed here".
@@ -26,8 +26,8 @@ const tokenRgb = (name: string): Rgb => {
 // Assigning currentTime seeks even to the same position, so a paused primary shows the frame the compare side's seek lands on.
 const seekInPlace = (video: HTMLVideoElement) => { video.currentTime = video.currentTime; };
 
-// A VideoFrame only references the decoded frame, where createImageBitmap copies it on the page's
-// thread; the copy is the fallback for browsers without WebCodecs.
+// A VideoFrame only references the decoded frame, where createImageBitmap copies it on the page's thread;
+// the copy is the fallback for browsers without WebCodecs.
 const grabFrame = async (video: HTMLVideoElement): Promise<VideoFrame | ImageBitmap> =>
     typeof VideoFrame === "undefined" ? createImageBitmap(video) : new VideoFrame(video);
 
@@ -48,8 +48,8 @@ export function useDiffImage(
 
         const engine = createDiffEngine();
         const highlight = tokenRgb(HIGHLIGHT_TOKEN);
-        // Only the response to this request is shown. Bumping it without sending one drops
-        // every request still in flight, e.g. after the position or a revision changed.
+        // Only the response to this request is shown.
+        // Bumping it without sending one drops every request still in flight, e.g. after the position or a revision changed.
         let requestId = 0;
 
         // Bitmaps hold GPU memory until closed, so each one is released once replaced.
@@ -103,8 +103,7 @@ export function useDiffImage(
                     show(null);
                     return dispatch({ type: "refused" });
                 }
-                // The GPU failed and the CPU engine took over; the frames went with the failed
-                // request, so the same position is taken again.
+                // The GPU failed and the CPU engine took over; the frames went with the failed request, so the same position is taken again.
                 if (engine.name !== engineName) return capture();
                 dispatch({ type: "cancelled" });
                 throw e;
@@ -122,8 +121,8 @@ export function useDiffImage(
             dispatch({ type: "reset" });
         };
 
-        // From the moment a paused primary moves, the shown diff and any still being worked out belong
-        // to the old position; on a slow machine the compare side can take a while to follow.
+        // From the moment a paused primary moves, the shown diff and any still being worked out belong to the old position;
+        // on a slow machine the compare side can take a while to follow.
         const moving = () => {
             if (!primary.paused) return;
             requestId++;
