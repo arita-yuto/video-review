@@ -14,21 +14,48 @@ const storeHeight = {
         // Relative to this file, not the cwd: editors lint with a workspace folder such as src/components as cwd.
         const file = path.relative(repoRoot, context.filename).replaceAll("\\", "/");
         const rel = file.replace(/^src\//, "");
+        // A relative path is resolved to the same src-relative form as the alias, so neither spelling escapes the check.
+        const target = (source) => {
+            if (source.startsWith("@/")) {
+                return source.slice(2);
+            }
+            if (source.startsWith(".")) {
+                return path.posix.join(path.posix.dirname(rel), source);
+            }
+            return null;
+        };
+        const check = (node, source) => {
+            const resolved = target(source);
+            const match = resolved && /^components\/((?:.*\/)?)(?:stores|hooks)\//.exec(resolved);
+            if (!match) {
+                return;
+            }
+            const owner = "components/" + match[1];
+            if (rel.startsWith(owner)) {
+                return;
+            }
+            // Pages mount the screens: they may read app-wide state and the screen they mount.
+            if (rel.startsWith("app/") && (owner === "components/" || owner === "components/review/")) {
+                return;
+            }
+            context.report({ node, message: `${source} is read only from inside src/${owner}` });
+        };
         return {
             ImportDeclaration(node) {
-                const match = /^@\/components\/((?:.*\/)?)(?:stores|hooks)\//.exec(node.source.value);
-                if (!match) {
-                    return;
+                check(node, node.source.value);
+            },
+            ExportNamedDeclaration(node) {
+                if (node.source) {
+                    check(node, node.source.value);
                 }
-                const owner = "components/" + match[1];
-                if (rel.startsWith(owner)) {
-                    return;
+            },
+            ExportAllDeclaration(node) {
+                check(node, node.source.value);
+            },
+            ImportExpression(node) {
+                if (node.source.type === "Literal" && typeof node.source.value === "string") {
+                    check(node, node.source.value);
                 }
-                // Pages mount the screens: they may read app-wide state and the screen they mount.
-                if (rel.startsWith("app/") && (owner === "components/" || owner === "components/review/")) {
-                    return;
-                }
-                context.report({ node, message: `${node.source.value} is read only from inside src/${owner}` });
             },
         };
     },
