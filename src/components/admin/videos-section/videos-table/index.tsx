@@ -81,9 +81,8 @@ export function VideosTable({ actions }: { actions: ReactNode }) {
         let failure: string | null = null;
 
         try {
-            // Purging the last revision is what hides a video, so nothing here decides that. With
-            // no revision to purge, only the flag itself can take an orphan record out of the list.
-            // The route parses deleted as a string ("true" | anything else).
+            // Purging the last revision is what hides a video; with none left only the deleted flag takes the orphan out of the list.
+            // The route parses deleted as a string.
             if (target.whole && target.revisions.length === 0) {
                 const res = await api.admin.maintenance.video.delete.$post({
                     json: { videoId: target.videoId, deleted: "true" },

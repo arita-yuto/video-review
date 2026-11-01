@@ -19,7 +19,6 @@ import { VcsSection } from "@/components/admin/integration-section/vcs-section";
 import { McpSection } from "@/components/admin/integration-section/mcp-section";
 import { VideosSection } from "@/components/admin/videos-section";
 
-// Add a section by appending here. Integrations are listed under one heading.
 const SECTIONS: { key: string; label: string; integration?: boolean; Component: () => React.JSX.Element | null }[] = [
     { key: "general", label: "sections.general", Component: GeneralSection },
     { key: "users", label: "sections.users", Component: UsersSection },
@@ -46,7 +45,7 @@ export default function AdminSettingsDialog({
     const { role } = useAuthStore();
     const [section, setSection] = useState<string>(SECTIONS[0].key);
 
-    // Belt and braces: the popover gates the entry, the server gates the routes.
+    // A third check: the menu already hides the entry and the server gates the routes.
     if (!isAdmin(role)) return null;
 
     return (
