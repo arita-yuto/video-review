@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/ui/input";
 
-// What a RenameInput renames.
 export type Renamer = {
     name: string;
     // A reason the name can't be used, checked as it is typed.

@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 import { SidebarGroupContent, SidebarInput } from "@/ui/sidebar";
 
-// A sidebar text filter with a search icon inside the field.
 export function SidebarSearchInput({ value, onChange, placeholder, className }: {
     value: string;
     onChange: (value: string) => void;

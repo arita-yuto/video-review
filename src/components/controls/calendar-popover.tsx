@@ -30,8 +30,7 @@ export default function CalendarPopover({
 }: CalendarPopoverProps) {
     const { locale } = useLocale();
     const [open, setOpen] = React.useState(false);
-    // Local working range so an in-progress selection (only "from" picked) stays
-    // visible until both ends are chosen, then it is committed via onSetRange.
+    // The draft keeps a half-picked range (only from) visible until both ends are chosen, then onSetRange commits it.
     const [draft, setDraft] = React.useState<DateRange | undefined>(range);
 
     const handleOpenChange = (next: boolean) => {
