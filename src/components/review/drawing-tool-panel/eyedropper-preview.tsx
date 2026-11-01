@@ -6,11 +6,7 @@ const RING_SIZE = 96;
 const HOLE_RADIUS = 34;
 const ZOOM = 4;
 
-/**
- * What the eyedropper shows while pressed: a ring whose top half is the colour being
- * picked and bottom half the one it replaces, with the spot under the pointer
- * magnified in the hole.
- */
+// While pressed: a ring, top half the colour being picked and bottom half the one it replaces, with the spot under the pointer magnified in the hole.
 export function EyedropperPreview({ picking, video, drawing }: {
     picking: { x: number; y: number; color: string; previous: string };
     video: HTMLVideoElement | null;

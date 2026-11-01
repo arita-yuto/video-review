@@ -15,7 +15,6 @@ interface DrawingSettingsStore {
     tool: ToolId;
     /** The tool in use before the eyedropper, which hands back to it after a pick. */
     lastTool: ToolId;
-    /** The color strokes are drawn with. */
     color: string;
     /** A second slot to switch back and forth with, like a paint app's sub color. */
     subColor: string;
@@ -33,11 +32,9 @@ interface DrawingSettingsStore {
     swapColors: () => void;
     setPressureEnabled: (enabled: boolean) => void;
     setCaptureDrawing: (enabled: boolean) => void;
-    /** Set the current tool's width. */
     setWidth: (width: number) => void;
     /** Move the current tool's width to the next (+1) or previous (-1) step. */
     stepWidth: (direction: 1 | -1) => void;
-    /** Set the current tool's opacity. */
     setOpacity: (opacity: number) => void;
     /** Remember a color once a stroke has actually used it. */
     noteColorUsed: (color: string) => void;

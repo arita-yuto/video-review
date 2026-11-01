@@ -1,7 +1,6 @@
 import React from "react";
 import { ColorSwatch } from "@/components/controls/color-swatch";
 
-/** Colours used before, newest first. */
 export function ColorHistory({ colors, selected, onSelect }: {
     colors: string[];
     selected: string;

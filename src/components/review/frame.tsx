@@ -21,8 +21,7 @@ export function ReviewFrame({ children }: { children: ReactNode }) {
             <PlaybackStoreProvider>
                 <VideoListPanel />
                 {isMobile ? (
-                    // Mobile (portrait): Player stacks above comments. Tabs/filters are desktop-only.
-                    // Landscape: Only the player fits (comments hidden).
+                    // A phone stacks the player above the comments; in landscape only the player fits.
                     <div data-slot="review-main" className="w-screen h-full flex flex-col">
                         <div className="shrink-0 min-w-0 landscape:flex-1 landscape:min-h-0">
                             {children}

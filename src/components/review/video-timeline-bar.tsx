@@ -44,8 +44,6 @@ export function SeekBar({ markers, onMarkerClick }: {
                 className="w-full"
             />
 
-            {/* Clicking a marker jumps playback to that timestamp.
-                The active marker is highlighted when close to current playback time. */}
             {
                 markers.map((m) => (
                     <div
