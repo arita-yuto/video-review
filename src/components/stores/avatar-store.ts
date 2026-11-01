@@ -1,16 +1,6 @@
-/**
- * Avatar fetching is intentionally centralized in this store.
- *
- * Reasons:
- * - Avatar sources differ in nature (local URL vs external binary data).
- * - External avatars (Slack / Jira) require authenticated fetch
- *   and must be converted into object URLs on the client.
- * - The UI layer should not care about *where* the avatar comes from.
- *
- * This store acts as a resolver and cache, exposing a single `icon(email)`
- * interface to consumers.
- */
 "use client";
+
+// Resolves and caches avatars behind one icon(email).
 import { api } from "@/api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -63,23 +53,7 @@ export const useAvatarStore = create<AvatarState>()((set, get) => ({
 
         const task = (async () => {
             try {
-                /**
-                 * Fetch order is important.
-                 *
-                 * 1. Local avatar:
-                 *    - Cheap to access
-                 *    - Stable URL
-                 *    - No authentication required
-                 *    - Can be reused across sessions
-                 *
-                 * 2. Integration avatar (Slack / Jira):
-                 *    - Requires authenticated API calls
-                 *    - Returned as binary data
-                 *    - Converted to an object URL (session-scoped)
-                 *    - More expensive and less stable
-                 *
-                 * Therefore, local avatars are always preferred when available.
-                 */
+                // Local first; the integration avatar is an authenticated fetch turned into a session-scoped object URL.
                 const fetchers = [
                     () => fetchLocal(email),
                     () => fetchIntegration(email),

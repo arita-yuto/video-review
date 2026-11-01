@@ -3,9 +3,7 @@ import { persist } from "zustand/middleware";
 import { DateRange } from "react-day-picker";
 import { toDateRange } from "@/lib/utils/date-helper";
 
-// Plain, JSON-serializable filter state. Relative modes ("today"/"recent") stay
-// relative so they follow the current day; "range" holds explicit epoch bounds
-// (numbers, so no Date persistence/revive is needed).
+// Relative modes stay relative so they follow the current day; range holds epoch numbers, which persist without reviving Dates.
 export type DateFilterState = {
     mode: "none" | "today" | "recent" | "range";
     days?: number;
@@ -21,13 +19,7 @@ interface DateFilterStore extends DateFilterState {
     resolve: () => DateRange | undefined;
 }
 
-/**
- * Revives persisted filter state.
- *
- * Only relative modes survive a reload/day-change; everything else collapses to
- * "none". This drops stale absolute ranges AND legacy persisted `{from,to}`
- * objects (written before this store existed) that carry no known mode.
- */
+// Only relative modes survive a reload; a stale absolute range, or a legacy {from,to} with no mode, collapses to none.
 export function reviveDateFilter(persisted: unknown): DateFilterState {
     if (persisted && typeof persisted === "object") {
         const mode = (persisted as { mode?: unknown }).mode;
@@ -40,10 +32,7 @@ export function reviveDateFilter(persisted: unknown): DateFilterState {
     return { mode: "none" };
 }
 
-/**
- * Resolves filter state into concrete dates using the CURRENT date, so relative
- * modes always reflect "now" instead of when the option was selected.
- */
+// Resolved against the current date, so relative modes mean now, not when they were picked.
 export function resolveDateFilter(state: DateFilterState | undefined): DateRange | undefined {
     if (!state || state.mode === "none") return undefined;
 
@@ -69,14 +58,11 @@ export const createDateFilterStore = (name: string) =>
                 setRange: (from: Date, to: Date) =>
                     set({ mode: "range", from: from.getTime(), to: to.getTime(), days: undefined }),
                 clear: () => set({ mode: "none", days: undefined, from: undefined, to: undefined }),
-                // Resolve the current filter to concrete dates so callers don't
-                // reach for the pure helper themselves.
                 resolve: () => resolveDateFilter(get()),
             }),
             {
                 name,
-                // Keep the live actions from currentState; overlay only the revived
-                // (relative-or-none) filter fields so no stale range is restored.
+                // Overlays only the revived filter fields, so no stale range comes back.
                 merge: (persisted, current) => ({ ...current, ...reviveDateFilter(persisted) }),
             },
         ),
