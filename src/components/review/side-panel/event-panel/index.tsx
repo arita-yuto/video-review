@@ -6,8 +6,8 @@ import { SidebarGroup } from "@/ui/sidebar";
 import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
 import { PanelSearchActions } from "@/components/review/side-panel/panel-search-actions";
 import VideoEventContent from "@/components/review/side-panel/event-panel/content";
-import { useVideoEventSearchStore } from "@/components/review/side-panel/event-panel/stores/video-event-search-store";
-import { useVideoEventStore } from "@/components/review/side-panel/event-panel/stores/video-event-store";
+import { useVideoEventSearchStore } from "@/components/review/stores/video-event-search-store";
+import { useVideoEventStore } from "@/components/review/stores/video-event-store";
 import { useVideoStore } from "@/components/stores/video-store";
 import { VideoSidePanelDefinition } from "@/components/review/side-panel/types";
 

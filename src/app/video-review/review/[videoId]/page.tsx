@@ -3,6 +3,7 @@ import VideoReview from "@/components/review/player";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { useVideoStore } from "@/components/stores/video-store";
+import { fetchVideoEvents } from "@/components/review/stores/video-event-store";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import { api } from "@/api";
@@ -59,11 +60,10 @@ export default function VideoReviewPage() {
                 if (eventContentId) {
                     const { selectedRevision } = useVideoStore.getState();
                     if (selectedRevision) {
-                        const eventsRes = await api.videos[":id"].events.$get({
-                            param: { id: selectedRevision.videoId },
-                            query: { selectRevision: String(selectedRevision.revision) },
+                        const events = await fetchVideoEvents({
+                            videoId: selectedRevision.videoId,
+                            selectRevision: selectedRevision.revision,
                         });
-                        const events = eventsRes.status === 200 ? await eventsRes.json() : [];
                         const target = events.find((e) => e.contentId === eventContentId);
                         if (target) setTimelineTime(target.startMs / 1000);
                     }

@@ -5,11 +5,11 @@ import { useTranslations } from "next-intl";
 import { FormDialog } from "@/components/controls/form-dialog";
 import { ClearableComboBox, ClearableTextField } from "@/components/controls/clearable-fields";
 import { ControlRow } from "@/components/controls/control-row";
-import { useVideoEventSearchStore } from "@/components/review/side-panel/event-panel/stores/video-event-search-store";
+import { useVideoEventSearchStore } from "@/components/review/stores/video-event-search-store";
 import { Checkbox } from "@/ui/checkbox";
 import { useVideoStore } from "@/components/stores/video-store";
 import { api } from "@/api";
-import { useVideoEventStore } from "@/components/review/side-panel/event-panel/stores/video-event-store";
+import { useVideoEventStore } from "@/components/review/stores/video-event-store";
 
 export function VideoEventSearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     const t = useTranslations("video-event-search");

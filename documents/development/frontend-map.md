@@ -30,7 +30,7 @@ flowchart LR
 
 | Directory | Contents | May import |
 |---|---|---|
-| app | Next.js pages | components, api, lib |
+| app | Pages that read the URL and open the screen | components, api, lib |
 | app/api (Bridge) | The one file that mounts Hono in Next.js | server |
 | components | Screens, parts, stores, hooks | api, lib |
 | api | The HTTP client that talks to the server | server (types only) |
@@ -46,7 +46,7 @@ api imports only the server's route types, and only with `import type`.
 `src/components` has one directory per screen, and the parts a screen uses sit under it.  
 Stores go in `stores/` and hooks in `hooks/`; only files under the parent directory may read them.
 
-Note: pages in app may read `components/stores/` and `review/stores/`. This is the one exception.
+Pages in app turn the URL into store state and mount the screen, so they may read `components/stores/` and `review/stores/`.
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
@@ -106,18 +106,12 @@ flowchart LR
                 cedit[comment-edit-store]
                 csearch[comment-search-store]
                 vreview[video-review-store]
+                vevent[video-event-store]
+                vesearch[video-event-search-store]
             end
             subgraph browser["browser/"]
                 subgraph s2["stores/"]
                     chat[chat-search-store]
-                end
-            end
-            subgraph side["side-panel/"]
-                subgraph event["event-panel/"]
-                    subgraph s4["stores/"]
-                        vevent[video-event-store]
-                        vesearch[video-event-search-store]
-                    end
                 end
             end
         end

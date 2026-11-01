@@ -30,7 +30,7 @@ flowchart LR
 
 | ディレクトリ | 中身 | 読めるもの |
 |---|---|---|
-| app | Next.js のページ | components、api、lib |
+| app | URL を読んで画面を開くページ | components、api、lib |
 | app/api (Bridge) | Hono を Next.js に載せる 1 ファイル | server |
 | components | 画面、部品、store、hook | api、lib |
 | api | server と話す HTTP クライアント | server（型だけ） |
@@ -46,7 +46,7 @@ api は server のルートの型だけを `import type` で参照します
 `src/components` は画面ごとのディレクトリで、使う部品はその下に置きます  
 store は `stores/`、hook は `hooks/` に置き、その親ディレクトリの下にあるファイルだけが読めます
 
-※ app のページは `components/stores/` と `review/stores/` を読むことを例外的に認めています
+app のページは URL を store の状態に変えて画面を mount するので、`components/stores/` と `review/stores/` を読めます
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
@@ -106,18 +106,12 @@ flowchart LR
                 cedit[comment-edit-store]
                 csearch[comment-search-store]
                 vreview[video-review-store]
+                vevent[video-event-store]
+                vesearch[video-event-search-store]
             end
             subgraph browser["browser/"]
                 subgraph s2["stores/"]
                     chat[chat-search-store]
-                end
-            end
-            subgraph side["side-panel/"]
-                subgraph event["event-panel/"]
-                    subgraph s4["stores/"]
-                        vevent[video-event-store]
-                        vesearch[video-event-search-store]
-                    end
                 end
             end
         end

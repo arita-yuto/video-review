@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { api } from "@/api";
 import { VideoRevision, VideoEventWithKind } from "@/lib/db-types";
-import { useVideoEventSearchStore } from "@/components/review/side-panel/event-panel/stores/video-event-search-store";
+import { useVideoEventSearchStore } from "@/components/review/stores/video-event-search-store";
 
 export async function fetchVideoEvents(data: {
     videoId: string;
