@@ -35,6 +35,7 @@
   },
   "extensions": {
     "recommendations": [
+      "dbaeumer.vscode-eslint",
     ]
   }
 }
