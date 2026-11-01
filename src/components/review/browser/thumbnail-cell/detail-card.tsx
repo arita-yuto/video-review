@@ -14,7 +14,6 @@ type Props = {
     video: VideoWithRevision;
 };
 
-/** Contents of the hover card: preview on the left, facts on the right. */
 export function VideoDetailCard({ video }: Props) {
     const thumbnailUrl = useThumbnailGridStore((s) => s.urls.get(thumbnailKey(video.id)));
     const latest = video.latestRevision;

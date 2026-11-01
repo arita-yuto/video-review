@@ -42,12 +42,10 @@ export default function VideoListPanelHeader(
     const organizing = useOrganizing();
     const setOrganizing = useVideoListStore((s) => s.setOrganizing);
 
-    // Refetch when the tree text or the date filter changes.
     useEffect(() => {
         reloadOnViewChange();
     }, [filterTree, videoDate.mode, videoDate.from, videoDate.to, videoDate.days]);
 
-    // The date filter now lives in its own store, so fold it into the indicator.
     const filtering = isFiltering() || videoDate.mode !== "none";
 
     const handleClear = () => {
@@ -123,7 +121,6 @@ export default function VideoListPanelHeader(
             <ChatSearchPanel />
 
             <SidebarGroup>
-                {/* On the mobile layout the date and text filters share a row. */}
                 <div className="mobile:flex mobile:flex-wrap mobile:items-center mobile:gap-2">
                     <CalendarDateRadio
                         mode={videoDate.mode}

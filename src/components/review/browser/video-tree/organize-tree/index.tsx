@@ -22,7 +22,6 @@ import { useSelection } from "@/components/review/browser/video-tree/organize-tr
 import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 import { useVideoStore } from "@/components/stores/video-store";
 
-// The tree in organize mode: every folder as its own node, under the Top node.
 export function OrganizeTree() {
     const t = useTranslations("video-list-panel.organize");
     const { videos, reload } = useAllVideos();

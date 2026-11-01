@@ -19,9 +19,8 @@ type Options<Source> = {
     onLinger: (target: string) => void;
 };
 
-// Native drag and drop between buttons. Several buttons may share one target, which stays
-// highlighted while the drag moves among them. The source is kept here rather than in
-// dataTransfer, which can't be read during dragover to decide whether a target accepts it.
+// Native drag and drop between buttons; several buttons may share one target.
+// The source is kept here: dataTransfer can't be read during dragover to decide whether a target accepts it.
 export function useDragDrop<Source>({ accepts, onDrop, onLinger }: Options<Source>) {
     const [source, setSource] = useState<Source | null>(null);
     const [target, setTarget] = useState<string | null>(null);

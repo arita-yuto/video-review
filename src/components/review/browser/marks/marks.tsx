@@ -7,7 +7,6 @@ import { unreadCommentsMark } from "@/components/review/browser/marks/parts/unre
 // A row marks one video; a folder header marks the videos inside it.
 export type MarkScope = "video" | "folder";
 
-// One mark: when it applies to a video, and how it looks.
 export type Mark = {
     key: string;
     isShown: (video: VideoWithRevision, context: MarkContext) => boolean;
@@ -15,7 +14,6 @@ export type Mark = {
     render: (count: number, scope: MarkScope) => ReactNode;
 };
 
-// Every mark, in the order they line up.
 const MARKS: Mark[] = [newMark, unreadCommentsMark];
 
 type Props = {
@@ -24,7 +22,6 @@ type Props = {
     context: MarkContext;
 };
 
-// The right edge of a list row, where marks line up in one column across headers and rows.
 export function Marks({ videos, scope, context }: Props) {
     const shown = MARKS
         .map((mark) => ({ mark, count: videos.filter((video) => mark.isShown(video, context)).length }))

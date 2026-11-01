@@ -51,7 +51,6 @@ export default function VideoThumbnails({ videos, markContext, selectedVideoId, 
             ref={containerRef}
             className="w-full h-full flex flex-col"
         >
-            {/* Grid */}
             <div className="flex-1 overflow-auto px-3 pb-3">
                 {groups.map(([folderKey, folderVideos]) => (
                     <section key={folderKey} data-slot="thumbnail-group" className="pt-3">
@@ -88,7 +87,6 @@ export default function VideoThumbnails({ videos, markContext, selectedVideoId, 
                 ))}
             </div>
 
-            {/* Slider */}
             <div className="flex items-center gap-3 px-3 py-3 border-t bg-background">
                 <ZoomInIcon></ZoomInIcon>
                 <Slider
