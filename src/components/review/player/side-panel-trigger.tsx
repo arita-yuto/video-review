@@ -3,7 +3,6 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
 import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 
-// The right-hand counterpart of SidebarTrigger, for the side panel.
 export function SidePanelTrigger({ className }: { className?: string }) {
     const t = useTranslations("video-title");
     const sidePanelOpen = useVideoPlayerStore((s) => s.sidePanelOpen);

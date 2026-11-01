@@ -158,11 +158,11 @@ const PLAY_MODES: { mode: EPlayMode; Icon: LucideIcon }[] = [
     { mode: "next", Icon: ListVideo },
 ];
 
-// A sync session plays on the normal mode, so one screen's loop or next video does not carry everyone along.
 export function PlayModeButtons({ videoId }: { videoId: string | null }) {
     const t = useTranslations("video-control-panel");
     const syncing = useSyncing(videoId);
     const chosen = useVideoPlayerStore((s) => s.playMode);
+    // A sync session plays on the normal mode, so one screen's loop or next video does not carry everyone along.
     const playMode = syncing ? "normal" : chosen;
     const setMode = useVideoPlayerStore((s) => s.setMode);
 

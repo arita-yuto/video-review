@@ -14,11 +14,8 @@ const isTextInput = (target: EventTarget | null) => {
     return target.isContentEditable || target.matches("input, textarea, select");
 };
 
-/**
- * Runs the canvas while a comment is being edited: routes each pointer to the active
- * tool, handles the keyboard shortcuts, and repaints the base, the committed marks and
- * the tool's live mark, in that order. The committed layer is cached offscreen.
- */
+// Runs the canvas while a comment is edited: pointer input, shortcuts, and repainting.
+// The committed layer is cached offscreen.
 export const useDrawingCanvas = () => {
     const canvas = useDrawingStore((s) => s.canvasRefElement);
     const canvasEditing = useDrawingStore((s) => s.canvasEditing);

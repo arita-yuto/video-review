@@ -12,10 +12,7 @@ import { toolClass } from "@/lib/drawing/tools";
 import { EyedropperPreview } from "@/components/review/drawing-tool-panel/eyedropper-preview";
 import { cn } from "@/lib/utils";
 
-/**
- * The canvas over the video: shows the drawings of the comments at the playhead and,
- * while a comment is being edited, hands itself to the drawing hook.
- */
+// The canvas over the video: shows the comments' drawings, and hands itself to the drawing hook while a comment is edited.
 export function DrawingLayer() {
     const video = useVideoReviewStore((s) => s.videoRefElement);
     const {

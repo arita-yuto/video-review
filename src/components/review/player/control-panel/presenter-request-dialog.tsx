@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/ui/button";
 import type { Participant } from "@/components/review/stores/playback-store";
 
-// Shown to the presenter while a participant requests to take over; `onAnswer(false)` hands over.
 export function PresenterRequestDialog({ requester, onAnswer }: {
     requester: Participant;
     onAnswer: (keepPresenting: boolean) => void;
