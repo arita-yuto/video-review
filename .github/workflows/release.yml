@@ -20,8 +20,8 @@ jobs:
           - name: video-processing
             dockerfile: docker/video-processing/Dockerfile
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/build-images
+      - uses: actions/checkout@v7.0.1
+      - uses: $/.github/actions/build-images
         with:
           name: ${{ matrix.name }}
           dockerfile: ${{ matrix.dockerfile }}
@@ -33,15 +33,15 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/build-cli
+      - uses: actions/checkout@v7.0.1
+      - uses: $/.github/actions/build-cli
         with:
           package: "true"
-      - uses: ./.github/actions/build-launcher
+      - uses: $/.github/actions/build-launcher
         with:
           package: "true"
       - name: Attach the binaries to the release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        uses: softprops/action-gh-release@v3.0.3
         with:
           files: |
             maintenance/dist/*
