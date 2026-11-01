@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 
 // The settings routes, taken from the typed API client, minus the ones that aren't connections to test.
 export type IntegrationName = Exclude<keyof typeof api.admin.settings, "llm-provider" | "vcs-provider" | "mcp-guide">;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 import { AdminSection } from "@/components/admin/admin-section";
 import { Button } from "@/ui/button";
 import { Label } from "@/ui/label";

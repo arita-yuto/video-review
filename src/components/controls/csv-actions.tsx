@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Download, Upload } from "lucide-react";
-import { readError } from "@/lib/api-client";
+import { readError } from "@/api";
 import { Button } from "@/ui/button";
 import { CsvImportDialog } from "@/components/controls/csv-import-dialog";
 

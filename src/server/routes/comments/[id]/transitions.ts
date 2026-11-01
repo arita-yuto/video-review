@@ -3,7 +3,7 @@ import { createRouter } from "@/server/lib/openapi/router";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorizeComment } from "@/server/lib/videos/guest-access";
 import { issueTracker } from "@/server/lib/issue-tracker";
-import { IssueStatusSchema } from "@/server/lib/issue-tracker/tracker";
+import { IssueStatusSchema } from "@/lib/issue-types";
 import { ServerError } from "@/server/lib/server-error";
 import { broadcastComments } from "@/server/lib/video-stream";
 

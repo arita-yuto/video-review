@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { toDateRange } from "@/lib/utils/date-helper";
-import { createDateFilterStore, resolveDateFilter, reviveDateFilter } from "@/stores/date-filter-store";
+import { createDateFilterStore, resolveDateFilter, reviveDateFilter } from "@/components/stores/date-filter-store";
 
 // Expected values are derived from a fresh `new Date()` so the assertions stay
 // date-independent and mirror the resolver's own "current date" behavior.

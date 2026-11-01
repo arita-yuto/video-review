@@ -2,15 +2,15 @@
 
 import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 import { SidebarSearchInput } from "@/components/controls/sidebar-search-input";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/ui/table";
-import { DeleteConfirmDialog, type DeleteTarget } from "@/components/dialog/delete-confirm-dialog";
+import { DeleteConfirmDialog, type DeleteTarget } from "@/components/admin/videos-section/delete-confirm-dialog";
 import { VideoRow } from "@/components/admin/videos-section/videos-table/video-row";
 import { RevisionRow } from "@/components/admin/videos-section/videos-table/revision-row";
 import type { VideoWithRevisionList } from "@/lib/db-types";
 import { Spinner } from "@/ui/spinner";
-import { useVideoStore } from "@/stores/video-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 // The filter runs on the server, so wait for a pause in typing before asking again.
 const FILTER_DEBOUNCE_MS = 300;
@@ -46,8 +46,8 @@ export function VideosTable({ actions }: { actions: ReactNode }) {
                 const rows = await res.json();
                 if (cancelled) return;
 
-                // The query asks for revisions, but the route builds the field conditionally,
-                // so the response type leaves it optional. Settle it here instead of casting.
+                // The query asks for revisions, but the route builds the field conditionally, so the response type leaves it optional.
+                // Settle it here instead of casting.
                 setVideos(rows.map(row => ({ ...row, revisions: row.revisions ?? [] })));
             } catch (e) {
                 if (!cancelled) setError(`${t("videos.loadFailed")}: ${e instanceof Error ? e.message : String(e)}`);
@@ -81,9 +81,8 @@ export function VideosTable({ actions }: { actions: ReactNode }) {
         let failure: string | null = null;
 
         try {
-            // Purging the last revision is what hides a video, so nothing here decides that. With
-            // no revision to purge, only the flag itself can take an orphan record out of the list.
-            // The route parses deleted as a string ("true" | anything else).
+            // Purging the last revision is what hides a video; with none left only the deleted flag takes the orphan out of the list.
+            // The route parses deleted as a string.
             if (target.whole && target.revisions.length === 0) {
                 const res = await api.admin.maintenance.video.delete.$post({
                     json: { videoId: target.videoId, deleted: "true" },

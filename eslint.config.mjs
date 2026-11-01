@@ -1,6 +1,69 @@
 import { plugin as shadcn } from "@shadcn/lint";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const repoRoot = path.dirname(fileURLToPath(import.meta.url));
+
+// A store or hook is read only from inside the directory that holds its stores/ or hooks/ folder,
+// so state sits at the lowest height that covers every reader (see CLAUDE.md, Frontend).
+const storeHeight = {
+    meta: { type: "problem", schema: [] },
+    create(context) {
+        // Relative to this file, not the cwd: editors lint with a workspace folder such as src/components as cwd.
+        const file = path.relative(repoRoot, context.filename).replaceAll("\\", "/");
+        const rel = file.replace(/^src\//, "");
+        // A relative path is resolved to the same src-relative form as the alias, so neither spelling escapes the check.
+        const target = (source) => {
+            if (source.startsWith("@/")) {
+                return source.slice(2);
+            }
+            if (source.startsWith(".")) {
+                return path.posix.join(path.posix.dirname(rel), source);
+            }
+            return null;
+        };
+        const check = (node, source) => {
+            const resolved = target(source);
+            const match = resolved && /^components\/((?:.*\/)?)(?:stores|hooks)\//.exec(resolved);
+            if (!match) {
+                return;
+            }
+            const owner = "components/" + match[1];
+            if (rel.startsWith(owner)) {
+                return;
+            }
+            // Pages mount the screens: they may read app-wide state and the screen they mount.
+            if (rel.startsWith("app/") && (owner === "components/" || owner === "components/review/")) {
+                return;
+            }
+            context.report({ node, message: `${source} is read only from inside src/${owner}` });
+        };
+        return {
+            ImportDeclaration(node) {
+                check(node, node.source.value);
+            },
+            ExportNamedDeclaration(node) {
+                if (node.source) {
+                    check(node, node.source.value);
+                }
+            },
+            ExportAllDeclaration(node) {
+                check(node, node.source.value);
+            },
+            ImportExpression(node) {
+                if (node.source.type === "Literal" && typeof node.source.value === "string") {
+                    check(node, node.source.value);
+                }
+            },
+        };
+    },
+};
+
+const uiAliases = ["@/components/*", "@/ui/*", "@/app/*", "@/web/*"];
+const apiAliases = ["@/api", "@/api/*"];
+const serverAliases = ["@/server", "@/server/*"];
 
 export default defineConfig([
     {
@@ -9,10 +72,11 @@ export default defineConfig([
             parser: tsParser,
             parserOptions: { ecmaFeatures: { jsx: true } },
         },
-        plugins: { shadcn },
+        plugins: { shadcn, local: { rules: { "store-height": storeHeight } } },
         // Colours, spacing and shapes come from the tokens in src/styles/globals.css and the
         // wrappers in src/components/ui; a finding means a hand-written exception crept back in.
         rules: {
+            "local/store-height": "error",
             "shadcn/no-restyle": ["error", {
                 allow: ["layout", "typography"],
                 // A popover that wraps a Command list has no padding of its own.
@@ -35,6 +99,54 @@ export default defineConfig([
             "shadcn/no-inline-styles": "error",
             "shadcn/no-unknown-classes": "error",
             "shadcn/require-static-classes": "error",
+        },
+    },
+    {
+        // Layers: lib sits below the UI and never sees the server.
+        files: ["src/lib/**/*.{ts,tsx}"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: uiAliases, message: "lib does not import the UI" },
+                    { group: serverAliases, message: "lib does not import the server" },
+                ],
+            }],
+        },
+    },
+    {
+        // The client is typed by the routers; a type import leaves nothing in the bundle.
+        files: ["src/api/**/*.{ts,tsx}"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: uiAliases, message: "api does not import the UI" },
+                    { group: ["@/lib/*"], message: "api does not import lib" },
+                    { group: serverAliases, message: "api reads the server's types only", allowTypeImports: true },
+                ],
+            }],
+        },
+    },
+    {
+        // The UI talks to the server over HTTP through src/api; the Hono bridge is the one mount point.
+        files: ["src/components/**/*.{ts,tsx}", "src/app/**/*.{ts,tsx}"],
+        ignores: ["src/app/api/**"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: serverAliases, message: "the UI does not import the server" },
+                ],
+            }],
+        },
+    },
+    {
+        files: ["src/server/**/*.{ts,tsx}"],
+        rules: {
+            "no-restricted-imports": ["error", {
+                patterns: [
+                    { group: uiAliases, message: "the server does not import the UI" },
+                    { group: apiAliases, message: "the server does not import api" },
+                ],
+            }],
         },
     },
     {

@@ -1,4 +1,4 @@
-import { ReviewFrame } from "@/app/video-review/review/review-frame";
+import { ReviewFrame } from "@/components/review/frame";
 
 export default function VideoReviewLayout({
     children,

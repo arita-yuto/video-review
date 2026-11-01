@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DiffImageEvent, diffImageReducer, initialDiffImageState } from "@/components/revision-diff-view/diff-image-state";
+import { DiffImageEvent, diffImageReducer, initialDiffImageState } from "@/components/review/diff/diff-image-state";
 
 // The reducer only passes bitmaps along, so any object stands in for one.
 const imageA = { name: "A" } as unknown as ImageBitmap;

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { api, readError } from "@/lib/api-client";
-import { FormDialog } from "@/components/dialog/form-dialog";
+import { api, readError } from "@/api";
+import { FormDialog } from "@/components/controls/form-dialog";
 import type { User } from "@/lib/db-types";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";

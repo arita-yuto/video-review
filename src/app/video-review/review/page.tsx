@@ -1,7 +1,7 @@
 "use client"
-import VideoReview from "@/components/video-review";
-import { useAuthStore } from "@/stores/auth-store";
-import { useConfigStore } from "@/stores/config-store";
+import VideoReview from "@/components/review/player";
+import { useAuthStore } from "@/components/stores/auth-store";
+import { useConfigStore } from "@/components/stores/config-store";
 import { useRouter } from "next/navigation";
 import { createLoginLink } from "@/lib/url";
 import React, { useEffect } from "react";

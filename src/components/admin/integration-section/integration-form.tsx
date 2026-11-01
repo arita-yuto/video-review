@@ -17,9 +17,8 @@ export function FieldRow({ label, htmlFor, children }: { label: string; htmlFor:
     );
 }
 
-// The frame every integration screen shares: its fields scroll, and the buttons stay at the bottom.
-// Reset appears only while a saved secret locks the connection, since only then is there anything to reset.
-// submitLabel replaces "Test & save" on a screen that has no connection to test.
+// The frame every integration screen shares: fields scroll, buttons stay at the bottom.
+// Reset shows only while a saved secret locks the connection; submitLabel replaces "Test & save" where there is nothing to test.
 export function IntegrationForm({ title, settings, submitLabel, children }: {
     title: string;
     settings: ReturnType<typeof useIntegrationSettings>;

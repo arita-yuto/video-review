@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { VideoWithRevision } from "@/lib/db-types";
-import { emptiedFolders, planMove, TOP } from "@/components/video-browser/video-tree/organize-tree/hooks/operations/movers";
+import { emptiedFolders, planMove, TOP } from "@/components/review/browser/video-tree/organize-tree/hooks/operations/movers";
 
 const video = (id: string, folderKey: string) =>
     ({ id, title: id, folderKey, latestRevision: null }) as VideoWithRevision;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareTimeFor } from "@/components/revision-diff-view/use-diff-sync";
+import { compareTimeFor } from "@/components/review/diff/use-diff-sync";
 
 describe("compareTimeFor", () => {
     it("follows the primary while the compare revision still has footage", () => {

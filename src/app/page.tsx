@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/components/stores/auth-store";
 import { withRetry } from "@/lib/utils";
 import { LoadingBadge } from "@/components/controls/loading-badge";
-import { api } from "@/lib/api-client";
+import { api } from "@/api";
 
 export default function Home() {
     const router = useRouter();

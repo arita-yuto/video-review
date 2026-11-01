@@ -3,15 +3,14 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { readError } from "@/lib/api-client";
-import { FormDialog } from "@/components/dialog/form-dialog";
+import { readError } from "@/api";
+import { FormDialog } from "@/components/controls/form-dialog";
 import { FilePicker } from "@/components/controls/file-picker";
 import { CsvErrorTable, type CsvImportError } from "@/components/controls/csv-error-table";
 
 type ImportResponse = { status: number; json: () => Promise<unknown> };
 
-// The texts live under `admin-settings.<messages>`: title, file, submit, cancel, failed, done,
-// and errors.<code> for the reasons the route adds to the shared CSV ones.
+// The texts live under `admin-settings.<messages>`: title, file, submit, cancel, failed, done, and errors.<code> for the route's own reasons.
 export function CsvImportDialog({ messages, send, onImported, onClose }: {
     messages: "users.import" | "videos.import";
     send: (csv: string) => Promise<ImportResponse>;

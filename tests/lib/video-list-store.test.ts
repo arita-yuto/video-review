@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { useVideoListStore } from "@/stores/video-list-store";
+import { useVideoListStore } from "@/components/review/browser/stores/video-list-store";
 
 const at = (day: number, hour: number) => new Date(2026, 9, day, hour);
 

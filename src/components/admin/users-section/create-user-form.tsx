@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { api, readError } from "@/lib/api-client";
+import { api, readError } from "@/api";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Button } from "@/ui/button";
