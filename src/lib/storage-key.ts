@@ -14,4 +14,8 @@ export const videoRevisionKey = (videoId: string, revision: number) =>
 // The downscaled copy sits beside its source, always as .mp4.
 export const downscaledVideoKey = (key: string, width: number) => key.replace(/\.[^./]+$/, "") + `_${width}p.mp4`;
 
+// Filmstrip sheets sit beside their source too, numbered from 000.
+export const filmstripKey = (key: string, sheet: number) =>
+    key.replace(/\.[^./]+$/, "") + `_strip_${String(sheet).padStart(3, "0")}.jpg`;
+
 export const thumbnailKey = (id: string) => `thumbnails/${id}/thumb.png`;

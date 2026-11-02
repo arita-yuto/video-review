@@ -9,7 +9,8 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { z } from "zod";
 import { hash, randomBytes } from "crypto";
 import { getResolutionPresets } from "@/server/lib/integrations/general";
-import { downscaledVideoKey } from "@/lib/storage-key";
+import { downscaledVideoKey, filmstripKey } from "@/lib/storage-key";
+import { FILMSTRIP_TILES_PER_SHEET, parseFilmstrip } from "@/lib/filmstrip";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 
 const DeleteQuerySchema = z.object({
@@ -162,6 +163,14 @@ export const maintenanceRouter = createRouter()
             for (const res of await getResolutionPresets()) {
                 const derivedStorageKey = downscaledVideoKey(videoRevision.filePath, res);
                 await VideoReviewStorage.deleteObject(derivedStorageKey);
+            }
+
+            const filmstrip = parseFilmstrip(videoRevision.filmstrip);
+            if (filmstrip) {
+                const sheets = Math.ceil(filmstrip.count / FILMSTRIP_TILES_PER_SHEET);
+                for (let sheet = 0; sheet < sheets; sheet++) {
+                    await VideoReviewStorage.deleteObject(filmstripKey(videoRevision.filePath, sheet));
+                }
             }
 
             if (!ret) {

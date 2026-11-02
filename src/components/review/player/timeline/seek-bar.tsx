@@ -1,10 +1,15 @@
 "use client";
-import { useCommentStore } from "@/components/review/stores/comment-store";
 import { usePlayback } from "@/components/review/stores/playback-store";
-import { useMemo } from "react";
 import { Slider } from "@/ui/slider";
 import { cn } from "@/lib/utils";
 import { usePresenterLock } from "@/components/review/sync-session";
+import type { MouseEvent as ReactMouseEvent } from "react";
+
+// Where the pointer is along the element, 0 at its left edge and 1 at its right.
+export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+};
 
 export type SeekBarMarker = { time: number; className: string };
 
@@ -75,12 +80,3 @@ export const commentMarkers = (comments: { time: number }[], className: string):
 
     return [...byHundredth.values()].map((time) => ({ time, className }));
 };
-
-export default function VideoTimelineBar() {
-    const { displayComments } = useCommentStore();
-    // A marker is a jump request like a card click, so the player seeks and the comment list follows.
-    const setTimelineTime = usePlayback((s) => s.setTimelineTime);
-    const markers = useMemo(() => commentMarkers(displayComments, "bg-primary"), [displayComments]);
-
-    return <SeekBar markers={markers} onMarkerClick={setTimelineTime} />;
-}

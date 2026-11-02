@@ -17,8 +17,10 @@ export async function videoIdForStorageKey(key: string): Promise<string | null> 
 
     // Revision variants append "_<width>p" before the extension; match against the stored base path.
     const base = key.replace(/_\d+p(\.[^./]+)$/, "$1");
+    // Filmstrip sheets append "_strip_<n>.jpg" to the base path, whatever the source's extension was.
+    const stripBase = key.match(/^(.*)_strip_\d+\.jpg$/)?.[1];
     const revision = await prisma.videoRevision.findFirst({
-        where: { filePath: { in: [base, key] } },
+        where: stripBase ? { filePath: { startsWith: `${stripBase}.` } } : { filePath: { in: [base, key] } },
         select: { videoId: true },
     });
     if (revision) return revision.videoId;

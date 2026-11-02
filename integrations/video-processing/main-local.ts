@@ -1,4 +1,4 @@
-import { processVideo, prisma } from "./core.js";
+import { processStep, processVideo, prisma, type PendingStep } from "./core.js";
 import { JobStatus, VideoRevision } from "@prisma/client";
 
 function sleep(ms: number): Promise<void> {
@@ -14,6 +14,28 @@ export async function fetchUnprocessedVideoRevisions(limit: number): Promise<Vid
         },
         orderBy: [{ uploadedAt: "asc" }],
         take: limit,
+    });
+}
+
+// Newest revision first, since those are the ones being reviewed.
+export async function fetchPendingStep(): Promise<PendingStep | null> {
+    return prisma().videoProcessingStep.findFirst({
+        where: {
+            status: JobStatus.pending,
+            job: {
+                status: { not: JobStatus.running },
+                videoRevision: { deleted: false, video: { deleted: false } },
+            },
+        },
+        orderBy: { job: { videoRevision: { uploadedAt: "desc" } } },
+        include: {
+            job: {
+                select: {
+                    id: true,
+                    videoRevision: { select: { id: true, videoId: true, filePath: true } },
+                },
+            },
+        },
     });
 }
 
@@ -41,7 +63,15 @@ export async function runLocalWorker(): Promise<void> {
     while (!stopping) {
         const pendingVideos = await fetchUnprocessedVideoRevisions(batchSize);
         if (pendingVideos.length === 0) {
-            // console.log("No pending videos found, waiting...");
+            // One per cycle: each step downloads its whole source, and new uploads must not wait behind them.
+            const step = await fetchPendingStep();
+            if (step) {
+                try {
+                    await processStep(step);
+                } catch (error) {
+                    console.error(`Error processing step ${step.kind} for videoRevId ${step.job.videoRevision.id}:`, error);
+                }
+            }
         } else {
             let successCounter = 0;
             let failureCounter = 0;

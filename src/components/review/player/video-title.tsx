@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { formatDateTime } from "@/lib/utils";
-import { CompareButton } from "@/components/review/diff/compare-button";
+import { CompareButton } from "@/components/review/player/compare-button";
 import { SidePanelTrigger } from "@/components/review/player/side-panel-trigger";
 import { usePresenterLock } from "@/components/review/sync-session";
 

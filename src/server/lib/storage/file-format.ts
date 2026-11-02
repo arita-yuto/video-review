@@ -3,6 +3,7 @@ import "server-only";
 // Every format the server stores, with the signature and Content-Type that go with it.
 export enum FileFormat {
     Png = "png",
+    Jpeg = "jpeg",
     Mp4 = "mp4",
 }
 
@@ -18,6 +19,12 @@ const FORMATS: Record<FileFormat, Format> = {
         contentType: "image/png",
         extensions: [".png"],
         signatures: [{ offset: 0, bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] }],
+    },
+    [FileFormat.Jpeg]: {
+        kind: "image",
+        contentType: "image/jpeg",
+        extensions: [".jpg", ".jpeg"],
+        signatures: [{ offset: 0, bytes: [0xff, 0xd8, 0xff] }],
     },
     [FileFormat.Mp4]: {
         kind: "video",

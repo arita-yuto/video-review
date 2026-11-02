@@ -4,9 +4,10 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 import { spawn } from "child_process";
 import { pipeline } from "stream/promises";
-import { JobStatus, PrismaClient } from "@prisma/client";
+import { JobStatus, PrismaClient, ProcessingStepKind, type VideoProcessingStep, type VideoRevision } from "@prisma/client";
 import { DriversFactory } from "@/server/lib/storage/drivers";
-import { thumbnailKey, downscaledVideoKey } from "@/lib/storage-key";
+import { thumbnailKey, downscaledVideoKey, filmstripKey } from "@/lib/storage-key";
+import { FILMSTRIP_COLS, FILMSTRIP_TILE_WIDTH, filmstripInterval, type Filmstrip } from "@/lib/filmstrip";
 
 const FileDriver = DriversFactory();
 
@@ -15,6 +16,12 @@ type StorageKeyPath = {
     filePath: string;
 }
 
+export type StepSource = {
+    storageKey: string;
+    videoId: string;
+    videoRevId: string;
+    path: string;
+};
 
 let prismaInstance: PrismaClient | undefined = undefined;
 
@@ -57,17 +64,9 @@ function execFFmpeg(args: string[]): Promise<void> {
     });
 }
 
-function getVideoWidth(filePath: string): Promise<number> {
+function execFFprobe(args: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
-        const args = [
-            "-v", "error",
-            "-select_streams", "v:0",
-            "-show_entries", "stream=width",
-            "-of", "csv=p=0",
-            filePath,
-        ];
-
-        const proc = spawn("ffprobe", args, {
+        const proc = spawn("ffprobe", ["-v", "error", ...args], {
             stdio: ["ignore", "pipe", "pipe"],
         });
 
@@ -77,68 +76,116 @@ function getVideoWidth(filePath: string): Promise<number> {
         proc.stderr.on("data", (data) => (stderr += data.toString()));
 
         proc.on("close", (code) => {
-            if (code !== 0) {
+            if (code === 0) {
+                resolve(stdout);
+            } else {
                 reject(new Error(`ffprobe failed: ${stderr}`));
-                return;
             }
-
-            const width = parseInt(stdout.trim(), 10);
-            if (isNaN(width) || width <= 0) {
-                reject(new Error(`Invalid video width from ffprobe: ${stdout}`));
-                return;
-            }
-            resolve(width);
         });
 
         proc.on("error", reject);
     });
 }
 
+async function probeDimensions(filePath: string): Promise<{ width: number; height: number }> {
+    const out = await execFFprobe(["-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "json", filePath]);
+    const stream = JSON.parse(out).streams?.[0];
+    const width = Number(stream?.width);
+    const height = Number(stream?.height);
+    if (!(width > 0) || !(height > 0)) {
+        throw new Error(`Invalid dimensions from ffprobe: ${out}`);
+    }
+    return { width, height };
+}
+
+// Some containers (fragmented MP4) report no format duration; the video stream usually still does.
+async function probeDuration(filePath: string): Promise<number> {
+    const out = await execFFprobe(["-select_streams", "v:0", "-show_entries", "format=duration:stream=duration", "-of", "json", filePath]);
+    const parsed = JSON.parse(out);
+    const duration = Number(parsed.format?.duration) || Number(parsed.streams?.[0]?.duration);
+    if (!(duration > 0)) {
+        throw new Error(`Invalid duration from ffprobe: ${out}`);
+    }
+    return duration;
+}
+
+type FilmstripSheetFiles = { dir: string; files: StorageKeyPath[]; filmstrip: Filmstrip };
+
+async function generateFilmstrip(storageKey: string, tempMoviePath: string): Promise<FilmstripSheetFiles> {
+    const interval = filmstripInterval(await probeDuration(tempMoviePath));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "filmstrip-"));
+
+    try {
+        // Single frames first, so the count and the tile size come from real files.
+        await execFFmpeg([
+            "-y",
+            "-i", tempMoviePath,
+            "-vf", `fps=1/${interval},scale=${FILMSTRIP_TILE_WIDTH}:-2`,
+            path.join(dir, "frame_%05d.png"),
+        ]);
+
+        const frames = (await fs.promises.readdir(dir)).filter((name) => name.startsWith("frame_")).sort();
+        if (frames.length === 0) {
+            throw new Error("ffmpeg produced no frames");
+        }
+        const { width: tileWidth, height: tileHeight } = await probeDimensions(path.join(dir, frames[0]));
+
+        await execFFmpeg([
+            "-y",
+            "-i", path.join(dir, "frame_%05d.png"),
+            "-vf", `tile=${FILMSTRIP_COLS}x${FILMSTRIP_COLS}`,
+            "-q:v", "4",
+            "-start_number", "0",
+            path.join(dir, "sheet_%03d.jpg"),
+        ]);
+
+        const sheets = (await fs.promises.readdir(dir)).filter((name) => name.startsWith("sheet_")).sort();
+        const files = sheets.map((name, sheet) => ({ storageKey: filmstripKey(storageKey, sheet), filePath: path.join(dir, name) }));
+
+        return { dir, files, filmstrip: { interval, tileWidth, tileHeight, count: frames.length } };
+    } catch (e) {
+        await fs.promises.rm(dir, { recursive: true, force: true });
+        throw e;
+    }
+}
+
 export async function generateThumbnail(videoRevId: string, tempMoviePath: string): Promise<StorageKeyPath> {
     const storageKey = thumbnailKey(videoRevId);
     const tmpPngPath = path.join(os.tmpdir(), "thumb_" + uuidv4() + ".png");
 
-    try {
-        await execFFmpeg([
-            "-y",
-            "-ss", "1",
-            "-i", tempMoviePath,
-            "-frames:v", "1",
-            "-vf", "scale=480:-1",
-            tmpPngPath
-        ]);
+    await execFFmpeg([
+        "-y",
+        "-ss", "1",
+        "-i", tempMoviePath,
+        "-frames:v", "1",
+        "-vf", "scale=480:-1",
+        tmpPngPath
+    ]);
 
-        return {
-            storageKey,
-            filePath: tmpPngPath
-        };
-    } catch (e) {
-        throw e;
-    }
+    return {
+        storageKey,
+        filePath: tmpPngPath
+    };
 }
 
 export async function generateDownScaled(storageKey: string, tempMoviePath: string, width: number): Promise<StorageKeyPath> {
     const scaledStorageKey = downscaledVideoKey(storageKey, width);
     const outputTemp = path.join(os.tmpdir(), path.basename(scaledStorageKey));
 
-    try {
-        await execFFmpeg([
-            "-i", tempMoviePath,
-            "-vf", `scale=${width}:-2`,
-            // Emit 8-bit 4:2:0 explicitly for broad browser and device compatibility.
-            "-pix_fmt", "yuv420p",
-            "-f", "mp4",
-            "-movflags", "frag_keyframe+empty_moov",
-            outputTemp,
-        ]);
+    await execFFmpeg([
+        "-i", tempMoviePath,
+        "-vf", `scale=${width}:-2`,
+        // Emit 8-bit 4:2:0 explicitly for broad browser and device compatibility.
+        "-pix_fmt", "yuv420p",
+        "-f", "mp4",
+        "-movflags", "frag_keyframe+empty_moov",
+        outputTemp,
+    ]);
 
-        return {
-            storageKey: scaledStorageKey,
-            filePath: outputTemp
-        };
-    } catch (e) {
-        throw new Error("Failed to download and scale video");
-    }
+    return {
+        storageKey: scaledStorageKey,
+        filePath: outputTemp
+    };
 }
 
 async function downloadToTemp(storageKey: string): Promise<string> {
@@ -150,83 +197,150 @@ async function downloadToTemp(storageKey: string): Promise<string> {
     return tempPath;
 }
 
-export async function processVideo(storageKey: string, videoId: string, videoRevId: string): Promise<JobStatus> {
-    console.log(`Processing video at path: ${storageKey} for videoId: ${videoId}, videoRevId: ${videoRevId}`);
-    const results: StorageKeyPath[] = [];
+async function moveToStorage(file: StorageKeyPath): Promise<void> {
+    try {
+        await FileDriver!.directUploadFromFile(file.storageKey, file.filePath);
+    } finally {
+        await fs.promises.rm(file.filePath, { force: true });
+    }
+}
 
-    let filePath: string | undefined = undefined;
-    let status: JobStatus = JobStatus.failed;
+// The steps a new revision gets, in the order they run.
+export const NEW_REVISION_STEP_KINDS: ProcessingStepKind[] = [ProcessingStepKind.thumbnail, ProcessingStepKind.downscaled, ProcessingStepKind.filmstrip];
+
+const runners: Record<ProcessingStepKind, (source: StepSource) => Promise<void>> = {
+    thumbnail: async (source) => {
+        await moveToStorage(await generateThumbnail(source.videoId, source.path));
+    },
+    downscaled: async (source) => {
+        const { width: sourceWidth } = await probeDimensions(source.path);
+        for (const width of await resolutionPresets()) {
+            if (width > sourceWidth) {
+                console.log(`Skip preset ${width}p because source width is ${sourceWidth}px`);
+                continue;
+            }
+            await moveToStorage(await generateDownScaled(source.storageKey, source.path, width));
+        }
+    },
+    filmstrip: async (source) => {
+        const sheets = await generateFilmstrip(source.storageKey, source.path);
+        try {
+            for (const file of sheets.files) {
+                await moveToStorage(file);
+            }
+        } finally {
+            await fs.promises.rm(sheets.dir, { recursive: true, force: true });
+        }
+        await prisma().videoRevision.update({
+            where: { id: source.videoRevId },
+            data: { filmstrip: sheets.filmstrip },
+        });
+    },
+};
+
+async function runStep(step: Pick<VideoProcessingStep, "id" | "kind">, source: StepSource): Promise<JobStatus> {
+    await prisma().videoProcessingStep.update({
+        where: { id: step.id },
+        data: { status: JobStatus.running, error: null },
+    });
 
     try {
-        if(!FileDriver) {
-            throw new Error("No file driver configured");
-        }
-
-        try {
-            await prisma().videoProcessingJob.create({
-                data: {
-                    videoRevisionId: videoRevId,
-                    status: JobStatus.running,
-                },
-            });
-        } catch (e) {
-            throw new Error("Failed to create videoProcessingJob record: " + (e as any).message);
-        }
-        
-        try {
-            const tempPath = await downloadToTemp(storageKey);
-            filePath = tempPath;
-        } catch (e) {
-            throw new Error("Failed to download video for processing: " + (e as any).message);
-        }
-
-        if (!filePath) {
-            throw new Error("Failed to obtain file path for processing");
-        }
-
-        try {
-            const thumb = await generateThumbnail(videoId, filePath);
-            results.push(thumb);
-        } catch (e) {
-            throw new Error("Failed to generate thumbnail: " + (e as any).message);
-        }
-
-        try {
-            const sourceWidth = await getVideoWidth(filePath);
-            for (const width of await resolutionPresets()) {
-                if (width > sourceWidth) {
-                    console.log(`Skip preset ${width}p because source width is ${sourceWidth}px`);
-                    continue;
-                }
-                const scaled = await generateDownScaled(storageKey, filePath, width);
-                results.push(scaled);
-            }
-        } catch (e) {
-            throw new Error("Failed to generate downscaled video: " + (e as any).message);
-        }
-
-        for (const result of results) {
-            try {
-                await FileDriver.directUploadFromFile(result.storageKey, result.filePath);
-            } catch (e) {
-                throw new Error(`Failed to upload processed file (${result.storageKey}): ` + (e as any).message);
-            }
-        }
-
-        status = JobStatus.succeeded;
-    } finally {
-        console.log(`Finished processing video at path: ${storageKey} for videoRevId: ${videoRevId} with status: ${status}`);
-        if (filePath) {
-            try {
-                await fs.promises.unlink(filePath);
-            } catch (error: any) {}
-        }
-
-        await prisma().videoProcessingJob.update({
-            where: { videoRevisionId: videoRevId },
-            data: { status },
+        await runners[step.kind](source);
+        await prisma().videoProcessingStep.update({
+            where: { id: step.id },
+            data: { status: JobStatus.succeeded },
         });
-
-        return status;
+        return JobStatus.succeeded;
+    } catch (e) {
+        console.error(`Step ${step.kind} failed for videoRevId ${source.videoRevId}:`, e);
+        // Operators read error before deciding on a redo.
+        await prisma().videoProcessingStep.update({
+            where: { id: step.id },
+            data: { status: JobStatus.failed, error: (e as any).message },
+        });
+        return JobStatus.failed;
     }
+}
+
+// Only a failed step fails the job; skipped and still-pending steps count as done.
+async function summarizeJob(jobId: string): Promise<JobStatus> {
+    const steps = await prisma().videoProcessingStep.findMany({ where: { jobId }, select: { status: true } });
+    const status = steps.some((step) => step.status === JobStatus.failed) ? JobStatus.failed : JobStatus.succeeded;
+    await prisma().videoProcessingJob.update({ where: { id: jobId }, data: { status } });
+    return status;
+}
+
+async function withSource<T>(storageKey: string, work: (sourcePath: string) => Promise<T>): Promise<T> {
+    const sourcePath = await downloadToTemp(storageKey);
+    try {
+        return await work(sourcePath);
+    } finally {
+        await fs.promises.rm(sourcePath, { force: true });
+    }
+}
+
+export async function processVideo(storageKey: string, videoId: string, videoRevId: string): Promise<JobStatus> {
+    console.log(`Processing video at path: ${storageKey} for videoId: ${videoId}, videoRevId: ${videoRevId}`);
+    if (!FileDriver) {
+        throw new Error("No file driver configured");
+    }
+
+    const job = await prisma().videoProcessingJob.create({
+        data: {
+            videoRevisionId: videoRevId,
+            status: JobStatus.running,
+            steps: { create: NEW_REVISION_STEP_KINDS.map((kind) => ({ kind })) },
+        },
+        include: { steps: true },
+    });
+
+    let status: JobStatus;
+    try {
+        status = await withSource(storageKey, async (sourcePath) => {
+            const source: StepSource = { storageKey, videoId, videoRevId, path: sourcePath };
+            // The nested create returns the steps in no fixed order, so run them in the declared order.
+            for (const kind of NEW_REVISION_STEP_KINDS) {
+                await runStep(job.steps.find((step) => step.kind === kind)!, source);
+            }
+            return summarizeJob(job.id);
+        });
+    } catch (e) {
+        console.error(`Failed to process videoRevId ${videoRevId}:`, e);
+        // Steps still pending never ran; record the reason so the job does not stay running.
+        await prisma().videoProcessingStep.updateMany({
+            where: { jobId: job.id, status: JobStatus.pending },
+            data: { status: JobStatus.failed, error: (e as any).message },
+        });
+        status = await summarizeJob(job.id);
+    }
+
+    console.log(`Finished processing video at path: ${storageKey} for videoRevId: ${videoRevId} with status: ${status}`);
+    return status;
+}
+
+export type PendingStep = VideoProcessingStep & {
+    job: { id: string; videoRevision: Pick<VideoRevision, "id" | "videoId" | "filePath"> };
+};
+
+// Runs one step without touching the others in its job.
+export async function processStep(step: PendingStep): Promise<JobStatus> {
+    const { id: videoRevId, videoId, filePath: storageKey } = step.job.videoRevision;
+    console.log(`Processing step ${step.kind} for videoRevId: ${videoRevId}`);
+    if (!FileDriver) {
+        throw new Error("No file driver configured");
+    }
+
+    try {
+        await withSource(storageKey, async (sourcePath) => {
+            await runStep(step, { storageKey, videoId, videoRevId, path: sourcePath });
+        });
+    } catch (e) {
+        console.error(`Failed to process step ${step.kind} for videoRevId ${videoRevId}:`, e);
+        await prisma().videoProcessingStep.update({
+            where: { id: step.id },
+            data: { status: JobStatus.failed, error: (e as any).message },
+        });
+    }
+
+    return summarizeJob(step.job.id);
 }
