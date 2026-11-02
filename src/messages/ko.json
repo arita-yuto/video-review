@@ -108,9 +108,9 @@
     "chat-search": {
         "title": "채팅 검색",
         "clearHistory": "대화 지우기",
-        "emptyState": "동영상, 댓글, 이벤트에 대해 자연어로 질문할 수 있습니다",
-        "loading": "생각 중...",
-        "inputPlaceholder": "동영상에 대해 물어보세요... (Enter로 전송)",
+        "emptyState": "동영상, 댓글, 이벤트에 대해 질문",
+        "loading": "검색 중...",
+        "inputPlaceholder": "질문 입력... ({keys}로 전송)",
         "error": {
             "notConfigured": "AI가 설정되어 있지 않습니다. 관리자에게 문의해 주세요",
             "requestFailed": "AI로부터 응답을 받지 못했습니다",

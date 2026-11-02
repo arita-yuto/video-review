@@ -109,8 +109,8 @@
         "title": "Chat search",
         "clearHistory": "Clear conversation",
         "emptyState": "Ask about videos, comments and events.",
-        "loading": "Thinking...",
-        "inputPlaceholder": "Ask about the videos... (Enter to send)",
+        "loading": "Searching...",
+        "inputPlaceholder": "Ask a question ({keys} to send)",
         "error": {
             "notConfigured": "AI search is not set up. Ask an administrator.",
             "requestFailed": "No answer came back from the AI.",

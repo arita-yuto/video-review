@@ -106,11 +106,11 @@
         }
     },
     "chat-search": {
-        "title": "チャット検索",
+        "title": "Chat search",
         "clearHistory": "会話をクリア",
-        "emptyState": "動画・コメント・イベントについて自然言語で質問できます",
-        "loading": "考え中...",
-        "inputPlaceholder": "動画について聞いてみましょう...（Enter で送信）",
+        "emptyState": "動画・コメント・イベントについて質問",
+        "loading": "Searching...",
+        "inputPlaceholder": "質問を入力...（{keys} で送信）",
         "error": {
             "notConfigured": "AI が設定されていません。管理者に確認してください",
             "requestFailed": "AI から応答を得られませんでした",
