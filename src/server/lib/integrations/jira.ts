@@ -99,11 +99,6 @@ export async function searchJiraAccount(deployment: JiraDeployment, base: string
     return first.success ? first.data[0] : undefined;
 }
 
-// Jira's own id for an account: the key on Data Center, the accountId on Cloud.
-export function jiraAccountId(deployment: JiraDeployment, account: JiraAccount) {
-    return deployment === "cloud" ? account.accountId : account.key;
-}
-
 // For the comment menu; neither value is a secret.
 export async function getJiraIssueTypes() {
     return {

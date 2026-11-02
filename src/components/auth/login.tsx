@@ -76,8 +76,6 @@ export default function Login() {
         switch (type) {
             case "password":
                 return api.auth.login.password.$post({ json: { email: email ?? "", password } });
-            case "jira":
-                return api.auth.login.jira.$post({ json: { email: email ?? "" } });
             default:
                 return api.auth.login.guest.$post({ json: { displayName } });
         }
@@ -105,7 +103,6 @@ export default function Login() {
                 <Tabs value={type} onValueChange={(val) => setType(val as LoginType)}>
                     <TabsList>
                         {loginMethods?.includes("guest") && <TabsTrigger value="guest">Guest</TabsTrigger>}
-                        {loginMethods?.includes("jira") && <TabsTrigger value="jira">JIRA</TabsTrigger>}
                         {loginMethods?.includes("password") && <TabsTrigger value="password">Email & Password</TabsTrigger>}
                         {loginMethods?.includes("oidc") && <TabsTrigger value="oidc">SSO</TabsTrigger>}
                     </TabsList>
@@ -119,21 +116,6 @@ export default function Login() {
                                         type="text"
                                         value={displayName ?? ""}
                                         onChange={(x) => setDisplayName(x.target.value)} />
-                                </div>
-                                <ButtonLogin exec={handleLogin} title={t("ok")} />
-                            </AuthCard>
-                        </TabsContent>
-                    )}
-                    {loginMethods?.includes("jira") && (
-                        <TabsContent value="jira">
-                            <AuthCard>
-                                <div className="h-8"></div>
-                                <div className="grid gap-3 mb-4">
-                                    <Label htmlFor="email">{t("email")}</Label>
-                                    <Input id="email"
-                                        type="email"
-                                        value={email ?? ""}
-                                        onChange={(x) => setEmail(x.target.value)} />
                                 </div>
                                 <ButtonLogin exec={handleLogin} title={t("ok")} />
                             </AuthCard>

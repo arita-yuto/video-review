@@ -180,7 +180,7 @@ export default function EditUserProfileDialog({
                             onChange={(x) => setEditDisplayName(x.target.value)} />
                     </div>
 
-                    {/* Only a password session can change a password; jira/guest have no password identity. */}
+                    {/* Only a password session can change a password; guest and SSO sessions have no password identity. */}
                     {provider === "password" && (
                         <>
                             <Separator className="w-full" />
