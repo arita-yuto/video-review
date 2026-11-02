@@ -4,9 +4,15 @@
 @custom-variant dark (&:is(.dark *));
 /* Inside an element that is fullscreen (the player). */
 @custom-variant fullscreen (&:where(:fullscreen *));
-/* Below the sidebar breakpoint, or a phone held sideways: the same test as useIsMobile. */
+/* Below Tailwind's md, or a phone held sideways: the same test as useIsMobile. */
 @custom-variant mobile {
   @media (max-width: 767px), ((pointer: coarse) and (max-height: 767px)) {
+    @slot;
+  }
+}
+/* Where the video list is a sheet instead of a column: the same test as useIsNarrow. */
+@custom-variant narrow {
+  @media (max-width: 1151px) {
     @slot;
   }
 }
@@ -58,6 +64,9 @@
   --color-card: var(--card);
   --color-primary-strong: var(--primary-strong);
   --shadow-panel: 0 8px 30px rgb(0 0 0 / 0.4);
+  /* The side panel: a readable minimum and a cap so its cards never stretch; in between it takes 27% of the review area. */
+  --container-side-panel-min: 20rem;
+  --container-side-panel-max: 30rem;
   /* Badge and chip text below Tailwind's xs. */
   --text-2xs: 0.625rem;
   --text-3xs: 0.5rem;
@@ -158,21 +167,20 @@
   max-width: calc(100vw - var(--panel-offset, 0px));
 }
 
-/* Player on the left, side panel on the right.
-   The panel keeps its width while it slides, so its contents don't squeeze. */
+/* Player on the left, side panel on the right. The panel keeps its width while it slides, so its contents don't squeeze. */
 @utility review-columns {
-  grid-template-columns: 73% 27%;
+  grid-template-columns: 1fr clamp(var(--container-side-panel-min), 27%, var(--container-side-panel-max));
   transition: grid-template-columns 200ms linear;
 }
 
 @utility review-columns-closed {
-  grid-template-columns: 100% 0%;
+  grid-template-columns: 1fr 0;
   transition: grid-template-columns 200ms linear;
 }
 
-/* 27% of review-main, the @container around it, which the open video list narrows. */
+/* Matches the open column: 27cqw of review-main (the @container) is the column's 27%. */
 @utility side-panel-width {
-  width: 27cqw;
+  width: clamp(var(--container-side-panel-min), 27cqw, var(--container-side-panel-max));
 }
 
 /* The video is sized against the stage's box (cqw/cqh in video-fit), not the viewport. */
