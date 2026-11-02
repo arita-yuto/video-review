@@ -126,7 +126,23 @@ model VideoProcessingJob {
   createdAt       DateTime @default(now())
 
   videoRevision VideoRevision @relation(fields: [videoRevisionId], references: [id], onDelete: Cascade)
+  steps         VideoProcessingStep[]
 
+  @@index([status])
+}
+
+// One row per artifact of a job, so one can fail, be redone or be skipped without the others.
+model VideoProcessingStep {
+  id        String             @id @default(uuid())
+  jobId     String
+  kind      ProcessingStepKind
+  status    JobStatus          @default(pending)
+  error     String?
+  updatedAt DateTime           @updatedAt
+
+  job VideoProcessingJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, kind])
   @@index([status])
 }
 
@@ -211,6 +227,13 @@ enum JobStatus {
   running
   succeeded
   failed
+  skipped
+}
+
+enum ProcessingStepKind {
+  thumbnail
+  downscaled
+  filmstrip
 }
 
 model VCSConfig {
