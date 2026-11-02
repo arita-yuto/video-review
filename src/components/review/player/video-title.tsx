@@ -65,7 +65,7 @@ export default function VideoTitle() {
         <div className="py-1 px-2 mb-2 flex items-center justify-between immersive:absolute immersive:inset-x-0 immersive:top-0 immersive:z-10 immersive:mb-0 immersive:bg-background transition-opacity duration-300 immersive:idle:opacity-0 immersive:idle:pointer-events-none">
             <div className="min-w-0">
                 <div className="flex items-center justify-between">
-                    <h2 className="flex items-center gap-1 px-2 min-w-0 text-lg font-semibold tracking-wide">
+                    <h2 className="flex flex-1 items-center gap-1 px-2 min-w-0 text-lg font-semibold tracking-wide">
                         {/* Hidden in fullscreen: these open things outside the player. */}
                         <SidebarTrigger className="-ml-1 fullscreen:hidden" />
                         <Separator

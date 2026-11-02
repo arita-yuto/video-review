@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
 
-import { useIsMobile } from "@/lib/hooks/use-mobile"
+import { useIsNarrow } from "@/lib/hooks/use-mobile"
 import { cn } from "@/lib/utils/index"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -66,7 +66,8 @@ function SidebarProvider({
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
-  const isMobile = useIsMobile()
+  // shadcn's name; here it means narrow, where a column would squeeze the player.
+  const isMobile = useIsNarrow()
   const [openMobile, setOpenMobile] = React.useState(false)
 
   // This is the internal state of the sidebar.
@@ -206,12 +207,10 @@ function Sidebar({
     )
   }
 
-  // Using `max-md:hidden` prevents the desktop sidebar from disappearing 
-  // when page-injected CSS from extensions like DeepL messes with our 
-  // display logic. It avoids the race condition you get with `hidden md:block`.
+  // Visible by default and hidden only under the media query, so CSS injected by extensions such as DeepL cannot blank the desktop sidebar.
   return (
     <div
-      className="group peer text-sidebar-foreground max-md:hidden md:block"
+      className="group peer text-sidebar-foreground narrow:hidden block"
       data-state={state}
       data-collapsible={state === "collapsed" ? collapsible : ""}
       data-variant={variant}
@@ -233,7 +232,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 max-md:hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed inset-y-0 z-10 narrow:hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",

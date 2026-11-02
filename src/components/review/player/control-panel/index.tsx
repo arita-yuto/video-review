@@ -35,7 +35,7 @@ export default function VideoControlPanel() {
         // Anchored to the whole bar so the settings open above its right end, not above the gear.
         <Popover>
             <PopoverAnchor asChild>
-                <div className="flex items-center gap-3 mb-3 bg-card rounded-lg px-3 py-2 border">
+                <div className="flex flex-wrap items-center gap-3 mb-3 bg-card rounded-lg px-3 py-2 border">
                     <PlayButton />
                     {/* The mobile row has no room for the rest, and a phone has hardware volume. */}
                     {!isMobile && <VolumeControl />}
