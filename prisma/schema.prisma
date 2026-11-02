@@ -84,6 +84,7 @@ model VideoRevision {
   deleted        Boolean  @default(false)
   tags           String[] @default([])
   summary        String?
+  filmstrip      Json?
   latestForVideo Video?   @relation("VideoLatestRevision")
 
   processingJob VideoProcessingJob?
