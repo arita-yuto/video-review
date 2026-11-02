@@ -1,10 +1,9 @@
 # Jira
 
-Jira に接続すると、次の 3 つが使えます
+Jira に接続すると、次のことができます
 
 - コメントから Jira の issue を作る、または既存の issue を結びつける
 - issue のステータスをコメントから見る・変える
-- Jira のメールアドレスでログインする（ログイン画面の JIRA タブ）
 
 <img src="https://github.com/user-attachments/assets/c14c6896-8e6a-416c-a44f-b94e823f17a7" />
 
@@ -55,10 +54,3 @@ Task と Bug の issue type を設定していると、それぞれの種類で�
 コメントのメニューの Change status で issue ステータスを更新も可能です
 
 <img  src="https://github.com/user-attachments/assets/aab3530d-ad58-411a-99ec-475c1a091f9f" />
-
-### Jira のメールアドレスでログインする
-
-ログイン画面の JIRA タブで、Jira に登録しているメールアドレスを入力します  
-Jira にそのユーザーがいれば、VideoReview のユーザーが自動で作られてログインします
-
-

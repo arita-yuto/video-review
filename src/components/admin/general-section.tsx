@@ -10,7 +10,6 @@ import { useIntegrationSettings } from "@/components/admin/integration-section/u
 // The login tabs keep their English names on the login screen, so they do here too.
 const LOGIN_TYPES = [
     { value: "guest", label: "Guest" },
-    { value: "jira", label: "JIRA" },
     { value: "password", label: "Email & Password" },
     { value: "oidc", label: "SSO" },
 ];

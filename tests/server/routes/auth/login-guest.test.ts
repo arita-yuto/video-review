@@ -9,7 +9,6 @@ const generalMock = vi.hoisted(() => ({
 const loginMock = vi.hoisted(() => ({
     loginUser: vi.fn(),
     loginAsGuest: vi.fn(),
-    loginWithJira: vi.fn(),
 }));
 
 vi.mock("@/server/lib/integrations/general", () => generalMock);

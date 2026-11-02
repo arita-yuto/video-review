@@ -10,7 +10,7 @@
 | 項目 | 内容 | 既定値 |
 |---|---|---|
 | Guest ログイン | オンにするとログイン画面に Guest タブが出て、誰でも Guest としてログインできる | オフ |
-| ログイン画面の既定タブ | ログイン画面が最初に開くタブ（Guest / JIRA / Email & Password / SSO） | Guest（Guest ログインがオフなら Email & Password） |
+| ログイン画面の既定タブ | ログイン画面が最初に開くタブ（Guest / Email & Password / SSO） | Guest（Guest ログインがオフなら Email & Password） |
 | URL scheme | 動画の Open Scene ボタンが開くリンク（`{scenePath}` が動画のシーンのパスに置き換わる）、空にするとボタンが出ない | `videoreview://open?scene={scenePath}`（同梱の launcher が登録するもの） |
 | Resolution presets | 動画処理が作る縮小版の幅をピクセルでカンマ区切りに書く（例 `480,720,1080`）、空なら縮小版を作らない | 空 |
 | Upload chunk (MB) | 動画アップロードの 1 チャンクの大きさ、サーバーの前のプロキシがこの大きさを拒否するときに下げる | 16 |

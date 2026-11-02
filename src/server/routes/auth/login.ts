@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
-import { loginUser, loginAsGuest, loginWithJira } from "@/server/lib/login";
+import { loginUser, loginAsGuest } from "@/server/lib/login";
 import { ServerError } from "@/server/lib/server-error";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { setAuthCookie } from "@/server/lib/set-auth-cookie";
@@ -14,10 +14,6 @@ const loginUserSchema = z.object({
 
 const loginGuestSchema = z.object({
     displayName: z.string().min(1),
-});
-
-const loginJIRASchema = z.object({
-    email: z.email(),
 });
 
 const LoginResponseSchema = z.object({
@@ -121,53 +117,6 @@ export const loginRouter = createRouter()
         } catch(e) {
             if (e instanceof ServerError) {
                 return c.json({ error: e.message }, e.status as 400 | 401 | 500);
-            } else {
-                return c.json({ error: "failed to login" }, 500);
-            }
-        }
-    })
-    .openapi(createRoute({
-        method: "post",
-        summary: "Login with Jira",
-        description: "Logs in a user with Jira credentials.",
-        path: "/jira",
-        request: {
-            body: {
-                content: {
-                    "application/json": {
-                        schema: loginJIRASchema,
-                    },
-                },
-                required: true,
-            },
-        },
-        responses: {
-            200: {
-                description: "login successful",
-                content: {
-                    "application/json": {
-                        schema: LoginResponseSchema,
-                    },
-                },
-            },
-            400: errorResponse("Invalid parameters"),
-            401: errorResponse("Unauthorized"),
-            403: errorResponse("The account is disabled"),
-            500: errorResponse("Login failed"),
-        },
-    }), async (c) => {
-        try{
-            const body = c.req.valid("json");
-            const response = await loginWithJira({
-                ...body,
-                displayName: "",
-                password: "",
-            });
-            setAuthCookie(c, response.token);
-            return c.json(response, 200);
-        } catch(e) {
-            if (e instanceof ServerError) {
-                return c.json({ error: e.message }, e.status as 400 | 401 | 403 | 500);
             } else {
                 return c.json({ error: "failed to login" }, 500);
             }

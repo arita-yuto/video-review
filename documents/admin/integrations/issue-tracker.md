@@ -1,10 +1,9 @@
 # Jira
 
-Connecting to Jira gives you three things:
+Connecting to Jira lets you:
 
 - Create Jira issues from comments, or link a comment to an existing issue
 - See and change the status of an issue from its comment
-- Log in with a Jira email address (the JIRA tab on the login screen)
 
 <img src="https://github.com/user-attachments/assets/c14c6896-8e6a-416c-a44f-b94e823f17a7" />
 
@@ -54,8 +53,3 @@ A comment's issue carries a status icon.
 Change status in the comment's menu updates the issue's status.
 
 <img src="https://github.com/user-attachments/assets/aab3530d-ad58-411a-99ec-475c1a091f9f" />
-
-### Log in with a Jira email address
-
-On the JIRA tab of the login screen, enter the email address registered in Jira.
-If Jira has that user, a VideoReview user is created and logged in.

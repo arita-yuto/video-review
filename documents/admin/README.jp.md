@@ -39,7 +39,7 @@ Administration は admin にだけ表示されます
 | General | Guest ログイン、ログイン画面の既定タブ、URL scheme、解像度プリセット、アップロードのチャンクサイズ | [general.jp.md](general.jp.md) |
 | Users | ユーザーの一覧、作成、role の変更 | [users.jp.md](users.jp.md) |
 | Videos | 動画の一覧と、動画やリビジョンの削除 | [videos.jp.md](videos.jp.md) |
-| Jira | Jira への接続、コメントからの issue 作成、Jira ログイン | [integrations/issue-tracker.jp.md](integrations/issue-tracker.jp.md) |
+| Jira | Jira への接続、コメントからの issue 作成 | [integrations/issue-tracker.jp.md](integrations/issue-tracker.jp.md) |
 | SSO (OIDC) | OneLogin などの IdP との接続と、SSO ログイン | [integrations/sso.jp.md](integrations/sso.jp.md) |
 | Slack / Webhook / Email | コメントの通知先 | [integrations/notify.jp.md](integrations/notify.jp.md) |
 | AI / MCP | LLM プロバイダー、チャット検索、AI エージェント | [AI 機能ガイド](../build.run/ai-guide.jp.md) |
