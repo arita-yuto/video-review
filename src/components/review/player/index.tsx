@@ -5,7 +5,6 @@ import { usePlayback } from "@/components/review/stores/playback-store";
 import { Timeline } from "@/components/review/player/timeline";
 import { EPlayMode, useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 import VideoControlPanel from "@/components/review/player/control-panel";
-import { Filmstrip } from "@/components/review/player/filmstrip";
 import { useCommentStore } from "@/components/review/stores/comment-store";
 import { useVideoStore } from "@/components/stores/video-store";
 import VideoTitle from "@/components/review/player/video-title";
@@ -443,7 +442,6 @@ export default function VideoReview() {
                                 {/* Overlaid so the picture can fill the player. */}
                                 <div ref={controlsRef} className="immersive:absolute immersive:inset-x-0 immersive:bottom-0 immersive:px-2 transition-opacity duration-300 immersive:idle:opacity-0 immersive:idle:pointer-events-none">
                                     <Timeline />
-                                    <Filmstrip />
                                     <VideoControlPanel />
                                 </div>
                             </>

@@ -42,3 +42,7 @@ export function filmstripTile(index: number): { sheet: number; col: number; row:
         row: Math.floor(inSheet / FILMSTRIP_COLS),
     };
 }
+
+export function filmstripIndexAt(strip: Filmstrip, time: number): number {
+    return Math.min(strip.count - 1, Math.max(0, Math.floor(time / strip.interval)));
+}

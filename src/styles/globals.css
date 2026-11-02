@@ -192,6 +192,12 @@
   background-repeat: no-repeat;
 }
 
+/* Centred on the hovered point (--hover, 0 to 1) and kept inside the timeline. */
+@utility frame-preview {
+  width: 10rem;
+  left: clamp(0px, calc(var(--hover) * 100% - 5rem), calc(100% - 10rem));
+}
+
 /* The video is sized against the stage's box (cqw/cqh in video-fit), not the viewport. */
 @utility video-stage {
   container-type: size;
