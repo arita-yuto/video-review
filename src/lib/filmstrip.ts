@@ -17,7 +17,7 @@ export function filmstripInterval(duration: number): number {
     return Math.max(1, Math.ceil(duration / targetTiles));
 }
 
-// The column also records a failed attempt as { error }, which reads as "no filmstrip".
+// The column is null until the worker's filmstrip step has run; anything else must be the full record.
 export function parseFilmstrip(value: unknown): Filmstrip | null {
     if (!value || typeof value !== "object") {
         return null;

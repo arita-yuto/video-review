@@ -6,7 +6,8 @@ import { spawn } from "child_process";
 import { pipeline } from "stream/promises";
 import { JobStatus, PrismaClient, ProcessingStepKind, type VideoProcessingStep, type VideoRevision } from "@prisma/client";
 import { DriversFactory } from "@/server/lib/storage/drivers";
-import { thumbnailKey, downscaledVideoKey } from "@/lib/storage-key";
+import { thumbnailKey, downscaledVideoKey, filmstripKey } from "@/lib/storage-key";
+import { FILMSTRIP_COLS, FILMSTRIP_TILE_WIDTH, filmstripInterval, type Filmstrip } from "@/lib/filmstrip";
 
 const FileDriver = DriversFactory();
 
@@ -63,17 +64,9 @@ function execFFmpeg(args: string[]): Promise<void> {
     });
 }
 
-function getVideoWidth(filePath: string): Promise<number> {
+function execFFprobe(args: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
-        const args = [
-            "-v", "error",
-            "-select_streams", "v:0",
-            "-show_entries", "stream=width",
-            "-of", "csv=p=0",
-            filePath,
-        ];
-
-        const proc = spawn("ffprobe", args, {
+        const proc = spawn("ffprobe", ["-v", "error", ...args], {
             stdio: ["ignore", "pipe", "pipe"],
         });
 
@@ -83,21 +76,77 @@ function getVideoWidth(filePath: string): Promise<number> {
         proc.stderr.on("data", (data) => (stderr += data.toString()));
 
         proc.on("close", (code) => {
-            if (code !== 0) {
+            if (code === 0) {
+                resolve(stdout);
+            } else {
                 reject(new Error(`ffprobe failed: ${stderr}`));
-                return;
             }
-
-            const width = parseInt(stdout.trim(), 10);
-            if (isNaN(width) || width <= 0) {
-                reject(new Error(`Invalid video width from ffprobe: ${stdout}`));
-                return;
-            }
-            resolve(width);
         });
 
         proc.on("error", reject);
     });
+}
+
+async function probeDimensions(filePath: string): Promise<{ width: number; height: number }> {
+    const out = await execFFprobe(["-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "json", filePath]);
+    const stream = JSON.parse(out).streams?.[0];
+    const width = Number(stream?.width);
+    const height = Number(stream?.height);
+    if (!(width > 0) || !(height > 0)) {
+        throw new Error(`Invalid dimensions from ffprobe: ${out}`);
+    }
+    return { width, height };
+}
+
+// Some containers (fragmented MP4) report no format duration; the video stream usually still does.
+async function probeDuration(filePath: string): Promise<number> {
+    const out = await execFFprobe(["-select_streams", "v:0", "-show_entries", "format=duration:stream=duration", "-of", "json", filePath]);
+    const parsed = JSON.parse(out);
+    const duration = Number(parsed.format?.duration) || Number(parsed.streams?.[0]?.duration);
+    if (!(duration > 0)) {
+        throw new Error(`Invalid duration from ffprobe: ${out}`);
+    }
+    return duration;
+}
+
+type FilmstripSheetFiles = { dir: string; files: StorageKeyPath[]; filmstrip: Filmstrip };
+
+async function generateFilmstrip(storageKey: string, tempMoviePath: string): Promise<FilmstripSheetFiles> {
+    const interval = filmstripInterval(await probeDuration(tempMoviePath));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "filmstrip-"));
+
+    try {
+        // Single frames first, so the count and the tile size come from real files.
+        await execFFmpeg([
+            "-y",
+            "-i", tempMoviePath,
+            "-vf", `fps=1/${interval},scale=${FILMSTRIP_TILE_WIDTH}:-2`,
+            path.join(dir, "frame_%05d.png"),
+        ]);
+
+        const frames = (await fs.promises.readdir(dir)).filter((name) => name.startsWith("frame_")).sort();
+        if (frames.length === 0) {
+            throw new Error("ffmpeg produced no frames");
+        }
+        const { width: tileWidth, height: tileHeight } = await probeDimensions(path.join(dir, frames[0]));
+
+        await execFFmpeg([
+            "-y",
+            "-i", path.join(dir, "frame_%05d.png"),
+            "-vf", `tile=${FILMSTRIP_COLS}x${FILMSTRIP_COLS}`,
+            "-q:v", "4",
+            "-start_number", "0",
+            path.join(dir, "sheet_%03d.jpg"),
+        ]);
+
+        const sheets = (await fs.promises.readdir(dir)).filter((name) => name.startsWith("sheet_")).sort();
+        const files = sheets.map((name, sheet) => ({ storageKey: filmstripKey(storageKey, sheet), filePath: path.join(dir, name) }));
+
+        return { dir, files, filmstrip: { interval, tileWidth, tileHeight, count: frames.length } };
+    } catch (e) {
+        await fs.promises.rm(dir, { recursive: true, force: true });
+        throw e;
+    }
 }
 
 export async function generateThumbnail(videoRevId: string, tempMoviePath: string): Promise<StorageKeyPath> {
@@ -157,14 +206,14 @@ async function moveToStorage(file: StorageKeyPath): Promise<void> {
 }
 
 // The steps a new revision gets, in the order they run.
-export const NEW_REVISION_STEP_KINDS: ProcessingStepKind[] = [ProcessingStepKind.thumbnail, ProcessingStepKind.downscaled];
+export const NEW_REVISION_STEP_KINDS: ProcessingStepKind[] = [ProcessingStepKind.thumbnail, ProcessingStepKind.downscaled, ProcessingStepKind.filmstrip];
 
 const runners: Record<ProcessingStepKind, (source: StepSource) => Promise<void>> = {
     thumbnail: async (source) => {
         await moveToStorage(await generateThumbnail(source.videoId, source.path));
     },
     downscaled: async (source) => {
-        const sourceWidth = await getVideoWidth(source.path);
+        const { width: sourceWidth } = await probeDimensions(source.path);
         for (const width of await resolutionPresets()) {
             if (width > sourceWidth) {
                 console.log(`Skip preset ${width}p because source width is ${sourceWidth}px`);
@@ -173,8 +222,19 @@ const runners: Record<ProcessingStepKind, (source: StepSource) => Promise<void>>
             await moveToStorage(await generateDownScaled(source.storageKey, source.path, width));
         }
     },
-    filmstrip: async () => {
-        throw new Error("This worker does not produce filmstrips");
+    filmstrip: async (source) => {
+        const sheets = await generateFilmstrip(source.storageKey, source.path);
+        try {
+            for (const file of sheets.files) {
+                await moveToStorage(file);
+            }
+        } finally {
+            await fs.promises.rm(sheets.dir, { recursive: true, force: true });
+        }
+        await prisma().videoRevision.update({
+            where: { id: source.videoRevId },
+            data: { filmstrip: sheets.filmstrip },
+        });
     },
 };
 

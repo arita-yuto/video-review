@@ -7,8 +7,7 @@ describe("parseFilmstrip", () => {
         expect(parseFilmstrip(stored)).toEqual(stored);
     });
 
-    it("reads a recorded failure and a missing field as no filmstrip", () => {
-        expect(parseFilmstrip({ error: "ffmpeg failed" })).toBeNull();
+    it("reads a missing field or no value as no filmstrip", () => {
         expect(parseFilmstrip({ interval: 4, tileWidth: 160, tileHeight: 90 })).toBeNull();
         expect(parseFilmstrip(null)).toBeNull();
     });
