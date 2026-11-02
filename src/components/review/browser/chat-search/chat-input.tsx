@@ -5,6 +5,7 @@ import { SendHorizontal } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
 import { Textarea } from "@/ui/textarea";
+import { useIsMac } from "@/lib/platform";
 
 interface ChatInputProps {
     onSend: (message: string) => void;
@@ -15,6 +16,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     const t = useTranslations("chat-search");
     const [value, setValue] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const mac = useIsMac();
 
     useEffect(() => {
         if (!disabled && textareaRef.current) {
@@ -30,14 +32,15 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         if (textareaRef.current) textareaRef.current.style.height = "auto";
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        // Enter sends, Shift+Enter keeps the newline.
-        // The Enter that confirms an IME conversion reports isComposing (Safari reports keyCode 229 instead) and is ignored.
-        if (e.nativeEvent.isComposing || e.keyCode === 229) return;
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
+    // Enter alone stays a new line, and an Enter that confirms the IME conversion is left to it.
+    const sendOnShortcut = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        const modifier = mac ? e.metaKey : e.ctrlKey;
+        if (e.key !== "Enter" || !modifier || e.nativeEvent.isComposing) {
+            return;
         }
+
+        e.preventDefault();
+        handleSend();
     };
 
     return (
@@ -46,10 +49,10 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
                 ref={textareaRef}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={sendOnShortcut}
                 disabled={disabled}
                 rows={1}
-                placeholder={t("inputPlaceholder")}
+                placeholder={t("inputPlaceholder", { keys: mac ? "⌘ Enter" : "Ctrl Enter" })}
                 className="flex-1 min-h-9 max-h-30 overflow-y-auto resize-none"
                 onInput={(e) => {
                     const el = e.currentTarget;

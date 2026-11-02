@@ -4,18 +4,15 @@ import { Button } from "@/ui/button";
 import { Textarea } from "@/ui/textarea";
 import { Input } from "@/ui/input";
 import { Spinner } from "@/ui/spinner";
-import { useEffect, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { isGuest } from "@/lib/role";
 import { useVideoStore } from "@/components/stores/video-store";
 import { useSyncing } from "@/components/review/sync-session";
-import { isMac } from "@/lib/platform";
+import { useIsMac } from "@/lib/platform";
 import { api } from "@/api";
-
-// The OS never changes while the page is open, so there is nothing to subscribe to.
-const subscribeNever = () => () => {};
 
 export type ECommentConfirmedType = "commentUpdate" | "commentAdd";
 
@@ -93,8 +90,7 @@ export default function CommentConfirmed(props: {
         }
     };
 
-    // Read in the browser only: the server cannot tell the OS, and the hint must not differ on hydration.
-    const mac = useSyncExternalStore(subscribeNever, isMac, () => false);
+    const mac = useIsMac();
 
     // Enter alone stays a new line, and an Enter that confirms the IME conversion is left to it.
     const submitOnShortcut = (e: KeyboardEvent<HTMLElement>) => {
