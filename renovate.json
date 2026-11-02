@@ -50,5 +50,14 @@
             "groupName": "non-major actions",
             "schedule": ["before 9am on monday"]
         }
+    ],
+    "customManagers": [
+        {
+            "description": "The lockfile job installs the gh-actions-lock extension with --pin; that line is not a uses:, so the github-actions manager does not see it.",
+            "customType": "regex",
+            "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.ya?ml$/"],
+            "matchStrings": ["gh extension install (?<depName>[\\w.-]+/[\\w.-]+) --pin (?<currentValue>\\S+)"],
+            "datasourceTemplate": "github-releases"
+        }
     ]
 }
