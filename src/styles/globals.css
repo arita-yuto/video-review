@@ -183,6 +183,16 @@
   width: clamp(var(--container-side-panel-min), 27cqw, var(--container-side-panel-max));
 }
 
+/* One tile of a filmstrip sheet: the sheet is scaled to FILMSTRIP_COLS tiles across, and --tile-x/--tile-y are
+   the column and row as a share of (cols - 1), which is how percentage background-position addresses a tile. */
+@utility filmstrip-tile {
+  aspect-ratio: var(--tile-aspect);
+  background-image: var(--sheet);
+  background-size: 1000% auto;
+  background-position: var(--tile-x) var(--tile-y);
+  background-repeat: no-repeat;
+}
+
 /* The video is sized against the stage's box (cqw/cqh in video-fit), not the viewport. */
 @utility video-stage {
   container-type: size;

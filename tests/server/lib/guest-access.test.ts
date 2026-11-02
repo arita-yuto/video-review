@@ -31,6 +31,15 @@ describe("videoIdForStorageKey", () => {
         });
     });
 
+    it("matches a filmstrip sheet key against the revision filePath with any extension", async () => {
+        prismaMock.videoRevision.findFirst.mockResolvedValue({ videoId: "vid-3" });
+        await expect(videoIdForStorageKey("videos/x/rev_001_strip_002.jpg")).resolves.toBe("vid-3");
+        expect(prismaMock.videoRevision.findFirst).toHaveBeenCalledWith({
+            where: { filePath: { startsWith: "videos/x/rev_001." } },
+            select: { videoId: true },
+        });
+    });
+
     it("reaches a drawing's video through the comment", async () => {
         prismaMock.videoRevision.findFirst.mockResolvedValue(null);
         prismaMock.videoComment.findFirst.mockResolvedValue({ videoId: "vid-4" });
