@@ -8,6 +8,7 @@ import { resolveMediaUrl } from "@/lib/media-url";
 import { filmstripKey } from "@/lib/storage-key";
 import { FILMSTRIP_COLS, FILMSTRIP_TILES_PER_SHEET, filmstripTile, parseFilmstrip } from "@/lib/filmstrip";
 import { cn } from "@/lib/utils";
+import { formatTime } from "@/lib/utils/profiler";
 
 // Tiles are drawn at half their stored width, so they stay sharp on a 2x display.
 const DISPLAY_TILE_WIDTH = 80;
@@ -64,14 +65,14 @@ export function Filmstrip() {
     const slotDuration = duration / slots;
     const tiles = Array.from({ length: slots }, (_, slot) => {
         const index = Math.min(strip.count - 1, Math.floor(((slot + 0.5) * slotDuration) / strip.interval));
-        const tile = filmstripTile(strip, index);
+        const tile = filmstripTile(index);
         return {
             time: index * strip.interval,
             current: currentTime >= slot * slotDuration && currentTime < (slot + 1) * slotDuration,
             style: {
                 "--sheet": `url('${sheetUrls[tile.sheet]}')`,
-                "--tile-x": `${(tile.x / strip.tileWidth / (FILMSTRIP_COLS - 1)) * 100}%`,
-                "--tile-y": `${(tile.y / strip.tileHeight / (FILMSTRIP_COLS - 1)) * 100}%`,
+                "--tile-x": `${(tile.col / (FILMSTRIP_COLS - 1)) * 100}%`,
+                "--tile-y": `${(tile.row / (FILMSTRIP_COLS - 1)) * 100}%`,
             } as CSSProperties,
         };
     });
@@ -80,13 +81,14 @@ export function Filmstrip() {
         <div
             ref={setRow}
             className="mobile:hidden flex w-full gap-px overflow-hidden"
-            style={{ "--tile-aspect": `${strip.tileWidth} / ${strip.tileHeight}` } as CSSProperties}
+            style={{ "--tile-aspect": `${strip.tileWidth} / ${strip.tileHeight}`, "--sheet-cols": FILMSTRIP_COLS } as CSSProperties}
         >
             {tiles.map((tile, slot) => (
                 <button
                     key={slot}
                     type="button"
                     disabled={locked}
+                    aria-label={formatTime(tile.time)}
                     onClick={() => setTimelineTime(tile.time)}
                     className={cn("filmstrip-tile flex-1 min-w-0", tile.current && "ring-2 ring-inset ring-primary")}
                     style={tile.style}

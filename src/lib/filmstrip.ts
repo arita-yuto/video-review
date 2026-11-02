@@ -32,13 +32,13 @@ export function parseFilmstrip(value: unknown): Filmstrip | null {
     return { interval, tileWidth, tileHeight, count } as Filmstrip;
 }
 
-export function filmstripTile(strip: Filmstrip, index: number): { sheet: number; x: number; y: number } {
+export function filmstripTile(index: number): { sheet: number; col: number; row: number } {
     const sheet = Math.floor(index / FILMSTRIP_TILES_PER_SHEET);
     const inSheet = index % FILMSTRIP_TILES_PER_SHEET;
 
     return {
         sheet,
-        x: (inSheet % FILMSTRIP_COLS) * strip.tileWidth,
-        y: Math.floor(inSheet / FILMSTRIP_COLS) * strip.tileHeight,
+        col: inSheet % FILMSTRIP_COLS,
+        row: Math.floor(inSheet / FILMSTRIP_COLS),
     };
 }
