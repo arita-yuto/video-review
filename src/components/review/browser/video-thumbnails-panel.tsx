@@ -6,7 +6,6 @@ import { Button } from "@/ui/button";
 import { useTranslations } from "next-intl";
 import { VideoWithRevision } from "@/lib/db-types";
 import { useSidebar } from "@/ui/sidebar";
-import { useIsMobile } from "@/lib/hooks/use-mobile";
 import VideoThumbnails from "@/components/review/browser/video-thumbnails";
 import type { MarkContext } from "@/components/review/browser/marks/use-mark-context";
 import { Panel } from "@/components/controls/panel";
@@ -32,8 +31,7 @@ export default function VideoThumbnailsPanel({
     onClose,
 }: Props) {
     const panelRef = useRef<HTMLDivElement>(null);
-    const { state } = useSidebar();
-    const isMobile = useIsMobile();
+    const { state, isMobile } = useSidebar();
     // --sidebar-width stays set while the sidebar is collapsed off-canvas.
     const offset = state === "collapsed" ? "0px" : "var(--sidebar-width)";
 
@@ -65,7 +63,7 @@ export default function VideoThumbnailsPanel({
 
     const t = useTranslations("video-list-panel");
 
-    // Below the mobile breakpoint the sidebar is a modal sheet whose overlay would cover this panel.
+    // While the list is a sheet its overlay would cover this panel.
     if (!open || isMobile) return null;
 
     return (

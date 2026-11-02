@@ -13,7 +13,6 @@ import { OrganizeTree } from "@/components/review/browser/video-tree/organize-tr
 import { useOrganizing } from "@/components/review/browser/hooks/use-organizing";
 import { useFolderList } from "@/components/review/browser/video-tree/use-folder-list";
 import { useMarkContext } from "@/components/review/browser/marks/use-mark-context";
-import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useVideoStore } from "@/components/stores/video-store";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { isGuest } from "@/lib/role";
@@ -42,10 +41,9 @@ export default function VideoListPanel() {
     const folderList = useFolderList(videos, { filtering: searching || dateFiltering });
     const organizing = useOrganizing();
 
-    const isMobile = useIsMobile();
-    const { setOpenMobile } = useSidebar();
+    const { isMobile, setOpenMobile } = useSidebar();
 
-    // Below the sidebar breakpoint the list is a sheet over the whole screen, so picking a video also closes it.
+    // While the list is a sheet it covers the screen, so picking a video also closes it.
     const openVideo = (id: string) => {
         router.replace(`/video-review/review/${id}`);
         setOpenMobile(false);

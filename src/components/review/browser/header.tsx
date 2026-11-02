@@ -12,7 +12,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useVideoSearchStore } from "@/components/stores/video-search-store";
 import { useVideoDateFilterStore } from "@/components/stores/date-filter-store";
-import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useVideoStore } from "@/components/stores/video-store";
 import CalendarDateRadio from "@/components/controls/calendar-date-radio";
 import { Separator } from "@/components/ui/separator";
@@ -32,8 +31,7 @@ export default function VideoListPanelHeader(
 }) {
     const t = useTranslations("video-list-panel");
     const tChat = useTranslations("chat-search");
-    const isMobile = useIsMobile();
-    const { setOpenMobile } = useSidebar();
+    const { isMobile, setOpenMobile } = useSidebar();
     const { role } = useAuthStore();
     const { reloadOnViewChange } = useVideoStore();
     const { filterTree, setFilterTree, isFiltering, clear } = useVideoSearchStore();

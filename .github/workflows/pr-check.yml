@@ -14,9 +14,9 @@ jobs:
   web:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Use Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: "24.22.1"
           cache: "npm"
@@ -28,9 +28,9 @@ jobs:
   cli:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/build-cli
-      - uses: ./.github/actions/build-launcher
+      - uses: actions/checkout@v7.0.1
+      - uses: $/.github/actions/build-cli
+      - uses: $/.github/actions/build-launcher
 
   images:
     runs-on: ubuntu-latest
@@ -45,8 +45,18 @@ jobs:
           - name: video-processing
             dockerfile: docker/video-processing/Dockerfile
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/build-images
+      - uses: actions/checkout@v7.0.1
+      - uses: $/.github/actions/build-images
         with:
           name: ${{ matrix.name }}
           dockerfile: ${{ matrix.dockerfile }}
+
+  lockfile:
+    name: Actions lockfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      # Fails when a workflow's uses: and actions.lock disagree; `gh actions-lock` regenerates the lockfile.
+      - run: gh extension install github/gh-actions-lock --pin v0.4.0 && gh actions-lock --verify
+        env:
+          GH_TOKEN: ${{ github.token }}
