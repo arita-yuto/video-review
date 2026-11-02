@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/api";
 import { Video, VideoComment, VideoRevision } from "@/lib/db-types";
 import { LoadingBadge } from "@/components/controls/loading-badge";
-import { SeekBar, commentMarkers } from "@/components/review/video-timeline-bar";
+import { SeekBar, commentMarkers } from "@/components/review/player/timeline/seek-bar";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackRateSelect } from "@/components/review/player/control-panel/playback";
 import { PlaybackStoreProvider } from "@/components/review/stores/playback-store";
 import { useDiffViewStore } from "@/components/review/diff/stores/diff-view-store";

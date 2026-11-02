@@ -183,6 +183,21 @@
   width: clamp(var(--container-side-panel-min), 27cqw, var(--container-side-panel-max));
 }
 
+/* One tile of a sheet --sheet-cols across; percentage background-position addresses tile (c, r) as c/(cols-1), r/(cols-1). */
+@utility filmstrip-tile {
+  aspect-ratio: var(--tile-aspect);
+  background-image: var(--sheet);
+  background-size: calc(var(--sheet-cols) * 100%) auto;
+  background-position: var(--tile-x) var(--tile-y);
+  background-repeat: no-repeat;
+}
+
+/* Centred on the hovered point (--hover, 0 to 1) and kept inside the timeline. */
+@utility frame-preview {
+  width: 10rem;
+  left: clamp(0px, calc(var(--hover) * 100% - 5rem), calc(100% - 10rem));
+}
+
 /* The video is sized against the stage's box (cqw/cqh in video-fit), not the viewport. */
 @utility video-stage {
   container-type: size;
