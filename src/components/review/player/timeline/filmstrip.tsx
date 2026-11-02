@@ -1,19 +1,12 @@
 "use client";
 
-import type { CSSProperties, MouseEvent as ReactMouseEvent } from "react";
+import type { CSSProperties } from "react";
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { usePresenterLock } from "@/components/review/sync-session";
 import { FILMSTRIP_COLS, filmstripIndexAt, filmstripTile } from "@/lib/filmstrip";
 import { cn } from "@/lib/utils";
 import type { FilmstripSheets } from "@/components/review/player/timeline/hooks/use-filmstrip-sheets";
-
-// Tiles are drawn at half their stored width, so they stay sharp on a 2x display.
-const DISPLAY_TILE_WIDTH = 80;
-
-export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-};
+import { pointerFraction } from "@/components/review/player/timeline/seek-bar";
 
 export function Filmstrip({ sheets: { strip, sheetUrls }, width }: { sheets: FilmstripSheets; width: number }) {
     const currentTime = usePlayback((s) => s.currentTime);
@@ -21,8 +14,8 @@ export function Filmstrip({ sheets: { strip, sheetUrls }, width }: { sheets: Fil
     const setTimelineTime = usePlayback((s) => s.setTimelineTime);
     const locked = usePresenterLock();
 
-    // Shrink tiles to 48px before showing fewer than 12.
-    const tileWidth = Math.min(DISPLAY_TILE_WIDTH, Math.max(48, width / 12));
+    // Half the stored width keeps tiles sharp on a 2x display; they shrink to 48px before showing fewer than 12.
+    const tileWidth = Math.min(80, Math.max(48, width / 12));
     const slots = Math.max(1, Math.floor(width / tileWidth));
     const slotDuration = duration / slots;
     // Each tile shows the frame at the middle of its share of the duration.
@@ -59,7 +52,7 @@ export function FilmstripTile({ sheetUrls, index, className }: { sheetUrls: stri
         <div
             className={cn("filmstrip-tile", className)}
             style={{
-                "--sheet": `url('${sheetUrls[tile.sheet]}')`,
+                "--sheet": `url("${sheetUrls[tile.sheet].replaceAll('"', "%22")}")`,
                 "--tile-x": `${(tile.col / (FILMSTRIP_COLS - 1)) * 100}%`,
                 "--tile-y": `${(tile.row / (FILMSTRIP_COLS - 1)) * 100}%`,
             } as CSSProperties}

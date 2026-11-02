@@ -3,6 +3,13 @@ import { usePlayback } from "@/components/review/stores/playback-store";
 import { Slider } from "@/ui/slider";
 import { cn } from "@/lib/utils";
 import { usePresenterLock } from "@/components/review/sync-session";
+import type { MouseEvent as ReactMouseEvent } from "react";
+
+// Where the pointer is along the element, 0 at its left edge and 1 at its right.
+export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+};
 
 export type SeekBarMarker = { time: number; className: string };
 

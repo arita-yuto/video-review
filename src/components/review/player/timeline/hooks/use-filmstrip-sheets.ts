@@ -10,19 +10,21 @@ export type FilmstripSheets = { strip: Filmstrip; sheetUrls: string[] };
 
 // The selected revision's filmstrip with every sheet resolved to a URL; null until then.
 export function useFilmstripSheets(): FilmstripSheets | null {
-    const selectedRevision = useVideoStore((s) => s.selectedRevision);
-    const strip = useMemo(() => parseFilmstrip(selectedRevision?.filmstrip), [selectedRevision]);
+    const filePath = useVideoStore((s) => s.selectedRevision?.filePath);
+    const filmstrip = useVideoStore((s) => s.selectedRevision?.filmstrip);
+    // Keyed on the column itself: a tag edit replaces the revision object but not its filmstrip.
+    const strip = useMemo(() => parseFilmstrip(filmstrip), [filmstrip]);
     const [sheetUrls, setSheetUrls] = useState<string[]>([]);
 
     useEffect(() => {
         setSheetUrls([]);
-        if (!strip || !selectedRevision) {
+        if (!strip || !filePath) {
             return;
         }
 
         const sheets = Math.ceil(strip.count / FILMSTRIP_TILES_PER_SHEET);
         let cancelled = false;
-        Promise.all(Array.from({ length: sheets }, (_, sheet) => resolveMediaUrl(filmstripKey(selectedRevision.filePath, sheet))))
+        Promise.all(Array.from({ length: sheets }, (_, sheet) => resolveMediaUrl(filmstripKey(filePath, sheet))))
             .then((urls) => {
                 if (!cancelled && urls.every((url) => url !== undefined)) {
                     setSheetUrls(urls as string[]);
@@ -32,7 +34,7 @@ export function useFilmstripSheets(): FilmstripSheets | null {
         return () => {
             cancelled = true;
         };
-    }, [strip, selectedRevision]);
+    }, [strip, filePath]);
 
     if (!strip || sheetUrls.length === 0) {
         return null;
