@@ -2,7 +2,7 @@
 import { useRef, useEffect, useState, useMemo, useCallback, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { usePlayback } from "@/components/review/stores/playback-store";
-import VideoTimelineBar from "@/components/review/video-timeline-bar";
+import { Timeline } from "@/components/review/player/timeline";
 import { EPlayMode, useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 import VideoControlPanel from "@/components/review/player/control-panel";
 import { useCommentStore } from "@/components/review/stores/comment-store";
@@ -441,7 +441,7 @@ export default function VideoReview() {
 
                                 {/* Overlaid so the picture can fill the player. */}
                                 <div ref={controlsRef} className="immersive:absolute immersive:inset-x-0 immersive:bottom-0 immersive:px-2 transition-opacity duration-300 immersive:idle:opacity-0 immersive:idle:pointer-events-none">
-                                    <VideoTimelineBar />
+                                    <Timeline />
                                     <VideoControlPanel />
                                 </div>
                             </>
