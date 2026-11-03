@@ -11,7 +11,7 @@ import { PlaybackStoreProvider } from "@/components/review/stores/playback-store
 import { useDiffViewStore } from "@/components/review/diff/stores/diff-view-store";
 import { useDiffSync } from "./use-diff-sync";
 import { CommentSide, useRevisionComments } from "./comment-side";
-import { DiffStage, ModeTabs, RevisionSelect } from "./stage";
+import { DiffStage, ModeTabs, OverlaySlider, RevisionSelect } from "./stage";
 import { DiffImage, DiffImageSwitch } from "./diff-image";
 
 type Side = "left" | "right";
@@ -175,6 +175,7 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
                         />
                     )}
                 </div>
+                <OverlaySlider />
                 <SeekBar markers={markers} onMarkerClick={seek} />
                 <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
                     <PlayButton />
