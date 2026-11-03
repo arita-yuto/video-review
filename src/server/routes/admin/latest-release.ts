@@ -16,7 +16,7 @@ export const latestReleaseRouter = createRouter()
                 description: "The newer release, or null when the check is off, GitHub cannot be reached, or this build is current",
                 content: {
                     "application/json": {
-                        schema: z.object({ latest: z.object({ version: z.string(), url: z.string() }).nullable() }),
+                        schema: z.object({ latest: z.object({ version: z.string(), url: z.string(), notes: z.string() }).nullable() }),
                     },
                 },
             },
@@ -31,6 +31,8 @@ export const latestReleaseRouter = createRouter()
         }
 
         const release = await getLatestRelease();
-        const latest = release && isNewerVersion(release.version, env.BUILD_VERSION) ? release : null;
+        // The dev server has no release of its own, so it offers the latest one to show the dialog with real notes.
+        const offered = env.DEV_SERVER || isNewerVersion(release?.version ?? "", env.BUILD_VERSION);
+        const latest = release && offered ? release : null;
         return c.json({ latest }, 200);
     });

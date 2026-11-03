@@ -3,7 +3,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 
 const checkEnabled = vi.hoisted(() => ({ value: true }));
 
-vi.mock("@/server/lib/env", () => ({ env: { BUILD_VERSION: "v0.13.0" } }));
+vi.mock("@/server/lib/env", () => ({ env: { BUILD_VERSION: "v0.13.0", DEV_SERVER: false } }));
 vi.mock("@/server/lib/token", () => ({ authorize: vi.fn(async () => ({ type: "jwt" })) }));
 vi.mock("@/server/lib/integrations/general", () => ({ isUpdateCheckEnabled: async () => checkEnabled.value }));
 
@@ -55,8 +55,8 @@ describe("GET /admin/latest-release", () => {
 
     it("returns a newer release", async () => {
         const url = "https://github.com/arita-yuto/video-review/releases/tag/v0.14.0";
-        fetchMock.mockResolvedValue(Response.json({ tag_name: "v0.14.0", html_url: url }));
+        fetchMock.mockResolvedValue(Response.json({ tag_name: "v0.14.0", html_url: url, body: "## What's Changed" }));
 
-        expect(await getLatest()).toEqual({ status: 200, body: { latest: { version: "v0.14.0", url } } });
+        expect(await getLatest()).toEqual({ status: 200, body: { latest: { version: "v0.14.0", url, notes: "## What's Changed" } } });
     });
 });

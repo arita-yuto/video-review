@@ -256,7 +256,12 @@
         "logout": "로그아웃",
         "editProfile": "프로필 편집",
         "administration": "관리",
+        "updateAvailable": "{version} 사용 가능",
         "editPrompt": "프롬프트 편집"
+    },
+    "release-dialog": {
+        "running": "현재 {version}",
+        "viewOnGitHub": "GitHub에서 보기"
     },
     "calendar-date-radio": {
         "today": "오늘",

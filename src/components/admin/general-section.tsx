@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { api } from "@/api";
+import { useLatestRelease } from "@/components/hooks/use-latest-release";
+import { ReleaseDialog } from "@/components/admin/release-dialog";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
@@ -24,21 +25,8 @@ export function GeneralSection() {
     const allowGuest = settings.field("allowGuest");
     const loginDefaultType = settings.field("loginDefaultType");
     const checkUpdates = settings.field("checkUpdates");
-    const [latest, setLatest] = useState<{ version: string; url: string } | null>(null);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        // A failed check shows nothing.
-        void (async () => {
-            const res = await api.admin["latest-release"].$get();
-            if (!cancelled && res.status === 200) {
-                setLatest((await res.json()).latest);
-            }
-        })().catch(() => {});
-
-        return () => { cancelled = true; };
-    }, []);
+    const latest = useLatestRelease(true);
+    const [releaseOpen, setReleaseOpen] = useState(false);
 
     const text = (name: string, placeholder?: string) => {
         const props = settings.field(name);
@@ -81,11 +69,12 @@ export function GeneralSection() {
                     onCheckedChange={(checked) => checkUpdates.onChange(checked ? "true" : "false")}
                 />
                 {latest && (
-                    <Button variant="link" size="xs" asChild>
-                        <a href={latest.url} target="_blank" rel="noopener noreferrer">
+                    <>
+                        <Button variant="link" size="xs" onClick={() => setReleaseOpen(true)}>
                             {t("updateAvailable", { version: latest.version })}
-                        </a>
-                    </Button>
+                        </Button>
+                        <ReleaseDialog release={latest} open={releaseOpen} onOpenChange={setReleaseOpen} />
+                    </>
                 )}
             </FieldRow>
         </IntegrationForm>

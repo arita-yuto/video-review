@@ -256,7 +256,12 @@
         "logout": "ログアウト",
         "editProfile": "プロフィール編集",
         "administration": "管理",
+        "updateAvailable": "{version} 公開中",
         "editPrompt": "プロンプト編集"
+    },
+    "release-dialog": {
+        "running": "現在 {version}",
+        "viewOnGitHub": "GitHub で見る"
     },
     "calendar-date-radio": {
         "today": "今日",

@@ -256,7 +256,12 @@
         "logout": "Log out",
         "editProfile": "Edit profile",
         "administration": "Administration",
+        "updateAvailable": "{version} available",
         "editPrompt": "Edit prompt"
+    },
+    "release-dialog": {
+        "running": "Running {version}",
+        "viewOnGitHub": "View on GitHub"
     },
     "calendar-date-radio": {
         "today": "Today",

@@ -2,7 +2,7 @@ import "server-only";
 
 const LATEST_RELEASE_URL = "https://api.github.com/repos/arita-yuto/video-review/releases/latest";
 
-export type Release = { version: string; url: string };
+export type Release = { version: string; url: string; notes: string };
 
 let cached: { fetchedAt: number; release: Release | null } | undefined;
 
@@ -37,11 +37,11 @@ async function fetchLatestRelease(): Promise<Release | null> {
             return null;
         }
 
-        const body = await res.json() as { tag_name?: unknown; html_url?: unknown };
+        const body = await res.json() as { tag_name?: unknown; html_url?: unknown; body?: unknown };
         if (typeof body.tag_name !== "string" || typeof body.html_url !== "string") {
             return null;
         }
-        return { version: body.tag_name, url: body.html_url };
+        return { version: body.tag_name, url: body.html_url, notes: typeof body.body === "string" ? body.body : "" };
     } catch {
         return null;
     }
