@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { api } from "@/api";
+import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -21,6 +24,21 @@ export function GeneralSection() {
     const allowGuest = settings.field("allowGuest");
     const loginDefaultType = settings.field("loginDefaultType");
     const checkUpdates = settings.field("checkUpdates");
+    const [latest, setLatest] = useState<{ version: string; url: string } | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        // A failed check shows nothing.
+        void (async () => {
+            const res = await api.admin["latest-release"].$get();
+            if (!cancelled && res.status === 200) {
+                setLatest((await res.json()).latest);
+            }
+        })().catch(() => {});
+
+        return () => { cancelled = true; };
+    }, []);
 
     const text = (name: string, placeholder?: string) => {
         const props = settings.field(name);
@@ -62,6 +80,13 @@ export function GeneralSection() {
                     disabled={checkUpdates.disabled}
                     onCheckedChange={(checked) => checkUpdates.onChange(checked ? "true" : "false")}
                 />
+                {latest && (
+                    <Button variant="link" size="xs" asChild>
+                        <a href={latest.url} target="_blank" rel="noopener noreferrer">
+                            {t("updateAvailable", { version: latest.version })}
+                        </a>
+                    </Button>
+                )}
             </FieldRow>
         </IntegrationForm>
     );

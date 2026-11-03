@@ -288,8 +288,7 @@
             "users": "Users",
             "apiToken": "API Token",
             "integrations": "Integrations",
-            "videos": "Videos",
-            "system": "System"
+            "videos": "Videos"
         },
         "general": {
             "title": "General",
@@ -300,6 +299,7 @@
             "resolutionPresetsExample": "480,720,1080",
             "uploadChunkMb": "업로드 청크 (MB)",
             "checkUpdates": "업데이트 확인",
+            "updateAvailable": "{version} 사용 가능",
             "save": "저장",
             "saveFailed": "저장하지 못했습니다",
             "saved": "저장했습니다"
@@ -497,11 +497,6 @@
                 "saveFailed": "저장에 실패했습니다",
                 "loadFailed": "추가 내용을 불러오지 못했습니다"
             }
-        },
-        "system": {
-            "title": "System",
-            "version": "버전",
-            "available": "{version} 사용 가능"
         }
     },
     "csv-import": {

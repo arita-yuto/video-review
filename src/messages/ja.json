@@ -288,8 +288,7 @@
             "users": "Users",
             "apiToken": "API Token",
             "integrations": "Integrations",
-            "videos": "Videos",
-            "system": "System"
+            "videos": "Videos"
         },
         "general": {
             "title": "General",
@@ -300,6 +299,7 @@
             "resolutionPresetsExample": "480,720,1080",
             "uploadChunkMb": "Upload chunk (MB)",
             "checkUpdates": "更新の確認",
+            "updateAvailable": "{version} available",
             "save": "保存",
             "saveFailed": "保存できませんでした",
             "saved": "保存しました"
@@ -497,11 +497,6 @@
                 "saveFailed": "保存に失敗しました",
                 "loadFailed": "追記の取得に失敗しました"
             }
-        },
-        "system": {
-            "title": "System",
-            "version": "Version",
-            "available": "{version} available"
         }
     },
     "csv-import": {
