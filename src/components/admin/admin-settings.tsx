@@ -18,6 +18,7 @@ import { AiSection } from "@/components/admin/integration-section/ai-section";
 import { VcsSection } from "@/components/admin/integration-section/vcs-section";
 import { McpSection } from "@/components/admin/integration-section/mcp-section";
 import { VideosSection } from "@/components/admin/videos-section";
+import { SystemSection } from "@/components/admin/system-section";
 
 const SECTIONS: { key: string; label: string; integration?: boolean; Component: () => React.JSX.Element | null }[] = [
     { key: "general", label: "sections.general", Component: GeneralSection },
@@ -32,6 +33,7 @@ const SECTIONS: { key: string; label: string; integration?: boolean; Component: 
     { key: "integrations.vcs", label: "integrations.vcs.title", integration: true, Component: VcsSection },
     { key: "integrations.mcp", label: "integrations.mcp.title", integration: true, Component: McpSection },
     { key: "apiToken", label: "sections.apiToken", Component: ApiTokenSection },
+    { key: "system", label: "sections.system", Component: SystemSection },
 ];
 
 export default function AdminSettingsDialog({

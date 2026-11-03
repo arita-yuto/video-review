@@ -20,6 +20,7 @@ export function GeneralSection() {
 
     const allowGuest = settings.field("allowGuest");
     const loginDefaultType = settings.field("loginDefaultType");
+    const checkUpdates = settings.field("checkUpdates");
 
     const text = (name: string, placeholder?: string) => {
         const props = settings.field(name);
@@ -53,6 +54,15 @@ export function GeneralSection() {
             {text("urlSchema")}
             {text("resolutionPresets", t("resolutionPresetsExample"))}
             {text("uploadChunkMb")}
+
+            <FieldRow label={t("checkUpdates")} htmlFor={checkUpdates.id}>
+                <Switch
+                    id={checkUpdates.id}
+                    checked={checkUpdates.value === "true"}
+                    disabled={checkUpdates.disabled}
+                    onCheckedChange={(checked) => checkUpdates.onChange(checked ? "true" : "false")}
+                />
+            </FieldRow>
         </IntegrationForm>
     );
 }

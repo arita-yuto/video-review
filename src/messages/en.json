@@ -288,7 +288,8 @@
             "users": "Users",
             "apiToken": "API Token",
             "integrations": "Integrations",
-            "videos": "Videos"
+            "videos": "Videos",
+            "system": "System"
         },
         "general": {
             "title": "General",
@@ -298,6 +299,7 @@
             "resolutionPresets": "Resolution presets",
             "resolutionPresetsExample": "480,720,1080",
             "uploadChunkMb": "Upload chunk (MB)",
+            "checkUpdates": "Check for updates",
             "save": "Save",
             "saveFailed": "Could not save",
             "saved": "Saved"
@@ -495,6 +497,11 @@
                 "saveFailed": "Save failed",
                 "loadFailed": "Could not load the notes"
             }
+        },
+        "system": {
+            "title": "System",
+            "version": "Version",
+            "available": "{version} available"
         }
     },
     "csv-import": {
