@@ -5,6 +5,8 @@ import "server-only"
 
 export const env = {
     ...StorageEnv,
+    // Inlined at build time by next.config.ts; setting it when the server starts changes nothing.
+    BUILD_VERSION: process.env.VIDEO_REVIEW_BUILD_VERSION || "dev",
     DATABASE_URL: process.env.DATABASE_URL,
     DB_IDLE_DISCONNECT_MS: process.env.VIDEO_REVIEW_DB_IDLE_DISCONNECT_MS,
     VIDEO_REVIEW_API_TOKEN: process.env.VIDEO_REVIEW_API_TOKEN,
