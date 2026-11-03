@@ -64,6 +64,7 @@
         "compare": "Compare",
         "sideBySide": "Side by side",
         "wipe": "Wipe",
+        "overlay": "Overlay",
         "leftRevision": "Left revision",
         "rightRevision": "Right revision",
         "diffImage": "Diff",
