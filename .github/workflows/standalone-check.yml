@@ -41,7 +41,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Start-Service postgresql-x64-*
+          # The runner image installs the service disabled.
+          $name = (Get-Service postgresql*).Name
+          Set-Service $name -StartupType Manual
+          Start-Service $name
 
       - name: Build standalone
         run: |
