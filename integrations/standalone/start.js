@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -8,8 +9,8 @@ const entries = {
 };
 
 const role = process.argv[2];
-if (!(role in entries)) {
-    console.error(`usage: node start.js <${Object.keys(entries).join("|")}>`);
+if (!(role in entries) && role !== "migrate") {
+    console.error(`usage: node start.js <${Object.keys(entries).join("|")}|migrate>`);
     process.exit(1);
 }
 
@@ -28,6 +29,16 @@ process.env.PORT ??= "3489";
 
 // The app keeps secrets/ and uploads/ under the folder it runs from, as it does when started from a source checkout.
 process.chdir(installDir);
+
+if (role === "migrate") {
+    const migrateDir = path.join(releaseDir, "migrate");
+    // prisma's build/index.js reads files next to itself, which node_modules/.bin/prisma reaches only through a link.
+    const cli = path.join(migrateDir, "node_modules", "prisma", "build", "index.js");
+    const schema = path.join(migrateDir, "prisma", "schema.prisma");
+    const result = spawnSync(process.execPath, [cli, "migrate", "deploy", "--schema", schema], { stdio: "inherit" });
+    process.exit(result.status ?? 1);
+}
+
 await import(pathToFileURL(path.join(releaseDir, entries[role])).href);
 // server.js chdirs to its own folder on load; chdir back before the server resolves secrets/ and uploads/.
 process.chdir(installDir);

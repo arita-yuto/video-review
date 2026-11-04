@@ -82,10 +82,10 @@ runs:
           7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
         fi
         printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$I/.env"
-        (cd "$I/releases/$VERSION/migrate" && npx --no-install prisma migrate deploy --schema prisma/schema.prisma)
 
         # Started from elsewhere without DATABASE_URL, so the install's .env is what they read.
         cd "$RUNNER_TEMP"
+        env -u DATABASE_URL node "install/releases/$VERSION/start.js" migrate
         env -u DATABASE_URL node "install/releases/$VERSION/start.js" web > web.log 2>&1 &
         env -u DATABASE_URL node "install/releases/$VERSION/start.js" worker > worker.log 2>&1 &
         worker=$!
