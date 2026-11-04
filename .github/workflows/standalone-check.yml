@@ -74,6 +74,7 @@ jobs:
           cp integrations/video-processing/dist/main-local.js $B/worker-today/
           npx esbuild integrations/video-processing/main-local.ts --bundle --platform=node --format=esm --target=node20 \
             --tsconfig=integrations/video-processing/tsconfig.json --external:@prisma/client \
+            --banner:js='import { createRequire } from "node:module"; const require = createRequire(import.meta.url);' \
             --outfile=$B/worker/main-local.js --log-level=warning
           du -sh $B/worker-today $B/worker
 
