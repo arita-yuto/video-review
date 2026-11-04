@@ -12,21 +12,8 @@ function applyCiDefaults() {
     mkdirSync(process.env.VIDEO_REVIEW_LOCAL_ROOTDIR, { recursive: true });
 }
 
-function checkedOutTag() {
-    try {
-        return execSync("git describe --tags --exact-match", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
-    } catch {
-        return undefined;
-    }
-}
-
 async function build() {
     applyCiDefaults();
-    // Keep the image build arg when present; otherwise take the checked-out tag.
-    const tag = checkedOutTag();
-    if (!process.env.VIDEO_REVIEW_BUILD_VERSION && tag) {
-        process.env.VIDEO_REVIEW_BUILD_VERSION = tag;
-    }
     // A build on top of the previous output can keep files the new build no longer writes.
     rmSync(".next", { recursive: true, force: true });
     mkdirSync("public", { recursive: true });
