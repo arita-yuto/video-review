@@ -14,6 +14,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    # Linux runners can host a database; an empty image skips the service on Windows.
+    services:
+      postgres:
+        image: ${{ matrix.os == 'ubuntu-latest' && 'postgres:16' || '' }}
+        env:
+          POSTGRES_USER: videoreview
+          POSTGRES_PASSWORD: videoreview
+          POSTGRES_DB: videoreview
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 2s --health-retries 30
+    env:
+      # Windows has no database, so its URL only satisfies the check at start; nothing there queries it.
+      DATABASE_URL: ${{ matrix.os == 'ubuntu-latest' && 'postgresql://videoreview:videoreview@127.0.0.1:5432/videoreview' || 'postgresql://none:none@127.0.0.1:1/none' }}
     defaults:
       run:
         shell: bash
@@ -47,6 +60,12 @@ jobs:
           find . -name "*.node" -o -name "*schema-engine*" | grep -v "/bcrypt/prebuilds/" | sort
           du -sh . node_modules migrate
 
+      - name: Migrate with the bundled Prisma CLI
+        if: runner.os == 'Linux'
+        run: |
+          cd .next/standalone/migrate
+          npx --no-install prisma migrate deploy --schema prisma/schema.prisma
+
       - name: Start it and ask for the version
         run: |
           cd .next/standalone
@@ -55,6 +74,14 @@ jobs:
           for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3499/api/v1/version && break; sleep 1; done
           cat server.log
           curl -s http://127.0.0.1:3499/api/v1/version | tee /dev/stderr | grep -q standalone-check
+
+      - name: Sign in against the migrated database
+        if: runner.os == 'Linux'
+        run: |
+          curl -sf -X POST http://127.0.0.1:3499/api/v1/admin/bootstrap -H 'content-type: application/json' -d '{"email":"admin@example.com","pass":"standalone-pass"}'
+          echo
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:3499/api/v1/auth/login/password -H 'content-type: application/json' -d '{"email":"admin@example.com","password":"standalone-pass"}')" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3499/login)" = 200
 
       - name: Check the bundled Prisma CLI
         run: |
