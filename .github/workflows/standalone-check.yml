@@ -1,0 +1,69 @@
+name: standalone-check
+
+# Builds the Next standalone bundle on Linux and Windows and starts it, to see whether a ready-to-run zip per OS works.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24.22.1"
+          cache: "npm"
+      - run: npm ci
+
+      - name: Build standalone
+        run: |
+          sed -i 's|const nextConfig: NextConfig = {|const nextConfig: NextConfig = {\n    output: "standalone",|' next.config.ts
+          npm run build
+        env:
+          CI_BUILD: true
+          VIDEO_REVIEW_BUILD_VERSION: standalone-check
+
+      - name: Assemble the bundle
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
+          mkdir -p .next/standalone/migrate
+          cp -r prisma .next/standalone/migrate/prisma
+          cd .next/standalone/migrate
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund "prisma@$(node -p "require('../../../node_modules/prisma/package.json').version")"
+          cd ..
+          echo "native modules:"
+          find . -name "*.node" -o -name "*schema-engine*" | grep -v "/bcrypt/prebuilds/" | sort
+          du -sh . node_modules migrate
+
+      - name: Start it and ask for the version
+        run: |
+          cd .next/standalone
+          PORT=3499 HOSTNAME=127.0.0.1 NODE_ENV=production VIDEO_REVIEW_LOCAL_ROOTDIR="$RUNNER_TEMP/uploads" node server.js > server.log 2>&1 &
+          for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:3499/login && break; sleep 1; done
+          cat server.log
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3499/login)" = 200
+          curl -s http://127.0.0.1:3499/api/v1/version | tee /dev/stderr | grep -q standalone-check
+
+      - name: Check the bundled Prisma CLI
+        run: |
+          cd .next/standalone/migrate
+          npx --no-install prisma --version
+
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: video-review-${{ runner.os }}-x64
+          path: .next/standalone
+          include-hidden-files: true
+          retention-days: 3
