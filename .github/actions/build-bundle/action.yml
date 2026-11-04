@@ -58,7 +58,12 @@ runs:
         mkdir -p dist
         os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
         cd bundle
-        7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
+        # The runner's 7z stores the target of a symlink in place of the link, which breaks node_modules/.bin on Linux.
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          zip -qry "../dist/video-review-$os-x64.zip" .
+        else
+          7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
+        fi
         ls -la ../dist
 
     # Installs from the zip so the check runs what the release ships.
@@ -71,7 +76,11 @@ runs:
 
         I="$RUNNER_TEMP/install"
         mkdir -p "$I/releases/$VERSION"
-        7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          unzip -q dist/*.zip -d "$I/releases/$VERSION"
+        else
+          7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
+        fi
         printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$I/.env"
         (cd "$I/releases/$VERSION/migrate" && npx --no-install prisma migrate deploy --schema prisma/schema.prisma)
 
