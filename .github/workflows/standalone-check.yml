@@ -1,6 +1,6 @@
 name: standalone-check
 
-# Builds the Next standalone bundle on Linux and Windows and starts it, to see whether a ready-to-run zip per OS works.
+# Builds the Next standalone bundle on Linux and Windows and runs it from a separate root, the way an install would.
 on:
   workflow_dispatch:
 
@@ -14,7 +14,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    # Linux runners can host a database; an empty image skips the service on Windows.
     services:
       postgres:
         image: ${{ matrix.os == 'ubuntu-latest' && 'postgres:16' || '' }}
@@ -25,8 +24,8 @@ jobs:
         ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 2s --health-retries 30
     env:
-      # Windows has no database, so its URL only satisfies the check at start; nothing there queries it.
-      DATABASE_URL: ${{ matrix.os == 'ubuntu-latest' && 'postgresql://videoreview:videoreview@127.0.0.1:5432/videoreview' || 'postgresql://none:none@127.0.0.1:1/none' }}
+      # The Windows image ships PostgreSQL with the superuser password "root".
+      DATABASE_URL: ${{ matrix.os == 'ubuntu-latest' && 'postgresql://videoreview:videoreview@127.0.0.1:5432/videoreview' || 'postgresql://postgres:root@127.0.0.1:5432/postgres' }}
     defaults:
       run:
         shell: bash
@@ -38,6 +37,12 @@ jobs:
           cache: "npm"
       - run: npm ci
 
+      - name: Start PostgreSQL on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Start-Service postgresql-x64-*
+
       - name: Build standalone
         run: |
           sed -i 's|const nextConfig: NextConfig = {|const nextConfig: NextConfig = {\n    output: "standalone",|' next.config.ts
@@ -46,53 +51,82 @@ jobs:
           CI_BUILD: true
           VIDEO_REVIEW_BUILD_VERSION: standalone-check
 
+      - name: next start still serves with output standalone
+        run: |
+          npx next start -p 3498 > next-start.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3498/api/v1/version && break; sleep 1; done
+          cat next-start.log
+          curl -s http://127.0.0.1:3498/api/v1/version | grep -q standalone-check
+
       - name: Assemble the bundle
         run: |
-          cp -r .next/static .next/standalone/.next/static
-          cp -r public .next/standalone/public
-          mkdir -p .next/standalone/migrate
-          cp -r prisma .next/standalone/migrate/prisma
-          cd .next/standalone/migrate
-          npm init -y > /dev/null
-          npm install --no-audit --no-fund "prisma@$(node -p "require('../../../node_modules/prisma/package.json').version")"
-          cd ..
-          echo "native modules:"
-          find . -name "*.node" -o -name "*schema-engine*" | grep -v "/bcrypt/prebuilds/" | sort
-          du -sh . node_modules migrate
+          B=.next/standalone
+          cp -r .next/static $B/.next/static
+          cp -r public $B/public
+          mkdir -p $B/migrate
+          cp -r prisma $B/migrate/prisma
+          (cd $B/migrate && npm init -y > /dev/null && npm install --no-audit --no-fund "prisma@$(node -p "require('../../../node_modules/prisma/package.json').version")")
+          echo "worker as built today, then with only @prisma/client left outside the bundle:"
+          mkdir -p $B/worker-today $B/worker
+          cp integrations/video-processing/dist/main-local.js $B/worker-today/
+          npx esbuild integrations/video-processing/main-local.ts --bundle --platform=node --format=esm --target=node20 \
+            --tsconfig=integrations/video-processing/tsconfig.json --external:@prisma/client \
+            --outfile=$B/worker/main-local.js --log-level=warning
+          du -sh $B/worker-today $B/worker
+
+      - name: Lay out a root the way an install has it
+        run: |
+          R="$RUNNER_TEMP/root"
+          mkdir -p "$R/releases" "$R/secrets" "$R/uploads"
+          cp -r .next/standalone "$R/releases/check"
+          printf 'DATABASE_URL=%s\nJWT_SECRET=standalone-check\n' "$DATABASE_URL" > "$R/.env"
+          ls -la "$R"
 
       - name: Migrate with the bundled Prisma CLI
-        if: runner.os == 'Linux'
         run: |
-          cd .next/standalone/migrate
+          cd "$RUNNER_TEMP/root/releases/check/migrate"
           npx --no-install prisma migrate deploy --schema prisma/schema.prisma
 
-      - name: Start it and ask for the version
+      - name: Start from the root and use it
         run: |
-          cd .next/standalone
-          PORT=3499 HOSTNAME=127.0.0.1 NODE_ENV=production VIDEO_REVIEW_LOCAL_ROOTDIR="$RUNNER_TEMP/uploads" node server.js > server.log 2>&1 &
-          # The runners have no database, so only a route that needs none is asked.
-          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3499/api/v1/version && break; sleep 1; done
-          cat server.log
-          version=$(curl -s http://127.0.0.1:3499/api/v1/version)
-          echo "$version"
-          echo "$version" | grep -q standalone-check
+          R="$RUNNER_TEMP/root"
+          cd "$R"
+          HOSTNAME=0.0.0.0 PORT=3499 NODE_ENV=production node --env-file=.env releases/check/server.js > web.log 2>&1 &
+          cat > probe.mjs <<'EOF'
+          const base = "http://127.0.0.1:3499";
+          const call = async (method, p, body, headers = {}) => {
+              const r = await fetch(base + p, { method, headers: { "content-type": "application/json", ...headers }, body: body && JSON.stringify(body) });
+              return [r.status, await r.text()];
+          };
+          for (let i = 0; i < 30; i++) {
+              try { if ((await fetch(base + "/api/v1/version")).ok) break; } catch {}
+              await new Promise((r) => setTimeout(r, 1000));
+          }
+          console.log("version", await call("GET", "/api/v1/version"));
+          console.log("bootstrap", await call("POST", "/api/v1/admin/bootstrap", { email: "admin@example.com", pass: "check-pass" }));
+          const [status, text] = await call("POST", "/api/v1/auth/login/password", { email: "admin@example.com", password: "check-pass" });
+          console.log("login", status);
+          const auth = { authorization: "Bearer " + JSON.parse(text).token };
+          console.log("slack", await call("PUT", "/api/v1/admin/settings/slack", { token: "xoxb-check" }, auth));
+          EOF
+          node probe.mjs
+          cat web.log
+          echo "secret.key files:"
+          find . -name secret.key -not -path "*/node_modules/*"
 
-      - name: Sign in against the migrated database
-        if: runner.os == 'Linux'
+      - name: Run the worker from the root
         run: |
-          curl -sf -X POST http://127.0.0.1:3499/api/v1/admin/bootstrap -H 'content-type: application/json' -d '{"email":"admin@example.com","pass":"standalone-pass"}'
-          echo
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:3499/api/v1/auth/login/password -H 'content-type: application/json' -d '{"email":"admin@example.com","password":"standalone-pass"}')" = 200
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3499/login)" = 200
+          cd "$RUNNER_TEMP/root"
+          for w in worker-today worker; do
+            echo "== $w"
+            node --env-file=.env releases/check/$w/main-local.js > $w.log 2>&1 &
+            pid=$!
+            sleep 10
+            kill $pid 2>/dev/null || true
+            cat $w.log
+          done
 
       - name: Check the bundled Prisma CLI
         run: |
-          cd .next/standalone/migrate
+          cd "$RUNNER_TEMP/root/releases/check/migrate"
           npx --no-install prisma --version
-
-      - uses: actions/upload-artifact@v7.0.2
-        with:
-          name: video-review-${{ runner.os }}-x64
-          path: .next/standalone
-          include-hidden-files: true
-          retention-days: 3
