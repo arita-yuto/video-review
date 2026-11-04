@@ -48,6 +48,8 @@ jobs:
             integrations/launcher/dist/*.zip
           # GitHub writes the body from the pull request titles merged since the last tag.
           generate_release_notes: true
+          # upgrade and the release notice skip pre-releases unless asked for them.
+          prerelease: ${{ contains(github.ref_name, '-rc.') }}
 
   bundle:
     # The cli job creates the release; attaching after it keeps two jobs from creating it at once.
