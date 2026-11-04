@@ -2,7 +2,7 @@ name: standalone-check
 
 # Builds the Next standalone bundle on Linux and Windows and starts it, to see whether a ready-to-run zip per OS works.
 on:
-  workflow_dispatch:
+  workflow_dispatch::
 
 permissions:
   contents: read
