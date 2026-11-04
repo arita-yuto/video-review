@@ -73,7 +73,9 @@ jobs:
           # The runners have no database, so only a route that needs none is asked.
           for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3499/api/v1/version && break; sleep 1; done
           cat server.log
-          curl -s http://127.0.0.1:3499/api/v1/version | tee /dev/stderr | grep -q standalone-check
+          version=$(curl -s http://127.0.0.1:3499/api/v1/version)
+          echo "$version"
+          echo "$version" | grep -q standalone-check
 
       - name: Sign in against the migrated database
         if: runner.os == 'Linux'
