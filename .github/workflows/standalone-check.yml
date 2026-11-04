@@ -51,9 +51,9 @@ jobs:
         run: |
           cd .next/standalone
           PORT=3499 HOSTNAME=127.0.0.1 NODE_ENV=production VIDEO_REVIEW_LOCAL_ROOTDIR="$RUNNER_TEMP/uploads" node server.js > server.log 2>&1 &
-          for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:3499/login && break; sleep 1; done
+          # The runners have no database, so only a route that needs none is asked.
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3499/api/v1/version && break; sleep 1; done
           cat server.log
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3499/login)" = 200
           curl -s http://127.0.0.1:3499/api/v1/version | tee /dev/stderr | grep -q standalone-check
 
       - name: Check the bundled Prisma CLI
