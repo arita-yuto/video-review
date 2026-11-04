@@ -13,10 +13,15 @@ workflows:
     '.github/workflows/release.yml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
+        - 'actions/setup-node@v7.1.0'
         - 'docker/build-push-action@v7.4.0'
         - 'docker/login-action@v4.6.0'
         - 'docker/setup-buildx-action@v4.4.1'
         - 'softprops/action-gh-release@v3.0.3'
+    '.github/workflows/standalone-check.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'actions/setup-node@v7.1.0'
+        - 'actions/upload-artifact@v7.0.2'
     '.github/workflows/test.yml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-node@v7.1.0'

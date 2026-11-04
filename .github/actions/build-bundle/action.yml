@@ -1,0 +1,98 @@
+name: Build the release bundle
+description: Builds the standalone web server, worker and Prisma CLI for this runner's OS, runs it from an install folder, and leaves the zip in dist/
+
+inputs:
+  version:
+    description: Release tag baked into the build
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v7.1.0
+      with:
+        node-version: "24.22.1"
+        cache: "npm"
+
+    - name: Install
+      shell: bash
+      run: npm ci
+
+    - name: Build
+      shell: bash
+      run: npm run build
+      env:
+        CI_BUILD: "true"
+        VIDEO_REVIEW_BUILD_STANDALONE: "true"
+        VIDEO_REVIEW_BUILD_VERSION: ${{ inputs.version }}
+
+    - name: Assemble
+      shell: bash
+      run: |
+        B=bundle
+        rm -rf $B
+        cp -r .next/standalone $B
+        cp -r .next/static $B/.next/static
+        cp -r public $B/public
+        cp integrations/standalone/start.js $B/start.js
+        mkdir -p $B/worker $B/migrate
+        cp integrations/video-processing/dist/main-local.js $B/worker/main-local.js
+        cp -r prisma $B/migrate/prisma
+        cd $B/migrate
+        npm init -y > /dev/null
+        npm install --no-audit --no-fund "prisma@$(node -p "require('../../node_modules/prisma/package.json').version")"
+
+    # The Windows image installs PostgreSQL as a disabled service; Linux jobs bring their own service container.
+    - name: Start PostgreSQL
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $name = (Get-Service postgresql*).Name
+        Set-Service $name -StartupType Manual
+        Start-Service $name
+
+    - name: Zip
+      shell: bash
+      run: |
+        mkdir -p dist
+        os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+        cd bundle
+        7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
+        ls -la ../dist
+
+    # Installs from the zip so the check runs what the release ships.
+    - name: Install the zip and check it
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        npx playwright install chromium ${{ runner.os == 'Linux' && '--with-deps' || '' }}
+
+        I="$RUNNER_TEMP/install"
+        mkdir -p "$I/releases/$VERSION"
+        7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
+        printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$I/.env"
+        (cd "$I/releases/$VERSION/migrate" && npx --no-install prisma migrate deploy --schema prisma/schema.prisma)
+
+        # Started from elsewhere without DATABASE_URL, so the install's .env is what they read.
+        cd "$RUNNER_TEMP"
+        env -u DATABASE_URL node "install/releases/$VERSION/start.js" web > web.log 2>&1 &
+        env -u DATABASE_URL node "install/releases/$VERSION/start.js" worker > worker.log 2>&1 &
+        worker=$!
+
+        node "$GITHUB_WORKSPACE/integrations/standalone/check.mjs" "$I" "$VERSION"
+
+        # The worker queries the database every 10 seconds; by now it has done so at least once.
+        sleep 15
+        if ! kill -0 $worker 2>/dev/null || grep -q "crashed" worker.log; then
+          echo "the worker stopped"
+          exit 1
+        fi
+        echo "ok: the worker keeps running"
+
+    - name: Show the logs
+      if: failure()
+      shell: bash
+      run: |
+        cat "$RUNNER_TEMP/web.log" "$RUNNER_TEMP/worker.log" || true

@@ -23,28 +23,29 @@ function parseKey(text: string) {
 
 // Only the write path may create the key: a key made while reading would orphan everything encrypted before it.
 export function ensureSecretKey(keyFile = SECRET_KEY_FILE) {
-    if (fs.existsSync(keyFile)) {
-        return parseKey(fs.readFileSync(keyFile, "utf8"));
+    // turbopackIgnore keeps Next's file tracing from copying the whole project into the standalone output.
+    if (fs.existsSync(/*turbopackIgnore: true*/ keyFile)) {
+        return parseKey(fs.readFileSync(/*turbopackIgnore: true*/ keyFile, "utf8"));
     }
 
     fs.mkdirSync(path.dirname(keyFile), { recursive: true, mode: 0o700 });
     const key = randomBytes(KEY_BYTES);
     try {
         // "wx" refuses to overwrite a key another process has just written.
-        fs.writeFileSync(keyFile, key.toString("hex") + "\n", { flag: "wx", mode: 0o600 });
+        fs.writeFileSync(/*turbopackIgnore: true*/ keyFile, key.toString("hex") + "\n", { flag: "wx", mode: 0o600 });
     } catch (e) {
         if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
-        return parseKey(fs.readFileSync(keyFile, "utf8"));
+        return parseKey(fs.readFileSync(/*turbopackIgnore: true*/ keyFile, "utf8"));
     }
 
     return key;
 }
 
 function loadSecretKey(keyFile: string) {
-    if (!fs.existsSync(keyFile)) {
+    if (!fs.existsSync(/*turbopackIgnore: true*/ keyFile)) {
         throw new ServerError("secret key file is missing", 500);
     }
-    return parseKey(fs.readFileSync(keyFile, "utf8"));
+    return parseKey(fs.readFileSync(/*turbopackIgnore: true*/ keyFile, "utf8"));
 }
 
 export function encryptSecret(plain: string, keyFile = SECRET_KEY_FILE) {
