@@ -29,6 +29,10 @@ jobs:
           Set-Service $name -StartupType Manual
           Start-Service $name
 
+      - name: Install ffmpeg
+        shell: pwsh
+        run: choco install ffmpeg -y --no-progress
+
       - name: Install rc.1 and start it with the CLI
         shell: bash
         run: |
@@ -36,7 +40,7 @@ jobs:
           I="$RUNNER_TEMP/install"
           gh release download v0.14.0-rc.1 -p video-review-windows-x64.zip -D "$RUNNER_TEMP/dl"
           7z x -bso0 -o"$I/releases/v0.14.0-rc.1" "$RUNNER_TEMP/dl/video-review-windows-x64.zip"
-          printf 'DATABASE_URL=%s\nJWT_SECRET=upgrade-check\n' "$DATABASE_URL" > "$I/.env"
+          printf 'DATABASE_URL=%s\nJWT_SECRET=upgrade-check\nVIDEO_REVIEW_API_TOKEN=check-token\n' "$DATABASE_URL" > "$I/.env"
           cd "$RUNNER_TEMP"
           node "install/releases/v0.14.0-rc.1/start.js" migrate
           ./vrcli.exe start --dir install
@@ -72,12 +76,22 @@ jobs:
           if grep -q "crashed" install/logs/worker.log; then echo "the worker crashed"; exit 1; fi
           echo "ok: the worker log has no crash"
 
-      - name: Stop
+      - name: Stop while the worker runs ffmpeg
         shell: bash
         run: |
           cd "$RUNNER_TEMP"
+          ffmpeg -loglevel error -y -f lavfi -i "color=c=0x30405a:s=1920x1080:d=1200" -c:v libx264 -preset ultrafast -pix_fmt yuv420p long.mp4
+          ./vrcli.exe --server http://127.0.0.1:3489 --token check-token upload-video --title long --folder_key check --scene_path check --video_path long.mp4 > /dev/null
+          for i in $(seq 1 120); do
+            if tasklist //FI "IMAGENAME eq ffmpeg.exe" | grep -q ffmpeg; then break; fi
+            sleep 1
+          done
+          tasklist //FI "IMAGENAME eq ffmpeg.exe" | grep -q ffmpeg || { echo "the worker never ran ffmpeg"; exit 1; }
+          echo "ok: the worker runs ffmpeg"
           ./vrcli.exe stop --dir install
           sleep 2
+          if tasklist //FI "IMAGENAME eq ffmpeg.exe" | grep -q ffmpeg; then echo "ffmpeg outlived the worker"; exit 1; fi
+          echo "ok: stop ended ffmpeg too"
           if curl -s -m 3 http://127.0.0.1:3489/api/v1/version; then echo "still answering"; exit 1; fi
           echo "ok: stop closed the port"
 
