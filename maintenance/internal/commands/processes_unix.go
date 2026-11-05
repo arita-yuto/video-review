@@ -21,7 +21,7 @@ func isInstallProcess(pid int, installDir string) bool {
 	return err == nil && cwd == installDir
 }
 
-func stopProcess(pid int) error {
+func stopProcess(pid int, withChildren bool) error {
 	if err := syscall.Kill(pid, syscall.SIGTERM); err != nil {
 		return err
 	}
@@ -33,8 +33,12 @@ func stopProcess(pid int) error {
 		time.Sleep(100 * time.Millisecond)
 	}
 
+	target := pid
 	// The negative pid reaches the process group Setsid made, so the worker's ffmpeg ends with it.
-	if err := syscall.Kill(-pid, syscall.SIGKILL); err != nil && !errors.Is(err, syscall.ESRCH) {
+	if withChildren {
+		target = -pid
+	}
+	if err := syscall.Kill(target, syscall.SIGKILL); err != nil && !errors.Is(err, syscall.ESRCH) {
 		return err
 	}
 	return nil

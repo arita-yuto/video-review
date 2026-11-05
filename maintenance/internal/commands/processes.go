@@ -19,7 +19,7 @@ var roles = []string{"web", "worker"}
 
 func RunStart(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", ".", "Install folder holding .env and releases/")
+	dir := fs.String("dir", "", "Install folder holding .env and releases/; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
 	fs.Parse(args)
 
 	abs := absDir(*dir)
@@ -35,7 +35,7 @@ func RunStart(cmd string, args []string) {
 
 func RunStop(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", ".", "Install folder holding .env and releases/")
+	dir := fs.String("dir", "", "Install folder holding .env and releases/; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
 	fs.Parse(args)
 
 	if err := stopInstall(absDir(*dir)); err != nil {
@@ -45,6 +45,13 @@ func RunStop(cmd string, args []string) {
 
 // Links resolved, as the working folder of a running process is reported.
 func absDir(dir string) string {
+	if dir == "" {
+		dir = os.Getenv("VIDEO_REVIEW_INSTALL_DIR")
+	}
+	if dir == "" {
+		dir = "."
+	}
+
 	abs, err := filepath.Abs(dir)
 	if err == nil {
 		abs, err = filepath.EvalSymlinks(abs)
@@ -115,7 +122,8 @@ func stopRole(installDir string, role string) error {
 	}
 
 	fmt.Printf("stopping %s (pid %d)\n", role, pid)
-	if err := stopProcess(pid); err != nil {
+	// Only the worker's children are its own; the web's can be the upgrade that is stopping it.
+	if err := stopProcess(pid, role == "worker"); err != nil {
 		return fmt.Errorf("stopping %s: %w", role, err)
 	}
 	return os.Remove(pidFile(installDir, role))

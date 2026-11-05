@@ -1,4 +1,8 @@
 import "server-only";
+import { spawn } from "child_process";
+import fs from "fs";
+import path from "path";
+import { env } from "@/server/lib/env";
 
 const LATEST_RELEASE_URL = "https://api.github.com/repos/arita-yuto/video-review/releases/latest";
 
@@ -53,4 +57,30 @@ export async function getLatestRelease(): Promise<Release | null> {
         cached = { fetchedAt: Date.now(), release: await fetchLatestRelease() };
     }
     return cached.release;
+}
+
+// start.js runs the server from the install folder, where only a zip install has the running release's video-review-cli.
+function installCli() {
+    const cli = path.join(process.cwd(), "releases", env.BUILD_VERSION, process.platform === "win32" ? "video-review-cli.exe" : "video-review-cli");
+    return fs.existsSync(/*turbopackIgnore: true*/ cli) ? cli : null;
+}
+
+export function canInstallRelease() {
+    return installCli() !== null;
+}
+
+// Detached, since the upgrade stops this server before it starts the new release.
+export function installLatestRelease() {
+    const cli = installCli();
+    if (!cli) {
+        return false;
+    }
+
+    const logs = path.join(process.cwd(), "logs");
+    fs.mkdirSync(/*turbopackIgnore: true*/ logs, { recursive: true });
+    const log = fs.openSync(/*turbopackIgnore: true*/ path.join(logs, "upgrade.log"), "a");
+
+    spawn(/*turbopackIgnore: true*/ cli, ["upgrade", "--dir", process.cwd()], { cwd: process.cwd(), detached: true, stdio: ["ignore", log, log], windowsHide: true }).unref();
+    fs.closeSync(log);
+    return true;
 }

@@ -261,7 +261,10 @@
     },
     "release-dialog": {
         "running": "Running {version}",
-        "viewOnGitHub": "View on GitHub"
+        "viewOnGitHub": "View on GitHub",
+        "update": "Update",
+        "installing": "Updating to {version}; the server restarts",
+        "installFailed": "Still not on {version}. See logs/upgrade.log on the server"
     },
     "calendar-date-radio": {
         "today": "Today",

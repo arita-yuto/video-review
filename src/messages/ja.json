@@ -261,7 +261,10 @@
     },
     "release-dialog": {
         "running": "現在 {version}",
-        "viewOnGitHub": "GitHub で見る"
+        "viewOnGitHub": "GitHub で見る",
+        "update": "アップデート",
+        "installing": "{version} にアップデート中（サーバーが再起動）",
+        "installFailed": "{version} に切り替わらず。サーバーの logs/upgrade.log を確認"
     },
     "calendar-date-radio": {
         "today": "今日",

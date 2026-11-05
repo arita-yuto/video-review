@@ -47,7 +47,7 @@ type Upgrader struct {
 
 func RunUpgrade(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", ".", "Install folder holding .env and releases/")
+	dir := fs.String("dir", "", "Install folder holding .env and releases/; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
 	prerelease := fs.Bool("prerelease", false, "Also install release candidates")
 	fs.Parse(args)
 
