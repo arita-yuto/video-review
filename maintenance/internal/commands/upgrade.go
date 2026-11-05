@@ -54,6 +54,25 @@ func RunUpgrade(cmd string, args []string) {
 		os.Exit(1)
 	}
 
+	hasReleases := dirExists(filepath.Join(abs, "releases"))
+	// A clone also holds compose.prod.yml, so only running containers mark a docker compose install.
+	if !hasReleases && composeRunning(abs) {
+		if *prerelease {
+			fmt.Fprintln(os.Stderr, "--prerelease works only for a zip install")
+			os.Exit(1)
+		}
+		if err := dockerUpgrade(abs); err != nil {
+			fmt.Fprintln(os.Stderr, "upgrade failed:", err)
+			os.Exit(1)
+		}
+		return
+	}
+
+	if !hasReleases {
+		fmt.Fprintln(os.Stderr, abs, "has neither releases/ from a zip nor running docker compose containers")
+		os.Exit(1)
+	}
+
 	u := &Upgrader{
 		Dir:         abs,
 		Prerelease:  *prerelease,
@@ -67,6 +86,44 @@ func RunUpgrade(cmd string, args []string) {
 		fmt.Fprintln(os.Stderr, "upgrade failed:", err)
 		os.Exit(1)
 	}
+}
+
+func dirExists(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.IsDir()
+}
+
+func composeRunning(dir string) bool {
+	if _, err := os.Stat(filepath.Join(dir, "compose.prod.yml")); err != nil {
+		return false
+	}
+
+	cmd := exec.Command("docker", "compose", "-f", "compose.prod.yml", "ps", "-q", "videoreview")
+	cmd.Dir = dir
+	out, err := cmd.Output()
+	return err == nil && strings.TrimSpace(string(out)) != ""
+}
+
+// Only the app's own services, so the ones a profile or another compose file added keep running untouched.
+func dockerUpgrade(dir string) error {
+	services := []string{"videoreview", "video-processing"}
+	steps := [][]string{
+		// compose.prod.yml itself changes between releases.
+		{"git", "pull"},
+		append([]string{"docker", "compose", "-f", "compose.prod.yml", "pull"}, services...),
+		append([]string{"docker", "compose", "-f", "compose.prod.yml", "up", "-d"}, services...),
+	}
+
+	for _, step := range steps {
+		cmd := exec.Command(step[0], step[1:]...)
+		cmd.Dir = dir
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("%s: %w", strings.Join(step, " "), err)
+		}
+	}
+	return nil
 }
 
 func nodeMigrate(releaseDir string) error {

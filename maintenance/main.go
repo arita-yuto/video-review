@@ -80,7 +80,7 @@ var commands = map[string]Command{
 	},
 	"upgrade": {
 		Run:      RunUpgrade,
-		Desc:     "Install the latest release into the install folder and apply its migrations",
+		Desc:     "Update a zip install or a docker compose install to the latest release",
 		NoServer: true,
 	},
 	"warm-vcs-cache": {
