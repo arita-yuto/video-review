@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { mkdirSync, rmSync } from "fs";
+import { mkdirSync } from "fs";
 
 const isCiBuild = process.env.CI_BUILD === "true";
 
@@ -14,8 +14,7 @@ function applyCiDefaults() {
 
 async function build() {
     applyCiDefaults();
-    // A build on top of the previous output can keep files the new build no longer writes.
-    rmSync(".next", { recursive: true, force: true });
+    // The zip and the image copy public/, which a fresh clone does not have.
     mkdirSync("public", { recursive: true });
     execSync("npm install", { stdio: "inherit" });
     execSync("npm run prisma:generate", { stdio: "inherit" });

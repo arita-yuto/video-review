@@ -33,7 +33,8 @@ func stopProcess(pid int) error {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil && !errors.Is(err, syscall.ESRCH) {
+	// The negative pid reaches the process group Setsid made, so the worker's ffmpeg ends with it.
+	if err := syscall.Kill(-pid, syscall.SIGKILL); err != nil && !errors.Is(err, syscall.ESRCH) {
 		return err
 	}
 	return nil

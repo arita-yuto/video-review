@@ -27,13 +27,13 @@ func isInstallProcess(pid int, installDir string) bool {
 	return err == nil && strings.Contains(strings.ToLower(string(out)), strings.ToLower(filepath.Join(installDir, "releases")))
 }
 
-// Windows has no SIGTERM for a process without a console, so the server is ended outright.
+// Windows has no SIGTERM for a process without a console, so the server is ended outright, with /T taking the worker's ffmpeg too.
 func stopProcess(pid int) error {
 	process, err := os.FindProcess(pid)
 	if err != nil {
 		return err
 	}
-	if err := process.Kill(); err != nil {
+	if err := exec.Command("taskkill", "/T", "/F", "/PID", strconv.Itoa(pid)).Run(); err != nil {
 		return err
 	}
 	_, err = process.Wait()

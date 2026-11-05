@@ -16,6 +16,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type githubRelease struct {
@@ -72,12 +73,14 @@ func RunUpgrade(cmd string, args []string) {
 		fail(errors.New("the server on port " + installPort(abs) + " was not started with video-review-cli start; stop it and run upgrade again"))
 	}
 
+	// A stalled connection would otherwise keep upgrade waiting forever; the zip is about 130MB.
+	client := &http.Client{Timeout: 10 * time.Minute}
 	u := &Upgrader{
 		Dir:         abs,
 		Prerelease:  *prerelease,
 		ReleasesURL: "https://api.github.com/repos/arita-yuto/video-review/releases?per_page=30",
 		AssetName:   fmt.Sprintf("video-review-%s-x64.zip", runtime.GOOS),
-		HTTP:        http.DefaultClient,
+		HTTP:        client,
 		Migrate:     nodeMigrate,
 		Restart:     func(tag string) error { return restartInstall(abs, tag) },
 		Out:         os.Stdout,
