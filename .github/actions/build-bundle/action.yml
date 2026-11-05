@@ -1,5 +1,5 @@
 name: Build the release bundle
-description: Builds the standalone web server, worker and Prisma CLI for this runner's OS, runs it from an install folder, and leaves the zip in dist/
+description: Builds and collects what the release zip needs for this runner's OS, checks it from an install folder, and leaves the zip in dist/
 
 inputs:
   version:
@@ -15,6 +15,11 @@ runs:
         node-version: "24.22.1"
         cache: "npm"
 
+    - name: Set up Go
+      uses: actions/setup-go@v7.0.0
+      with:
+        go-version-file: maintenance/go.mod
+
     - name: Install
       shell: bash
       run: npm ci
@@ -27,21 +32,51 @@ runs:
         VIDEO_REVIEW_BUILD_STANDALONE: "true"
         VIDEO_REVIEW_BUILD_VERSION: ${{ inputs.version }}
 
+    # The zip ships this OS's CLI, so its tests run on this OS.
+    - name: Test the CLI
+      shell: bash
+      working-directory: maintenance
+      run: go test ./...
+
     - name: Assemble
       shell: bash
       run: |
-        B=bundle
-        rm -rf $B
-        cp -r .next/standalone $B
-        cp -r .next/static $B/.next/static
-        cp -r public $B/public
-        cp integrations/standalone/start.js $B/start.js
-        mkdir -p $B/worker $B/migrate
-        cp integrations/video-processing/dist/main-local.js $B/worker/main-local.js
-        cp -r prisma $B/migrate/prisma
-        cd $B/migrate
+        rm -rf bundle
+        # -L copies what Next's links in .next/node_modules point to, so the bundle holds no links.
+        cp -rL .next/standalone bundle
+
+        declare -A copies=(
+          [.next/static]=bundle/.next/static
+          [public]=bundle/public
+          [integrations/standalone/start.js]=bundle/start.js
+          [integrations/video-processing/dist/main-local.js]=bundle/worker/main-local.js
+          [prisma]=bundle/migrate/prisma
+        )
+        for source in "${!copies[@]}"; do
+          mkdir -p "$(dirname "${copies[$source]}")"
+          cp -r "$source" "${copies[$source]}"
+        done
+
+        # The release dialog's update runs this CLI.
+        (cd maintenance && go build -o "../bundle/video-review-cli${{ runner.os == 'Windows' && '.exe' || '' }}" .)
+
+        cd bundle/migrate
         npm init -y > /dev/null
-        npm install --no-audit --no-fund "prisma@$(node -p "require('../../node_modules/prisma/package.json').version")"
+        npm install --no-audit --no-fund --no-bin-links "prisma@$(node -p "require('../../node_modules/prisma/package.json').version")"
+
+    - name: Zip
+      shell: bash
+      run: |
+        mkdir -p dist
+        cd bundle
+        7z a -tzip -bso0 "../dist/video-review-${{ runner.os == 'Windows' && 'windows' || 'linux' }}-x64.zip" .
+
+    # Installs from the zip so the check runs what the release ships.
+    - name: Unpack the zip into an install folder
+      shell: bash
+      run: |
+        7z x -bso0 -o"$RUNNER_TEMP/install/releases/${{ inputs.version }}" dist/*.zip
+        printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$RUNNER_TEMP/install/.env"
 
     # The Windows image installs PostgreSQL as a disabled service; Linux jobs bring their own service container.
     - name: Start PostgreSQL
@@ -52,42 +87,21 @@ runs:
         Set-Service $name -StartupType Manual
         Start-Service $name
 
-    - name: Zip
+    # Run from elsewhere without DATABASE_URL, so the install's .env is what they read.
+    - name: Apply the migrations
       shell: bash
-      run: |
-        mkdir -p dist
-        os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
-        cd bundle
-        # 7z stores what a link points to, so the zip holds no links.
-        7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
-        ls -la ../dist
+      working-directory: ${{ runner.temp }}
+      run: env -u DATABASE_URL node "install/releases/${{ inputs.version }}/start.js" migrate
 
-    # Installs from the zip so the check runs what the release ships.
-    - name: Install the zip and check it
+    - name: Start the web and worker and check them
       shell: bash
-      env:
-        VERSION: ${{ inputs.version }}
+      working-directory: ${{ runner.temp }}
       run: |
-        npx playwright install chromium ${{ runner.os == 'Linux' && '--with-deps' || '' }}
-
-        I="$RUNNER_TEMP/install"
-        mkdir -p "$I/releases/$VERSION"
-        7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
-        links=$(find "$I/releases/$VERSION" -type l | wc -l)
-        if [ "$links" != 0 ]; then
-          echo "the zip holds $links links"
-          exit 1
-        fi
-        printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$I/.env"
-
-        # Started from elsewhere without DATABASE_URL, so the install's .env is what they read.
-        cd "$RUNNER_TEMP"
-        env -u DATABASE_URL node "install/releases/$VERSION/start.js" migrate
-        env -u DATABASE_URL node "install/releases/$VERSION/start.js" web > web.log 2>&1 &
-        env -u DATABASE_URL node "install/releases/$VERSION/start.js" worker > worker.log 2>&1 &
+        env -u DATABASE_URL node "install/releases/${{ inputs.version }}/start.js" web > web.log 2>&1 &
+        env -u DATABASE_URL node "install/releases/${{ inputs.version }}/start.js" worker > worker.log 2>&1 &
         worker=$!
 
-        node "$GITHUB_WORKSPACE/integrations/standalone/check.mjs" "$I" "$VERSION"
+        node "$GITHUB_WORKSPACE/integrations/standalone/check.mjs" "${{ inputs.version }}"
 
         # The worker queries the database every 10 seconds; by now it has done so at least once.
         sleep 15

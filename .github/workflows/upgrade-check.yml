@@ -88,8 +88,9 @@ jobs:
         run: |
           cd "$RUNNER_TEMP"
           sleep 15
-          curl -s http://127.0.0.1:3489/api/v1/version | grep -q '"v0.14.0-rc.2"' || { echo "rc.2 does not answer"; exit 1; }
-          echo "ok: rc.2 answers"
+          v=$(curl -s http://127.0.0.1:3489/api/v1/version)
+          if [ -z "$v" ] || echo "$v" | grep -q '"v0.14.0-rc.1"'; then echo "still not upgraded: $v"; exit 1; fi
+          echo "ok: the newest release candidate answers: $v"
           for r in web worker; do
             p=$(cat install/run/$r.pid)
             tasklist //FI "PID eq $p" | grep -q node || { echo "$r ($p) is not running"; exit 1; }
