@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -22,26 +23,14 @@ func RunStart(cmd string, args []string) {
 	fs.Parse(args)
 
 	abs := absDir(*dir)
-	u := &Upgrader{Dir: abs}
-	tag := u.installedTag()
+	tag := (&Upgrader{Dir: abs}).installedTag()
 	if tag == "" {
-		exitWith(errors.New(abs + " has no release in releases/"))
+		fail(errors.New(abs + " has no release in releases/"))
 	}
 
-	for _, role := range roles {
-		if pid := runningPID(abs, role); pid != 0 {
-			fmt.Printf("%s is already running (pid %d)\n", role, pid)
-			continue
-		}
-		if err := startRole(abs, tag, role); err != nil {
-			exitWith(err)
-		}
+	if err := startInstall(abs, tag); err != nil {
+		fail(err)
 	}
-
-	if err := waitForVersion(abs, tag); err != nil {
-		exitWith(err)
-	}
-	fmt.Printf("%s is running; logs are in %s\n", tag, filepath.Join(abs, "logs"))
 }
 
 func RunStop(cmd string, args []string) {
@@ -52,20 +41,24 @@ func RunStop(cmd string, args []string) {
 	abs := absDir(*dir)
 	for _, role := range roles {
 		if err := stopRole(abs, role); err != nil {
-			exitWith(err)
+			fail(err)
 		}
 	}
 }
 
+// Links resolved, as the working folder of a running process is reported.
 func absDir(dir string) string {
 	abs, err := filepath.Abs(dir)
+	if err == nil {
+		abs, err = filepath.EvalSymlinks(abs)
+	}
 	if err != nil {
-		exitWith(err)
+		fail(err)
 	}
 	return abs
 }
 
-func exitWith(err error) {
+func fail(err error) {
 	fmt.Fprintln(os.Stderr, err)
 	os.Exit(1)
 }
@@ -131,8 +124,12 @@ func stopRole(installDir string, role string) error {
 	return os.Remove(pidFile(installDir, role))
 }
 
-// start.js listens on PORT from the install's .env, or 3489.
+// start.js listens on PORT, where the environment the CLI passes on wins over the install's .env, or on 3489.
 func installPort(installDir string) string {
+	if port := os.Getenv("PORT"); port != "" {
+		return port
+	}
+
 	file, err := os.Open(filepath.Join(installDir, ".env"))
 	if err != nil {
 		return "3489"
@@ -142,23 +139,25 @@ func installPort(installDir string) string {
 	port := "3489"
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		if value, ok := strings.CutPrefix(strings.TrimSpace(scanner.Text()), "PORT="); ok {
-			port = strings.Trim(value, `"'`)
+		value, ok := strings.CutPrefix(strings.TrimSpace(scanner.Text()), "PORT=")
+		if !ok {
+			continue
 		}
+		value, _, _ = strings.Cut(value, "#")
+		port = strings.Trim(strings.TrimSpace(value), `"'`)
 	}
 	return port
 }
 
-func waitForVersion(installDir string, tag string) error {
+func awaitVersion(installDir string, tag string) error {
 	url := "http://127.0.0.1:" + installPort(installDir) + "/api/v1/version"
 	client := &http.Client{Timeout: 2 * time.Second}
 	for i := 0; i < 60; i++ {
 		res, err := client.Get(url)
 		if err == nil {
-			body := make([]byte, 256)
-			n, _ := res.Body.Read(body)
+			body, _ := io.ReadAll(io.LimitReader(res.Body, 256))
 			res.Body.Close()
-			if strings.Contains(string(body[:n]), `"`+tag+`"`) {
+			if strings.Contains(string(body), `"`+tag+`"`) {
 				return nil
 			}
 		}
@@ -177,6 +176,25 @@ func portAnswers(installDir string) bool {
 	return true
 }
 
+// Starts the roles that are not running yet and waits until the web answers as tag.
+func startInstall(installDir string, tag string) error {
+	for _, role := range roles {
+		if pid := runningPID(installDir, role); pid != 0 {
+			fmt.Printf("%s is already running (pid %d)\n", role, pid)
+			continue
+		}
+		if err := startRole(installDir, tag, role); err != nil {
+			return err
+		}
+	}
+
+	if err := awaitVersion(installDir, tag); err != nil {
+		return err
+	}
+	fmt.Printf("%s is running; logs are in %s\n", tag, filepath.Join(installDir, "logs"))
+	return nil
+}
+
 // Stops the old release before starting the new one, since both listen on the same port.
 func restartInstall(installDir string, tag string) error {
 	for _, role := range roles {
@@ -184,14 +202,5 @@ func restartInstall(installDir string, tag string) error {
 			return err
 		}
 	}
-	for _, role := range roles {
-		if err := startRole(installDir, tag, role); err != nil {
-			return err
-		}
-	}
-	if err := waitForVersion(installDir, tag); err != nil {
-		return err
-	}
-	fmt.Printf("%s is running; logs are in %s\n", tag, filepath.Join(installDir, "logs"))
-	return nil
+	return startInstall(installDir, tag)
 }

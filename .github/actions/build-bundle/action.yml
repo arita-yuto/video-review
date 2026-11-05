@@ -58,7 +58,7 @@ runs:
         mkdir -p dist
         os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
         cd bundle
-        # 7z stores what a link points to, so the zip holds no links and unpacks the same with any tool.
+        # 7z stores what a link points to, so the zip holds no links.
         7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
         ls -la ../dist
 

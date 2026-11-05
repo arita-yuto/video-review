@@ -50,35 +50,26 @@ func RunUpgrade(cmd string, args []string) {
 	prerelease := fs.Bool("prerelease", false, "Also install release candidates")
 	fs.Parse(args)
 
-	abs, err := filepath.Abs(*dir)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
+	abs := absDir(*dir)
 	hasReleases := dirExists(filepath.Join(abs, "releases"))
 	// A clone also holds compose.prod.yml, so only running containers mark a docker compose install.
 	if !hasReleases && composeRunning(abs) {
 		if *prerelease {
-			fmt.Fprintln(os.Stderr, "--prerelease works only for a zip install")
-			os.Exit(1)
+			fail(errors.New("--prerelease works only for a zip install"))
 		}
-		if err := dockerUpgrade(abs); err != nil {
-			fmt.Fprintln(os.Stderr, "upgrade failed:", err)
-			os.Exit(1)
+		if err := composeUpgrade(abs); err != nil {
+			fail(fmt.Errorf("upgrade failed: %w", err))
 		}
 		return
 	}
 
 	if !hasReleases {
-		fmt.Fprintln(os.Stderr, abs, "has neither releases/ from a zip nor running docker compose containers")
-		os.Exit(1)
+		fail(errors.New(abs + " has neither releases/ from a zip nor running docker compose containers"))
 	}
 
 	// A server started by hand holds the port, so the new release could not take it over.
 	if runningPID(abs, "web") == 0 && portAnswers(abs) {
-		fmt.Fprintln(os.Stderr, "the server on port "+installPort(abs)+" was not started with video-review-cli start; stop it and run upgrade again")
-		os.Exit(1)
+		fail(errors.New("the server on port " + installPort(abs) + " was not started with video-review-cli start; stop it and run upgrade again"))
 	}
 
 	u := &Upgrader{
@@ -92,8 +83,7 @@ func RunUpgrade(cmd string, args []string) {
 		Out:         os.Stdout,
 	}
 	if err := u.Run(); err != nil {
-		fmt.Fprintln(os.Stderr, "upgrade failed:", err)
-		os.Exit(1)
+		fail(fmt.Errorf("upgrade failed: %w", err))
 	}
 }
 
@@ -114,7 +104,7 @@ func composeRunning(dir string) bool {
 }
 
 // Only the app's own services, so the ones a profile or another compose file added keep running untouched.
-func dockerUpgrade(dir string) error {
+func composeUpgrade(dir string) error {
 	services := []string{"videoreview", "video-processing"}
 	steps := [][]string{
 		// compose.prod.yml itself changes between releases.
@@ -166,9 +156,6 @@ func (u *Upgrader) Run() error {
 	}
 
 	u.removeOldReleases()
-	if u.Restart == nil {
-		return nil
-	}
 	return u.Restart(release.TagName)
 }
 

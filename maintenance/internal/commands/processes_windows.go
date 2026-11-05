@@ -5,6 +5,7 @@ package commands
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -23,7 +24,7 @@ func detached() *syscall.SysProcAttr {
 func isInstallProcess(pid int, installDir string) bool {
 	out, err := exec.Command("powershell", "-NoProfile", "-Command",
 		"(Get-CimInstance Win32_Process -Filter 'ProcessId="+strconv.Itoa(pid)+"').CommandLine").Output()
-	return err == nil && strings.Contains(string(out), "start.js")
+	return err == nil && strings.Contains(strings.ToLower(string(out)), strings.ToLower(filepath.Join(installDir, "releases")))
 }
 
 // Windows has no SIGTERM for a process without a console, so the server is ended outright.

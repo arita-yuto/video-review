@@ -86,6 +86,7 @@ func newUpgrader(t *testing.T, github *fakeGitHub, migrate *fakeMigrations, inst
 		AssetName:   testAsset,
 		HTTP:        srv.Client(),
 		Migrate:     migrate.run,
+		Restart:     func(string) error { return nil },
 		Out:         io.Discard,
 	}
 }
@@ -194,5 +195,40 @@ func TestUpgradeKeepsOnlyTheTwoNewestReleaseFolders(t *testing.T) {
 	sort.Strings(folders)
 	if len(folders) != 2 || folders[0] != "v0.15.0" || folders[1] != "v0.15.0-rc.2" {
 		t.Fatalf("release folders = %v, want v0.15.0 and v0.15.0-rc.2", folders)
+	}
+}
+
+// Restarting before the folder takes its tag name, or after a failed install, would start a release that is not there.
+func TestUpgradeRestartsOnlyOnceTheNewReleaseIsInPlace(t *testing.T) {
+	cases := []struct {
+		name      string
+		installed string
+		migrate   error
+		want      []string
+	}{
+		{"newer release", "v0.14.0", nil, []string{"v0.15.0"}},
+		{"already latest", "v0.15.0", nil, nil},
+		{"failed migrations", "v0.14.0", errors.New("migration failed"), nil},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			github := &fakeGitHub{releases: []fakeRelease{{tag: "v0.14.0"}, {tag: "v0.15.0"}}}
+			u := newUpgrader(t, github, &fakeMigrations{err: c.migrate}, c.installed)
+
+			var restarted []string
+			u.Restart = func(tag string) error {
+				if _, err := os.Stat(filepath.Join(u.Dir, "releases", tag, "start.js")); err != nil {
+					t.Errorf("restarted %s before releases/%s/start.js was in place: %v", tag, tag, err)
+				}
+				restarted = append(restarted, tag)
+				return nil
+			}
+			u.Run()
+
+			if strings.Join(restarted, ",") != strings.Join(c.want, ",") {
+				t.Fatalf("restarted %v, want %v", restarted, c.want)
+			}
+		})
 	}
 }
