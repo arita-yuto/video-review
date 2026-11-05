@@ -22,6 +22,31 @@ jobs:
         with:
           node-version: "24.22.1"
 
+      # The release dialog's server starts the upgrade as a detached child, which the upgrade then stops with taskkill.
+      - name: A detached child outlives its parent's taskkill without /T
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          cat > parent.js <<'JS'
+          const { spawn } = require("child_process");
+          const child = spawn(process.execPath, ["-e", "setInterval(() => require('fs').writeFileSync(process.argv[1], String(Date.now())), 500)", process.argv[2]], { detached: true, stdio: "ignore", windowsHide: true });
+          child.unref();
+          require("fs").writeFileSync(process.argv[3], String(child.pid));
+          setInterval(() => {}, 1000);
+          JS
+          for mode in plain tree; do
+            rm -f beat.txt child.pid
+            node parent.js beat.txt child.pid &
+            parent=$!
+            sleep 3
+            child=$(cat child.pid)
+            winparent=$(cat /proc/$parent/winpid)
+            if [ "$mode" = tree ]; then taskkill //F //T //PID $winparent; else taskkill //F //PID $winparent; fi
+            sleep 3
+            if tasklist //FI "PID eq $child" | grep -q node; then echo "$mode: child alive"; else echo "$mode: child gone"; fi
+            taskkill //F //PID $child > /dev/null 2>&1 || true
+          done
+
       - name: Start PostgreSQL
         shell: pwsh
         run: |
