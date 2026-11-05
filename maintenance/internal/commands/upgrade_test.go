@@ -86,7 +86,7 @@ func newUpgrader(t *testing.T, github *fakeGitHub, migrate *fakeMigrations, inst
 		AssetName:   testAsset,
 		HTTP:        srv.Client(),
 		Migrate:     migrate.run,
-		Restart:     func(string) error { return nil },
+		Restart:     func(string, string) error { return nil },
 		Out:         io.Discard,
 	}
 }
@@ -120,8 +120,8 @@ func TestUpgradeUnpacksTheNewerReleaseAndMigratesFromIt(t *testing.T) {
 		t.Fatalf("start.js in %s = %q, %v; want the v0.15.0 zip", want, body, err)
 	}
 
-	if len(migrate.dirs) != 1 || migrate.dirs[0] != want+".partial" {
-		t.Fatalf("migrations ran in %v, want only %s.partial", migrate.dirs, want)
+	if len(migrate.dirs) != 1 || migrate.dirs[0] != want {
+		t.Fatalf("migrations ran in %v, want only %s", migrate.dirs, want)
 	}
 }
 
@@ -139,8 +139,8 @@ func TestUpgradeLeavesTheInstallAloneWhenItHasTheLatestRelease(t *testing.T) {
 	}
 }
 
-// The newest release folder counts as installed, so one named before its migrations succeeded would pass for it.
-func TestUpgradeNamesNoReleaseFolderWhenMigrationsFail(t *testing.T) {
+// Without a current file the newest folder counts as installed, which the failed release would be.
+func TestUpgradeKeepsTheRunningReleaseWhenMigrationsFail(t *testing.T) {
 	github := &fakeGitHub{releases: []fakeRelease{{tag: "v0.14.0"}, {tag: "v0.15.0"}}}
 	migrate := &fakeMigrations{err: errors.New("migration failed")}
 	u := newUpgrader(t, github, migrate, "v0.14.0")
@@ -148,8 +148,8 @@ func TestUpgradeNamesNoReleaseFolderWhenMigrationsFail(t *testing.T) {
 	if err := u.Run(); err == nil {
 		t.Fatal("Run succeeded although the migrations failed")
 	}
-	if _, err := os.Stat(filepath.Join(u.Dir, "releases", "v0.15.0")); !os.IsNotExist(err) {
-		t.Fatalf("releases/v0.15.0 exists after failed migrations: %v", err)
+	if got := u.installedTag(); got != "v0.14.0" {
+		t.Fatalf("installed release after failed migrations = %s, want v0.14.0", got)
 	}
 
 	migrate.err = nil
@@ -177,7 +177,7 @@ func TestUpgradeTakesReleaseCandidatesOnlyWhenAskedTo(t *testing.T) {
 	if err := u.Run(); err != nil {
 		t.Fatal(err)
 	}
-	if want := filepath.Join(u.Dir, "releases", "v0.15.0-rc.1.partial"); len(migrate.dirs) != 1 || migrate.dirs[0] != want {
+	if want := filepath.Join(u.Dir, "releases", "v0.15.0-rc.1"); len(migrate.dirs) != 1 || migrate.dirs[0] != want {
 		t.Fatalf("migrations ran in %v with --prerelease, want %s", migrate.dirs, want)
 	}
 }
@@ -198,7 +198,7 @@ func TestUpgradeKeepsOnlyTheTwoNewestReleaseFolders(t *testing.T) {
 	}
 }
 
-// Restarting before the folder takes its tag name, or after a failed install, would start a release that is not there.
+// Restarting before the release is unpacked, or after a failed install, would start a release that is not there.
 func TestUpgradeRestartsOnlyOnceTheNewReleaseIsInPlace(t *testing.T) {
 	cases := []struct {
 		name      string
@@ -206,7 +206,7 @@ func TestUpgradeRestartsOnlyOnceTheNewReleaseIsInPlace(t *testing.T) {
 		migrate   error
 		want      []string
 	}{
-		{"newer release", "v0.14.0", nil, []string{"v0.15.0"}},
+		{"newer release", "v0.14.0", nil, []string{"v0.15.0 after v0.14.0"}},
 		{"already latest", "v0.15.0", nil, nil},
 		{"failed migrations", "v0.14.0", errors.New("migration failed"), nil},
 	}
@@ -217,17 +217,40 @@ func TestUpgradeRestartsOnlyOnceTheNewReleaseIsInPlace(t *testing.T) {
 			u := newUpgrader(t, github, &fakeMigrations{err: c.migrate}, c.installed)
 
 			var restarted []string
-			u.Restart = func(tag string) error {
+			u.Restart = func(tag string, previous string) error {
 				if _, err := os.Stat(filepath.Join(u.Dir, "releases", tag, "start.js")); err != nil {
 					t.Errorf("restarted %s before releases/%s/start.js was in place: %v", tag, tag, err)
 				}
-				restarted = append(restarted, tag)
+				restarted = append(restarted, tag+" after "+previous)
 				return nil
 			}
 			u.Run()
 
 			if strings.Join(restarted, ",") != strings.Join(c.want, ",") {
 				t.Fatalf("restarted %v, want %v", restarted, c.want)
+			}
+		})
+	}
+}
+
+// start runs the release in current, so naming one that never answered would start it again.
+func TestUpgradeNamesTheNewReleaseCurrentOnlyOnceItStarts(t *testing.T) {
+	for _, c := range []struct {
+		name    string
+		restart error
+		want    string
+	}{
+		{"it starts", nil, "v0.15.0"},
+		{"it does not start", errors.New("did not answer"), "v0.14.0"},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			github := &fakeGitHub{releases: []fakeRelease{{tag: "v0.14.0"}, {tag: "v0.15.0"}}}
+			u := newUpgrader(t, github, &fakeMigrations{}, "v0.14.0")
+			u.Restart = func(string, string) error { return c.restart }
+			u.Run()
+
+			if got := u.installedTag(); got != c.want {
+				t.Fatalf("installed release = %s, want %s", got, c.want)
 			}
 		})
 	}

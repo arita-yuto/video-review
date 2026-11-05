@@ -40,8 +40,8 @@ type Upgrader struct {
 	AssetName   string
 	HTTP        *http.Client
 	Migrate     func(releaseDir string) error
-	// Replaces the running web and worker with the release just installed.
-	Restart func(tag string) error
+	// Replaces the running web and worker of release previous with release tag.
+	Restart func(tag string, previous string) error
 	Out     io.Writer
 }
 
@@ -82,7 +82,7 @@ func RunUpgrade(cmd string, args []string) {
 		AssetName:   fmt.Sprintf("video-review-%s-x64.zip", runtime.GOOS),
 		HTTP:        client,
 		Migrate:     nodeMigrate,
-		Restart:     func(tag string) error { return restartInstall(abs, tag) },
+		Restart:     func(tag string, previous string) error { return restartInstall(abs, tag, previous) },
 		Out:         os.Stdout,
 	}
 	if err := u.Run(); err != nil {
@@ -137,6 +137,12 @@ func nodeMigrate(releaseDir string) error {
 
 func (u *Upgrader) Run() error {
 	current := u.installedTag()
+	// Recorded before anything is unpacked, so a release that then fails never passes for the installed one.
+	if current != "" {
+		if err := u.writeCurrent(current); err != nil {
+			return err
+		}
+	}
 
 	release, asset, err := u.latestRelease()
 	if err != nil {
@@ -158,17 +164,32 @@ func (u *Upgrader) Run() error {
 		return err
 	}
 
+	if err := u.Restart(release.TagName, current); err != nil {
+		return err
+	}
+	if err := u.writeCurrent(release.TagName); err != nil {
+		return err
+	}
+
 	u.removeOldReleases()
-	return u.Restart(release.TagName)
+	return nil
 }
 
-// The newest release folder, which install names only after its migrations succeed.
+// The release named in <Dir>/current, which upgrade writes once a release answers; a hand-unpacked install has none yet.
 func (u *Upgrader) installedTag() string {
+	if body, err := os.ReadFile(filepath.Join(u.Dir, "current")); err == nil {
+		return strings.TrimSpace(string(body))
+	}
+
 	tags := u.releaseTags()
 	if len(tags) == 0 {
 		return ""
 	}
 	return tags[len(tags)-1]
+}
+
+func (u *Upgrader) writeCurrent(tag string) error {
+	return os.WriteFile(filepath.Join(u.Dir, "current"), []byte(tag+"\n"), 0o644)
 }
 
 // Release folders, oldest first.
@@ -188,12 +209,14 @@ func (u *Upgrader) releaseTags() []string {
 	return tags
 }
 
-// Keeps the two newest, so the one before the update can still be started by hand.
+// Keeps the running release and the one before it.
 func (u *Upgrader) removeOldReleases() {
+	current := u.installedTag()
 	tags := u.releaseTags()
-	for len(tags) > 2 {
-		os.RemoveAll(filepath.Join(u.Dir, "releases", tags[0]))
-		tags = tags[1:]
+	for _, tag := range tags[:max(len(tags)-2, 0)] {
+		if tag != current {
+			os.RemoveAll(filepath.Join(u.Dir, "releases", tag))
+		}
 	}
 }
 
@@ -235,10 +258,11 @@ func pickRelease(releases []githubRelease, assetName string, prerelease bool) (*
 	return picked, pickedAsset
 }
 
-// Migrates in <tag>.partial and renames it to <tag> only on success, so installedTag never counts an unfinished install.
+// A folder left by an earlier attempt at the same release is replaced, not unpacked over.
 func (u *Upgrader) install(url string, releaseDir string) error {
-	partial := releaseDir + ".partial"
-	os.RemoveAll(partial)
+	if err := os.RemoveAll(releaseDir); err != nil {
+		return err
+	}
 
 	archive, err := u.downloadZip(url, filepath.Dir(releaseDir))
 	if err != nil {
@@ -246,15 +270,14 @@ func (u *Upgrader) install(url string, releaseDir string) error {
 	}
 	defer os.Remove(archive)
 
-	if err := unzip(archive, partial); err != nil {
+	if err := unzip(archive, releaseDir); err != nil {
 		return err
 	}
 
-	if err := u.Migrate(partial); err != nil {
+	if err := u.Migrate(releaseDir); err != nil {
 		return fmt.Errorf("migrations failed: %w", err)
 	}
-
-	return os.Rename(partial, releaseDir)
+	return nil
 }
 
 func (u *Upgrader) downloadZip(url string, dir string) (string, error) {

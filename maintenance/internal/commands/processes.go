@@ -38,11 +38,8 @@ func RunStop(cmd string, args []string) {
 	dir := fs.String("dir", ".", "Install folder holding .env and releases/")
 	fs.Parse(args)
 
-	abs := absDir(*dir)
-	for _, role := range roles {
-		if err := stopRole(abs, role); err != nil {
-			fail(err)
-		}
+	if err := stopInstall(absDir(*dir)); err != nil {
+		fail(err)
 	}
 }
 
@@ -195,12 +192,32 @@ func startInstall(installDir string, tag string) error {
 	return nil
 }
 
-// Stops the old release before starting the new one, since both listen on the same port.
-func restartInstall(installDir string, tag string) error {
+// Stops the old release before starting the new one, since both listen on the same port, and goes back to previous if the new one never answers.
+func restartInstall(installDir string, tag string, previous string) error {
+	if err := stopInstall(installDir); err != nil {
+		return err
+	}
+
+	failed := startInstall(installDir, tag)
+	if failed == nil || previous == "" {
+		return failed
+	}
+
+	fmt.Printf("%s did not start (%v); starting %s again\n", tag, failed, previous)
+	if err := stopInstall(installDir); err != nil {
+		return err
+	}
+	if err := startInstall(installDir, previous); err != nil {
+		return err
+	}
+	return fmt.Errorf("%s did not start, so %s runs again; see %s", tag, previous, filepath.Join(installDir, "logs"))
+}
+
+func stopInstall(installDir string) error {
 	for _, role := range roles {
 		if err := stopRole(installDir, role); err != nil {
 			return err
 		}
 	}
-	return startInstall(installDir, tag)
+	return nil
 }
