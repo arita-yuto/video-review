@@ -39,7 +39,9 @@ type Upgrader struct {
 	AssetName   string
 	HTTP        *http.Client
 	Migrate     func(releaseDir string) error
-	Out         io.Writer
+	// Replaces the running web and worker with the release just installed.
+	Restart func(tag string) error
+	Out     io.Writer
 }
 
 func RunUpgrade(cmd string, args []string) {
@@ -73,6 +75,12 @@ func RunUpgrade(cmd string, args []string) {
 		os.Exit(1)
 	}
 
+	// A server started by hand holds the port, so the new release could not take it over.
+	if runningPID(abs, "web") == 0 && portAnswers(abs) {
+		fmt.Fprintln(os.Stderr, "the server on port "+installPort(abs)+" was not started with video-review-cli start; stop it and run upgrade again")
+		os.Exit(1)
+	}
+
 	u := &Upgrader{
 		Dir:         abs,
 		Prerelease:  *prerelease,
@@ -80,6 +88,7 @@ func RunUpgrade(cmd string, args []string) {
 		AssetName:   fmt.Sprintf("video-review-%s-x64.zip", runtime.GOOS),
 		HTTP:        http.DefaultClient,
 		Migrate:     nodeMigrate,
+		Restart:     func(tag string) error { return restartInstall(abs, tag) },
 		Out:         os.Stdout,
 	}
 	if err := u.Run(); err != nil {
@@ -157,10 +166,10 @@ func (u *Upgrader) Run() error {
 	}
 
 	u.removeOldReleases()
-	fmt.Fprintf(u.Out, "installed %s; restart with:\n", release.TagName)
-	fmt.Fprintf(u.Out, "  node %s web\n", filepath.Join(releaseDir, "start.js"))
-	fmt.Fprintf(u.Out, "  node %s worker\n", filepath.Join(releaseDir, "start.js"))
-	return nil
+	if u.Restart == nil {
+		return nil
+	}
+	return u.Restart(release.TagName)
 }
 
 // The newest release folder, which install names only after its migrations succeed.

@@ -83,6 +83,16 @@ var commands = map[string]Command{
 		Desc:     "Update a zip install or a docker compose install to the latest release",
 		NoServer: true,
 	},
+	"start": {
+		Run:      RunStart,
+		Desc:     "Start the newest release's web and worker in the background",
+		NoServer: true,
+	},
+	"stop": {
+		Run:      RunStop,
+		Desc:     "Stop the web and worker that start or upgrade started",
+		NoServer: true,
+	},
 	"warm-vcs-cache": {
 		Run:  RunWarmVCSCache,
 		Desc: "Pre-warm VCS file cache for a date range (use before users access vcs-changes)",
