@@ -1,0 +1,88 @@
+name: upgrade-check
+
+# Throwaway: starts the v0.14.0-rc.1 zip with video-review-cli start and upgrades it to rc.2 on Windows.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upgrade:
+    runs-on: windows-latest
+    env:
+      DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/postgres
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: maintenance/go.mod
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24.22.1"
+
+      - name: Start PostgreSQL
+        shell: pwsh
+        run: |
+          $name = (Get-Service postgresql*).Name
+          Set-Service $name -StartupType Manual
+          Start-Service $name
+
+      - name: Install rc.1 and start it with the CLI
+        shell: bash
+        run: |
+          (cd maintenance && go build -o "$RUNNER_TEMP/vrcli.exe" .)
+          I="$RUNNER_TEMP/install"
+          gh release download v0.14.0-rc.1 -p video-review-windows-x64.zip -D "$RUNNER_TEMP/dl"
+          7z x -bso0 -o"$I/releases/v0.14.0-rc.1" "$RUNNER_TEMP/dl/video-review-windows-x64.zip"
+          printf 'DATABASE_URL=%s\nJWT_SECRET=upgrade-check\n' "$DATABASE_URL" > "$I/.env"
+          cd "$RUNNER_TEMP"
+          node "install/releases/v0.14.0-rc.1/start.js" migrate
+          ./vrcli.exe start --dir install
+          curl -s http://127.0.0.1:3489/api/v1/version
+          cat install/run/web.pid install/run/worker.pid > old.pids
+
+      - name: Upgrade to rc.2
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          ./vrcli.exe upgrade --prerelease --dir install
+          for p in $(cat old.pids); do
+            if tasklist //FI "PID eq $p" | grep -q node; then echo "old pid $p still runs"; exit 1; fi
+          done
+          echo "ok: the rc.1 processes are gone"
+
+      # A later step shows the processes outlived the CLI and the step that ran it.
+      - name: Check rc.2 keeps running
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          sleep 15
+          curl -s http://127.0.0.1:3489/api/v1/version | grep -q '"v0.14.0-rc.2"' || { echo "rc.2 does not answer"; exit 1; }
+          echo "ok: rc.2 answers"
+          for r in web worker; do
+            p=$(cat install/run/$r.pid)
+            tasklist //FI "PID eq $p" | grep -q node || { echo "$r ($p) is not running"; exit 1; }
+            echo "ok: $r runs as $p"
+          done
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:3489/api/v1/admin/bootstrap -H 'content-type: application/json' -d '{"email":"admin@example.com","pass":"upgrade-check-pass"}')
+          [ "$status" = 200 ] || { echo "bootstrap answered $status"; exit 1; }
+          echo "ok: rc.2 reaches the database"
+          if grep -q "crashed" install/logs/worker.log; then echo "the worker crashed"; exit 1; fi
+          echo "ok: the worker log has no crash"
+
+      - name: Stop
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          ./vrcli.exe stop --dir install
+          sleep 2
+          if curl -s -m 3 http://127.0.0.1:3489/api/v1/version; then echo "still answering"; exit 1; fi
+          echo "ok: stop closed the port"
+
+      - name: Show the logs
+        if: always()
+        shell: bash
+        run: |
+          tail -40 "$RUNNER_TEMP/install/logs/web.log" "$RUNNER_TEMP/install/logs/worker.log" || true
