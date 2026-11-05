@@ -58,12 +58,8 @@ runs:
         mkdir -p dist
         os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
         cd bundle
-        # The runner's 7z stores the target of a symlink in place of the link, which breaks node_modules/.bin on Linux.
-        if [ "$RUNNER_OS" = "Linux" ]; then
-          zip -qry "../dist/video-review-$os-x64.zip" .
-        else
-          7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
-        fi
+        # 7z stores what a link points to, so the zip holds no links and unpacks the same with any tool.
+        7z a -tzip -bso0 "../dist/video-review-$os-x64.zip" .
         ls -la ../dist
 
     # Installs from the zip so the check runs what the release ships.
@@ -76,10 +72,11 @@ runs:
 
         I="$RUNNER_TEMP/install"
         mkdir -p "$I/releases/$VERSION"
-        if [ "$RUNNER_OS" = "Linux" ]; then
-          unzip -q dist/*.zip -d "$I/releases/$VERSION"
-        else
-          7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
+        7z x -bso0 -o"$I/releases/$VERSION" dist/*.zip
+        links=$(find "$I/releases/$VERSION" -type l | wc -l)
+        if [ "$links" != 0 ]; then
+          echo "the zip holds $links links"
+          exit 1
         fi
         printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$I/.env"
 
