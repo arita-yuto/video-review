@@ -86,3 +86,4 @@ jobs:
         shell: bash
         run: |
           tail -40 "$RUNNER_TEMP/install/logs/web.log" "$RUNNER_TEMP/install/logs/worker.log" || true
+broken: [
