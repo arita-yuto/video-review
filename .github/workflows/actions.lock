@@ -17,6 +17,7 @@ workflows:
         - 'docker/build-push-action@v7.4.0'
         - 'docker/login-action@v4.6.0'
         - 'docker/setup-buildx-action@v4.4.1'
+        - 'peter-evans/dockerhub-description@v5.0.0'
         - 'softprops/action-gh-release@v3.0.3'
     '.github/workflows/test.yml':
         - 'actions/checkout@v7.0.1'
@@ -64,6 +65,11 @@ dependencies:
         commit: 'sha1-d1b5dff021aa968b288b02285a8bf47471c5928a'
         owner_id: 1588572
         repo_id: 300422142
+    'peter-evans/dockerhub-description@v5.0.0':
+        ref: 'v5.0.0'
+        commit: 'sha1-1b9a80c056b620d92cedb9d9b5a223409c68ddfa'
+        owner_id: 18365890
+        repo_id: 193685475
     'softprops/action-gh-release@v3.0.3':
         ref: 'v3.0.3'
         commit: 'sha1-efb35369e0ad2afab669f228072c1b0d510eae64'
