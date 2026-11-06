@@ -116,8 +116,6 @@ func startRole(installDir string, tag string, role string) error {
 
 	cmd := exec.Command("node", filepath.Join(installDir, "releases", tag, "start.js"), role)
 	cmd.Dir = installDir
-	// start.js does not override a variable already set, so the .env keys go, or a CLI run by the old web would pass its values on.
-	cmd.Env = withoutEnvFileKeys(os.Environ(), installDir)
 	cmd.Stdout = log
 	cmd.Stderr = log
 	cmd.SysProcAttr = detached()
@@ -145,52 +143,28 @@ func stopRole(installDir string, role string) error {
 	return os.Remove(pidFile(installDir, role))
 }
 
-// start.js listens on PORT, where the environment the CLI passes on wins over the install's .env, or on 3489.
-// The .env wins over the environment, as it does for the processes startRole runs.
+// The .env wins over the environment, as it does in start.js.
 func installPort(installDir string) string {
-	if port, ok := envFile(installDir)["PORT"]; ok && port != "" {
-		return port
+	if file, err := os.Open(filepath.Join(installDir, ".env")); err == nil {
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			value, ok := strings.CutPrefix(strings.TrimSpace(scanner.Text()), "PORT=")
+			if !ok {
+				continue
+			}
+			value, _, _ = strings.Cut(value, "#")
+			if port := strings.Trim(strings.TrimSpace(value), `"'`); port != "" {
+				return port
+			}
+		}
 	}
+
 	if port := os.Getenv("PORT"); port != "" {
 		return port
 	}
 	return "3489"
-}
-
-func envFile(installDir string) map[string]string {
-	values := map[string]string{}
-	file, err := os.Open(filepath.Join(installDir, ".env"))
-	if err != nil {
-		return values
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		key, value, ok := strings.Cut(line, "=")
-		if !ok {
-			continue
-		}
-		value, _, _ = strings.Cut(value, "#")
-		values[strings.TrimSpace(key)] = strings.Trim(strings.TrimSpace(value), `"'`)
-	}
-	return values
-}
-
-func withoutEnvFileKeys(environ []string, installDir string) []string {
-	keys := envFile(installDir)
-	var kept []string
-	for _, entry := range environ {
-		key, _, _ := strings.Cut(entry, "=")
-		if _, inFile := keys[key]; !inFile {
-			kept = append(kept, entry)
-		}
-	}
-	return kept
 }
 
 func awaitVersion(installDir string, tag string) error {

@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { parseEnv } from "node:util";
 
 const entries = {
     web: "server.js",
@@ -20,7 +21,8 @@ const installDir = path.resolve(releaseDir, "..", "..");
 
 const envFile = path.join(installDir, ".env");
 if (fs.existsSync(envFile)) {
-    process.loadEnvFile(envFile);
+    // The .env wins over inherited variables, so a release the old web's CLI starts gets the current values.
+    Object.assign(process.env, parseEnv(fs.readFileSync(envFile, "utf8")));
 }
 
 // server.js listens on HOSTNAME, which shells and containers set to the machine name; next start listens everywhere.
