@@ -3,7 +3,9 @@
 VideoReview を Docker で動かす手順です  
 本番やコンテナでの運用にはこちらを使います
 
-イメージは GitHub のリリースごとに ghcr.io に公開されているので、build は要りません
+イメージは GitHub のリリースごとに ghcr.io に公開されているので、build は要りません  
+同じイメージを Docker Hub にも [aritayuto/videoreview](https://hub.docker.com/r/aritayuto/videoreview) と [aritayuto/video-processing](https://hub.docker.com/r/aritayuto/video-processing) として置いています  
+`compose.prod.yml` が pull するのは ghcr.io です
 
 ※ Docker Compose 2.24 以降が必要です（`docker compose version` で確認できます）
 

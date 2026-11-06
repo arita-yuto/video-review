@@ -1,5 +1,5 @@
 name: Build a Docker image
-description: Builds one image from the matrix and, when asked, pushes it to ghcr
+description: Builds one image from the matrix and, when asked, pushes it to ghcr and Docker Hub
 
 inputs:
   name:
@@ -14,6 +14,14 @@ inputs:
     default: ""
   github-token:
     description: Token with packages:write, only needed when publishing
+    required: false
+    default: ""
+  dockerhub-username:
+    description: Docker Hub user, also the namespace the image is pushed under; only needed when publishing
+    required: false
+    default: ""
+  dockerhub-token:
+    description: Docker Hub personal access token, only needed when publishing
     required: false
     default: ""
 
@@ -31,13 +39,37 @@ runs:
         username: ${{ github.actor }}
         password: ${{ inputs.github-token }}
 
+    - name: Log in to Docker Hub
+      if: inputs.version != ''
+      uses: docker/login-action@v4.6.0
+      with:
+        username: ${{ inputs.dockerhub-username }}
+        password: ${{ inputs.dockerhub-token }}
+
+    - name: List the tags
+      id: tags
+      if: inputs.version != ''
+      shell: bash
+      env:
+        GHCR: ghcr.io/${{ github.repository }}/${{ inputs.name }}
+        DOCKERHUB: docker.io/${{ inputs.dockerhub-username }}/${{ inputs.name }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        tags="$GHCR:$VERSION,$DOCKERHUB:$VERSION"
+
+        # A release candidate leaves :latest on the last release, which compose.prod.yml pulls when VIDEO_REVIEW_VERSION is empty.
+        if [[ "$VERSION" != *-rc.* ]]; then
+          tags="$tags,$GHCR:latest,$DOCKERHUB:latest"
+        fi
+
+        echo "tags=$tags" >> "$GITHUB_OUTPUT"
+
     - name: Build ${{ inputs.name }}
       uses: docker/build-push-action@v7.4.0
       with:
         context: .
         file: ${{ inputs.dockerfile }}
         push: ${{ inputs.version != '' }}
-        # A release candidate leaves :latest on the last release, which compose.prod.yml pulls when VIDEO_REVIEW_VERSION is empty.
-        tags: ${{ inputs.version != '' && (contains(inputs.version, '-rc.') && format('ghcr.io/{0}/{1}:{2}', github.repository, inputs.name, inputs.version) || format('ghcr.io/{0}/{1}:{2},ghcr.io/{0}/{1}:latest', github.repository, inputs.name, inputs.version)) || '' }}
+        tags: ${{ steps.tags.outputs.tags }}
         provenance: false
         build-args: VIDEO_REVIEW_BUILD_VERSION=${{ inputs.version }}

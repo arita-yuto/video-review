@@ -27,6 +27,34 @@ jobs:
           dockerfile: ${{ matrix.dockerfile }}
           version: ${{ github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          dockerhub-username: ${{ vars.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  dockerhub-overview:
+    runs-on: ubuntu-latest
+    needs: images
+    if: ${{ !contains(github.ref_name, '-rc.') }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: videoreview
+            description: Self-hosted, on-premise alternative to Frame.io for game and video teams
+          - name: video-processing
+            description: Thumbnail and transcode worker for VideoReview, a self-hosted Frame.io alternative
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: peter-evans/dockerhub-description@v5.0.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ vars.DOCKERHUB_USERNAME }}/${{ matrix.name }}
+          short-description: ${{ matrix.description }}
+          readme-filepath: ./README.md
+          # Docker Hub resolves no relative links, so ./documents/... become links into the GitHub repository.
+          enable-url-completion: true
 
   cli:
     runs-on: ubuntu-latest
