@@ -52,6 +52,8 @@ func (g *fakeGitHub) serve(t *testing.T) *httptest.Server {
 		archive := zip.NewWriter(&buf)
 		file, _ := archive.Create("start.js")
 		io.WriteString(file, "// "+tag)
+		cli, _ := archive.Create(cliName())
+		io.WriteString(cli, "cli "+tag)
 		archive.Close()
 		w.Write(buf.Bytes())
 	}))
@@ -275,5 +277,23 @@ func TestUnzipRefusesAnEntryThatLeavesTheReleaseFolder(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(root, "releases", "outside.txt")); !errors.Is(err, os.ErrNotExist) {
 		t.Fatal("unzip wrote outside the release folder")
+	}
+}
+
+func TestUpgradeKeepsTheNewReleasesCliAtTheInstallFolder(t *testing.T) {
+	github := &fakeGitHub{releases: []fakeRelease{{tag: "v0.14.0"}, {tag: "v0.15.0"}}}
+	u := newUpgrader(t, github, &fakeMigrations{}, "v0.14.0")
+	installCli := filepath.Join(u.Dir, cliName())
+	if err := os.WriteFile(installCli, []byte("cli v0.14.0"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := u.Run(); err != nil {
+		t.Fatal(err)
+	}
+
+	body, err := os.ReadFile(installCli)
+	if err != nil || string(body) != "cli v0.15.0" {
+		t.Fatalf("%s = %q, %v; want the v0.15.0 CLI", installCli, body, err)
 	}
 }

@@ -189,6 +189,10 @@ func (u *Upgrader) Run() error {
 		return err
 	}
 
+	if err := u.replaceInstallCli(releaseDir); err != nil {
+		return fmt.Errorf("%s is running, but %s was not replaced: %w", release.TagName, filepath.Join(u.Dir, cliName()), err)
+	}
+
 	u.removeOldReleases()
 	return nil
 }
@@ -296,6 +300,40 @@ func (u *Upgrader) install(url string, releaseDir string) error {
 		return fmt.Errorf("migrations failed: %w", err)
 	}
 	return nil
+}
+
+func cliName() string {
+	if runtime.GOOS == "windows" {
+		return "video-review-cli.exe"
+	}
+	return "video-review-cli"
+}
+
+// The install folder keeps the newest release's CLI at one path, so it can stay on PATH across updates.
+func (u *Upgrader) replaceInstallCli(releaseDir string) error {
+	installCli := filepath.Join(u.Dir, cliName())
+	previous := installCli + ".old"
+
+	// Windows refuses to overwrite a running exe but lets it be renamed; the previous upgrade's .old goes once nothing runs it.
+	os.Remove(previous)
+	if err := os.Rename(installCli, previous); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
+	src, err := os.Open(filepath.Join(releaseDir, cliName()))
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dst, err := os.OpenFile(installCli, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, src)
+	return err
 }
 
 func (u *Upgrader) downloadZip(url string, dir string) (string, error) {
