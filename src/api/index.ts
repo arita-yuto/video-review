@@ -13,6 +13,7 @@ import type { chatRouter } from "@/server/routes/chat";
 import type { chatSearchRouter } from "@/server/routes/chat/search";
 import type { thumbnailRouter } from "@/server/routes/thumbnail";
 import type { configRouter } from "@/server/routes/config";
+import type { versionRouter } from "@/server/routes/version";
 
 // The token lives in UI state; the auth store hands a reader in, so api never imports components.
 let tokenSource: () => string | null = () => null;
@@ -47,6 +48,7 @@ export const api = {
     chatSearch: v1<typeof chatSearchRouter>("/chat/search"),
     thumbnail: v1<typeof thumbnailRouter>("/thumbnail"),
     config: v1<typeof configRouter>("/config"),
+    version: v1<typeof versionRouter>("/version"),
 };
 
 // Takes a structural type because error routes declare no content schema, which types their

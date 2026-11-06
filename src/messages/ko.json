@@ -256,7 +256,18 @@
         "logout": "로그아웃",
         "editProfile": "프로필 편집",
         "administration": "관리",
+        "updateAvailable": "{version} 사용 가능",
         "editPrompt": "프롬프트 편집"
+    },
+    "release-dialog": {
+        "running": "현재 {version}",
+        "viewOnGitHub": "GitHub에서 보기",
+        "update": "업데이트",
+        "installing": "{version}(으)로 업데이트 중",
+        "installFailed": "{version}(으)로 업데이트 실패",
+        "restarting": "재시작 중",
+        "installed": "{version}(으)로 업데이트 완료",
+        "reload": "새로고침"
     },
     "calendar-date-radio": {
         "today": "오늘",
@@ -298,6 +309,8 @@
             "resolutionPresets": "해상도 프리셋",
             "resolutionPresetsExample": "480,720,1080",
             "uploadChunkMb": "업로드 청크 (MB)",
+            "checkUpdates": "업데이트 확인",
+            "updateAvailable": "{version} 사용 가능",
             "save": "저장",
             "saveFailed": "저장하지 못했습니다",
             "saved": "저장했습니다"

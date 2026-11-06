@@ -256,7 +256,18 @@
         "logout": "Log out",
         "editProfile": "Edit profile",
         "administration": "Administration",
+        "updateAvailable": "{version} available",
         "editPrompt": "Edit prompt"
+    },
+    "release-dialog": {
+        "running": "Running {version}",
+        "viewOnGitHub": "View on GitHub",
+        "update": "Update",
+        "installing": "Updating to {version}",
+        "installFailed": "Couldn't update to {version}",
+        "restarting": "Restarting",
+        "installed": "Updated to {version}",
+        "reload": "Reload"
     },
     "calendar-date-radio": {
         "today": "Today",
@@ -298,6 +309,8 @@
             "resolutionPresets": "Resolution presets",
             "resolutionPresetsExample": "480,720,1080",
             "uploadChunkMb": "Upload chunk (MB)",
+            "checkUpdates": "Check for updates",
+            "updateAvailable": "{version} available",
             "save": "Save",
             "saveFailed": "Could not save",
             "saved": "Saved"

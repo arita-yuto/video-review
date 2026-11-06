@@ -39,6 +39,14 @@ export async function fetchPendingStep(): Promise<PendingStep | null> {
     });
 }
 
+// One local worker runs per install, so anything still running was cut off when the previous worker was stopped.
+async function requeueInterruptedSteps(): Promise<void> {
+    await prisma().$transaction([
+        prisma().videoProcessingStep.updateMany({ where: { status: JobStatus.running }, data: { status: JobStatus.pending } }),
+        prisma().videoProcessingJob.updateMany({ where: { status: JobStatus.running }, data: { status: JobStatus.pending } }),
+    ]);
+}
+
 async function shutdownProcessingResources(): Promise<void> {
     await prisma().$disconnect();
 }
@@ -59,6 +67,8 @@ export async function runLocalWorker(): Promise<void> {
 
     process.on("SIGINT", () => onSignal("SIGINT"));
     process.on("SIGTERM", () => onSignal("SIGTERM"));
+
+    await requeueInterruptedSteps();
 
     while (!stopping) {
         const pendingVideos = await fetchUnprocessedVideoRevisions(batchSize);

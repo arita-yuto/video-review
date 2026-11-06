@@ -152,6 +152,11 @@
   @apply tabular-nums text-muted-foreground;
 }
 
+/* A small dot on a control's top right corner; the control needs position: relative. */
+@utility notice-dot {
+  @apply absolute top-0.5 right-0.5 size-2 rounded-full bg-primary;
+}
+
 @utility thumb-frame {
   @apply overflow-hidden rounded-sm;
 }

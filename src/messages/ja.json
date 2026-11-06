@@ -256,7 +256,18 @@
         "logout": "ログアウト",
         "editProfile": "プロフィール編集",
         "administration": "管理",
+        "updateAvailable": "{version} 公開中",
         "editPrompt": "プロンプト編集"
+    },
+    "release-dialog": {
+        "running": "現在 {version}",
+        "viewOnGitHub": "GitHub で見る",
+        "update": "アップデート",
+        "installing": "{version} にアップデート中",
+        "installFailed": "{version} へのアップデートに失敗",
+        "restarting": "再起動中",
+        "installed": "{version} にアップデート完了",
+        "reload": "再読み込み"
     },
     "calendar-date-radio": {
         "today": "今日",
@@ -298,6 +309,8 @@
             "resolutionPresets": "Resolution presets",
             "resolutionPresetsExample": "480,720,1080",
             "uploadChunkMb": "Upload chunk (MB)",
+            "checkUpdates": "更新の確認",
+            "updateAvailable": "{version} available",
             "save": "保存",
             "saveFailed": "保存できませんでした",
             "saved": "保存しました"

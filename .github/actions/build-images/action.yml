@@ -37,5 +37,7 @@ runs:
         context: .
         file: ${{ inputs.dockerfile }}
         push: ${{ inputs.version != '' }}
-        tags: ${{ inputs.version != '' && format('ghcr.io/{0}/{1}:{2},ghcr.io/{0}/{1}:latest', github.repository, inputs.name, inputs.version) || '' }}
+        # A release candidate leaves :latest on the last release, which compose.prod.yml pulls when VIDEO_REVIEW_VERSION is empty.
+        tags: ${{ inputs.version != '' && (contains(inputs.version, '-rc.') && format('ghcr.io/{0}/{1}:{2}', github.repository, inputs.name, inputs.version) || format('ghcr.io/{0}/{1}:{2},ghcr.io/{0}/{1}:latest', github.repository, inputs.name, inputs.version)) || '' }}
         provenance: false
+        build-args: VIDEO_REVIEW_BUILD_VERSION=${{ inputs.version }}

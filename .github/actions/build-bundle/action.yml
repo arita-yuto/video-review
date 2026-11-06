@@ -1,0 +1,118 @@
+name: Build the release bundle
+description: Builds and collects what the release zip needs for this runner's OS, checks it from an install folder, and leaves the zip in dist/
+
+inputs:
+  version:
+    description: Release tag baked into the build
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v7.1.0
+      with:
+        node-version: "24.22.1"
+        cache: "npm"
+
+    - name: Set up Go
+      uses: actions/setup-go@v7.0.0
+      with:
+        go-version-file: maintenance/go.mod
+
+    - name: Install
+      shell: bash
+      run: npm ci
+
+    - name: Build
+      shell: bash
+      run: npm run build
+      env:
+        CI_BUILD: "true"
+        VIDEO_REVIEW_BUILD_STANDALONE: "true"
+        VIDEO_REVIEW_BUILD_VERSION: ${{ inputs.version }}
+
+    # The zip ships this OS's CLI, so its tests run on this OS.
+    - name: Test the CLI
+      shell: bash
+      working-directory: maintenance
+      run: go test ./...
+
+    - name: Assemble
+      shell: bash
+      run: |
+        rm -rf bundle
+        # -L copies what Next's links in .next/node_modules point to, so the bundle holds no links.
+        cp -rL .next/standalone bundle
+
+        declare -A copies=(
+          [.next/static]=bundle/.next/static
+          [public]=bundle/public
+          [integrations/standalone/start.js]=bundle/start.js
+          [integrations/video-processing/dist/main-local.js]=bundle/worker/main-local.js
+          [prisma]=bundle/migrate/prisma
+        )
+        for source in "${!copies[@]}"; do
+          mkdir -p "$(dirname "${copies[$source]}")"
+          cp -r "$source" "${copies[$source]}"
+        done
+
+        # The release dialog's update runs this CLI.
+        (cd maintenance && go build -o "../bundle/video-review-cli${{ runner.os == 'Windows' && '.exe' || '' }}" .)
+
+        cd bundle/migrate
+        npm init -y > /dev/null
+        npm install --no-audit --no-fund --no-bin-links "prisma@$(node -p "require('../../node_modules/prisma/package.json').version")"
+
+    - name: Zip
+      shell: bash
+      run: |
+        mkdir -p dist
+        cd bundle
+        7z a -tzip -bso0 "../dist/video-review-${{ runner.os == 'Windows' && 'windows' || 'linux' }}-x64.zip" .
+
+    # Installs from the zip so the check runs what the release ships.
+    - name: Unpack the zip into an install folder
+      shell: bash
+      run: |
+        7z x -bso0 -o"$RUNNER_TEMP/install/releases/${{ inputs.version }}" dist/*.zip
+        printf 'DATABASE_URL=%s\nJWT_SECRET=bundle-check\n' "$DATABASE_URL" > "$RUNNER_TEMP/install/.env"
+
+    # The Windows image installs PostgreSQL as a disabled service; Linux jobs bring their own service container.
+    - name: Start PostgreSQL
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $name = (Get-Service postgresql*).Name
+        Set-Service $name -StartupType Manual
+        Start-Service $name
+
+    # Run from elsewhere without DATABASE_URL, so the install's .env is what they read.
+    - name: Apply the migrations
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: env -u DATABASE_URL node "install/releases/${{ inputs.version }}/start.js" migrate
+
+    - name: Start the web and worker and check them
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        env -u DATABASE_URL node "install/releases/${{ inputs.version }}/start.js" web > web.log 2>&1 &
+        env -u DATABASE_URL node "install/releases/${{ inputs.version }}/start.js" worker > worker.log 2>&1 &
+        worker=$!
+
+        node "$GITHUB_WORKSPACE/integrations/standalone/check.mjs" "${{ inputs.version }}"
+
+        # The worker queries the database every 10 seconds; by now it has done so at least once.
+        sleep 15
+        if ! kill -0 $worker 2>/dev/null || grep -q "crashed" worker.log; then
+          echo "the worker stopped"
+          exit 1
+        fi
+        echo "ok: the worker keeps running"
+
+    - name: Show the logs
+      if: failure()
+      shell: bash
+      run: |
+        cat "$RUNNER_TEMP/web.log" "$RUNNER_TEMP/worker.log" || true

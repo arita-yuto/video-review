@@ -13,6 +13,8 @@ import (
 type Command struct {
 	Run  func(cmd string, args []string)
 	Desc string
+	// Runs without the server URL and API token.
+	NoServer bool
 }
 
 var commands = map[string]Command{
@@ -76,6 +78,21 @@ var commands = map[string]Command{
 		Run:  RunPatchVideo,
 		Desc: "Update mutable video metadata (e.g. vcsWatchPaths)",
 	},
+	"upgrade": {
+		Run:      RunUpgrade,
+		Desc:     "Update a zip install or a docker compose install to the latest release",
+		NoServer: true,
+	},
+	"start": {
+		Run:      RunStart,
+		Desc:     "Start the web and worker of a zip install or a docker compose install",
+		NoServer: true,
+	},
+	"stop": {
+		Run:      RunStop,
+		Desc:     "Stop the web and worker of a zip install or a docker compose install",
+		NoServer: true,
+	},
 	"warm-vcs-cache": {
 		Run:  RunWarmVCSCache,
 		Desc: "Pre-warm VCS file cache for a date range (use before users access vcs-changes)",
@@ -96,30 +113,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	baseURL := *server
-	if baseURL == "" {
-		baseURL = os.Getenv("VIDEO_REVIEW_SERVER_URL")
-	}
-	apiToken := *token
-	if apiToken == "" {
-		apiToken = os.Getenv("VIDEO_REVIEW_API_TOKEN")
-	}
-
-	if baseURL == "" {
-		panic("VIDEO_REVIEW_SERVER_URL is not set")
-	}
-
-	if apiToken == "" {
-		panic("VIDEO_REVIEW_API_TOKEN is not set")
-	}
-
 	args := fs.Args()
 	cmd := args[0]
-
-	GlobalConfig = Config{
-		BaseURL:  strings.TrimRight(baseURL, "/"),
-		APIToken: apiToken,
-	}
 
 	c, ok := commands[cmd]
 	if !ok {
@@ -127,6 +122,31 @@ func main() {
 		printUsage()
 		os.Exit(1)
 	}
+
+	if !c.NoServer {
+		baseURL := *server
+		if baseURL == "" {
+			baseURL = os.Getenv("VIDEO_REVIEW_SERVER_URL")
+		}
+		apiToken := *token
+		if apiToken == "" {
+			apiToken = os.Getenv("VIDEO_REVIEW_API_TOKEN")
+		}
+
+		if baseURL == "" {
+			panic("VIDEO_REVIEW_SERVER_URL is not set")
+		}
+
+		if apiToken == "" {
+			panic("VIDEO_REVIEW_API_TOKEN is not set")
+		}
+
+		GlobalConfig = Config{
+			BaseURL:  strings.TrimRight(baseURL, "/"),
+			APIToken: apiToken,
+		}
+	}
+
 	c.Run(cmd, args[1:])
 }
 

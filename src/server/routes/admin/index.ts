@@ -3,6 +3,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
 import { maintenanceRouter } from "@/server/routes/admin/maintenance";
 import { settingsRouter } from "@/server/routes/admin/settings";
+import { latestReleaseRouter } from "@/server/routes/admin/latest-release";
 import { usersExportRouter } from "@/server/routes/admin/users-export";
 import { usersImportRouter } from "@/server/routes/admin/users-import";
 import { videosExportRouter } from "@/server/routes/admin/videos-export";
@@ -506,6 +507,7 @@ export const adminRouter = createRouter()
     })
     .route("/maintenance", maintenanceRouter)
     .route("/settings", settingsRouter)
+    .route("/latest-release", latestReleaseRouter)
     .route("/users/export", usersExportRouter)
     .route("/users/import", usersImportRouter)
     .route("/videos/export", videosExportRouter)

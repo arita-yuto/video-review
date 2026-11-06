@@ -12,8 +12,9 @@ VideoReview を Docker で動かす手順です
 ## 1. 起動する
 
 ```bash
-git clone --depth 1 https://github.com/arita-yuto/video-review.git
+mkdir video-review
 cd video-review
+curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
 docker compose -f compose.prod.yml up -d
 ```
 
@@ -24,7 +25,6 @@ docker compose -f compose.prod.yml up -d
 ## 2. 更新する
 
 ```bash
-git pull
 docker compose -f compose.prod.yml pull
 docker compose -f compose.prod.yml up -d
 ```
@@ -33,7 +33,7 @@ docker compose -f compose.prod.yml up -d
 
 ## 3. 保存先や版を固定する
 
-必要なときだけ、リポジトリの直下に `.env` を作ります
+必要なときだけ、`compose.prod.yml` と同じフォルダに `.env` を作ります
 
 | 変数 | 内容 |
 |---|---|
@@ -43,6 +43,24 @@ docker compose -f compose.prod.yml up -d
 ---
 
 ## Reference
+### video-review-cli でまとめて実行する
+
+`compose.prod.yml` と同じフォルダに `video-review-cli` をダウンロードすると、更新の手順をまとめて実行できます
+
+```bash
+# Linux
+curl -L -o video-review-cli https://github.com/arita-yuto/video-review/releases/latest/download/video-review-cli-linux-amd64
+chmod +x video-review-cli
+
+# Windows
+curl.exe -L -o video-review-cli.exe https://github.com/arita-yuto/video-review/releases/latest/download/video-review-cli-windows-amd64.exe
+
+# 更新する
+./video-review-cli upgrade --docker
+```
+
+起動・終了は `./video-review-cli start --docker` / `stop --docker` です
+
 ### ソースから build する
 
 公開イメージの代わりに手元で build するときは、compose が参照する名前で tag を付けます

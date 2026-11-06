@@ -48,3 +48,38 @@ jobs:
             integrations/launcher/dist/*.zip
           # GitHub writes the body from the pull request titles merged since the last tag.
           generate_release_notes: true
+          # upgrade and the release notice skip pre-releases unless asked for them.
+          prerelease: ${{ contains(github.ref_name, '-rc.') }}
+
+  bundle:
+    # The cli job creates the release; attaching after it keeps two jobs from creating it at once.
+    needs: cli
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    services:
+      postgres:
+        # An empty image skips the service on Windows, which starts its own PostgreSQL.
+        image: ${{ matrix.os == 'ubuntu-latest' && 'postgres:16' || '' }}
+        env:
+          POSTGRES_USER: videoreview
+          POSTGRES_PASSWORD: videoreview
+          POSTGRES_DB: videoreview
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 2s --health-retries 30
+    env:
+      # The Windows image ships PostgreSQL with the superuser password "root".
+      DATABASE_URL: ${{ matrix.os == 'ubuntu-latest' && 'postgresql://videoreview:videoreview@127.0.0.1:5432/videoreview' || 'postgresql://postgres:root@127.0.0.1:5432/postgres' }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: $/.github/actions/build-bundle
+        with:
+          version: ${{ github.ref_name }}
+      - name: Attach the bundle to the release
+        uses: softprops/action-gh-release@v3.0.3
+        with:
+          files: dist/*.zip

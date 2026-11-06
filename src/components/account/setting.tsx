@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Globe, LogOut, Settings, ShieldUser, UserPen } from "lucide-react";
+import { CircleArrowUp, Globe, LogOut, Settings, ShieldUser, UserPen } from "lucide-react";
+import { useLatestRelease } from "@/components/hooks/use-latest-release";
+import { ReleaseDialog } from "@/components/admin/release-dialog";
 import { Locales, useLocale } from "@/app/locale-provider";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { isAdmin, isGuest } from "@/lib/role";
@@ -36,6 +38,7 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
     const [isLogged, setLogged] = useState(false);
     const [editProfileOpen, setEditProfileOpen] = useState(false);
     const [adminSettingsOpen, setAdminSettingsOpen] = useState(false);
+    const [releaseOpen, setReleaseOpen] = useState(false);
 
     useEffect(() => {
         void (async () => {
@@ -47,17 +50,21 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
         })();
     }, []);
 
+    const latest = useLatestRelease(isLogged && isAdmin(role));
+
     const menu = (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 {compact ? (
-                    <Button variant="ghost" size="icon-sm" aria-label={t("title")}>
+                    <Button variant="ghost" size="icon-sm" aria-label={t("title")} className="relative">
                         <AccountAvatar email={email} className="size-6" />
+                        {latest && <span className="notice-dot" />}
                     </Button>
                 ) : (
-                    <SidebarMenuButton size="lg" aria-label={t("title")}>
+                    <SidebarMenuButton size="lg" aria-label={t("title")} className="relative">
                         <AccountSummary displayName={displayName ?? ""} email={email} />
                         <Settings />
+                        {latest && <span className="notice-dot" />}
                     </SidebarMenuButton>
                 )}
             </DropdownMenuTrigger>
@@ -70,6 +77,12 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
+                {latest && (
+                    <DropdownMenuItem onSelect={() => setReleaseOpen(true)}>
+                        <CircleArrowUp />
+                        {t("updateAvailable", { version: latest.version })}
+                    </DropdownMenuItem>
+                )}
                 {isLogged && !isGuest(role) && (
                     <DropdownMenuItem onSelect={() => setEditProfileOpen(true)}>
                         <UserPen />
@@ -118,6 +131,7 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
             {/* Outside the menu, which closes when an item is chosen. */}
             <EditUserProfileDialog open={editProfileOpen} onClose={() => setEditProfileOpen(false)} />
             <AdminSettingsDialog open={adminSettingsOpen} onClose={() => setAdminSettingsOpen(false)} />
+            {latest && <ReleaseDialog release={latest} open={releaseOpen} onOpenChange={setReleaseOpen} />}
         </>
     );
 }

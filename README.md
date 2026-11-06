@@ -65,8 +65,9 @@
 ## Quick Start (Docker)
 
 ```bash
-git clone --depth 1 https://github.com/arita-yuto/video-review.git
+mkdir video-review
 cd video-review
+curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
 docker compose -f compose.prod.yml up -d
 ```
 

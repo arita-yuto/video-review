@@ -30,6 +30,8 @@ export const general = defineIntegration({
         urlSchema: { kind: "plain", env: () => env.URL_SCHEMA || DEFAULT_URL_SCHEMA, schema: z.string() },
         resolutionPresets: { kind: "plain", env: () => env.RESOLUTION_PRESETS, schema: PresetsSchema },
         uploadChunkMb: { kind: "plain", env: () => env.UPLOAD_CHUNK_MB || String(DEFAULT_UPLOAD_CHUNK_MB), schema: PositiveIntSchema },
+        // No env default: asking GitHub is the admin's choice.
+        checkUpdates: { kind: "plain", env: () => undefined, schema: z.enum(["true", "false"]) },
     },
     testSchema: TestResultSchema,
     check: () => false,
@@ -47,6 +49,8 @@ export async function getLoginDefaultType(): Promise<LoginType> {
     const type = await getPlainField(general, "loginDefaultType");
     return (LOGIN_TYPES as readonly string[]).includes(type ?? "") ? (type as LoginType) : "guest";
 }
+
+export const isUpdateCheckEnabled = async () => (await getPlainField(general, "checkUpdates")) === "true";
 
 export const getUrlSchema = async () => (await getPlainField(general, "urlSchema")) || undefined;
 

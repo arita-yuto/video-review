@@ -1,6 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useLatestRelease } from "@/components/hooks/use-latest-release";
+import { ReleaseDialog } from "@/components/admin/release-dialog";
+import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -20,6 +24,9 @@ export function GeneralSection() {
 
     const allowGuest = settings.field("allowGuest");
     const loginDefaultType = settings.field("loginDefaultType");
+    const checkUpdates = settings.field("checkUpdates");
+    const latest = useLatestRelease(true);
+    const [releaseOpen, setReleaseOpen] = useState(false);
 
     const text = (name: string, placeholder?: string) => {
         const props = settings.field(name);
@@ -53,6 +60,23 @@ export function GeneralSection() {
             {text("urlSchema")}
             {text("resolutionPresets", t("resolutionPresetsExample"))}
             {text("uploadChunkMb")}
+
+            <FieldRow label={t("checkUpdates")} htmlFor={checkUpdates.id}>
+                <Switch
+                    id={checkUpdates.id}
+                    checked={checkUpdates.value === "true"}
+                    disabled={checkUpdates.disabled}
+                    onCheckedChange={(checked) => checkUpdates.onChange(checked ? "true" : "false")}
+                />
+                {latest && (
+                    <>
+                        <Button variant="link" size="xs" onClick={() => setReleaseOpen(true)}>
+                            {t("updateAvailable", { version: latest.version })}
+                        </Button>
+                        <ReleaseDialog release={latest} open={releaseOpen} onOpenChange={setReleaseOpen} />
+                    </>
+                )}
+            </FieldRow>
         </IntegrationForm>
     );
 }

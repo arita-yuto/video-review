@@ -22,12 +22,9 @@ await build({
     target: ["node20"],
     sourcemap: false,
     tsconfig: path.join(scriptDir, "tsconfig.json"),
-    external: [
-        "@prisma/client",
-        "@aws-sdk/client-s3",
-        "@aws-sdk/s3-request-presigner",
-        "mime-types",
-        "uuid",
-    ],
+    // The release zip runs the worker from the web server's standalone node_modules, which hold only what Next traced.
+    external: ["@prisma/client"],
+    // Bundled CommonJS dependencies call require(), which an ES module does not have by itself.
+    banner: { js: 'import { createRequire } from "node:module"; const require = createRequire(import.meta.url);' },
     logLevel: "info",
 });
