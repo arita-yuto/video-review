@@ -263,9 +263,9 @@
         "running": "현재 {version}",
         "viewOnGitHub": "GitHub에서 보기",
         "update": "업데이트",
-        "installing": "{version}(으)로 업데이트 중(서버 재시작)",
-        "installFailed": "{version}(으)로 바뀌지 않음. 서버의 logs/upgrade.log 확인",
-        "restarting": "서버 재시작 중",
+        "installing": "{version}(으)로 업데이트 중",
+        "installFailed": "{version}(으)로 업데이트 실패",
+        "restarting": "재시작 중",
         "installed": "{version}(으)로 업데이트 완료",
         "reload": "새로고침"
     },
