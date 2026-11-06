@@ -6,6 +6,10 @@ inputs:
     description: Write the binaries to maintenance/dist instead of discarding them
     required: false
     default: "false"
+  version:
+    description: Release tag baked into the binaries
+    required: false
+    default: "dev"
 
 runs:
   using: composite
@@ -31,7 +35,7 @@ runs:
       working-directory: maintenance
       run: |
         mkdir -p dist
-        GOOS=linux GOARCH=amd64 go build -o dist/video-review-cli-linux-amd64 .
-        GOOS=windows GOARCH=amd64 go build -o dist/video-review-cli-windows-amd64.exe .
-        GOOS=darwin GOARCH=arm64 go build -o dist/video-review-cli-darwin-arm64 .
-        GOOS=darwin GOARCH=amd64 go build -o dist/video-review-cli-darwin-amd64 .
+        GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ inputs.version }}" -o dist/video-review-cli-linux-amd64 .
+        GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{ inputs.version }}" -o dist/video-review-cli-windows-amd64.exe .
+        GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ inputs.version }}" -o dist/video-review-cli-darwin-arm64 .
+        GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ inputs.version }}" -o dist/video-review-cli-darwin-amd64 .

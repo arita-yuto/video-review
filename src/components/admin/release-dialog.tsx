@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
 import { ScrollArea } from "@/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { MarkdownText } from "@/components/controls/markdown-text";
 import type { LatestRelease } from "@/components/hooks/use-latest-release";
-import { fetchRunningVersion, useReleaseInstall } from "@/components/admin/hooks/use-release-install";
+import { useRunningVersion } from "@/components/hooks/use-running-version";
+import { useReleaseInstall } from "@/components/admin/hooks/use-release-install";
 
 export function ReleaseDialog({ release, open, onOpenChange }: {
     release: LatestRelease;
@@ -15,23 +15,8 @@ export function ReleaseDialog({ release, open, onOpenChange }: {
     onOpenChange: (open: boolean) => void;
 }) {
     const t = useTranslations("release-dialog");
-    const [running, setRunning] = useState<string | null>(null);
+    const running = useRunningVersion();
     const install = useReleaseInstall(release);
-
-    useEffect(() => {
-        if (!open) {
-            return;
-        }
-        let cancelled = false;
-
-        void fetchRunningVersion().then((version) => {
-            if (!cancelled) {
-                setRunning(version);
-            }
-        });
-
-        return () => { cancelled = true; };
-    }, [open]);
 
     // Closing while it runs would look like stopping it.
     const changeOpen = (next: boolean) => {

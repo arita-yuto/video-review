@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/api";
 import type { LatestRelease } from "@/components/hooks/use-latest-release";
+import { fetchRunningVersion } from "@/components/hooks/use-running-version";
 
 type InstallStep = "idle" | "installing" | "restarting" | "done" | "failed";
 
@@ -62,9 +63,4 @@ function nextStep(answeredVersion: string, target: string, failed: boolean): Ins
         return "done";
     }
     return failed ? "failed" : "installing";
-}
-
-export async function fetchRunningVersion() {
-    const res = await api.version.index.$get().catch(() => null);
-    return res?.status === 200 ? (await res.json()).version : null;
 }

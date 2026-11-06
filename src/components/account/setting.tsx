@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CircleArrowUp, Globe, LogOut, Settings, ShieldUser, UserPen } from "lucide-react";
+import { CircleArrowUp, Globe, LogOut, Settings, ShieldUser, Tag, UserPen } from "lucide-react";
 import { useLatestRelease } from "@/components/hooks/use-latest-release";
+import { useRunningVersion } from "@/components/hooks/use-running-version";
 import { ReleaseDialog } from "@/components/admin/release-dialog";
 import { Locales, useLocale } from "@/app/locale-provider";
 import { useAuthStore } from "@/components/stores/auth-store";
@@ -51,6 +52,7 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
     }, []);
 
     const latest = useLatestRelease(isLogged && isAdmin(role));
+    const running = useRunningVersion();
 
     const menu = (
         <DropdownMenu>
@@ -77,10 +79,15 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                {latest && (
+                {latest ? (
                     <DropdownMenuItem onSelect={() => setReleaseOpen(true)}>
                         <CircleArrowUp />
                         {t("updateAvailable", { version: latest.version })}
+                    </DropdownMenuItem>
+                ) : running && (
+                    <DropdownMenuItem disabled>
+                        <Tag />
+                        {running}
                     </DropdownMenuItem>
                 )}
                 {isLogged && !isGuest(role) && (

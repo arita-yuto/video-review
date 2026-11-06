@@ -58,7 +58,7 @@ runs:
         done
 
         # The release dialog's update runs this CLI.
-        (cd maintenance && go build -o "../bundle/video-review-cli${{ runner.os == 'Windows' && '.exe' || '' }}" .)
+        (cd maintenance && go build -ldflags "-X main.version=${{ inputs.version }}" -o "../bundle/video-review-cli${{ runner.os == 'Windows' && '.exe' || '' }}" .)
 
         cd bundle/migrate
         npm init -y > /dev/null

@@ -10,6 +10,9 @@ import (
 	. "videoreview-maintenance/internal/lib"
 )
 
+// The release build sets this with -ldflags "-X main.version=<tag>".
+var version = "dev"
+
 type Command struct {
 	Run  func(cmd string, args []string)
 	Desc string
@@ -91,6 +94,11 @@ var commands = map[string]Command{
 	"stop": {
 		Run:      RunStop,
 		Desc:     "Stop the web and worker of a zip install or a docker compose install",
+		NoServer: true,
+	},
+	"version": {
+		Run:      func(cmd string, args []string) { fmt.Println(version) },
+		Desc:     "Print the release this CLI was built from",
 		NoServer: true,
 	},
 	"warm-vcs-cache": {
