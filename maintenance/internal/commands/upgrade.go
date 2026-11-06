@@ -85,20 +85,45 @@ func RunUpgrade(cmd string, args []string) {
 	}
 }
 
-// compose.prod.yml itself changes between releases, so the clone is pulled first.
+// compose.prod.yml itself changes between releases, so the one on main is fetched first.
 func composeUpgrade(dir string) error {
-	cmd := exec.Command("git", "pull")
-	cmd.Dir = dir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git pull: %w", err)
+	client := &http.Client{Timeout: time.Minute}
+	url := "https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml"
+	if err := downloadCompose(client, url, dir); err != nil {
+		return fmt.Errorf("download compose.prod.yml: %w", err)
 	}
 
 	if err := runCompose(dir, "pull"); err != nil {
 		return err
 	}
 	return runCompose(dir, "up", "-d")
+}
+
+// Written beside it first, so a failed download leaves the working compose.prod.yml in place.
+func downloadCompose(client *http.Client, url string, dir string) error {
+	res, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return errors.New("the download answered " + strconv.Itoa(res.StatusCode))
+	}
+
+	tmp, err := os.CreateTemp(dir, "compose-*.yml")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmp.Name())
+
+	if _, err := io.Copy(tmp, res.Body); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp.Name(), filepath.Join(dir, "compose.prod.yml"))
 }
 
 // Only the app's own services, so the ones a profile or another compose file added are left alone.
