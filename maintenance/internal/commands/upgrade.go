@@ -47,7 +47,7 @@ type Upgrader struct {
 
 func RunUpgrade(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Install folder, or the clone with --docker; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Install folder, or the clone with --docker; defaults to the current folder")
 	docker := fs.Bool("docker", false, "Update a docker compose install from its clone")
 	prerelease := fs.Bool("prerelease", false, "Also install release candidates")
 	fs.Parse(args)
