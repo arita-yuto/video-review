@@ -37,6 +37,7 @@ jobs:
       - uses: $/.github/actions/build-cli
         with:
           package: "true"
+          version: ${{ github.ref_name }}
       - uses: $/.github/actions/build-launcher
         with:
           package: "true"
