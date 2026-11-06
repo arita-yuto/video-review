@@ -1,0 +1,54 @@
+name: pr-auto-update
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: pr-auto-update
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Bring open PRs up to date with main and run their checks
+        run: |
+          mapfile -t prs < <(gh pr list --base main --state open --json number,headRefName,headRefOid,isDraft,author \
+            --jq '.[] | select(.isDraft | not) | select(.author.is_bot | not) | "\(.number) \(.headRefName) \(.headRefOid)"')
+
+          for pr in "${prs[@]}"; do
+            read -r number branch old_sha <<< "$pr"
+
+            if ! gh api -X PUT "repos/$GH_REPO/pulls/$number/update-branch" -f expected_head_sha="$old_sha" > /dev/null; then
+              echo "#$number: not updated (already up to date or has conflicts)"
+              continue
+            fi
+
+            # update-branch answers 202 before the merge commit exists, so wait for the head to move.
+            new_sha="$old_sha"
+            for _ in $(seq 1 30); do
+              new_sha=$(gh pr view "$number" --json headRefOid --jq .headRefOid)
+              if [ "$new_sha" != "$old_sha" ]; then
+                break
+              fi
+              sleep 2
+            done
+
+            if [ "$new_sha" = "$old_sha" ]; then
+              echo "#$number: head did not move, checks not started"
+              continue
+            fi
+
+            # A push made with GITHUB_TOKEN starts no pull_request runs; workflow_dispatch is the exception.
+            gh workflow run test.yml --ref "$branch"
+            gh workflow run pr-check.yml --ref "$branch"
+            echo "#$number: updated to $new_sha, checks started"
+          done
