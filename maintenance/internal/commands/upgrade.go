@@ -317,11 +317,11 @@ func unzip(archive string, dir string) error {
 	defer reader.Close()
 
 	for _, file := range reader.File {
-		path := filepath.Join(dir, file.Name)
-		// A name with ".." would write outside the release folder.
-		if path != filepath.Clean(dir) && !strings.HasPrefix(path, filepath.Clean(dir)+string(os.PathSeparator)) {
+		// A name with ".." or an absolute path would write outside the release folder.
+		if !filepath.IsLocal(file.Name) {
 			return fmt.Errorf("%s leaves the release folder", file.Name)
 		}
+		path := filepath.Join(dir, file.Name)
 
 		if file.FileInfo().IsDir() {
 			if err := os.MkdirAll(path, 0o755); err != nil {

@@ -255,3 +255,25 @@ func TestUpgradeNamesTheNewReleaseCurrentOnlyOnceItStarts(t *testing.T) {
 		})
 	}
 }
+
+func TestUnzipRefusesAnEntryThatLeavesTheReleaseFolder(t *testing.T) {
+	root := t.TempDir()
+	archivePath := filepath.Join(root, "release.zip")
+
+	var buf bytes.Buffer
+	archive := zip.NewWriter(&buf)
+	file, _ := archive.Create("../outside.txt")
+	io.WriteString(file, "written outside")
+	archive.Close()
+	if err := os.WriteFile(archivePath, buf.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	releaseDir := filepath.Join(root, "releases", "v0.15.0")
+	if err := unzip(archivePath, releaseDir); err == nil {
+		t.Fatal("unzip accepted an entry outside the release folder")
+	}
+	if _, err := os.Stat(filepath.Join(root, "releases", "outside.txt")); !errors.Is(err, os.ErrNotExist) {
+		t.Fatal("unzip wrote outside the release folder")
+	}
+}
