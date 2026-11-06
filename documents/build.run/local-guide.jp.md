@@ -93,6 +93,8 @@ OS を再起動したあとは、`start` で起動します
 
 管理画面からも更新できます（[General](../admin/general.jp.md)）
 
+※ `.env` を書き換えたときは、`./video-review-cli stop` → `start` で読み直します
+
 ---
 
 ## 参考

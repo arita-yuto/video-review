@@ -93,6 +93,8 @@ If it does not start, the previous release runs again.
 
 You can also update from the admin screen ([General](../admin/general.md)).
 
+Note: after editing `.env`, run `./video-review-cli stop` and then `start` to load it again.
+
 ---
 
 ## Reference

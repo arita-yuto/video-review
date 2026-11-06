@@ -143,28 +143,29 @@ func stopRole(installDir string, role string) error {
 	return os.Remove(pidFile(installDir, role))
 }
 
-// The .env wins over the environment, as it does in start.js.
+// start.js listens on PORT, where the environment the CLI passes on wins over the install's .env, or on 3489.
 func installPort(installDir string) string {
-	if file, err := os.Open(filepath.Join(installDir, ".env")); err == nil {
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			value, ok := strings.CutPrefix(strings.TrimSpace(scanner.Text()), "PORT=")
-			if !ok {
-				continue
-			}
-			value, _, _ = strings.Cut(value, "#")
-			if port := strings.Trim(strings.TrimSpace(value), `"'`); port != "" {
-				return port
-			}
-		}
-	}
-
 	if port := os.Getenv("PORT"); port != "" {
 		return port
 	}
-	return "3489"
+
+	file, err := os.Open(filepath.Join(installDir, ".env"))
+	if err != nil {
+		return "3489"
+	}
+	defer file.Close()
+
+	port := "3489"
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		value, ok := strings.CutPrefix(strings.TrimSpace(scanner.Text()), "PORT=")
+		if !ok {
+			continue
+		}
+		value, _, _ = strings.Cut(value, "#")
+		port = strings.Trim(strings.TrimSpace(value), `"'`)
+	}
+	return port
 }
 
 func awaitVersion(installDir string, tag string) error {
