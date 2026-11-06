@@ -19,11 +19,12 @@ var roles = []string{"web", "worker"}
 
 func RunStart(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Zip install folder or docker compose clone; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Install folder, or the clone with --docker; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	docker := fs.Bool("docker", false, "Run a docker compose install from its clone")
 	fs.Parse(args)
 
 	abs := absDir(*dir)
-	if isComposeInstall(abs) {
+	if *docker {
 		if err := runCompose(abs, "up", "-d"); err != nil {
 			fail(err)
 		}
@@ -42,11 +43,12 @@ func RunStart(cmd string, args []string) {
 
 func RunStop(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Zip install folder or docker compose clone; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Install folder, or the clone with --docker; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	docker := fs.Bool("docker", false, "Run a docker compose install from its clone")
 	fs.Parse(args)
 
 	abs := absDir(*dir)
-	if isComposeInstall(abs) {
+	if *docker {
 		if err := runCompose(abs, "stop"); err != nil {
 			fail(err)
 		}

@@ -47,14 +47,13 @@ type Upgrader struct {
 
 func RunUpgrade(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Zip install folder or docker compose clone; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Install folder, or the clone with --docker; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	docker := fs.Bool("docker", false, "Update a docker compose install from its clone")
 	prerelease := fs.Bool("prerelease", false, "Also install release candidates")
 	fs.Parse(args)
 
 	abs := absDir(*dir)
-	hasReleases := dirExists(filepath.Join(abs, "releases"))
-	// A clone also holds compose.prod.yml, so only running containers mark a docker compose install.
-	if !hasReleases && composeRunning(abs) {
+	if *docker {
 		if *prerelease {
 			fail(errors.New("--prerelease works only for a zip install"))
 		}
@@ -62,10 +61,6 @@ func RunUpgrade(cmd string, args []string) {
 			fail(fmt.Errorf("upgrade failed: %w", err))
 		}
 		return
-	}
-
-	if !hasReleases {
-		fail(errors.New(abs + " has neither releases/ from a zip nor running docker compose containers"))
 	}
 
 	// A server started by hand holds the port, so the new release could not take it over.
@@ -90,22 +85,6 @@ func RunUpgrade(cmd string, args []string) {
 	}
 }
 
-func dirExists(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && info.IsDir()
-}
-
-func composeRunning(dir string) bool {
-	if _, err := os.Stat(filepath.Join(dir, "compose.prod.yml")); err != nil {
-		return false
-	}
-
-	cmd := exec.Command("docker", "compose", "-f", "compose.prod.yml", "ps", "-q", "videoreview")
-	cmd.Dir = dir
-	out, err := cmd.Output()
-	return err == nil && strings.TrimSpace(string(out)) != ""
-}
-
 // compose.prod.yml itself changes between releases, so the clone is pulled first.
 func composeUpgrade(dir string) error {
 	cmd := exec.Command("git", "pull")
@@ -120,15 +99,6 @@ func composeUpgrade(dir string) error {
 		return err
 	}
 	return runCompose(dir, "up", "-d")
-}
-
-// A clone without releases/; a zip install never holds compose.prod.yml.
-func isComposeInstall(dir string) bool {
-	if dirExists(filepath.Join(dir, "releases")) {
-		return false
-	}
-	_, err := os.Stat(filepath.Join(dir, "compose.prod.yml"))
-	return err == nil
 }
 
 // Only the app's own services, so the ones a profile or another compose file added are left alone.
