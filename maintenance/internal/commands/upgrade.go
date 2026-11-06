@@ -47,7 +47,7 @@ type Upgrader struct {
 
 func RunUpgrade(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Install folder holding .env and releases/; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Zip install folder or docker compose clone; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
 	prerelease := fs.Bool("prerelease", false, "Also install release candidates")
 	fs.Parse(args)
 
@@ -106,24 +106,42 @@ func composeRunning(dir string) bool {
 	return err == nil && strings.TrimSpace(string(out)) != ""
 }
 
-// Only the app's own services, so the ones a profile or another compose file added keep running untouched.
+// compose.prod.yml itself changes between releases, so the clone is pulled first.
 func composeUpgrade(dir string) error {
-	services := []string{"videoreview", "video-processing"}
-	steps := [][]string{
-		// compose.prod.yml itself changes between releases.
-		{"git", "pull"},
-		append([]string{"docker", "compose", "-f", "compose.prod.yml", "pull"}, services...),
-		append([]string{"docker", "compose", "-f", "compose.prod.yml", "up", "-d"}, services...),
+	cmd := exec.Command("git", "pull")
+	cmd.Dir = dir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("git pull: %w", err)
 	}
 
-	for _, step := range steps {
-		cmd := exec.Command(step[0], step[1:]...)
-		cmd.Dir = dir
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("%s: %w", strings.Join(step, " "), err)
-		}
+	if err := runCompose(dir, "pull"); err != nil {
+		return err
+	}
+	return runCompose(dir, "up", "-d")
+}
+
+// A clone without releases/; a zip install never holds compose.prod.yml.
+func isComposeInstall(dir string) bool {
+	if dirExists(filepath.Join(dir, "releases")) {
+		return false
+	}
+	_, err := os.Stat(filepath.Join(dir, "compose.prod.yml"))
+	return err == nil
+}
+
+// Only the app's own services, so the ones a profile or another compose file added are left alone.
+func runCompose(dir string, args ...string) error {
+	step := append([]string{"compose", "-f", "compose.prod.yml"}, args...)
+	step = append(step, "videoreview", "video-processing")
+
+	cmd := exec.Command("docker", step...)
+	cmd.Dir = dir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("docker %s: %w", strings.Join(step, " "), err)
 	}
 	return nil
 }

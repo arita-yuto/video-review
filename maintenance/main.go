@@ -85,12 +85,12 @@ var commands = map[string]Command{
 	},
 	"start": {
 		Run:      RunStart,
-		Desc:     "Start the newest release's web and worker in the background",
+		Desc:     "Start the web and worker of a zip install or a docker compose install",
 		NoServer: true,
 	},
 	"stop": {
 		Run:      RunStop,
-		Desc:     "Stop the web and worker that start or upgrade started",
+		Desc:     "Stop the web and worker of a zip install or a docker compose install",
 		NoServer: true,
 	},
 	"warm-vcs-cache": {

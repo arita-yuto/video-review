@@ -19,10 +19,17 @@ var roles = []string{"web", "worker"}
 
 func RunStart(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Install folder holding .env and releases/; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Zip install folder or docker compose clone; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
 	fs.Parse(args)
 
 	abs := absDir(*dir)
+	if isComposeInstall(abs) {
+		if err := runCompose(abs, "up", "-d"); err != nil {
+			fail(err)
+		}
+		return
+	}
+
 	tag := (&Upgrader{Dir: abs}).installedTag()
 	if tag == "" {
 		fail(errors.New(abs + " has no release in releases/"))
@@ -35,10 +42,18 @@ func RunStart(cmd string, args []string) {
 
 func RunStop(cmd string, args []string) {
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-	dir := fs.String("dir", "", "Install folder holding .env and releases/; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
+	dir := fs.String("dir", "", "Zip install folder or docker compose clone; defaults to VIDEO_REVIEW_INSTALL_DIR, then the current folder")
 	fs.Parse(args)
 
-	if err := stopInstall(absDir(*dir)); err != nil {
+	abs := absDir(*dir)
+	if isComposeInstall(abs) {
+		if err := runCompose(abs, "stop"); err != nil {
+			fail(err)
+		}
+		return
+	}
+
+	if err := stopInstall(abs); err != nil {
 		fail(err)
 	}
 }
