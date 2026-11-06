@@ -116,6 +116,8 @@ func startRole(installDir string, tag string, role string) error {
 
 	cmd := exec.Command("node", filepath.Join(installDir, "releases", tag, "start.js"), role)
 	cmd.Dir = installDir
+	// start.js does not override a variable already set, so the .env keys go, or a CLI run by the old web would pass its values on.
+	cmd.Env = withoutEnvFileKeys(os.Environ(), installDir)
 	cmd.Stdout = log
 	cmd.Stderr = log
 	cmd.SysProcAttr = detached()
@@ -144,28 +146,51 @@ func stopRole(installDir string, role string) error {
 }
 
 // start.js listens on PORT, where the environment the CLI passes on wins over the install's .env, or on 3489.
+// The .env wins over the environment, as it does for the processes startRole runs.
 func installPort(installDir string) string {
+	if port, ok := envFile(installDir)["PORT"]; ok && port != "" {
+		return port
+	}
 	if port := os.Getenv("PORT"); port != "" {
 		return port
 	}
+	return "3489"
+}
 
+func envFile(installDir string) map[string]string {
+	values := map[string]string{}
 	file, err := os.Open(filepath.Join(installDir, ".env"))
 	if err != nil {
-		return "3489"
+		return values
 	}
 	defer file.Close()
 
-	port := "3489"
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		value, ok := strings.CutPrefix(strings.TrimSpace(scanner.Text()), "PORT=")
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		key, value, ok := strings.Cut(line, "=")
 		if !ok {
 			continue
 		}
 		value, _, _ = strings.Cut(value, "#")
-		port = strings.Trim(strings.TrimSpace(value), `"'`)
+		values[strings.TrimSpace(key)] = strings.Trim(strings.TrimSpace(value), `"'`)
 	}
-	return port
+	return values
+}
+
+func withoutEnvFileKeys(environ []string, installDir string) []string {
+	keys := envFile(installDir)
+	var kept []string
+	for _, entry := range environ {
+		key, _, _ := strings.Cut(entry, "=")
+		if _, inFile := keys[key]; !inFile {
+			kept = append(kept, entry)
+		}
+	}
+	return kept
 }
 
 func awaitVersion(installDir string, tag string) error {
@@ -210,6 +235,10 @@ func startInstall(installDir string, tag string) error {
 	if err := awaitVersion(installDir, tag); err != nil {
 		return err
 	}
+	// The worker answers nothing, so a worker that crashed on start shows only as a gone process.
+	if runningPID(installDir, "worker") == 0 {
+		return fmt.Errorf("the worker of %s stopped; see %s", tag, filepath.Join(installDir, "logs", "worker.log"))
+	}
 	fmt.Printf("%s is running; logs are in %s\n", tag, filepath.Join(installDir, "logs"))
 	return nil
 }
@@ -217,6 +246,10 @@ func startInstall(installDir string, tag string) error {
 // Stops the old release before starting the new one, since both listen on the same port, and goes back to previous if the new one never answers.
 func restartInstall(installDir string, tag string, previous string) error {
 	if err := stopInstall(installDir); err != nil {
+		// Whatever did stop comes back, so the install is not left without a server.
+		if previous != "" {
+			startInstall(installDir, previous)
+		}
 		return err
 	}
 

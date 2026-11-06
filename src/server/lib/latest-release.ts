@@ -97,7 +97,6 @@ let installLogStart: number | null = null;
 // A successful upgrade stops this server before the CLI ends, so an end this server sees is a failed one.
 let installEnded = false;
 
-// Detached, since the upgrade stops this server before it starts the new release.
 export function installLatestRelease() {
     const cli = installCli();
     if (!cli) {
@@ -110,8 +109,11 @@ export function installLatestRelease() {
 
     const args = ["upgrade", "--dir", process.cwd(), ...(runsReleaseCandidate() ? ["--prerelease"] : [])];
     installEnded = false;
+    // Detached, since the upgrade stops this server before it starts the new release.
     const child = spawn(/*turbopackIgnore: true*/ cli, args, { cwd: process.cwd(), detached: true, stdio: ["ignore", log, log], windowsHide: true });
     child.on("exit", () => { installEnded = true; });
+    // A CLI that cannot be started reports here instead of exiting.
+    child.on("error", () => { installEnded = true; });
     child.unref();
     fs.closeSync(log);
     return true;

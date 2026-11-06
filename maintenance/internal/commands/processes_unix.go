@@ -5,7 +5,9 @@ package commands
 import (
 	"errors"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -16,9 +18,15 @@ func detached() *syscall.SysProcAttr {
 }
 
 // Next renames its process title, so the command line no longer names start.js; start.js moves into the install folder.
+// The executable is checked too, since after a reboot the pid can belong to a shell sitting in that folder.
 func isInstallProcess(pid int, installDir string) bool {
-	cwd, err := os.Readlink("/proc/" + strconv.Itoa(pid) + "/cwd")
-	return err == nil && cwd == installDir
+	proc := "/proc/" + strconv.Itoa(pid)
+	cwd, err := os.Readlink(proc + "/cwd")
+	if err != nil || cwd != installDir {
+		return false
+	}
+	exe, err := os.Readlink(proc + "/exe")
+	return err == nil && strings.HasPrefix(filepath.Base(exe), "node")
 }
 
 func stopProcess(pid int, withChildren bool) error {

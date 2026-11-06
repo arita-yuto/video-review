@@ -85,45 +85,12 @@ func RunUpgrade(cmd string, args []string) {
 	}
 }
 
-// compose.prod.yml itself changes between releases, so the one on main is fetched first.
+// compose.prod.yml is left as it is, since installs edit it.
 func composeUpgrade(dir string) error {
-	client := &http.Client{Timeout: time.Minute}
-	url := "https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml"
-	if err := downloadCompose(client, url, dir); err != nil {
-		return fmt.Errorf("download compose.prod.yml: %w", err)
-	}
-
 	if err := runCompose(dir, "pull"); err != nil {
 		return err
 	}
 	return runCompose(dir, "up", "-d")
-}
-
-// Written beside it first, so a failed download leaves the working compose.prod.yml in place.
-func downloadCompose(client *http.Client, url string, dir string) error {
-	res, err := client.Get(url)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return errors.New("the download answered " + strconv.Itoa(res.StatusCode))
-	}
-
-	tmp, err := os.CreateTemp(dir, "compose-*.yml")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(tmp.Name())
-
-	if _, err := io.Copy(tmp, res.Body); err != nil {
-		tmp.Close()
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		return err
-	}
-	return os.Rename(tmp.Name(), filepath.Join(dir, "compose.prod.yml"))
 }
 
 // Only the app's own services, so the ones a profile or another compose file added are left alone.
@@ -275,8 +242,8 @@ func pickRelease(releases []githubRelease, assetName string, prerelease bool) (*
 	return picked, pickedAsset
 }
 
-// A folder left by an earlier attempt at the same release is replaced, not unpacked over.
 func (u *Upgrader) install(url string, releaseDir string) error {
+	// A folder left by an earlier attempt at the same release is replaced, not unpacked over.
 	if err := os.RemoveAll(releaseDir); err != nil {
 		return err
 	}
@@ -315,20 +282,30 @@ func (u *Upgrader) replaceInstallCli(releaseDir string) error {
 		return err
 	}
 
-	src, err := os.Open(filepath.Join(releaseDir, cliName()))
+	if err := copyFile(filepath.Join(releaseDir, cliName()), installCli); err != nil {
+		os.Remove(installCli)
+		os.Rename(previous, installCli)
+		return err
+	}
+	return nil
+}
+
+func copyFile(src string, dst string) error {
+	in, err := os.Open(src)
 	if err != nil {
 		return err
 	}
-	defer src.Close()
+	defer in.Close()
 
-	dst, err := os.OpenFile(installCli, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
 	if err != nil {
 		return err
 	}
-	defer dst.Close()
-
-	_, err = io.Copy(dst, src)
-	return err
+	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
+		return err
+	}
+	return out.Close()
 }
 
 func (u *Upgrader) downloadZip(url string, dir string) (string, error) {

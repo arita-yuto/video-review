@@ -25,7 +25,6 @@ Open `http://localhost:3489` and register the first administrator ([Admin Screen
 ## 2. Update
 
 ```bash
-curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
 docker compose -f compose.prod.yml pull
 docker compose -f compose.prod.yml up -d
 ```

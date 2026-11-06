@@ -297,24 +297,3 @@ func TestUpgradeKeepsTheNewReleasesCliAtTheInstallFolder(t *testing.T) {
 		t.Fatalf("%s = %q, %v; want the v0.15.0 CLI", installCli, body, err)
 	}
 }
-
-func TestComposeDownloadKeepsTheWorkingFileWhenTheDownloadFails(t *testing.T) {
-	dir := t.TempDir()
-	composeFile := filepath.Join(dir, "compose.prod.yml")
-	if err := os.WriteFile(composeFile, []byte("services: {}\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "not found", http.StatusNotFound)
-	}))
-	t.Cleanup(srv.Close)
-
-	if err := downloadCompose(srv.Client(), srv.URL, dir); err == nil {
-		t.Fatal("downloadCompose accepted a 404")
-	}
-	body, err := os.ReadFile(composeFile)
-	if err != nil || string(body) != "services: {}\n" {
-		t.Fatalf("compose.prod.yml = %q, %v; want the working file", body, err)
-	}
-}
