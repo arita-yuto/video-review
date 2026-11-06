@@ -12,8 +12,9 @@ Note: Docker Compose 2.24 or later is required (check with `docker compose versi
 ## 1. Start
 
 ```bash
-git clone --depth 1 https://github.com/arita-yuto/video-review.git
+mkdir video-review
 cd video-review
+curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
 docker compose -f compose.prod.yml up -d
 ```
 
@@ -24,7 +25,7 @@ Open `http://localhost:3489` and register the first administrator ([Admin Screen
 ## 2. Update
 
 ```bash
-git pull
+curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
 docker compose -f compose.prod.yml pull
 docker compose -f compose.prod.yml up -d
 ```
@@ -33,7 +34,7 @@ docker compose -f compose.prod.yml up -d
 
 ## 3. Pin the storage path or the version
 
-Only when you need to, create a `.env` at the root of the repository.
+Only when you need to, create a `.env` in the same folder as `compose.prod.yml`.
 
 | Variable | Meaning |
 |---|---|
@@ -43,6 +44,41 @@ Only when you need to, create a `.env` at the root of the repository.
 ---
 
 ## Reference
+
+### Run it all with video-review-cli
+
+With `video-review-cli` downloaded into the same folder as `compose.prod.yml`, the update steps run in one command.
+
+```bash
+# Linux
+curl -L -o video-review-cli https://github.com/arita-yuto/video-review/releases/latest/download/video-review-cli-linux-amd64
+chmod +x video-review-cli
+
+# Windows
+curl.exe -L -o video-review-cli.exe https://github.com/arita-yuto/video-review/releases/latest/download/video-review-cli-windows-amd64.exe
+
+# Update
+./video-review-cli upgrade --docker
+```
+
+Start and stop with `./video-review-cli start --docker` / `stop --docker`.
+
+### Update from GitHub Actions
+
+With a self-hosted runner on the server, you can update from the GitHub page.  
+Put a workflow like this in your own repository.
+
+```yaml
+name: Update VideoReview
+on: workflow_dispatch
+
+jobs:
+  upgrade:
+    runs-on: [self-hosted, videoreview]
+    steps:
+      - run: ./video-review-cli upgrade --docker
+        working-directory: /path/to/video-review
+```
 
 ### Build from source
 
