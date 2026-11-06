@@ -3,7 +3,8 @@
 How to run VideoReview with Docker.  
 Use this for production or any container-based deployment.
 
-The images are published to ghcr.io for every GitHub release, so there is nothing to build.
+The images are published to ghcr.io for every GitHub release, so there is nothing to build.  
+The same images are on Docker Hub as [aritayuto/videoreview](https://hub.docker.com/r/aritayuto/videoreview) and [aritayuto/video-processing](https://hub.docker.com/r/aritayuto/video-processing); `compose.prod.yml` pulls from ghcr.io.
 
 Note: Docker Compose 2.24 or later is required (check with `docker compose version`).
 

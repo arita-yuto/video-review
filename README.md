@@ -7,13 +7,13 @@
   </p>
 
   <p>
-    <a href="./README.jp.md"><img alt="日本語 README" src="https://img.shields.io/badge/README-日本語-ff69b4?style=for-the-badge" /></a>
+    <a href="https://github.com/arita-yuto/video-review/blob/main/README.jp.md"><img alt="日本語 README" src="https://img.shields.io/badge/README-日本語-ff69b4?style=for-the-badge" /></a>
   </p>
 
   <p>
     <a href="https://github.com/arita-yuto/video-review/stargazers"><img src="https://img.shields.io/github/stars/arita-yuto/video-review?style=social" alt="GitHub stars" /></a>
     &nbsp;&nbsp;
-    <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+    <a href="https://github.com/arita-yuto/video-review/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
   </p>
 
   <img src="https://github.com/user-attachments/assets/77a85359-9e3a-4b62-8ee5-27c9b18557d4" alt="VideoReview: find a video, comment, draw on the frame, and compare revisions" width="880" />
