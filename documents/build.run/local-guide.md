@@ -93,11 +93,6 @@ If it does not start, the previous release runs again.
 
 You can also update from the admin screen ([General](../admin/general.md)).
 
-### Update from GitHub Actions
-
-Use the workflow in the [Docker guide](./docker-guide.md#update-from-github-actions), with `./video-review-cli upgrade` as `run` and the install folder as `working-directory`.  
-So that the runner does not stop the web and the worker when the job ends, also set `RUNNER_TRACKING_ID: ""` in the job's `env`.
-
 ---
 
 ## Reference

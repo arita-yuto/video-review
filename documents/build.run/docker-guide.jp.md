@@ -62,23 +62,6 @@ curl.exe -L -o video-review-cli.exe https://github.com/arita-yuto/video-review/r
 
 起動・終了は `./video-review-cli start --docker` / `stop --docker` です
 
-### GitHub Actions から更新する
-
-サーバーに self-hosted runner を入れておくと、GitHub の画面から更新できます  
-次のような workflow を、自分のリポジトリに置きます
-
-```yaml
-name: Update VideoReview
-on: workflow_dispatch
-
-jobs:
-  upgrade:
-    runs-on: [self-hosted, videoreview]
-    steps:
-      - run: ./video-review-cli upgrade --docker
-        working-directory: /path/to/video-review
-```
-
 ### ソースから build する
 
 公開イメージの代わりに手元で build するときは、compose が参照する名前で tag を付けます

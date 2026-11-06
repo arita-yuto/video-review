@@ -93,11 +93,6 @@ OS を再起動したあとは、`start` で起動します
 
 管理画面からも更新できます（[General](../admin/general.jp.md)）
 
-### GitHub Actions から更新する
-
-[Docker ガイド](./docker-guide.jp.md#github-actions-から更新する) の workflow で、`run` を `./video-review-cli upgrade` に、`working-directory` をインストールのフォルダにします  
-job が終わったときに runner が Web と worker を止めないよう、job の `env` に `RUNNER_TRACKING_ID: ""` も書きます
-
 ---
 
 ## 参考

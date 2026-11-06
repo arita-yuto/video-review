@@ -63,23 +63,6 @@ curl.exe -L -o video-review-cli.exe https://github.com/arita-yuto/video-review/r
 
 Start and stop with `./video-review-cli start --docker` / `stop --docker`.
 
-### Update from GitHub Actions
-
-With a self-hosted runner on the server, you can update from the GitHub page.  
-Put a workflow like this in your own repository.
-
-```yaml
-name: Update VideoReview
-on: workflow_dispatch
-
-jobs:
-  upgrade:
-    runs-on: [self-hosted, videoreview]
-    steps:
-      - run: ./video-review-cli upgrade --docker
-        working-directory: /path/to/video-review
-```
-
 ### Build from source
 
 To build locally instead of pulling, tag the images with the names compose refers to.
