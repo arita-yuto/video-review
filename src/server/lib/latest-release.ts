@@ -72,9 +72,9 @@ async function fetchLatestRelease(): Promise<Release | null> {
     }
 }
 
-// A failed fetch is kept too, so an offline server asks GitHub at most once a day.
+// A failed fetch is kept too, so an offline server asks GitHub at most every 3 hours.
 export async function getLatestRelease(): Promise<Release | null> {
-    if (!cached || Date.now() - cached.fetchedAt > 24 * 60 * 60 * 1000) {
+    if (!cached || Date.now() - cached.fetchedAt > 3 * 60 * 60 * 1000) {
         cached = { fetchedAt: Date.now(), release: await fetchLatestRelease() };
     }
     return cached.release;
@@ -90,6 +90,13 @@ export function canInstallRelease() {
     return installCli() !== null;
 }
 
+const installLogPath = () => path.join(process.cwd(), "logs", "upgrade.log");
+
+// Where this server's upgrade starts in upgrade.log, so earlier upgrades' lines are not shown.
+let installLogStart: number | null = null;
+// A successful upgrade stops this server before the CLI ends, so an end this server sees is a failed one.
+let installEnded = false;
+
 // Detached, since the upgrade stops this server before it starts the new release.
 export function installLatestRelease() {
     const cli = installCli();
@@ -97,12 +104,50 @@ export function installLatestRelease() {
         return false;
     }
 
-    const logs = path.join(process.cwd(), "logs");
-    fs.mkdirSync(/*turbopackIgnore: true*/ logs, { recursive: true });
-    const log = fs.openSync(/*turbopackIgnore: true*/ path.join(logs, "upgrade.log"), "a");
+    fs.mkdirSync(/*turbopackIgnore: true*/ path.dirname(installLogPath()), { recursive: true });
+    const log = fs.openSync(/*turbopackIgnore: true*/ installLogPath(), "a");
+    installLogStart = fs.fstatSync(log).size;
 
     const args = ["upgrade", "--dir", process.cwd(), ...(runsReleaseCandidate() ? ["--prerelease"] : [])];
-    spawn(/*turbopackIgnore: true*/ cli, args, { cwd: process.cwd(), detached: true, stdio: ["ignore", log, log], windowsHide: true }).unref();
+    installEnded = false;
+    const child = spawn(/*turbopackIgnore: true*/ cli, args, { cwd: process.cwd(), detached: true, stdio: ["ignore", log, log], windowsHide: true });
+    child.on("exit", () => { installEnded = true; });
+    child.unref();
     fs.closeSync(log);
     return true;
+}
+
+export function readInstallLog() {
+    if (!fs.existsSync(/*turbopackIgnore: true*/ installLogPath())) {
+        return null;
+    }
+
+    // Read as bytes: installLogStart is a byte offset and Prisma prints non-ASCII box characters.
+    const bytes = fs.readFileSync(/*turbopackIgnore: true*/ installLogPath());
+    let text = "";
+
+    if (installLogStart !== null) {
+        text = bytes.subarray(installLogStart).toString("utf8");
+    } else {
+        // A server the upgrade started finds this upgrade from its last installing line.
+        const all = bytes.toString("utf8");
+        const lastInstalling = [...all.matchAll(/^installing v/gm)].at(-1);
+        text = lastInstalling ? all.slice(lastInstalling.index) : "";
+    }
+
+    const trimmed = text.trim();
+    return trimmed === "" ? null : trimmed;
+}
+
+export function hasInstallFailed() {
+    if (installEnded) {
+        return true;
+    }
+    if (installLogStart !== null) {
+        return false;
+    }
+
+    // A server the upgrade started is the target unless the upgrade went back to the previous release.
+    const target = /^installing (\S+)/.exec(readInstallLog() ?? "")?.[1];
+    return target !== undefined && target !== env.BUILD_VERSION;
 }

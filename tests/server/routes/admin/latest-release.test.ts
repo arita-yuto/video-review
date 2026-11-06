@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import fs from "fs";
+import os from "os";
+import path from "path";
 
 const checkEnabled = vi.hoisted(() => ({ value: true }));
 
@@ -44,7 +47,7 @@ describe("GET /admin/latest-release", () => {
         expect(await getLatest()).toEqual({ status: 200, body: { latest: null, installable: false } });
     });
 
-    it("asks GitHub once a day, even after a failure", async () => {
+    it("keeps a failed answer instead of asking GitHub again", async () => {
         fetchMock.mockRejectedValue(new TypeError("fetch failed"));
 
         await getLatest();
@@ -58,5 +61,39 @@ describe("GET /admin/latest-release", () => {
         fetchMock.mockResolvedValue(Response.json({ tag_name: "v0.14.0", html_url: url, body: "## What's Changed" }));
 
         expect(await getLatest()).toEqual({ status: 200, body: { latest: { version: "v0.14.0", url, notes: "## What's Changed" }, installable: false } });
+    });
+});
+
+// A server the upgrade started: this module never ran POST /install, and BUILD_VERSION is v0.13.0.
+describe("GET /admin/latest-release/install", () => {
+    let installDir: string;
+
+    beforeEach(() => {
+        installDir = fs.mkdtempSync(path.join(os.tmpdir(), "install-"));
+        fs.mkdirSync(path.join(installDir, "logs"));
+        vi.spyOn(process, "cwd").mockReturnValue(installDir);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        fs.rmSync(installDir, { recursive: true, force: true });
+    });
+
+    async function getInstall(upgradeLog: string) {
+        fs.writeFileSync(path.join(installDir, "logs", "upgrade.log"), upgradeLog);
+        const res = await app.request("/latest-release/install");
+        return await res.json();
+    }
+
+    it("reports failed when the upgrade went back to this release", async () => {
+        const upgradeLog = "installing v0.14.0\nstopping web (pid 1)\nv0.14.0 did not start (no answer); starting v0.13.0 again\n";
+
+        expect((await getInstall(upgradeLog)).failed).toBe(true);
+    });
+
+    it("reports this upgrade's lines and no failure when this release is the one installed", async () => {
+        const upgradeLog = "installing v0.12.0\nv0.12.0 is running\ninstalling v0.13.0\nv0.13.0 is running\n";
+
+        expect(await getInstall(upgradeLog)).toEqual({ log: "installing v0.13.0\nv0.13.0 is running", failed: false });
     });
 });

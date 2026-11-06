@@ -264,7 +264,10 @@
         "viewOnGitHub": "GitHub で見る",
         "update": "アップデート",
         "installing": "{version} にアップデート中（サーバーが再起動）",
-        "installFailed": "{version} に切り替わらず。サーバーの logs/upgrade.log を確認"
+        "installFailed": "{version} に切り替わらず。サーバーの logs/upgrade.log を確認",
+        "restarting": "サーバーを再起動中",
+        "installed": "{version} にアップデート完了",
+        "reload": "再読み込み"
     },
     "calendar-date-radio": {
         "today": "今日",

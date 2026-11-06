@@ -264,7 +264,10 @@
         "viewOnGitHub": "View on GitHub",
         "update": "Update",
         "installing": "Updating to {version}; the server restarts",
-        "installFailed": "Still not on {version}. See logs/upgrade.log on the server"
+        "installFailed": "Still not on {version}. See logs/upgrade.log on the server",
+        "restarting": "Restarting the server",
+        "installed": "Updated to {version}",
+        "reload": "Reload"
     },
     "calendar-date-radio": {
         "today": "Today",

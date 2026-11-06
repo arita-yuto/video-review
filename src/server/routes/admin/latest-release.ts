@@ -4,7 +4,7 @@ import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorize } from "@/server/lib/token";
 import { env } from "@/server/lib/env";
 import { isUpdateCheckEnabled } from "@/server/lib/integrations/general";
-import { canInstallRelease, getLatestRelease, installLatestRelease, isNewerVersion } from "@/server/lib/latest-release";
+import { canInstallRelease, getLatestRelease, hasInstallFailed, installLatestRelease, readInstallLog, isNewerVersion } from "@/server/lib/latest-release";
 
 export const latestReleaseRouter = createRouter()
     .openapi(createRoute({
@@ -60,4 +60,20 @@ export const latestReleaseRouter = createRouter()
             return c.json({ error: "this server is not a zip install with video-review-cli" }, 409);
         }
         return c.json({ started: true }, 202);
+    })
+    .openapi(createRoute({
+        method: "get",
+        summary: "Get what the latest upgrade wrote",
+        path: "/install",
+        responses: {
+            200: {
+                description: "The upgrade's lines from upgrade.log, or null before it writes one, and whether it ended without the new release",
+                content: { "application/json": { schema: z.object({ log: z.string().nullable(), failed: z.boolean() }) } },
+            },
+            401: errorResponse("Unauthorized"),
+            403: errorResponse("Forbidden"),
+        },
+    }), async (c) => {
+        await authorize(c.req.raw, ["admin"]);
+        return c.json({ log: readInstallLog(), failed: hasInstallFailed() }, 200);
     });
