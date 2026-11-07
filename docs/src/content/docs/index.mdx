@@ -2,10 +2,73 @@
 title: VideoReview
 description: Frame.io for game teams, running on your own storage.
 template: splash
+head:
+  - tag: title
+    content: VideoReview
 hero:
   tagline: Frame.io for game teams, running on your own storage.
   actions:
+    - text: Get started
+      link: /video-review/install/docker/
+      icon: right-arrow
     - text: GitHub
       link: https://github.com/arita-yuto/video-review
       icon: github
+      variant: minimal
 ---
+
+<video src="/video-review/images/home/review-demo.mp4" poster="/video-review/images/home/review-demo-poster.webp" autoplay loop muted playsinline class="vr-hero-video" aria-label="VideoReview: find a video, comment, draw on the frame, and compare revisions"></video>
+
+<section class="vr-section">
+    <h2>Review</h2>
+    <div class="vr-feature">
+        <h3>Draw right on the video</h3>
+        <p>Draw on the paused frame instead of describing the spot in words.</p>
+        <video src="/video-review/images/home/draw-on-frame.mp4" poster="/video-review/images/home/draw-on-frame-poster.webp" autoplay loop muted playsinline aria-label="Drawing on a paused frame"></video>
+    </div>
+    <div class="vr-feature">
+        <h3>Compare revisions</h3>
+        <p>Spot what a graphics update changed at a glance.</p>
+        <img src="/video-review/images/home/compare-revisions.webp" alt="Two revisions side by side with the diff image below" />
+    </div>
+</section>
+
+<section class="vr-section">
+    <h2>Built for game development</h2>
+    <div class="vr-columns">
+        <a href="/video-review/admin/integrations/vcs/">
+            <img src="/video-review/images/home/changes-tab.webp" alt="The Changes tab listing pull requests and commits" />
+            <strong>See what changed in the code</strong>
+            <span>See which update caused a change in the video, right in the browser.</span>
+        </a>
+        <a href="/video-review/features/editor/">
+            <video src="/video-review/images/features/editor/open-scene.mp4" poster="/video-review/images/features/editor/open-scene-poster.webp" autoplay loop muted playsinline aria-label="Opening the scene in the editor"></video>
+            <strong>Unity / Unreal Engine</strong>
+            <span>Open the scene from the video under review and check it in the editor right away.</span>
+        </a>
+        <a href="/video-review/admin/integrations/notify/">
+            <video src="/video-review/images/home/slack-jira.mp4" poster="/video-review/images/home/slack-jira-poster.webp" autoplay loop muted playsinline aria-label="Sending a comment to Slack and Jira"></video>
+            <strong>Slack / Jira</strong>
+            <span>Keep comments from being left behind: post them to Slack, or turn them into tasks in one click.</span>
+        </a>
+    </div>
+</section>
+
+<section class="vr-section">
+    <h2>Runs on-premise</h2>
+    <p>Review unreleased footage without it leaving your network (S3 and Nextcloud work too).</p>
+</section>
+
+<section class="vr-section vr-start">
+    <h2>Quick start (Docker)</h2>
+
+```bash
+mkdir video-review
+cd video-review
+curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
+docker compose -f compose.prod.yml up -d
+```
+
+<p>Open <code>{"http://localhost:3489"}</code> and register the first administrator.</p>
+<a class="vr-button" href="/video-review/install/docker/">Docker guide</a>
+</section>

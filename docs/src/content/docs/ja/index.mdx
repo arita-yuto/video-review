@@ -2,10 +2,73 @@
 title: VideoReview
 description: 自社のストレージで動く、ゲーム開発向けの Frame.io
 template: splash
+head:
+  - tag: title
+    content: VideoReview
 hero:
   tagline: 自社のストレージで動く、ゲーム開発向けの Frame.io
   actions:
+    - text: はじめる
+      link: /video-review/ja/install/docker/
+      icon: right-arrow
     - text: GitHub
       link: https://github.com/arita-yuto/video-review
       icon: github
+      variant: minimal
 ---
+
+<video src="/video-review/images/home/review-demo.mp4" poster="/video-review/images/home/review-demo-poster.webp" autoplay loop muted playsinline class="vr-hero-video" aria-label="VideoReview：動画の検索、コメント、フレームへの描き込み、リビジョンの比較"></video>
+
+<section class="vr-section">
+    <h2>レビュー</h2>
+    <div class="vr-feature">
+        <h3>動画に直接、描き込む</h3>
+        <p>場所を言葉で説明せず、止めたフレームに直接描けます</p>
+        <video src="/video-review/images/home/draw-on-frame.mp4" poster="/video-review/images/home/draw-on-frame-poster.webp" autoplay loop muted playsinline aria-label="止めたフレームに描き込む"></video>
+    </div>
+    <div class="vr-feature">
+        <h3>リビジョンを見比べる</h3>
+        <p>グラフィックスの更新による差異をすぐ発見できます</p>
+        <img src="/video-review/images/home/compare-revisions.webp" alt="2 つのリビジョンと、その下の差分画像" />
+    </div>
+</section>
+
+<section class="vr-section">
+    <h2>ゲーム開発で欲しい機能</h2>
+    <div class="vr-columns">
+        <a href="/video-review/ja/admin/integrations/vcs/">
+            <img src="/video-review/images/home/changes-tab.webp" alt="コミットと PR が並ぶ Changes タブ" />
+            <strong>変更の中身を見る</strong>
+            <span>動画の変更がどの更新が原因になったのかをWebですぐに確認できます</span>
+        </a>
+        <a href="/video-review/ja/features/editor/">
+            <video src="/video-review/images/features/editor/open-scene.mp4" poster="/video-review/images/features/editor/open-scene-poster.webp" autoplay loop muted playsinline aria-label="エディタでシーンを開く"></video>
+            <strong>Unity / Unreal Engine</strong>
+            <span>レビュー中の動画からシーンを開き、エディターですぐに確認できます</span>
+        </a>
+        <a href="/video-review/ja/admin/integrations/notify/">
+            <video src="/video-review/images/home/slack-jira.mp4" poster="/video-review/images/home/slack-jira-poster.webp" autoplay loop muted playsinline aria-label="コメントを Slack と Jira に送る"></video>
+            <strong>Slack / Jira</strong>
+            <span>コメントを放置されないようにSlack連携、タスク化もワンクリックでできます</span>
+        </a>
+    </div>
+</section>
+
+<section class="vr-section">
+    <h2>オンプレミスで動く</h2>
+    <p>未公開の映像を社外に出さずにレビューできます（S3 や Nextcloud にも置けます）</p>
+</section>
+
+<section class="vr-section vr-start">
+    <h2>Quick Start (Docker)</h2>
+
+```bash
+mkdir video-review
+cd video-review
+curl -L -O https://raw.githubusercontent.com/arita-yuto/video-review/main/compose.prod.yml
+docker compose -f compose.prod.yml up -d
+```
+
+<p><code>{"http://localhost:3489"}</code> を開き、管理者アカウントを作成します</p>
+<a class="vr-button" href="/video-review/ja/install/docker/">Docker ガイド</a>
+</section>

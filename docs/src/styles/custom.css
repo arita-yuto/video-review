@@ -10,6 +10,110 @@
     --sl-color-accent-high: #7c2d12;
 }
 
+.vr-hero-video {
+    width: 100%;
+    display: block;
+    border-radius: 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+}
+
+.vr-section {
+    margin-top: 6rem;
+    text-align: center;
+}
+
+.vr-section > h2 {
+    font-size: var(--sl-text-3xl);
+}
+
+.vr-section > p {
+    max-width: 40rem;
+    margin-inline: auto;
+    color: var(--sl-color-gray-2);
+}
+
+.vr-feature {
+    margin-top: 3rem;
+}
+
+.vr-feature p {
+    color: var(--sl-color-gray-2);
+}
+
+.vr-feature img,
+.vr-feature video {
+    display: block;
+    width: min(100%, 48rem);
+    margin: 1.25rem auto 0;
+    border-radius: 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+}
+
+.vr-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.vr-columns a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.vr-columns img,
+.vr-columns video {
+    margin: 0 0 0.75rem;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+}
+
+.vr-columns strong {
+    color: var(--sl-color-white);
+}
+
+.vr-columns a:hover strong {
+    color: var(--sl-color-accent-high);
+}
+
+.vr-columns span {
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+}
+
+.vr-start {
+    padding: 3rem 1.5rem;
+    border-radius: 1rem;
+    background: var(--sl-color-accent-low);
+}
+
+.vr-start pre {
+    text-align: left;
+}
+
+.vr-button {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999rem;
+    background: var(--sl-color-text-accent);
+    color: var(--sl-color-black);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+@media (max-width: 50rem) {
+    .vr-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 .hero {
     grid-template-columns: 100%;
     padding-block: 3rem 1rem;
