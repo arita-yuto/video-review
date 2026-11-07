@@ -22,7 +22,7 @@ docker compose -f compose.prod.yml up -d
 
 `http://localhost:3489` を開くと、最初の管理者を登録する画面が出ます（[管理画面ガイド](../admin/README.jp.md)）
 
-Docker Hub から pull したいときは、最新のリリースの `compose.dockerhub.yml` を `compose.prod.yml` という名前で保存します  
+Docker Hub から pull したいときは `compose.dockerhub.yml` を `compose.prod.yml` へリネームします  
 アップデートしても Docker Hub から pull し続けます
 
 ```bash
