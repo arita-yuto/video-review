@@ -5,7 +5,7 @@ VideoReview を Docker で動かす手順です
 
 イメージは GitHub のリリースごとに ghcr.io に公開されているので、build は要りません  
 同じイメージを Docker Hub にも [aritayuto/videoreview](https://hub.docker.com/r/aritayuto/videoreview) と [aritayuto/video-processing](https://hub.docker.com/r/aritayuto/video-processing) として置いています  
-`compose.prod.yml` が pull するのは ghcr.io です
+`compose.prod.yml` が pull するのは ghcr.io です（Docker Hub から pull する方法は [1](#1-起動する)）
 
 ※ Docker Compose 2.24 以降が必要です（`docker compose version` で確認できます）
 
@@ -21,6 +21,13 @@ docker compose -f compose.prod.yml up -d
 ```
 
 `http://localhost:3489` を開くと、最初の管理者を登録する画面が出ます（[管理画面ガイド](../admin/README.jp.md)）
+
+Docker Hub から pull したいときは、最新のリリースの `compose.dockerhub.yml` を `compose.prod.yml` という名前で保存します  
+アップデートしても Docker Hub から pull し続けます
+
+```bash
+curl -L -o compose.prod.yml https://github.com/arita-yuto/video-review/releases/latest/download/compose.dockerhub.yml
+```
 
 ---
 
