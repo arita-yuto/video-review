@@ -26,7 +26,7 @@ sidebar:
 
 一覧の上の Export を押すと、`users.csv` がダウンロードされます
 
-※ CLI では `export-users` で書き出せます（[メンテナンス CLI のガイド](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.jp.md)）
+※ CLI では `export-users` で書き出せます（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
 ### CSV を編集する
 

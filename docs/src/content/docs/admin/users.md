@@ -26,7 +26,7 @@ Export the users to a CSV file, edit it and import it to create and update users
 
 Press Export above the list to download `users.csv`.
 
-Note: the CLI exports with `export-users` ([maintenance CLI guide](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.md)).
+Note: the CLI exports with `export-users` ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
 
 ### Edit the CSV file
 

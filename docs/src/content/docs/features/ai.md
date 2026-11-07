@@ -193,7 +193,7 @@ Open Administration → MCP, write in the text box, and save.
 ## 5. Add more information to videos
 
 Videos with tags, events and related files attached are easier to find in search.  
-Attach them with the maintenance CLI ([maintenance CLI guide](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.md)).
+Attach them with the maintenance CLI ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
 
 Set tags and a summary
 ```bash

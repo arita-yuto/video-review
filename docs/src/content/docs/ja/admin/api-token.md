@@ -24,6 +24,6 @@ sidebar:
 
 | 使う場所 | 渡し方 |
 |---|---|
-| メンテナンス CLI | [メンテナンス CLI のガイド](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.jp.md) の手順で設定します |
+| メンテナンス CLI | [メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/) の手順で設定します |
 | AI エージェント | [AI 機能ガイド](/video-review/ja/features/ai/) の「AI エージェントから使う」の手順で `x-api-token` ヘッダーに渡します |
 | curl | `x-api-token` ヘッダーに入れます（API の一覧は `/api/docs`） |

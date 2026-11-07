@@ -30,7 +30,7 @@ AI 機能を有効にしていると、その要約も出ます（[AI 機能ガ�
 
 ## 2. 動画に結びつける
 
-動画をアップロードするときか、アップロード後に動画を直接指定して、関係するパスを渡します（[メンテナンス CLI のガイド](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.jp.md)）
+動画をアップロードするときか、アップロード後に動画を直接指定して、関係するパスを渡します（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
 ```bash
 # アップロード時

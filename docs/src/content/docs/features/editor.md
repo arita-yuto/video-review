@@ -71,7 +71,7 @@ Note: the bundled sample project was made with Unity 6000.3.
 ## 3. Tie a video to its scene
 
 When uploading a video, pass the scene's path as `scene_path`.
-The maintenance CLI's `upload-video` takes it ([maintenance CLI guide](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.md)).
+The maintenance CLI's `upload-video` takes it ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
 
 ```bash
 go run . upload-video \

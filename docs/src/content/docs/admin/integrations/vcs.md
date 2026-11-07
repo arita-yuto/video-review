@@ -30,7 +30,7 @@ Note: once the token is saved, Owner, Repository and Token cannot be changed; pr
 
 ## 2. Tie videos to the code
 
-Pass the paths a video relates to, either when uploading it or on the video afterwards ([maintenance CLI guide](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.md)).
+Pass the paths a video relates to, either when uploading it or on the video afterwards ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
 
 ```bash
 # When uploading

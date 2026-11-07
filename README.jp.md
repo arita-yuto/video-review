@@ -60,7 +60,7 @@
 </table>
 
 **オンプレミスで動く**：未公開の映像を社外に出さずにレビューできます（S3 や Nextcloud にも置けます）  
-**他機能**：検索 · [AI チャット検索](https://arita-yuto.github.io/video-review/ja/features/ai/#2-アプリ内チャット検索を使う) · [MCP](https://arita-yuto.github.io/video-review/ja/features/ai/#3-ai-エージェントから使う) · [メンテナンス CLI](./maintenance/README.jp.md)
+**他機能**：検索 · [AI チャット検索](https://arita-yuto.github.io/video-review/ja/features/ai/#2-アプリ内チャット検索を使う) · [MCP](https://arita-yuto.github.io/video-review/ja/features/ai/#3-ai-エージェントから使う) · [メンテナンス CLI](https://arita-yuto.github.io/video-review/ja/features/maintenance-cli/)
 
 ## Quick Start (Docker)
 
