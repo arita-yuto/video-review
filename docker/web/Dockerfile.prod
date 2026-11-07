@@ -1,4 +1,4 @@
-FROM node:24.22.1-slim AS deps
+FROM node:24.22.2-slim AS deps
 WORKDIR /app
 
 # Prisma picks its engines by the OpenSSL it finds at install, so the runner's OpenSSL is here
@@ -21,7 +21,7 @@ RUN npm run prisma:generate
 RUN npm run build
 
 
-FROM node:24.22.1-slim AS runner
+FROM node:24.22.2-slim AS runner
 WORKDIR /app
 
 RUN apt-get update \
