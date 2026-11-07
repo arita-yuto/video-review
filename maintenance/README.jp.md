@@ -21,7 +21,7 @@ VideoReview のメンテナンス用 CLI ツールです
 VideoReviewのメンテナンスCLIを利用するためには、APIトークンが必要になります  
 adminユーザーがWebUI上でトークンを発行することができます
 
-詳しくは、[管理画面ガイド](../documents/admin/api-token.jp.md) でご確認ください
+詳しくは、[管理画面ガイド](https://arita-yuto.github.io/video-review/ja/admin/api-token/) でご確認ください
 
 
 ### 必須環境変数

@@ -64,7 +64,7 @@ Early discussion helps avoid rework and keeps the project consistent.
 ## Code Style
 
 Please follow the existing style and structure as much as possible.  
-Where a frontend file goes, and what it may import, is in the [frontend dependency map](./documents/development/frontend-map.md).
+Where a frontend file goes, and what it may import, is in the [frontend dependency map](https://arita-yuto.github.io/video-review/development/frontend-map/).
 
 Comments are appreciated for:
 

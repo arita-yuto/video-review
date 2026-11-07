@@ -60,7 +60,7 @@
 </table>
 
 **Runs on-premise**: review unreleased footage without it leaving your network (S3 and Nextcloud work too).  
-**Also**: search · [AI chat search](./documents/build.run/ai-guide.md#2-use-chat-search-in-the-app) · [MCP](./documents/build.run/ai-guide.md#3-use-it-from-ai-agents) · [maintenance CLI](./maintenance/README.md)
+**Also**: search · [AI chat search](https://arita-yuto.github.io/video-review/features/ai/#2-use-chat-search-in-the-app) · [MCP](https://arita-yuto.github.io/video-review/features/ai/#3-use-it-from-ai-agents) · [maintenance CLI](./maintenance/README.md)
 
 ## Quick Start (Docker)
 
@@ -77,16 +77,16 @@ Open http://localhost:3489 and register the first administrator.
 
 ### Run
 
-- [Docker guide](./documents/build.run/docker-guide.md)
-- [Local / On‑premise guide](./documents/build.run/local-guide.md)
-- [https guide](./documents/build.run/https-guide.md)
+- [Docker guide](https://arita-yuto.github.io/video-review/install/docker/)
+- [Local / On‑premise guide](https://arita-yuto.github.io/video-review/install/local/)
+- [https guide](https://arita-yuto.github.io/video-review/install/https/)
 
 ### Settings & integrations
 
-- [Admin screen guide](./documents/admin/README.md)
-- [AI features guide](./documents/build.run/ai-guide.md)
-- [Editor integration guide](./documents/integrations/editor-guide.md)
-- [VCS integration](./documents/admin/integrations/vcs.md)
+- [Admin screen guide](https://arita-yuto.github.io/video-review/admin/)
+- [AI features guide](https://arita-yuto.github.io/video-review/features/ai/)
+- [Editor integration guide](https://arita-yuto.github.io/video-review/features/editor/)
+- [VCS integration](https://arita-yuto.github.io/video-review/admin/integrations/vcs/)
 
 ## Support · Contributing · License
 
