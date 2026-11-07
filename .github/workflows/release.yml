@@ -42,8 +42,10 @@ jobs:
         include:
           - name: videoreview
             description: Self-hosted, on-premise alternative to Frame.io for game and video teams
+            readme: docker/web/README.md
           - name: video-processing
             description: Thumbnail and transcode worker for VideoReview, a self-hosted Frame.io alternative
+            readme: docker/video-processing/README.md
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: peter-evans/dockerhub-description@v5.0.0
@@ -52,9 +54,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ vars.DOCKERHUB_USERNAME }}/${{ matrix.name }}
           short-description: ${{ matrix.description }}
-          readme-filepath: ./README.md
-          # Docker Hub resolves no relative links, so ./documents/... become links into the GitHub repository.
-          enable-url-completion: true
+          readme-filepath: ${{ matrix.readme }}
 
   cli:
     runs-on: ubuntu-latest
@@ -69,12 +69,27 @@ jobs:
       - uses: $/.github/actions/build-launcher
         with:
           package: "true"
+      - name: Write the compose file that pulls from Docker Hub
+        env:
+          GHCR: ghcr.io/${{ github.repository }}/
+          DOCKERHUB: docker.io/${{ vars.DOCKERHUB_USERNAME }}/
+        run: |
+          mkdir -p compose-dist
+          sed "s#$GHCR#$DOCKERHUB#" compose.prod.yml > compose-dist/compose.dockerhub.yml
+
+          if grep -q "$GHCR" compose-dist/compose.dockerhub.yml || [ "$(grep -c "$DOCKERHUB" compose-dist/compose.dockerhub.yml)" -ne 2 ]; then
+            echo "compose.prod.yml no longer has the two ghcr image lines this step rewrites" >&2
+            exit 1
+          fi
+
       - name: Attach the binaries to the release
         uses: softprops/action-gh-release@v3.0.3
         with:
           files: |
             maintenance/dist/*
             integrations/launcher/dist/*.zip
+            compose.prod.yml
+            compose-dist/compose.dockerhub.yml
           # GitHub writes the body from the pull request titles merged since the last tag.
           generate_release_notes: true
           # upgrade and the release notice skip pre-releases unless asked for them.
