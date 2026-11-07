@@ -15,6 +15,21 @@ export default defineConfig({
             social: [{ icon: "github", label: "GitHub", href: "https://github.com/arita-yuto/video-review" }],
             customCss: ["./src/styles/custom.css"],
             editLink: { baseUrl: "https://github.com/arita-yuto/video-review/edit/main/docs/" },
+            sidebar: [
+                { label: "Install", items: [{ autogenerate: { directory: "install" } }] },
+                {
+                    label: "Administration",
+                    items: [
+                        { slug: "admin" },
+                        { slug: "admin/general" },
+                        { slug: "admin/users" },
+                        { slug: "admin/videos" },
+                        { label: "Integrations", items: [{ autogenerate: { directory: "admin/integrations" } }] },
+                        { slug: "admin/api-token" },
+                    ],
+                },
+                { label: "Features", items: [{ autogenerate: { directory: "features" } }] },
+            ],
         }),
     ],
 });
