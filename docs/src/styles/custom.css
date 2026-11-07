@@ -1,0 +1,29 @@
+:root {
+    --sl-color-accent-low: #3b1d08;
+    --sl-color-accent: #ea6a0c;
+    --sl-color-accent-high: #fed7aa;
+}
+
+:root[data-theme="light"] {
+    --sl-color-accent-low: #ffedd5;
+    --sl-color-accent: #c2410c;
+    --sl-color-accent-high: #7c2d12;
+}
+
+.hero {
+    grid-template-columns: 100%;
+    padding-block: 3rem 1rem;
+}
+
+.hero .stack {
+    align-items: center;
+    text-align: center;
+}
+
+.hero .copy {
+    align-items: center;
+}
+
+.hero .actions {
+    justify-content: center;
+}
