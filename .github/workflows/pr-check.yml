@@ -57,6 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       # Fails when a workflow's uses: and actions.lock disagree; `gh actions-lock` regenerates the lockfile.
-      - run: gh extension install github/gh-actions-lock --pin v0.4.0 && gh actions-lock --verify
+      - run: gh extension install github/gh-actions-lock --pin v0.4.1 && gh actions-lock --verify
         env:
           GH_TOKEN: ${{ github.token }}
