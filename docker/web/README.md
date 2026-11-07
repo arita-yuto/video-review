@@ -2,7 +2,7 @@
 
 Frame.io for game teams, running on your own storage.
 
-<img src="https://github.com/user-attachments/assets/77a85359-9e3a-4b62-8ee5-27c9b18557d4" alt="VideoReview: find a video, comment, draw on the frame, and compare revisions" width="880" />
+<img src="https://arita-yuto.github.io/video-review/images/home/review-demo-animated.webp" alt="VideoReview: find a video, comment, draw on the frame, and compare revisions" width="880" />
 
 - **Draw right on the video**: draw on the paused frame instead of describing the spot in words.
 - **Compare revisions**: spot what a graphics update changed at a glance.
@@ -41,6 +41,7 @@ docker compose -f compose.prod.yml up -d
 ## Links
 
 - [GitHub](https://github.com/arita-yuto/video-review)
-- [Docker guide](https://github.com/arita-yuto/video-review/blob/main/documents/build.run/docker-guide.md)
-- [Admin screen guide](https://github.com/arita-yuto/video-review/blob/main/documents/admin/README.md)
+- [Docs](https://arita-yuto.github.io/video-review/)
+- [Docker guide](https://arita-yuto.github.io/video-review/install/docker/)
+- [Admin screen guide](https://arita-yuto.github.io/video-review/admin/)
 - [MIT License](https://github.com/arita-yuto/video-review/blob/main/LICENSE)
