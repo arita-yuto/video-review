@@ -22,6 +22,6 @@ Note: only one token can exist, so the old one stops working the moment you rege
 
 | Where | How |
 |---|---|
-| Maintenance CLI | Set it up as described in the [maintenance CLI guide](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.md) |
+| Maintenance CLI | Set it up as described in the [maintenance CLI guide](/video-review/features/maintenance-cli/) |
 | AI agents | Pass it in the `x-api-token` header, as described under "Use from an AI agent" in the [AI Features Guide](/video-review/features/ai/) |
 | curl | Put it in the `x-api-token` header (the API is listed at `/api/docs`) |

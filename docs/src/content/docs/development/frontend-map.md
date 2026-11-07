@@ -1,4 +1,6 @@
-# Frontend dependency map
+---
+title: "Frontend dependency map"
+---
 
 ## 1. Dependencies across `src`
 

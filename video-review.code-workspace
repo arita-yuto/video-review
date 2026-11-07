@@ -28,7 +28,6 @@
   "settings": {
     "search.exclude": {
       "**/.next": true,
-      "**/documents": true,
       "**/public": true,
       "**/uploads": true,
     },

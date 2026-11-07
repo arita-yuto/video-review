@@ -82,7 +82,7 @@ services:
       RELAYHOST_PASSWORD: ${SMTP_RELAYHOST_PASSWORD:-}
 
   # TLS in front of the app: docker compose --profile https up -d
-  # Needs certs/fullchain.pem and certs/privkey.pem; see documents/build.run/https-guide.md.
+  # Needs certs/fullchain.pem and certs/privkey.pem; see https://arita-yuto.github.io/video-review/install/https/.
   nginx:
     image: nginx:1.30
     container_name: videoreview-nginx

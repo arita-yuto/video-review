@@ -60,7 +60,7 @@
 </table>
 
 **オンプレミスで動く**：未公開の映像を社外に出さずにレビューできます（S3 や Nextcloud にも置けます）  
-**他機能**：検索 · [AI チャット検索](./documents/build.run/ai-guide.jp.md#2-アプリ内チャット検索を使う) · [MCP](./documents/build.run/ai-guide.jp.md#3-ai-エージェントから使う) · [メンテナンス CLI](./maintenance/README.jp.md)
+**他機能**：検索 · [AI チャット検索](https://arita-yuto.github.io/video-review/ja/features/ai/#2-アプリ内チャット検索を使う) · [MCP](https://arita-yuto.github.io/video-review/ja/features/ai/#3-ai-エージェントから使う) · [メンテナンス CLI](https://arita-yuto.github.io/video-review/ja/features/maintenance-cli/)
 
 ## Quick Start (Docker)
 
@@ -77,16 +77,16 @@ http://localhost:3489 を開き、管理者アカウントを作成します
 
 ### 起動方法
 
-- [Docker ガイド](./documents/build.run/docker-guide.jp.md)
-- [Local / On‑premise ガイド](./documents/build.run/local-guide.jp.md)
-- [https ガイド](./documents/build.run/https-guide.jp.md)
+- [Docker ガイド](https://arita-yuto.github.io/video-review/ja/install/docker/)
+- [Local / On‑premise ガイド](https://arita-yuto.github.io/video-review/ja/install/local/)
+- [https ガイド](https://arita-yuto.github.io/video-review/ja/install/https/)
 
 ### 設定・連携
 
-- [管理画面ガイド](./documents/admin/README.jp.md)
-- [AI 機能ガイド](./documents/build.run/ai-guide.jp.md)
-- [エディター連携ガイド](./documents/integrations/editor-guide.jp.md)
-- [VCS 連携](./documents/admin/integrations/vcs.jp.md)
+- [管理画面ガイド](https://arita-yuto.github.io/video-review/ja/admin/)
+- [AI 機能ガイド](https://arita-yuto.github.io/video-review/ja/features/ai/)
+- [エディター連携ガイド](https://arita-yuto.github.io/video-review/ja/features/editor/)
+- [VCS 連携](https://arita-yuto.github.io/video-review/ja/admin/integrations/vcs/)
 
 ## 導入の相談・Contributing・License
 

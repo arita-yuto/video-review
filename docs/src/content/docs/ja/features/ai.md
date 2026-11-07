@@ -194,7 +194,7 @@ Administration → MCP を開き、テキストボックスに書いて保存し
 ## 5. 動画に追加情報を付ける
 
 タグ、イベント、関係するファイルを動画に付けておくと、検索で見つかりやすくなります  
-メンテナンス CLI で付けます（[メンテナンス CLI のガイド](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.jp.md)）
+メンテナンス CLI で付けます（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
 タグと要約を付ける
 ```bash

@@ -71,7 +71,7 @@ Console に `[VideoReview] TCP server started on port 18766` と出れば待ち�
 ## 3. 動画にシーンを結びつける
 
 動画をアップロードするときに、そのシーンのパスを `scene_path` に付けます  
-メンテナンス CLI の `upload-video` で指定します（[メンテナンス CLI のガイド](https://github.com/arita-yuto/video-review/blob/main/maintenance/README.jp.md)）
+メンテナンス CLI の `upload-video` で指定します（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
 ```bash
 go run . upload-video \

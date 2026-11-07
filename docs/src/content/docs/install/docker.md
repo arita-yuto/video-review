@@ -25,7 +25,7 @@ docker compose -f compose.prod.yml up -d
 
 Open `http://localhost:3489` and register the first administrator ([Admin Screen Guide](/video-review/admin/)).
 
-To pull from Docker Hub instead, save `compose.dockerhub.yml` from the latest release as `compose.prod.yml`. Updates then keep pulling from Docker Hub.
+To pull from Docker Hub instead, rename `compose.dockerhub.yml` to `compose.prod.yml`. Updates then keep pulling from Docker Hub.
 
 ```bash
 curl -L -o compose.prod.yml https://github.com/arita-yuto/video-review/releases/latest/download/compose.dockerhub.yml
