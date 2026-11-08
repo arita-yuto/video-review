@@ -27,12 +27,19 @@
     <td width="50%" valign="top">
       <b>Draw right on the video</b><br/>
       Draw on the paused frame instead of describing the spot in words.<br/><br/>
-      <img src="https://github.com/user-attachments/assets/caf847d0-be43-4d89-b843-600b733a0731" width="400" alt="Drawing on a paused frame" />
+      <img src="docs/public/images/home/draw-on-frame-animated.webp" width="400" alt="Drawing on a paused frame" />
     </td>
     <td width="50%" valign="top">
       <b>Compare revisions</b><br/>
       Spot what a graphics update changed at a glance.<br/><br/>
-      <img src="https://github.com/user-attachments/assets/8fd74149-bea6-492d-b789-30f4c23e7ba1" width="400" alt="Two revisions side by side with the diff image below" />
+      <img src="docs/public/images/home/compare-revisions.webp" width="400" alt="Two revisions side by side with the diff image below" />
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top">
+      <b>Watch together</b><br/>
+      Without screen sharing, everyone who opens the link plays, pauses and seeks in step.<br/><br/>
+      <img src="docs/public/images/home/synced-playback-animated.webp" width="820" alt="Play and pause in step across two browsers" />
     </td>
   </tr>
 </table>
@@ -44,17 +51,17 @@
     <td width="33%" valign="top">
       <b>See what changed in the code</b><br/>
       See which update caused a change in the video, right in the browser.<br/><br/>
-      <img src="https://github.com/user-attachments/assets/a282f05e-ff74-4406-948d-6cdf9ae27181" width="260" alt="The Changes tab listing pull requests and commits" />
+      <img src="docs/public/images/home/changes-tab.webp" width="260" alt="The Changes tab listing pull requests and commits" />
     </td>
     <td width="33%" valign="top">
       <b>Unity / Unreal Engine</b><br/>
       Open the scene from the video under review and check it in the editor right away.<br/><br/>
-      <img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="260" alt="Opening the scene in the editor" />
+      <img src="docs/public/images/features/editor/open-scene-animated.webp" width="260" alt="Opening the scene in the editor" />
     </td>
     <td width="33%" valign="top">
       <b>Slack / Jira</b><br/>
       Keep comments from being left behind: post them to Slack, or turn them into tasks in one click.<br/><br/>
-      <img src="https://github.com/user-attachments/assets/d5a23dba-b83b-4927-b202-a0079e339755" width="260" alt="Sending a comment to Slack and Jira" />
+      <img src="docs/public/images/home/slack-jira-animated.webp" width="260" alt="Sending a comment to Slack and Jira" />
     </td>
   </tr>
 </table>
