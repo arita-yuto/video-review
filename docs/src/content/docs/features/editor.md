@@ -15,7 +15,7 @@ editor plugin (listens inside Unity / UE and opens the scene)
 ```
 
 The launcher and the plugin are installed on each reviewer's PC.
-The scene path is tied to the video [when it is uploaded](#3-tie-a-video-to-its-scene).
+The scene path is tied to the video [when it is uploaded](#3-set-scene_path-on-a-video).
 
 ---
 
@@ -68,7 +68,7 @@ Note: the bundled sample project was made with Unity 6000.3.
 
 ---
 
-## 3. Tie a video to its scene
+## 3. Set scene_path on a video
 
 When uploading a video, pass the scene's path as `scene_path`.
 The maintenance CLI's `upload-video` takes it ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
@@ -90,7 +90,7 @@ Each editor expects its own form of path:
 
 ---
 
-## 4. How to use
+## 4. The Open Scene button
 
 1. Open the video. A video with a `scene_path` shows a gamepad icon (Open Scene) at the bottom right of the player.
 2. Press it. The running editor opens that scene and comes to the front.
@@ -104,7 +104,7 @@ Note: if the button is missing, check that the video has a `scene_path` and that
 
 ## Reference
 
-### API Test Window (call the VideoReview API from the editor)
+### API Test Window
 
 Both plugins include a debug window that calls the VideoReview API from inside the editor.
 It runs the maintenance CLI under the hood, so put the CLI binary in place first:
@@ -126,7 +126,7 @@ cd integrations/launcher
 
 # Build
 $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o installers\windows\videoreview-launcher.exe
-# Install with the script below
+# Install
 .\installers\windows\install.cmd
 ```
 
@@ -136,7 +136,7 @@ cd integrations/launcher
 
 # On an Intel Mac, use GOARCH=amd64
 GOOS=darwin GOARCH=arm64 go build -o installers/mac/videoreview-launcher
-# Install with the script below
+# Install
 bash installers/mac/build-app.sh
 ```
 

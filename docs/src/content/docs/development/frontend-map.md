@@ -8,7 +8,7 @@ There are two `lib` directories: `src/lib` is read by both components and server
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
-flowchart LR
+flowchart TD
     app[app]
     bridge["app/api (Bridge)"]
     components[components]
@@ -52,7 +52,7 @@ Pages in app turn the URL into store state and mount the screen, so they may rea
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
-flowchart TD
+flowchart LR
     components[components]
     review[review]
     browser[browser]
@@ -94,7 +94,7 @@ Arrows point from the reader to the store it reads, and every arrow stays in its
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
-flowchart LR
+flowchart TD
     subgraph components["components/"]
         subgraph s0["stores/"]
             auth[auth-store]

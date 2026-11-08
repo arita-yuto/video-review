@@ -6,11 +6,13 @@ sidebar:
 ---
 How to put nginx in front of VideoReview and serve it at `https://<server name>/`.
 
-Note: if you already have a certificate issued by a CA, start from "2. Place the certificate".
+Note: if you already have a certificate issued by a CA, start from "Place the certificate".
+
+---
 
 ## 1. Prepare a server name and a certificate
 
-- A server name (such as `videoreview.example.com`); users' browsers must reach the VideoReview server by this name
+- A server name that users' browsers reach the VideoReview server by (such as `videoreview.example.com`)
 - A certificate for that name (PEM, with any intermediate certificates appended)
 - The certificate's private key (PEM)
 
@@ -27,14 +29,18 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
 
 Note: browsers warn about a self-signed certificate, since no known CA issued it.
 
+---
+
 ## 2. Place the certificate
 
-Create `certs/` at the repository root and put the certificate and the key there under these names:
+Create `certs/` and put the certificate and the key there under these names (with Docker, in the same folder as `compose.prod.yml`):
 
 ```
 certs/fullchain.pem
 certs/privkey.pem
 ```
+
+---
 
 ## 3. Start nginx
 
@@ -63,7 +69,7 @@ Also change the certificate paths (`/etc/nginx/certs/fullchain.pem` and `privkey
 
 Restart nginx.
 
-### Check
+### Verify
 
 Open `https://<server name>/` in a browser. If the login screen appears, the setup is complete.
 

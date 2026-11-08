@@ -8,7 +8,7 @@ lib は 2 つあり、src/lib は components と server の両方が読み、src
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
-flowchart LR
+flowchart TD
     app[app]
     bridge["app/api (Bridge)"]
     components[components]
@@ -52,7 +52,7 @@ app のページは URL を store の状態に変えて画面を mount するの
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
-flowchart TD
+flowchart LR
     components[components]
     review[review]
     browser[browser]
@@ -94,7 +94,7 @@ flowchart TD
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
-flowchart LR
+flowchart TD
     subgraph components["components/"]
         subgraph s0["stores/"]
             auth[auth-store]

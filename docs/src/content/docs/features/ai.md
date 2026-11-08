@@ -4,7 +4,7 @@ sidebar:
   label: "AI / MCP"
   order: 1
 ---
-AI features are optional. Once enabled, you get the AI summary in the VCS Code Changes panel, chat search, and search from AI agents.
+With AI features enabled, you get the AI summary in the Changes tab, chat search, and search from AI agents.
 
 ---
 
@@ -21,7 +21,7 @@ AI features are optional. Once enabled, you get the AI summary in the VCS Code C
 | Chat search | Available | The model must support tool calling (`qwen2.5` is recommended) |
 | Recommended for | Production, team use | Local and offline environments |
 
-### Configure and save
+### Connect and save
 
 Log in as an administrator and open the gear icon at the bottom left → Administration → AI.
 
@@ -69,7 +69,7 @@ docker compose -f compose.prod.yml -f compose.prod.ollama.yml --profile rocm up 
 
 ##### Download a model
 ```bash
-# 2. Download a model (first time only; stored in a Docker volume)
+# First time only; stored in a Docker volume
 docker exec videoreview-ollama ollama pull qwen2.5:3b
 ```
 
@@ -101,8 +101,7 @@ Note: chat search is not available when logged in as a guest.
 
 <img width="649" src="/video-review/images/features/ai/chat-search-button.webp" />
 
-<br>
-You can search by upload date, title, tags, commit messages, and more. <br>
+You can search by upload date, title, tags, commit messages, and more.
 
 - "Show me the 3 most recently uploaded videos"
 - "Which videos have comments with drawings?"
@@ -110,7 +109,7 @@ You can search by upload date, title, tags, commit messages, and more. <br>
 
 <img src="/video-review/images/features/ai/chat-search-answer.webp"/>
 
-## 3. Use it from AI agents
+## 3. Search from AI agents
 
 VideoReview exposes tools that read videos, comments, and code changes over MCP (Model Context Protocol) at `http://<VideoReview address>/api/v1/mcp`.  
 Each user registers their own AI agent (Claude Code, Codex CLI, Gemini CLI, and so on) with this URL.
@@ -190,7 +189,7 @@ Open Administration → MCP, write in the text box, and save.
 - "Waiting for review" means videos without the wip tag and with no comments
 ```
 
-## 5. Add more information to videos
+## 5. Add search details to videos
 
 Videos with tags, events and related files attached are easier to find in search.  
 Attach them with the maintenance CLI ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
@@ -239,4 +238,4 @@ The AI picks and calls them for each question, so users never use them directly.
 |---|---|
 | The agent's connection returns `HTTP 401` | The `x-api-token` header is missing, or the token is wrong or revoked (issue a new one) |
 | The agent cannot connect | The registered URL is wrong, or VideoReview is unreachable (check that the same address opens in a browser) |
-| `list_vcs_changes` asks for `from` | The first revision has nothing to compare with (open that video's VCS panel once, or ask about a later revision) |
+| `list_vcs_changes` asks for `from` | The first revision has nothing to compare with (open that video's Changes tab once, or ask about a later revision) |

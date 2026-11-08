@@ -61,9 +61,9 @@ When there are errors, nothing is applied and a list of the row, column and reas
 
 ---
 
-## 3. Permissions
+## 3. Permissions by role
 
-Written by what the server's API lets through.
+○ marks what the server's API allows.
 
 ### Reading
 

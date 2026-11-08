@@ -1,6 +1,7 @@
 ---
 title: "Notifications (Slack / Webhook / Email)"
 sidebar:
+  label: "Notifications"
   order: 3
 ---
 Where review comments are announced.
@@ -74,7 +75,7 @@ With Ollama as well, pass both: `--profile cpu --profile smtp`.
 docker compose -f compose.prod.yml --profile smtp up -d
 ```
 
-### Configure VideoReview
+### Configure the Email section
 
 Open Administration → Integrations → Email.
 

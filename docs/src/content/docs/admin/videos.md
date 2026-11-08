@@ -18,6 +18,8 @@ See the list of videos, delete the files of a video or of a revision, and move a
 Note: deleting a video deletes every revision too, and the video leaves the list.  
 Note: uploading the same folder key and title again brings it back with its comments, which are not deleted.
 
+---
+
 ## 2. Delete only a revision
 
 1. Open the revisions with the `>` arrow.

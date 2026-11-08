@@ -131,3 +131,7 @@
 .hero .actions {
     justify-content: center;
 }
+
+.pagination-links .link-title {
+    font-size: var(--sl-text-lg);
+}

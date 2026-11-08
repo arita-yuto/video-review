@@ -5,12 +5,12 @@ sidebar:
 ---
 Jira に接続すると、次のことができます
 
-- コメントから Jira の issue を作る、または既存の issue を結びつける
+- コメントから Jira の issue を作る、または既存の issue を紐づける
 - issue のステータスをコメントから見る・変える
 
 <img src="/video-review/images/admin/integrations/issue-tracker/jira-section.webp" />
 
-## 1. 接続して保存する
+## 1. Test & save で接続
 
 | 項目 | 内容 |
 |---|---|
@@ -26,7 +26,7 @@ Jira に接続すると、次のことができます
 1. 項目を入力します
 2. Test & save を押します
 
-Test & save を押し、Jira に接続して project と issue type を確かめ、成功したら保存されます  
+Jira に接続でき、project と issue type が見つかったときだけ保存されます
 
 ※ issue type の名前は、その project にあるものと同じ文字で書きます（無い名前だと Test & save が通りません）  
 ※ Token を保存すると URL と Token は変えられなくなるので、変えるときは Reset で保存した Token を消してから入れ直します  
@@ -34,9 +34,9 @@ Test & save を押し、Jira に接続して project と issue type を確かめ
 
 ---
 
-## 2. コメントを活用する
+## 2. コメントから issue を操作
 
-### コメントから issue を作る
+### issue を作成
 
 Comments パネルで、コメントのメニューから Create issue を選びます  
 Task と Bug の issue type を設定していると、それぞれの種類で作れます  
@@ -44,15 +44,15 @@ Task と Bug の issue type を設定していると、それぞれの種類で�
 
 <img src="/video-review/images/admin/integrations/issue-tracker/convert-comment.webp" />
 
-### 既存の issue を結びつける
+### 既存の issue を指定
 
-コメントの下の issue 欄にキーを入れると Jira で作成済みチケットと紐づけを後からすることができます  
+コメントの下の issue 欄にキーを入れると、作成済みの issue を後から紐づけられます
 
 <img src="/video-review/images/admin/integrations/issue-tracker/link-existing-issue.webp" />
 
-### ステータスを見る・変える
+### ステータスを変更
 
 コメントの issue には、ステータスアイコンが付きます  
-コメントのメニューの Change status で issue ステータスを更新も可能です
+コメントのメニューの Change status で、ステータスを変えられます
 
-<img  src="/video-review/images/admin/integrations/issue-tracker/change-status.webp" />
+<img src="/video-review/images/admin/integrations/issue-tracker/change-status.webp" />

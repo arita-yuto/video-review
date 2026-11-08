@@ -63,7 +63,7 @@ Note: a person set to active `false` in Users cannot enter VideoReview even when
 
 ---
 
-## Reference: try it locally
+## Reference: try it with Keycloak
 
 The repository ships a Keycloak configuration, so the SSO sign-in can be tried without an IdP.
 

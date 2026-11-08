@@ -5,36 +5,30 @@ sidebar:
   order: 3
 ---
 
-This is a CLI tool for maintaining VideoReview.  
-It is an **internal administrator tool** separate from the main application.
+A maintenance CLI for administrators that runs separately from VideoReview.
 
 Note: prebuilt binaries are on the GitHub Releases page (`video-review-cli-<OS>-<Architecture>`).
 
-## API Token
+## 1. Generate an API Token
 
-VideoReview uses an API token for maintenance and automation.
+The maintenance CLI needs an API Token.  
+An admin generates it on the admin screen ([API Token guide](/video-review/admin/api-token/)).
 
-After initial setup, an administrator can generate an API token
-from the web UI.
+## 2. Set the environment variables
 
-See the [Admin Screen Guide](/video-review/admin/api-token/) for details.
-
-## Required Environment Variables
-
-URL of the server running VideoReview
+The URL of the VideoReview server
 > VIDEO_REVIEW_SERVER_URL
 
-VideoReview API Token  
-Set the API token generated from the web UI
+The generated API Token
 > VIDEO_REVIEW_API_TOKEN
 
-It can also be specified directly in the command.
+You can also pass them on the command line.
 > go run . --server http://xxx.xxx.xxx.xxx:3489 --token xxxxxx command --video_id xxx
 
 Note: `--server` starts with `http://` or `https://`.  
 Note: put `--server` and `--token` before the command name.
 
-### Command List
+## 3. Commands
 
 ##### Create the first administrator
 > go run . bootstrap --email Nijika@example.com --pass 123abc
@@ -72,13 +66,13 @@ Note: `--filter_tree` narrows the list to titles or folder keys that contain the
 ##### Get a video's revision information (JSON)
 > go run . get-videos-rev --video_id {uuid}
 
-##### Logically delete a video
+##### Soft-delete a video
 > go run . delete-video --video_id {uuid}
 
-##### Delete the specified revision of a video
-* Performs file deletion + logical deletion
-* Cannot be undone after execution
+##### Delete a revision
 > go run . purge-revision --video_id {uuid} --revision 1
+
+Note: this also deletes the files, so it cannot be undone.
 
 ##### Upload a video
 > go run . upload-video --title "title" --folder_key "folder_key" --scene_path "scene_path" --video_path "/path/to/video.mp4"
@@ -86,7 +80,7 @@ Note: `--filter_tree` narrows the list to titles or folder keys that contain the
 To register the files whose VCS changes matter at the same time, add `--vcs_watch_paths` as a comma-separated list.
 > go run . upload-video --title "title" --folder_key "folder_key" --video_path "/path/to/video.mp4" --vcs_watch_paths "Assets/Scenes/Boss.unity,Assets/Prefabs"
 
-##### Change a video's settings
+##### Change a video's vcs_watch_paths
 Replace the files whose VCS changes matter for a video already uploaded.
 > go run . patch-video --video_id {uuid} --vcs_watch_paths "Assets/Scenes/Boss.unity,Assets/Prefabs"
 

@@ -67,7 +67,7 @@
 </table>
 
 **Runs on-premise**: review unreleased footage without it leaving your network (S3 and Nextcloud work too).  
-**Also**: search · [AI chat search](https://arita-yuto.github.io/video-review/features/ai/#2-use-chat-search-in-the-app) · [MCP](https://arita-yuto.github.io/video-review/features/ai/#3-use-it-from-ai-agents) · [maintenance CLI](https://arita-yuto.github.io/video-review/features/maintenance-cli/)
+**Also**: search · [AI chat search](https://arita-yuto.github.io/video-review/features/ai/#2-use-chat-search-in-the-app) · [MCP](https://arita-yuto.github.io/video-review/features/ai/#3-search-from-ai-agents) · [maintenance CLI](https://arita-yuto.github.io/video-review/features/maintenance-cli/)
 
 ## Quick Start (Docker)
 

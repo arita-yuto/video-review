@@ -4,7 +4,7 @@ sidebar:
   label: "Unity / Unreal Engine"
   order: 2
 ---
-動画のプレイヤーにある Open Scene ボタンで、その動画に結びついたシーンを Unity か Unreal Engine で直接開けます
+動画のプレイヤーにある Open Scene ボタンで、その動画に紐づいたシーンを Unity か Unreal Engine で直接開けます
 
 ```
 ブラウザ（Open Scene）
@@ -15,11 +15,11 @@ launcher（PC ごとにインストール、URL scheme を受け取る）
 ```
 
 launcher とプラグインは、レビューする人の PC ごとに入れます  
-シーンのパスは、[動画のアップロード時](#3-動画にシーンを結びつける)に紐づけます
+シーンのパスは、[動画のアップロード時](#3-動画に-scene_path-を指定)に紐づけます
 
 ---
 
-## 1. launcher をインストールする
+## 1. launcher のインストール
 
 GitHub の Releases から、自分の OS の zip をダウンロードします
 
@@ -39,7 +39,7 @@ GitHub の Releases から、自分の OS の zip をダウンロードします
 ### macOS
 
 1. zip を展開します
-2. 展開したフォルダでターミナルで以下を実行します
+2. 展開したフォルダで、ターミナルから次のコマンドを実行します
 
 ```bash
 bash build-app.sh
@@ -49,7 +49,7 @@ bash build-app.sh
 
 ---
 
-## 2. エディタにプラグインを入れる
+## 2. エディタにプラグインを追加
 
 ### Unity
 
@@ -68,7 +68,7 @@ Console に `[VideoReview] TCP server started on port 18766` と出れば待ち�
 
 ---
 
-## 3. 動画にシーンを結びつける
+## 3. 動画に scene_path を指定
 
 動画をアップロードするときに、そのシーンのパスを `scene_path` に付けます  
 メンテナンス CLI の `upload-video` で指定します（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
@@ -90,7 +90,7 @@ go run . upload-video \
 
 ---
 
-## 4. 使い方
+## 4. Open Scene ボタン
 
 1. 動画を開くと、`scene_path` が付いている動画にはプレイヤーの右下にゲームパッドのアイコン（Open Scene）が出ます
 2. 押すと、起動中のエディタがそのシーンを開き、前面に出ます
@@ -102,9 +102,9 @@ go run . upload-video \
 
 ---
 
-## Reference
+## 参考
 
-### API Test Window（エディタから VideoReview の API を試す）
+### API Test Window
 
 Unity と UE のプラグインには、エディタの中から VideoReview の API を呼ぶデバッグウィンドウが入っています  
 中身はメンテナンス CLI を呼んでいるので、CLI のバイナリを次の場所に置いてから使います
@@ -116,7 +116,7 @@ Unity と UE のプラグインには、エディタの中から VideoReview の
 
 Server URL と API Token を入れて Apply を押すと、動画の一覧やアップロード（scene_path 付き）などをエディタから試せます
 
-### launcher のローカルビルド方法（開発者向け）
+### launcher のローカルビルド（開発者向け）
 
 ビルドするために Go が必要です
 
@@ -126,7 +126,7 @@ cd integrations/launcher
 
 # ビルド
 $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o installers\windows\videoreview-launcher.exe
-# 下記スクリプトでインストールします
+# インストール
 .\installers\windows\install.cmd
 ```
 
@@ -136,7 +136,7 @@ cd integrations/launcher
 
 # Intel Mac は GOARCH=amd64 にします
 GOOS=darwin GOARCH=arm64 go build -o installers/mac/videoreview-launcher
-# 下記スクリプトでインストールします
+# インストール
 bash installers/mac/build-app.sh
 ```
 

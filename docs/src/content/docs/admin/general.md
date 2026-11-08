@@ -8,7 +8,7 @@ There is nothing to connect to, so Save stores the values as they are and they a
 
 <img src="/video-review/images/admin/general/general-section.webp" />
 
-## 1. Configure
+## 1. Settings
 
 | Field | Meaning | Default |
 |---|---|---|
