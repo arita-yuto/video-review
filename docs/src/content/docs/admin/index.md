@@ -40,12 +40,12 @@ Only admins see Administration.
 
 | Section | Details | Guide |
 |---|---|---|
-| General | Guest login, the login screen's default tab, the URL scheme, resolution presets, the upload chunk size | [general.md](/video-review/admin/general/) |
-| Users | List users, create them, change roles | [users.md](/video-review/admin/users/) |
-| Videos | List videos, delete videos or revisions | [videos.md](/video-review/admin/videos/) |
-| Jira | Connect to Jira, create issues from comments | [integrations/issue-tracker.md](/video-review/admin/integrations/issue-tracker/) |
-| SSO (OIDC) | Connect an identity provider such as OneLogin, sign in with SSO | [integrations/sso.md](/video-review/admin/integrations/sso/) |
-| Slack / Webhook / Email | Where comments are announced | [integrations/notify.md](/video-review/admin/integrations/notify/) |
+| General | Guest login, the login screen's default tab, the URL scheme, resolution presets, the upload chunk size | [General guide](/video-review/admin/general/) |
+| Users | List users, create them, change roles | [Users guide](/video-review/admin/users/) |
+| Videos | List videos, delete videos or revisions | [Videos guide](/video-review/admin/videos/) |
+| Jira | Connect to Jira, create issues from comments | [Jira guide](/video-review/admin/integrations/issue-tracker/) |
+| SSO (OIDC) | Connect an identity provider such as OneLogin, sign in with SSO | [SSO (OIDC) guide](/video-review/admin/integrations/sso/) |
+| Slack / Webhook / Email | Where comments are announced | [Notifications guide](/video-review/admin/integrations/notify/) |
 | AI / MCP | The LLM provider, chat search, AI agents | [AI Features Guide](/video-review/features/ai/) |
-| VCS | Connect to GitHub and show the code changes behind a video | [integrations/vcs.md](/video-review/admin/integrations/vcs/) |
-| API Token | The token the maintenance CLI and AI agents use | [api-token.md](/video-review/admin/api-token/) |
+| VCS | Connect to GitHub and show the code changes behind a video | [VCS guide](/video-review/admin/integrations/vcs/) |
+| API Token | The token the maintenance CLI and AI agents use | [API Token guide](/video-review/admin/api-token/) |

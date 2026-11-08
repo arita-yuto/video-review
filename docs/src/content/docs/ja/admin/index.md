@@ -40,14 +40,14 @@ Administration は admin にだけ表示されます
 
 | セクション | 詳細 | ガイド |
 |---|---|---|
-| General | Guest ログイン、ログイン画面の既定タブ、URL scheme、解像度プリセット、アップロードのチャンクサイズ | [general.jp.md](/video-review/ja/admin/general/) |
-| Users | ユーザーの一覧、作成、role の変更 | [users.jp.md](/video-review/ja/admin/users/) |
-| Videos | 動画の一覧と、動画やリビジョンの削除 | [videos.jp.md](/video-review/ja/admin/videos/) |
-| Jira | Jira への接続、コメントからの issue 作成 | [integrations/issue-tracker.jp.md](/video-review/ja/admin/integrations/issue-tracker/) |
-| SSO (OIDC) | OneLogin などの IdP との接続と、SSO ログイン | [integrations/sso.jp.md](/video-review/ja/admin/integrations/sso/) |
-| Slack / Webhook / Email | コメントの通知先 | [integrations/notify.jp.md](/video-review/ja/admin/integrations/notify/) |
+| General | Guest ログイン、ログイン画面の既定タブ、URL scheme、解像度プリセット、アップロードのチャンクサイズ | [General ガイド](/video-review/ja/admin/general/) |
+| Users | ユーザーの一覧、作成、role の変更 | [Users ガイド](/video-review/ja/admin/users/) |
+| Videos | 動画の一覧と、動画やリビジョンの削除 | [Videos ガイド](/video-review/ja/admin/videos/) |
+| Jira | Jira への接続、コメントからの issue 作成 | [Jira ガイド](/video-review/ja/admin/integrations/issue-tracker/) |
+| SSO (OIDC) | OneLogin などの IdP との接続と、SSO ログイン | [SSO (OIDC) ガイド](/video-review/ja/admin/integrations/sso/) |
+| Slack / Webhook / Email | コメントの通知先 | [通知ガイド](/video-review/ja/admin/integrations/notify/) |
 | AI / MCP | LLM プロバイダー、チャット検索、AI エージェント | [AI 機能ガイド](/video-review/ja/features/ai/) |
-| VCS | GitHub への接続と、動画に結びつくコード変更の表示 | [integrations/vcs.jp.md](/video-review/ja/admin/integrations/vcs/) |
-| API Token | メンテナンス CLI と AI エージェントが使うトークン | [api-token.jp.md](/video-review/ja/admin/api-token/) |
+| VCS | GitHub への接続と、動画に結びつくコード変更の表示 | [VCS ガイド](/video-review/ja/admin/integrations/vcs/) |
+| API Token | メンテナンス CLI と AI エージェントが使うトークン | [API Token ガイド](/video-review/ja/admin/api-token/) |
 
 
