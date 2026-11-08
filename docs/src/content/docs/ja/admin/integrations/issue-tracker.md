@@ -8,9 +8,9 @@ Jira に接続すると、次のことができます
 - コメントから Jira の issue を作る、または既存の issue を結びつける
 - issue のステータスをコメントから見る・変える
 
-<img src="https://github.com/user-attachments/assets/c14c6896-8e6a-416c-a44f-b94e823f17a7" />
+<img src="/video-review/images/admin/integrations/issue-tracker/jira-section.webp" />
 
-## 2. 接続して保存する
+## 1. 接続して保存する
 
 | 項目 | 内容 |
 |---|---|
@@ -28,14 +28,13 @@ Jira に接続すると、次のことができます
 
 Test & save を押し、Jira に接続して project と issue type を確かめ、成功したら保存されます  
 
-
 ※ issue type の名前は、その project にあるものと同じ文字で書きます（無い名前だと Test & save が通りません）  
 ※ Token を保存すると URL と Token は変えられなくなるので、変えるときは Reset で保存した Token を消してから入れ直します  
 ※ Cloud の API token は最長 1 年で切れるので、切れたら Reset して新しい token を入れ直します  
 
 ---
 
-## 3. コメントを活用する
+## 2. コメントを活用する
 
 ### コメントから issue を作る
 
