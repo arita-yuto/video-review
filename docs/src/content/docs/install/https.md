@@ -8,6 +8,8 @@ How to put nginx in front of VideoReview and serve it at `https://<server name>/
 
 Note: if you already have a certificate issued by a CA, start from "Place the certificate".
 
+---
+
 ## 1. Prepare a server name and a certificate
 
 - A server name that users' browsers reach the VideoReview server by (such as `videoreview.example.com`)
@@ -27,6 +29,8 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
 
 Note: browsers warn about a self-signed certificate, since no known CA issued it.
 
+---
+
 ## 2. Place the certificate
 
 Create `certs/` and put the certificate and the key there under these names (with Docker, in the same folder as `compose.prod.yml`):
@@ -35,6 +39,8 @@ Create `certs/` and put the certificate and the key there under these names (wit
 certs/fullchain.pem
 certs/privkey.pem
 ```
+
+---
 
 ## 3. Start nginx
 

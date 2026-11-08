@@ -18,6 +18,8 @@ Note: the token is shown only at this moment.
 Note: if it is lost, issue it again.  
 Note: only one token can exist, so the old one stops working the moment you regenerate.
 
+---
+
 ## 2. Use the token
 
 | Where | How |
