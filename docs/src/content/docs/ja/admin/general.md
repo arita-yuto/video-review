@@ -8,7 +8,7 @@ sidebar:
 
 <img src="/video-review/images/admin/general/general-section.webp" />
 
-## 1. 設定する
+## 1. 設定項目
 
 | 項目 | 内容 | 既定値 |
 |---|---|---|
@@ -22,7 +22,7 @@ sidebar:
 ※ Resolution presets はこれ以降に処理される動画に効きます（処理済みの動画の縮小版は作り直されません）  
 ※ S3 をストレージにしているときは、直接送るため Upload chunk は使われません  
 
-## 2. 新しいリリースに更新する
+## 2. 新しいリリースに更新
 
 Check for updates がオンなら、新しいリリースが出たとき、アカウントのメニューと Check for updates の横に `… available` が出ます
 

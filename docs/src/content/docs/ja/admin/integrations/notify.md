@@ -24,7 +24,7 @@ Administration → Integrations の Slack を開きます
 | Channel | 投稿先のチャンネル ID |
 | Team | Slack のチーム名（入れると VideoReview から Slack のメッセージへ直接飛べます） |
 
-Test & save を押し、Slack に接続に成功したら設定が保存されます
+Test & save を押し、Slack に接続できたら保存されます
 
 ※ Token を保存すると変えられなくなるので、変えるときは Reset で消してから入れ直します
 
@@ -49,7 +49,7 @@ Test & save はチャンネルにテストのメッセージを 1 件送り、�
 VideoReview は SMTP サーバーを内蔵しません  
 同梱の Postfix リレーか、社内の SMTP サーバーに渡します
 
-### SMTP リレーの転送先を設定する（Docker）
+### .env に転送先を設定（Docker）
 
 ※ 社内の SMTP サーバーに渡すときは、この手順を飛ばします
 
@@ -74,7 +74,7 @@ Ollama も使うときは `--profile cpu --profile smtp` のように並べま�
 docker compose -f compose.prod.yml --profile smtp up -d
 ```
 
-### VideoReview 側を設定する
+### Email セクションの設定
 
 Administration → Integrations の Email を開きます
 
@@ -88,7 +88,6 @@ Administration → Integrations の Email を開きます
 | 送信元 | 送信元のアドレス（例 `VideoReview <noreply@example.com>`） |
 | TLS 証明書を厳密に検証 | SMTP サーバーが信頼できる証明書を使っているときだけオン |
 | テストの送信先 | Test & save が送るテストメールの宛先 |
-
 
 Test & save を押すと保存され、送信先に 1 通届きます  
 届かないときはリレーのログ（`docker compose -f compose.prod.yml logs smtp`）を見ます

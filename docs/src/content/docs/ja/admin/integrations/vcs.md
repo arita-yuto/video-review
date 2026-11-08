@@ -8,7 +8,7 @@ AI 機能を有効にしていると、その要約も出ます（[AI 機能ガ�
 
 <img src="/video-review/images/admin/integrations/vcs/vcs-section.webp" />
 
-## 1. 接続して保存する
+## 1. Test & save で接続
 
 | 項目 | 内容 |
 |---|---|
@@ -28,7 +28,7 @@ AI 機能を有効にしていると、その要約も出ます（[AI 機能ガ�
 
 ---
 
-## 2. 動画に結びつける
+## 2. vcs_watch_paths で動画に紐づけ
 
 動画をアップロードするときか、アップロード後に動画を直接指定して、関係するパスを渡します（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
@@ -49,7 +49,7 @@ go run . patch-video \
   --vcs_watch_paths "/path/to/file1,/path/to/file2"
 ```
 
-## 3. 確認方法
+## 3. Changes タブで確認
 
 Changes タブに、前のリビジョンからアップロード日までの間に、そのパスに触れたコミットと Pull Request が出ます
 

@@ -4,13 +4,13 @@ sidebar:
   label: "AI / MCP"
   order: 1
 ---
-AI 機能は任意ですが、有効にすると VCS「コード変更」パネルの AI 要約、チャット検索、AI エージェントからの検索が使えます
+AI 機能を有効にすると、Changes タブの AI 要約、チャット検索、AI エージェントからの検索が使えます
 
 ---
 
-## 1. LLM プロバイダーを設定する
+## 1. LLM プロバイダーの設定
 
-### プロバイダーを選ぶ
+### プロバイダーの比較
 
 | | Claude / ChatGPT / Gemini | Ollama（ローカル） |
 |---|---|---|
@@ -21,18 +21,18 @@ AI 機能は任意ですが、有効にすると VCS「コード変更」パネ�
 | チャット検索 | 利用可 | モデルがツール呼び出しに対応している必要がある（`qwen2.5` を推奨） |
 | 推奨用途 | 本番環境、チーム利用 | ローカル、オフライン環境 |
 
-### 設定して保存する
+### Test & save で接続
 
 管理者でログインし、左下の歯車アイコン → Administration → AI を開きます
 
-1. Provider で使いたいAIを選びます
+1. Provider で使いたい AI を選びます
 2. API key（Ollama の場合は Base URL）と Model を入力します
 3. Test & save を押します
 
 <img src="/video-review/images/features/ai/ai-section.webp"/>
 
 接続に成功した設定だけが保存され、使用中 `●` になります  
-別のAIに切り替えるときは、「この Provider を使う」から可能です
+別の AI に切り替えるときは「この Provider を使う」を押します
 
 | Provider | API key の取得先 | Model の例 |
 |---|---|---|
@@ -43,7 +43,7 @@ AI 機能は任意ですが、有効にすると VCS「コード変更」パネ�
 
 ※ Ollama のモデルは GPU の VRAM に収まる大きさを選びます（収まらないと読み込みに失敗します）
 
-### Ollama を用意する
+### Ollama の準備
 
 ----
 #### Docker
@@ -56,20 +56,20 @@ CPU / NVIDIA / AMD のどれで動かすかを `--profile` で選びます
 docker compose -f compose.prod.yml -f compose.prod.ollama.yml --profile cpu up -d
 ```
 
-##### GPU(Nvidia)
+##### GPU（NVIDIA）
 [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) をインストールする必要があります
 ```bash
 docker compose -f compose.prod.yml -f compose.prod.ollama.yml --profile nvidia up -d
 ```
 
-##### GPU(Radion)
+##### GPU（Radeon）
 ```bash
 docker compose -f compose.prod.yml -f compose.prod.ollama.yml --profile rocm up -d
 ```
 
-##### モデルをダウンロードする
+##### モデルをダウンロード
 ```bash
-# 2. モデルをダウンロード（初回のみ、Docker ボリュームに保存される）
+# 初回のみ、Docker ボリュームに保存される
 docker exec videoreview-ollama ollama pull qwen2.5:3b
 ```
 
@@ -92,17 +92,16 @@ Base URL には `http://localhost:11434` を入力します
 
 ----
 
-## 2. アプリ内チャット検索を使う
+## 2. アプリ内のチャット検索
 
-### 質問する
+### チャットアイコンから質問
 
 動画一覧のヘッダーのチャットアイコンを押し、質問を入力して Enter を押します  
 ※ ゲストでログインしている場合は使えません
 
 <img width="649" src="/video-review/images/features/ai/chat-search-button.webp" />
 
-<br>
-アップロード日、タイトル、タグ、コミットコメントなどから、検索が可能です <br>
+アップロード日、タイトル、タグ、コミットコメントなどから検索できます
 
 - 「最近アップロードされた動画を 3 件教えて」
 - 「描画付きのコメントがある動画は？」
@@ -110,25 +109,25 @@ Base URL には `http://localhost:11434` を入力します
 
 <img src="/video-review/images/features/ai/chat-search-answer.webp"/>
 
-## 3. AI エージェントから使う
+## 3. AI エージェントから利用
 
 VideoReview は、動画、コメント、コード変更を読むツールを MCP（Model Context Protocol）で `http://<VideoReview のアドレス>/api/v1/mcp` に公開しています  
 利用者ごとに、自分の AI エージェント（Claude Code、Codex CLI、Gemini CLI など）をこの URL に登録します
 
-### API トークンを発行する
+### API トークンの発行
 
-管理者にAPIトークンを発行してもらい、共有してもらう必要があります  
+管理者に API トークンを発行してもらい、共有してもらう必要があります  
 Administration → API Token から発行します（[管理画面ガイド](/video-review/ja/admin/api-token/)）  
 エージェントはこのトークンを `x-api-token` ヘッダーに付けて VideoReview に接続します
 
-### 登録する
+### エージェントに登録
 
 Claude Code
 ```bash
 claude mcp add --transport http video-review http://videoreview.internal:3489/api/v1/mcp -H "x-api-token: <API トークン>"
 ```
 
-`mcp list` コマンドで確認する
+`mcp list` で確認
 ```bash
 claude mcp list
 ```
@@ -145,7 +144,7 @@ env_http_headers = { "x-api-token" = "VIDEO_REVIEW_API_TOKEN" }
 
 シェルに `VIDEO_REVIEW_API_TOKEN` を設定して `codex` を起動します
 
-`mcp list` コマンドで確認する
+`mcp list` で確認
 ```bash
 codex mcp list
 ```
@@ -156,23 +155,22 @@ Gemini CLI
 gemini mcp add --transport http -H "x-api-token: <API トークン>" video-review http://videoreview.internal:3489/api/v1/mcp
 ```
 
-`mcp list` コマンドで確認する
+`mcp list` で確認
 ```bash
 gemini mcp list
 ```
 
-## 4. 前提知識をカスタマイズする
+## 4. 前提知識のカスタマイズ
 
 ツールの使い分けや日付の解釈といった一般的な前提は VideoReview に組み込まれています  
 チーム固有の前提は管理画面に書きます  
 書いた内容はチャット検索と AI エージェントの両方に渡ります
 
-### ノートを書く
+### MCP セクションにノートを記入
 
 Administration → MCP を開き、テキストボックスに書いて保存します
 
 <img src="/video-review/images/features/ai/mcp-guide-notes.webp"/>
-
 
 ### タグやフォルダの意味、担当、回答の形式、よく聞く質問の言い回しなどを書きます
 ```markdown
@@ -191,24 +189,24 @@ Administration → MCP を開き、テキストボックスに書いて保存し
 - 「レビュー待ち」は wip タグが無く、コメントが 0 件の動画
 ```
 
-## 5. 動画に追加情報を付ける
+## 5. 動画にタグ・イベント・ファイルを追加
 
 タグ、イベント、関係するファイルを動画に付けておくと、検索で見つかりやすくなります  
 メンテナンス CLI で付けます（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
-タグと要約を付ける
+タグと要約
 ```bash
 go run . annotate-video-rev \
   --video_rev_id {uuid} \
   --tags "A,B,C" --summary "summary text"
 ```
 
-イベントを付ける（JSON の形は CLI のガイドにあります）
+イベント（JSON の形は CLI のガイドにあります）
 ```bash
 go run . upload-video-event-context --video_rev_id {uuid} --json_path "events.json"
 ```
 
-関係するファイルを登録する（VCS の接続が前提です、[VCS のガイド](/video-review/ja/admin/integrations/vcs/)）
+関係するファイル（VCS の接続が前提です、[VCS のガイド](/video-review/ja/admin/integrations/vcs/)）
 ```bash
 go run . patch-video \
   --video_id {uuid} \

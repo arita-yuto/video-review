@@ -11,7 +11,7 @@ VideoReview を Docker を使わずに、サーバーで直接動かす手順で
 
 ---
 
-## 1. 用意する
+## 1. 必要なソフトウェア
 
 - Node v24
 - PostgreSQL
@@ -19,11 +19,11 @@ VideoReview を Docker を使わずに、サーバーで直接動かす手順で
 
 ---
 
-## 2. インストールする
+## 2. インストール
 
 インストールのフォルダを作り、そのフォルダで進めます
 
-### video-review-cli と .env をダウンロードする
+### video-review-cli と .env をダウンロード
 
 ```bash
 # Linux
@@ -37,31 +37,24 @@ curl.exe -L -o video-review-cli.exe https://github.com/arita-yuto/video-review/r
 curl -L -o .env https://raw.githubusercontent.com/arita-yuto/video-review/main/.example.env
 ```
 
-### .env を書き換える
+### .env の設定
 
-PostgreSQLが稼働しているサーバーを指定してください
+`DATABASE_URL` に PostgreSQL のサーバーを書きます
 
 ```bash
 DATABASE_URL="postgresql://user:password@localhost:5432/videoreview"
 ```
 
-本番環境では、動画保存用のストレージを 必ず明示的に設定してください
+本番では `VIDEO_REVIEW_LOCAL_ROOTDIR` に動画の保存先を書きます
 
 ```bash
 VIDEO_REVIEW_LOCAL_ROOTDIR="/path/.../..."
 ```
 
-`VIDEO_REVIEW_LOCAL_ROOTDIR` が未設定、または無効な場合、  
-アプリケーションは `process.cwd()/uploads` にフォールバックして
-動画ファイルを保存します。
+空のときは、インストールのフォルダの `uploads` に保存されます  
+アプリと同じ場所に動画が溜まるので、容量の管理が難しくなります
 
-このフォールバック挙動は以下の理由から、長期保存や本番運用には適していません。
-
-- アプリケーションの更新や再デプロイ時にファイルが失われる可能性がある
-- ストレージの場所が不明確になる場合がある
-- アプリ実行場所と同居してしまうため、容量管理が難しくなる
-
-### インストールして起動する
+### インストールと起動
 
 ```bash
 ./video-review-cli upgrade
@@ -74,7 +67,7 @@ VIDEO_REVIEW_LOCAL_ROOTDIR="/path/.../..."
 
 ---
 
-## 3. 起動・終了する
+## 3. 起動と停止
 
 ```bash
 ./video-review-cli start
@@ -86,7 +79,7 @@ OS を再起動したあとは、`start` で起動します
 
 ---
 
-## 4. 更新する
+## 4. 新しいリリースに更新
 
 ```bash
 ./video-review-cli upgrade
@@ -116,16 +109,16 @@ OS を再起動したあとは、`start` で起動します
 | `run` | 動いている Web と worker のプロセス番号 |
 | `logs` | `web.log`、`worker.log`、`upgrade.log` |
 
-### VideoReview を別のフォルダへ移す
+### 別のフォルダに移動
 
 1. 今のサーバーを止めます
-2. 新しいフォルダに `video-review-cli` をダウンロードします（[ダウンロードする](#video-review-cli-と-env-をダウンロードする)、`.env` は落としません）
+2. 新しいフォルダに `video-review-cli` をダウンロードします（[video-review-cli と .env をダウンロード](#video-review-cli-と-env-をダウンロード)、`.env` は落としません）
 3. 今のフォルダから `.env`、`secrets`、`uploads` を、新しいフォルダに移します
 4. 新しいフォルダで `./video-review-cli upgrade` を実行します
 
 ※ `uploads` は、`VIDEO_REVIEW_LOCAL_ROOTDIR` を設定していなかった場合だけあります
 
-### ソースから build して動かす
+### ソースから build
 
 ```bash
 cp .example.env .env      # DATABASE_URL を書く

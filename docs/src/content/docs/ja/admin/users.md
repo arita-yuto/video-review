@@ -7,7 +7,7 @@ sidebar:
 
 <img src="/video-review/images/admin/users/users-section.webp" />
 
-## 1. ユーザーを作る
+## 1. Create user で作成
 
 一覧の下の Create user で作ります
 
@@ -18,17 +18,17 @@ sidebar:
 
 ---
 
-## 2. CSV でまとめて作成・更新する
+## 2. CSV で一括作成・更新
 
 ユーザーを CSV に書き出し、編集して読み込むと、作成と更新をまとめてできます
 
-### CSV に書き出す
+### Export で書き出し
 
 一覧の上の Export を押すと、`users.csv` がダウンロードされます
 
 ※ CLI では `export-users` で書き出せます（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
-### CSV を編集する
+### CSV の編集
 
 | 列 | 内容 |
 |---|---|
@@ -46,7 +46,7 @@ sidebar:
 ※ UTF-8 で保存します  
 ※ 自分の行の role、active、pass は変えられません
 
-### CSV を読み込む
+### Import で読み込み
 
 1. Import を押します
 
@@ -61,7 +61,7 @@ sidebar:
 
 ---
 
-## 3. 権限について
+## 3. role ごとの権限
 
 サーバーの API が通すかどうかで書いています
 
@@ -81,7 +81,7 @@ sidebar:
 | 操作 | guest | viewer | admin |
 |---|---|---|---|
 | コメントの作成、いいね | Guest 可 の動画だけ | ○ | ○ |
-| 動画にお絵かき機能 | Guest 可 の動画だけ | ○ | ○ |
+| 動画へのお絵かき | Guest 可 の動画だけ | ○ | ○ |
 | コメントの本文・issue 番号の編集、削除 | 自分のもの（ログイン中だけ） | 自分のもの | ○ |
 | コメントから Jira issue を作る | × | ○ | ○ |
 | コメントの通知を送る（Slack / Webhook / Email） | × | ○ | ○ |

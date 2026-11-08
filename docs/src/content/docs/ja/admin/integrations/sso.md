@@ -10,7 +10,7 @@ OpenID Connect に対応した IdP（OneLogin、Okta、Microsoft Entra ID、Keyc
 
 ---
 
-## 1. IdP にアプリを登録する
+## 1. IdP にアプリを登録
 
 IdP の管理者に、VideoReview を OpenID Connect のアプリとして登録してもらいます
 
@@ -22,7 +22,7 @@ IdP の管理者に、VideoReview を OpenID Connect のアプリとして登録
 
 ---
 
-## 2. 接続して保存する
+## 2. Test & save で接続
 
 登録後、IdP の管理者から受け取ったものを入力します
 
@@ -44,7 +44,7 @@ Test & save を押し、Issuer URL の OpenID 設定を取り、Client ID と Cl
 
 ---
 
-## 3. SSO でログインする
+## 3. SSO でログイン
 
 <img src="/video-review/images/admin/integrations/sso/sign-in-with-sso.webp" width="400" />
 
@@ -63,7 +63,7 @@ role を変えるときは [Users](/video-review/ja/admin/users/) で変えま�
 
 ---
 
-## 参考: 手元で試す
+## 参考: Keycloak で動作確認
 
 リポジトリに Keycloak の設定が入っているので、IdP が無くても SSO のログインを試せます
 
