@@ -83,7 +83,7 @@ jobs:
           fi
 
       - name: Attach the binaries to the release
-        uses: softprops/action-gh-release@v3.0.3
+        uses: softprops/action-gh-release@v3.0.4
         with:
           files: |
             maintenance/dist/*
@@ -124,6 +124,6 @@ jobs:
         with:
           version: ${{ github.ref_name }}
       - name: Attach the bundle to the release
-        uses: softprops/action-gh-release@v3.0.3
+        uses: softprops/action-gh-release@v3.0.4
         with:
           files: dist/*.zip
