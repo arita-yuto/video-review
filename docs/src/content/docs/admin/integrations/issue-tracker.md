@@ -8,9 +8,9 @@ Connecting to Jira lets you:
 - Create Jira issues from comments, or link a comment to an existing issue
 - See and change the status of an issue from its comment
 
-<img src="https://github.com/user-attachments/assets/c14c6896-8e6a-416c-a44f-b94e823f17a7" />
+<img src="/video-review/images/admin/integrations/issue-tracker/jira-section.webp" />
 
-## 2. Connect and save
+## 1. Connect and save
 
 | Field | Meaning |
 |---|---|
@@ -34,7 +34,7 @@ Note: a Cloud API token expires (after a year at most); when it does, press Rese
 
 ---
 
-## 3. Work with comments
+## 2. Work with comments
 
 ### Create an issue from a comment
 
