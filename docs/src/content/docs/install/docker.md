@@ -1,5 +1,5 @@
 ---
-title: "Build & Run Guide (Docker)"
+title: "Build & Run (Docker)"
 sidebar:
   label: "Docker"
   order: 1

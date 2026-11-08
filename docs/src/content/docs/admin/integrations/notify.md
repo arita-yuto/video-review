@@ -1,6 +1,7 @@
 ---
 title: "Notifications (Slack / Webhook / Email)"
 sidebar:
+  label: "Notifications"
   order: 3
 ---
 Where review comments are announced.

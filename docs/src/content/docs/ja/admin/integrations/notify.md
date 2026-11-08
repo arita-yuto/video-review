@@ -1,6 +1,7 @@
 ---
 title: "通知（Slack / Webhook / Email）"
 sidebar:
+  label: "通知"
   order: 3
 ---
 レビューコメントの通知先です  

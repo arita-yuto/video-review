@@ -1,5 +1,5 @@
 ---
-title: "Build & Run Guide (Local / On‑premise)"
+title: "Build & Run (Local)"
 sidebar:
   label: "ローカル / オンプレ"
   order: 2
