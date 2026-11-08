@@ -8,7 +8,7 @@ sidebar:
 
 <img src="/video-review/images/admin/api-token/api-token-section.webp" />
 
-## 1. Generate で発行
+## 1. トークンを発行
 
 1. Generate（発行済みなら Regenerate）を押します
 2. 表示されたトークンを Ctrl+C でコピーします
@@ -25,5 +25,5 @@ sidebar:
 | 使う場所 | 渡し方 |
 |---|---|
 | メンテナンス CLI | [メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/) の手順で設定します |
-| AI エージェント | [AI 機能ガイド](/video-review/ja/features/ai/) の「AI エージェントから利用」の手順で `x-api-token` ヘッダーに渡します |
+| AI エージェント | [AI 機能ガイド](/video-review/ja/features/ai/) の「AI エージェントから検索」の手順で `x-api-token` ヘッダーに渡します |
 | curl | `x-api-token` ヘッダーに入れます（API の一覧は `/api/docs`） |

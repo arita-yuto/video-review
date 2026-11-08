@@ -34,7 +34,7 @@ Note: a Cloud API token expires (after a year at most); when it does, press Rese
 
 ---
 
-## 2. Work with comments
+## 2. Manage issues from comments
 
 ### Create an issue from a comment
 

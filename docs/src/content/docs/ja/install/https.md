@@ -12,7 +12,7 @@ VideoReview の前に nginx を置き、`https://<サーバー名>/` で使え�
 
 ## 1. サーバー名と証明書の準備
 
-- サーバー名（`videoreview.example.com` など）、利用者のブラウザからこの名前で VideoReview のサーバーに届くこと
+- 利用者のブラウザから VideoReview のサーバーに届くサーバー名（`videoreview.example.com` など）
 - その名前の証明書（PEM 形式、中間証明書があれば連結したもの）
 - 証明書の秘密鍵（PEM 形式）
 
@@ -33,7 +33,7 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
 
 ## 2. certs/ に証明書を配置
 
-リポジトリ直下に `certs/` を作り、証明書と秘密鍵を次の名前で置きます
+`certs/` を作り、証明書と秘密鍵を次の名前で置きます（Docker なら `compose.prod.yml` と同じフォルダ）
 
 ```
 certs/fullchain.pem
@@ -73,6 +73,6 @@ nginx を再起動します
 
 ブラウザで `https://<サーバー名>/` を開き、ログイン画面が出れば完了です
 
-※ nginx 以外の逆 proxy を使う場合は、`X-Forwarded-Proto` と `X-Forwarded-Host` を VideoReview に渡してください  
+※ nginx 以外のリバースプロキシを使う場合は、`X-Forwarded-Proto` と `X-Forwarded-Host` を VideoReview に渡してください  
 ※ 応答のバッファリングは切ってください（nginx なら `proxy_buffering off`）  
 切らないとレビュー画面の stream（参加人数・同期再生）が届きません

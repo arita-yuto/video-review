@@ -4,7 +4,7 @@ sidebar:
   label: "Unity / Unreal Engine"
   order: 2
 ---
-動画のプレイヤーにある Open Scene ボタンで、その動画に結びついたシーンを Unity か Unreal Engine で直接開けます
+動画のプレイヤーにある Open Scene ボタンで、その動画に紐づいたシーンを Unity か Unreal Engine で直接開けます
 
 ```
 ブラウザ（Open Scene）
@@ -15,7 +15,7 @@ launcher（PC ごとにインストール、URL scheme を受け取る）
 ```
 
 launcher とプラグインは、レビューする人の PC ごとに入れます  
-シーンのパスは、[動画のアップロード時](#3-scene_path-で動画にシーンを紐づけ)に紐づけます
+シーンのパスは、[動画のアップロード時](#3-動画に-scene_path-を指定)に紐づけます
 
 ---
 
@@ -49,7 +49,7 @@ bash build-app.sh
 
 ---
 
-## 2. エディタにプラグインを導入
+## 2. エディタにプラグインを追加
 
 ### Unity
 
@@ -68,7 +68,7 @@ Console に `[VideoReview] TCP server started on port 18766` と出れば待ち�
 
 ---
 
-## 3. scene_path で動画にシーンを紐づけ
+## 3. 動画に scene_path を指定
 
 動画をアップロードするときに、そのシーンのパスを `scene_path` に付けます  
 メンテナンス CLI の `upload-video` で指定します（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
@@ -90,7 +90,7 @@ go run . upload-video \
 
 ---
 
-## 4. 使い方
+## 4. Open Scene ボタン
 
 1. 動画を開くと、`scene_path` が付いている動画にはプレイヤーの右下にゲームパッドのアイコン（Open Scene）が出ます
 2. 押すと、起動中のエディタがそのシーンを開き、前面に出ます
@@ -102,7 +102,7 @@ go run . upload-video \
 
 ---
 
-## Reference
+## 参考
 
 ### API Test Window
 

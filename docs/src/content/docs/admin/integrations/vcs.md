@@ -28,7 +28,7 @@ Note: once the token is saved, Owner, Repository and Token cannot be changed; pr
 
 ---
 
-## 2. Tie videos to the code
+## 2. Set vcs_watch_paths on a video
 
 Pass the paths a video relates to, either when uploading it or on the video afterwards ([maintenance CLI guide](/video-review/features/maintenance-cli/)).
 
@@ -49,7 +49,7 @@ go run . patch-video \
   --vcs_watch_paths "/path/to/file1,/path/to/file2"
 ```
 
-## 3. Check it
+## 3. Check the Changes tab
 
 The Changes tab shows the commits and pull requests that touched those paths between the previous revision and the upload date.
 

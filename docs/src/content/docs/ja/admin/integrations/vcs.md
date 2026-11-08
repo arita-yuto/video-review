@@ -3,7 +3,7 @@ title: "VCS"
 sidebar:
   order: 4
 ---
-リポジトリに接続すると、動画のサイドパネルの Changes タブに、そのリビジョンに結びつくコミットと Pull Request が出ます  
+リポジトリに接続すると、動画のサイドパネルの Changes タブに、そのリビジョンに紐づくコミットと Pull Request が出ます  
 AI 機能を有効にしていると、その要約も出ます（[AI 機能ガイド](/video-review/ja/features/ai/)）
 
 <img src="/video-review/images/admin/integrations/vcs/vcs-section.webp" />
@@ -28,7 +28,7 @@ AI 機能を有効にしていると、その要約も出ます（[AI 機能ガ�
 
 ---
 
-## 2. vcs_watch_paths で動画に紐づけ
+## 2. 動画に vcs_watch_paths を指定
 
 動画をアップロードするときか、アップロード後に動画を直接指定して、関係するパスを渡します（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 

@@ -11,7 +11,7 @@ Note: the zip is built for Linux (x64) and Windows (x64).
 
 ---
 
-## 1. Prepare
+## 1. Requirements
 
 - Node v24
 - PostgreSQL
@@ -39,27 +39,20 @@ curl -L -o .env https://raw.githubusercontent.com/arita-yuto/video-review/main/.
 
 ### Edit .env
 
-Please specify the server where PostgreSQL is running.
+Set `DATABASE_URL` to your PostgreSQL connection URL.
 
 ```bash
 DATABASE_URL="postgresql://user:password@localhost:5432/videoreview"
 ```
 
-In local (non-Docker) environments, it is strongly recommended to explicitly set:
+In production, set `VIDEO_REVIEW_LOCAL_ROOTDIR` to where videos are stored (create the folder first).
 
 ```bash
 VIDEO_REVIEW_LOCAL_ROOTDIR="/path/.../..."
 ```
 
-If `VIDEO_REVIEW_LOCAL_ROOTDIR` is not set or is invalid, the application falls back to
-`process.cwd()/uploads` to store uploaded video files.
-
-This fallback behavior is **not suitable for production use or long-term storage**
-for the following reasons:
-
-- Files may be lost during application updates or redeployment
-- The storage location may be unclear
-- Backups and capacity planning become difficult
+When it is empty or the folder does not exist, videos go to `uploads` in the install folder.  
+Videos then pile up next to the app, which makes capacity hard to manage.
 
 ### Install and start
 
@@ -86,7 +79,7 @@ After the OS restarts, start them with `start`.
 
 ---
 
-## 4. Update
+## 4. Update to a new release
 
 ```bash
 ./video-review-cli upgrade
@@ -125,7 +118,7 @@ Note: after editing `.env`, run `./video-review-cli stop` and then `start` to lo
 
 Note: `uploads` exists only if `VIDEO_REVIEW_LOCAL_ROOTDIR` was not set.
 
-### Build and run from source
+### Build from source
 
 ```bash
 cp .example.env .env      # set DATABASE_URL

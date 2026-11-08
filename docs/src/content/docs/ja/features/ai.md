@@ -109,14 +109,14 @@ Base URL には `http://localhost:11434` を入力します
 
 <img src="/video-review/images/features/ai/chat-search-answer.webp"/>
 
-## 3. AI エージェントから利用
+## 3. AI エージェントから検索
 
 VideoReview は、動画、コメント、コード変更を読むツールを MCP（Model Context Protocol）で `http://<VideoReview のアドレス>/api/v1/mcp` に公開しています  
 利用者ごとに、自分の AI エージェント（Claude Code、Codex CLI、Gemini CLI など）をこの URL に登録します
 
-### API トークンの発行
+### API トークンの入手
 
-管理者に API トークンを発行してもらい、共有してもらう必要があります  
+管理者に API トークンを発行してもらいます  
 Administration → API Token から発行します（[管理画面ガイド](/video-review/ja/admin/api-token/)）  
 エージェントはこのトークンを `x-api-token` ヘッダーに付けて VideoReview に接続します
 
@@ -189,7 +189,7 @@ Administration → MCP を開き、テキストボックスに書いて保存し
 - 「レビュー待ち」は wip タグが無く、コメントが 0 件の動画
 ```
 
-## 5. 動画にタグ・イベント・ファイルを追加
+## 5. 動画に検索用の情報を追加
 
 タグ、イベント、関係するファイルを動画に付けておくと、検索で見つかりやすくなります  
 メンテナンス CLI で付けます（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
@@ -224,7 +224,7 @@ AI が質問に応じて選んで呼ぶので、利用者が直接使うこと�
 |---|---|
 | `list_videos` | 動画一覧（タイトル、フォルダ、タグ、アップロード日、コメント条件で絞り込み） |
 | `get_video` | 1 本の動画と全リビジョン |
-| `list_comments` | レビューコメント（本文、ユーザー、日付、描画、課題リンクで絞り込み） |
+| `list_comments` | レビューコメント（本文、ユーザー、日付、描画、issue のリンクで絞り込み） |
 | `list_video_events` | 1 本の動画の解析イベント（画面内テキスト、文字起こしなど） |
 | `search_videos_by_event` | 台詞や字幕に特定の文字列を含む動画 |
 | `list_vcs_changes` | リビジョンに紐づく PR と commit |
@@ -238,4 +238,4 @@ AI が質問に応じて選んで呼ぶので、利用者が直接使うこと�
 |---|---|
 | エージェントの接続が `HTTP 401` になる | `x-api-token` ヘッダーが無いか、トークンが違うか失効している（発行し直す） |
 | エージェントから接続できない | 登録した URL が違うか、VideoReview に到達できない（同じアドレスをブラウザで開けるか確かめる） |
-| `list_vcs_changes` が `from` を要求する | 最初のリビジョンには比較対象が無い（その動画の VCS パネルを一度開くか、後のリビジョンについて聞く） |
+| `list_vcs_changes` が `from` を要求する | 最初のリビジョンには比較対象が無い（その動画の Changes タブを一度開くか、後のリビジョンについて聞く） |

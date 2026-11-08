@@ -5,17 +5,16 @@ sidebar:
   order: 3
 ---
 
-VideoReview のメンテナンス用 CLI ツールです  
-本体とは別の、管理者向けのツールです
+VideoReview の本体とは別に動く、管理者向けのメンテナンス用 CLI です
 
 ※ ビルド済みのものは GitHub の Releases にあります（`video-review-cli-<OS>-<Architecture>`）
 
-### API Token の発行
+## 1. API Token の発行
 
 メンテナンス CLI には API Token が必要です  
 admin が管理画面で発行します（[API Token ガイド](/video-review/ja/admin/api-token/)）
 
-### 必須環境変数
+## 2. 環境変数の設定
 
 VideoReview のサーバーの URL
 > VIDEO_REVIEW_SERVER_URL
@@ -29,7 +28,7 @@ VideoReview のサーバーの URL
 ※ `--server` は `http://` か `https://` から書きます  
 ※ `--server` と `--token` はコマンド名より前に置きます
 
-### コマンド一覧
+## 3. コマンド一覧
 
 ##### 最初の管理者を作成
 > go run . bootstrap --email Nijika@example.com --pass 123abc
@@ -39,7 +38,7 @@ VideoReview のサーバーの URL
 ##### ユーザーを作成
 > go run . create-user --name Nijika --email Nijika@example.com --pass 123abc
 
-##### ユーザーを CSV に書き出し
+##### ユーザーを CSV にエクスポート
 > go run . export-users --file users.csv
 
 ##### CSV からユーザーを一括作成・更新
@@ -62,7 +61,7 @@ VideoReview のサーバーの URL
 > go run . get-videos --include_revisions true  
 > go run . get-videos --filter_tree "battle"
 
-※ `--filter_tree` はタイトルかフォルダーキーの部分一致で絞り込みます
+※ `--filter_tree` はタイトルかフォルダキーの部分一致で絞り込みます
 
 ##### 動画のリビジョンを取得（JSON）
 > go run . get-videos-rev --video_id {uuid}
@@ -81,7 +80,7 @@ VideoReview のサーバーの URL
 VCS の変更を見るファイルを一緒に登録するときは `--vcs_watch_paths` をカンマ区切りで付けます
 > go run . upload-video --title "title" --folder_key "folder_key" --video_path "/path/to/video.mp4" --vcs_watch_paths "Assets/Scenes/Boss.unity,Assets/Prefabs"
 
-##### 動画の設定を変更
+##### 動画の vcs_watch_paths を変更
 アップロード済みの動画の、VCS の変更を見るファイルを差し替えます
 > go run . patch-video --video_id {uuid} --vcs_watch_paths "Assets/Scenes/Boss.unity,Assets/Prefabs"
 

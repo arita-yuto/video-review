@@ -39,7 +39,8 @@ Administration → Integrations の Webhook を開きます
 | Target | Slack か Teams |
 | URL | Slack または Teams で発行した Incoming Webhook の URL |
 
-Test & save はチャンネルにテストのメッセージを 1 件送り、成功したら保存されます
+Test & save を押すと、チャンネルにテストのメッセージが 1 件届きます  
+送れたときだけ保存されます
 
 ※ メッセージの形式は Target ごとに VideoReview が組み立てるので、URL 以外の設定はありません  
 ※ URL を保存すると変えられなくなるので、変えるときは Reset で消してから入れ直します
@@ -49,7 +50,7 @@ Test & save はチャンネルにテストのメッセージを 1 件送り、�
 VideoReview は SMTP サーバーを内蔵しません  
 同梱の Postfix リレーか、社内の SMTP サーバーに渡します
 
-### .env に転送先を設定（Docker）
+### SMTP リレーの転送先を設定（Docker）
 
 ※ 社内の SMTP サーバーに渡すときは、この手順を飛ばします
 
@@ -74,7 +75,7 @@ Ollama も使うときは `--profile cpu --profile smtp` のように並べま�
 docker compose -f compose.prod.yml --profile smtp up -d
 ```
 
-### Email セクションの設定
+### Email セクションを設定
 
 Administration → Integrations の Email を開きます
 

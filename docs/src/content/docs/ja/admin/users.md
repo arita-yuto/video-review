@@ -3,11 +3,11 @@ title: "Users"
 sidebar:
   order: 3
 ---
-ユーザーの一覧、作成、role の変更、CSV での一括作成・更新をします
+ユーザーの一覧を見て、ユーザーを作成したり、role を変えたり、CSV でまとめて作成・更新したりします
 
 <img src="/video-review/images/admin/users/users-section.webp" />
 
-## 1. Create user で作成
+## 1. ユーザーを作成
 
 一覧の下の Create user で作ります
 
@@ -22,13 +22,13 @@ sidebar:
 
 ユーザーを CSV に書き出し、編集して読み込むと、作成と更新をまとめてできます
 
-### Export で書き出し
+### CSV をエクスポート
 
 一覧の上の Export を押すと、`users.csv` がダウンロードされます
 
 ※ CLI では `export-users` で書き出せます（[メンテナンス CLI のガイド](/video-review/ja/features/maintenance-cli/)）
 
-### CSV の編集
+### CSV を編集
 
 | 列 | 内容 |
 |---|---|
@@ -46,7 +46,7 @@ sidebar:
 ※ UTF-8 で保存します  
 ※ 自分の行の role、active、pass は変えられません
 
-### Import で読み込み
+### CSV をインポート
 
 1. Import を押します
 
@@ -56,14 +56,14 @@ sidebar:
 
 <img src="/video-review/images/admin/users/import-dialog.webp" />
 
-取り込みに成功した場合、作成と更新の人数が表示されます  
+インポートに成功すると、作成と更新の人数が表示されます  
 エラーがある場合は何も反映されず、行・列・理由の一覧が出ます
 
 ---
 
 ## 3. role ごとの権限
 
-サーバーの API が通すかどうかで書いています
+○ はサーバーの API が許可する操作です
 
 ### 閲覧系
 

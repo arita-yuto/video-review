@@ -36,7 +36,7 @@ IdP の管理者に、VideoReview を OpenID Connect のアプリとして登録
 1. Issuer URL、Client ID、Client Secret を入力します
 2. Test & save を押します
 
-Test & save を押し、Issuer URL の OpenID 設定を取り、Client ID と Client Secret が IdP に通ることを確かめ、成功したら保存されます  
+Issuer URL に接続でき、Client ID と Client Secret が IdP に通ったときだけ保存されます  
 保存するとログイン画面に SSO タブが出ます
 
 ※ Client Secret を保存すると Issuer URL と Client Secret は変えられなくなるので、変えるときは Reset で保存した設定を消してから入れ直します  
@@ -56,7 +56,7 @@ Test & save を押し、Issuer URL の OpenID 設定を取り、Client ID と Cl
 role を変えるときは [Users](/video-review/ja/admin/users/) で変えます
 
 同じメールアドレスのユーザーが既に VideoReview にいるときは、そのユーザーでログインします  
-2 回目からは IdP のアカウントで結びつくので、IdP 側でメールアドレスが変わっても同じユーザーのままです
+2 回目からは IdP のアカウントで紐づくので、IdP 側でメールアドレスが変わっても同じユーザーのままです
 
 ※ IdP がメールアドレスを確認済みにしていない人は、初回のログインが拒否されます（IdP 側でメールアドレスを確認済みにします）  
 ※ Users で active を `false` にした人は、IdP でログインできても VideoReview には入れません
