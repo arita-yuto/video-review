@@ -27,12 +27,19 @@
     <td width="50%" valign="top">
       <b>動画に直接、描き込む</b><br/>
       場所を言葉で説明せず、止めたフレームに直接描けます<br/><br/>
-      <img src="https://github.com/user-attachments/assets/caf847d0-be43-4d89-b843-600b733a0731" width="400" alt="止めたフレームに描き込む" />
+      <img src="docs/public/images/home/draw-on-frame-animated.webp" width="400" alt="止めたフレームに描き込む" />
     </td>
     <td width="50%" valign="top">
       <b>リビジョンを見比べる</b><br/>
       グラフィックスの更新による差異をすぐ発見できます<br/><br/>
-      <img src="https://github.com/user-attachments/assets/8fd74149-bea6-492d-b789-30f4c23e7ba1" width="400" alt="2 つのリビジョンと、その下の差分画像" />
+      <img src="docs/public/images/home/compare-revisions.webp" width="400" alt="2 つのリビジョンと、その下の差分画像" />
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top">
+      <b>みんなで同時に見る</b><br/>
+      画面共有なしで、リンクを開いた全員の再生・停止・シークがそろいます<br/><br/>
+      <img src="docs/public/images/home/synced-playback-animated.webp" width="820" alt="2 つのブラウザで同じ動画の再生と停止がそろう" />
     </td>
   </tr>
 </table>
@@ -44,17 +51,17 @@
     <td width="33%" valign="top">
       <b>変更の中身を見る</b><br/>
       動画の変更がどの更新が原因になったのかをWebですぐに確認できます<br/><br/>
-      <img src="https://github.com/user-attachments/assets/a282f05e-ff74-4406-948d-6cdf9ae27181" width="260" alt="コミットと PR が並ぶ Changes タブ" />
+      <img src="docs/public/images/home/changes-tab.webp" width="260" alt="コミットと PR が並ぶ Changes タブ" />
     </td>
     <td width="33%" valign="top">
       <b>Unity / Unreal Engine</b><br/>
       レビュー中の動画からシーンを開き、エディターですぐに確認できます<br/><br/>
-      <img src="https://github.com/user-attachments/assets/b9c84fbc-a0a4-49ad-b038-1ee4d376fcd7" width="260" alt="エディタでシーンを開く" />
+      <img src="docs/public/images/features/editor/open-scene-animated.webp" width="260" alt="エディタでシーンを開く" />
     </td>
     <td width="33%" valign="top">
       <b>Slack / Jira</b><br/>
       コメントを放置されないようにSlack連携、タスク化もワンクリックでできます<br/><br/>
-      <img src="https://github.com/user-attachments/assets/d5a23dba-b83b-4927-b202-a0079e339755" width="260" alt="コメントを Slack と Jira に送る" />
+      <img src="docs/public/images/home/slack-jira-animated.webp" width="260" alt="コメントを Slack と Jira に送る" />
     </td>
   </tr>
 </table>
