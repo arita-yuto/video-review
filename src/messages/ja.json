@@ -270,8 +270,8 @@
         "reload": "再読み込み"
     },
     "calendar-date-radio": {
-        "today": "今日",
-        "recent": "直近{days}日",
+        "today": "Today",
+        "recent": "{days} days",
         "clear": "クリア"
     },
     "edit-user-profile": {
