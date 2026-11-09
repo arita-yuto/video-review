@@ -271,7 +271,7 @@
     },
     "calendar-date-radio": {
         "today": "Today",
-        "recent": "Last {days} days",
+        "recent": "{days} days",
         "clear": "Clear"
     },
     "edit-user-profile": {

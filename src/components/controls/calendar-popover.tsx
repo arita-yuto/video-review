@@ -5,6 +5,7 @@ import { Popover } from '@radix-ui/react-popover';
 import { PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { Button } from '@/ui/button';
 import { DateRange } from 'react-day-picker';
+import { format } from 'date-fns';
 import { Calendar } from '@/ui/calendar';
 import CalendarDateRadio from '@/components/controls/calendar-date-radio';
 import { Locales, useLocale } from '@/app/locale-provider';
@@ -47,8 +48,9 @@ export default function CalendarPopover({
     return (
         <Popover open={open} onOpenChange={handleOpenChange}>
             <PopoverTrigger asChild>
-                <Button size="sm" variant="secondary">
+                <Button size="sm" variant={mode === "range" ? "accent" : "secondary"}>
                     <CalendarIcon />
+                    {mode === "range" && range?.from && range?.to && `${format(range.from, "M/d")}–${format(range.to, "M/d")}`}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="flex items-center">

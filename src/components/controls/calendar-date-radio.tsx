@@ -5,7 +5,7 @@ import { ButtonGroup } from '@/ui/button-group';
 import { DateRange } from 'react-day-picker';
 import { useTranslations } from 'next-intl';
 import CalendarPopover from '@/components/controls/calendar-popover';
-import { X } from 'lucide-react';
+import { History, Sun, X } from 'lucide-react';
 
 // Any date-filter store can back it: mode and range come in as props, and each control reports through a callback.
 interface CalendarDateRadioProps extends React.ComponentProps<"div"> {
@@ -38,11 +38,13 @@ export default function CalendarDateRadio({
                 <Button
                     variant={mode === "today" ? "accent" : "secondary"} size="sm"
                     onClick={onToday}>
+                    <Sun />
                     {t("today")}
                 </Button>
                 <Button
                     variant={mode === "recent" ? "accent" : "secondary"} size="sm"
                     onClick={() => onRecent(recentDay)}>
+                    <History />
                     {t("recent", { days: recentDay })}
                 </Button>
                 {!collapseCalendarBtn && <>
