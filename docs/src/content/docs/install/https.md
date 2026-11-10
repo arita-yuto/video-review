@@ -52,7 +52,7 @@ Start with the `https` profile:
 docker compose -f compose.prod.yml --profile https up -d
 ```
 
-### Local / On‑premise
+### Local / On‑premises
 
 Install nginx on the same server as VideoReview and use `docker/nginx/videoreview.conf` as its config file
 (on Linux, `/etc/nginx/conf.d/videoreview.conf`).

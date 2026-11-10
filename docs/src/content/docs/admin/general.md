@@ -32,7 +32,7 @@ Clicking it opens the release notes.
 
 <img src="/video-review/images/admin/general/release-dialog.webp" />
 
-On a server installed with the [Local / On‑premise guide](/video-review/install/local/), click Update to install the new release.  
+On a server installed with the [Local / On‑premises guide](/video-review/install/local/), click Update to install the new release.  
 When it finishes, click Reload to load the page again.
 
 Note: when it runs in Docker, VideoReview inside a container cannot replace its own containers, so Update is not shown.  

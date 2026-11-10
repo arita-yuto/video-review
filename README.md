@@ -3,7 +3,7 @@
   <h1>VideoReview</h1>
 
   <p>
-    Frame.io for game teams, running on your own storage.
+    Self-hosted Frame.io for game teams.
   </p>
 
   <p>
@@ -60,13 +60,13 @@
     </td>
     <td width="33%" valign="top">
       <b>Slack / Jira</b><br/>
-      Keep comments from being left behind: post them to Slack, or turn them into tasks in one click.<br/><br/>
+      Post review comments to Slack, or turn them into tasks in one click, so every comment gets followed up.<br/><br/>
       <img src="docs/public/images/home/slack-jira-animated.webp" width="260" alt="Sending a comment to Slack and Jira" />
     </td>
   </tr>
 </table>
 
-**Runs on-premise**: review unreleased footage without it leaving your network (S3 and Nextcloud work too).  
+**Runs on-premises**: review unreleased footage without it ever leaving your infrastructure. You can also store it in your own S3 bucket or Nextcloud.  
 **Also**: search · [AI chat search](https://arita-yuto.github.io/video-review/features/ai/#2-use-chat-search-in-the-app) · [MCP](https://arita-yuto.github.io/video-review/features/ai/#3-search-from-ai-agents) · [maintenance CLI](https://arita-yuto.github.io/video-review/features/maintenance-cli/)
 
 ## Quick Start (Docker)
@@ -85,7 +85,7 @@ Open http://localhost:3489 and register the first administrator.
 ### Run
 
 - [Docker guide](https://arita-yuto.github.io/video-review/install/docker/)
-- [Local / On‑premise guide](https://arita-yuto.github.io/video-review/install/local/)
+- [Local / On‑premises guide](https://arita-yuto.github.io/video-review/install/local/)
 - [https guide](https://arita-yuto.github.io/video-review/install/https/)
 
 ### Settings & integrations

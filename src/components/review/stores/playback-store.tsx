@@ -65,7 +65,7 @@ const createPlaybackStore = () => createStore<PlaybackState>()((set) => ({
     participants: [],
     syncLink: null,
     syncState: null,
-    // Not crypto.randomUUID: on-premise http is not a secure context.
+    // Not crypto.randomUUID: on-premises http is not a secure context.
     screenId: Math.random().toString(36).slice(2),
     connectionId: null,
     presenter: null,

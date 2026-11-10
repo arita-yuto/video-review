@@ -85,7 +85,7 @@ http://localhost:3489 を開き、管理者アカウントを作成します
 ### 起動方法
 
 - [Docker ガイド](https://arita-yuto.github.io/video-review/ja/install/docker/)
-- [Local / On‑premise ガイド](https://arita-yuto.github.io/video-review/ja/install/local/)
+- [Local / On‑premises ガイド](https://arita-yuto.github.io/video-review/ja/install/local/)
 - [https ガイド](https://arita-yuto.github.io/video-review/ja/install/https/)
 
 ### 設定・連携
