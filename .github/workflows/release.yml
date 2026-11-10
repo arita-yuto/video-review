@@ -41,7 +41,7 @@ jobs:
       matrix:
         include:
           - name: videoreview
-            description: Self-hosted, on-premise alternative to Frame.io for game and video teams
+            description: Self-hosted, on-premises alternative to Frame.io for game and video teams
             readme: docker/web/README.md
           - name: video-processing
             description: Thumbnail and transcode worker for VideoReview, a self-hosted Frame.io alternative

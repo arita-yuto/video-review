@@ -1,7 +1,7 @@
 ---
 title: "Build & Run (Local)"
 sidebar:
-  label: "Local / On-premise"
+  label: "Local / On-premises"
   order: 2
 ---
 How to run VideoReview directly on a server, without Docker.  

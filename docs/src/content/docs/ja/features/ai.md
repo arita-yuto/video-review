@@ -78,7 +78,7 @@ Base URL には `http://ollama:11434` を入力します
 <img width="500" src="/video-review/images/features/ai/ollama-docker.webp" />
 
 ----
-#### Local / On‑premise
+#### Local / On‑premises
 
 ```bash
 # 1. Ollama をインストール: https://ollama.com/download

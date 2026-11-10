@@ -52,7 +52,7 @@ certs/privkey.pem
 docker compose -f compose.prod.yml --profile https up -d
 ```
 
-### Local / On‑premise
+### Local / On‑premises
 
 VideoReview と同じサーバーに nginx を入れ、`docker/nginx/videoreview.conf` を nginx の設定ファイルとして置きます  
 （Linux なら `/etc/nginx/conf.d/videoreview.conf`）
