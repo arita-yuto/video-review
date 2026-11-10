@@ -95,6 +95,13 @@ Open http://localhost:3489 and register the first administrator.
 - [Editor integration guide](https://arita-yuto.github.io/video-review/features/editor/)
 - [VCS integration](https://arita-yuto.github.io/video-review/admin/integrations/vcs/)
 
+## Used by
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/public/images/used-by/akatsuki-games-white.png" />
+  <img src="docs/public/images/used-by/akatsuki-games.png" alt="Akatsuki Games" height="100" />
+</picture>
+
 ## Support · Contributing · License
 
 - Stuck on setup or connecting your tools? Just ask! videoreview.contact.info@gmail.com
