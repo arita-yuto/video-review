@@ -1,5 +1,6 @@
 import type { VCSProvider, GetChangesParams } from "@/server/lib/vcs/provider";
 import type { ChangeSet, PullRequest, Commit } from "@/server/lib/vcs/types";
+import { ServerError } from "@/server/lib/server-error";
 
 type GitHubConfig = {
     owner: string;
@@ -161,7 +162,10 @@ export class GitHubProvider implements VCSProvider {
             },
         });
         if (!res.ok) {
-            throw new Error(`GitHub API error: ${res.status} ${res.statusText} — ${url}`);
+            // GitHub explains the failure in the body's message, e.g. the organization's SAML enforcement.
+            const body = await res.json().catch(() => null) as { message?: string } | null;
+            const reason = body?.message ?? res.statusText;
+            throw new ServerError(`GitHub API error: ${res.status} ${reason} — ${url}`, 502);
         }
         return res.json() as Promise<T>;
     }

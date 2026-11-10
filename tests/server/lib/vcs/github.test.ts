@@ -246,10 +246,32 @@ describe("GitHubProvider", () => {
         expect(result.pullRequests[0].title).toBe("Should be included");
     });
 
-    it("throws on non-OK response", async () => {
-        vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false, status: 401, statusText: "Unauthorized" })));
+    it("throws with GitHub's reason on non-OK response", async () => {
+        vi.stubGlobal("fetch", vi.fn(async () => ({
+            ok: false,
+            status: 403,
+            statusText: "Forbidden",
+            json: async () => ({ message: "Resource protected by organization SAML enforcement." }),
+        })));
 
-        await expect(provider.getChanges({ to: new Date() })).rejects.toThrow("GitHub API error: 401");
+        await expect(provider.getChanges({ to: new Date() })).rejects.toMatchObject({
+            status: 502,
+            message: expect.stringContaining("GitHub API error: 403 Resource protected by organization SAML enforcement."),
+        });
+    });
+
+    it("falls back to the status text when the error body is not JSON", async () => {
+        vi.stubGlobal("fetch", vi.fn(async () => ({
+            ok: false,
+            status: 502,
+            statusText: "Bad Gateway",
+            json: async () => { throw new SyntaxError("Unexpected token <"); },
+        })));
+
+        await expect(provider.getChanges({ to: new Date() })).rejects.toMatchObject({
+            status: 502,
+            message: expect.stringContaining("GitHub API error: 502 Bad Gateway"),
+        });
     });
 
     it("returns correct range metadata", async () => {
