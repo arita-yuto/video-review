@@ -39,6 +39,7 @@ export function RevisionFilterRadio({ value, onChange }: {
             <Button variant={variant("playing")} size="sm" title={t("revisionPlaying")} onClick={() => onChange({ mode: "playing" })}>
                 <Play />
                 Rev.{playing}
+                <span className="revision-dot" style={{ "--revision": playing } as React.CSSProperties} />
             </Button>
             <Popover open={open} onOpenChange={(next) => {
                 // Opening the popover already selects range mode, starting with the widest range.

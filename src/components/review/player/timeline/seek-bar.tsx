@@ -11,7 +11,7 @@ export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
     return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
 };
 
-export type SeekBarMarker = { time: number; className: string };
+export type SeekBarMarker = { time: number; className: string; revision?: number };
 
 // Markers carry their own colour so a caller can tell sources apart.
 export function SeekBar({ markers, onMarkerClick }: {
@@ -52,7 +52,7 @@ export function SeekBar({ markers, onMarkerClick }: {
             {
                 markers.map((m) => (
                     <div
-                        key={`${m.className}-${m.time}`}
+                        key={`${m.className}-${m.revision}-${m.time}`}
                         onClick={(e) => {
                             e.stopPropagation();
                             onMarkerClick(m.time);
@@ -61,22 +61,22 @@ export function SeekBar({ markers, onMarkerClick }: {
                             "absolute left-(--marker-left) -top-2.5 -translate-x-1/2 w-1.25 h-6.25 rounded-xs cursor-pointer",
                             Math.abs(currentTime - m.time) < 0.5 ? "bg-foreground" : m.className,
                         )}
-                        style={{ "--marker-left": `${(m.time / duration) * 100}%` } as React.CSSProperties}
+                        style={{ "--marker-left": `${(m.time / duration) * 100}%`, "--revision": m.revision } as React.CSSProperties}
                     />
                 ))}
         </div>
     );
 }
 
-// Comments within 0.01s share one marker, which carries the first comment's exact time so a click lands on it.
-export const commentMarkers = (comments: { time: number }[], className: string): SeekBarMarker[] => {
-    const byHundredth = new Map<string, number>();
-    for (const { time } of comments) {
-        const key = time.toFixed(2);
-        if (!byHundredth.has(key)) {
-            byHundredth.set(key, time);
+// Comments of one revision within 0.01s share one marker, which carries the first comment's exact time so a click lands on it.
+export const commentMarkers = (comments: { time: number; videoRevNum: number }[], className: string): SeekBarMarker[] => {
+    const markers = new Map<string, SeekBarMarker>();
+    for (const { time, videoRevNum } of comments) {
+        const key = `${videoRevNum}-${time.toFixed(2)}`;
+        if (!markers.has(key)) {
+            markers.set(key, { time, className, revision: videoRevNum });
         }
     }
 
-    return [...byHundredth.values()].map((time) => ({ time, className }));
+    return [...markers.values()];
 };

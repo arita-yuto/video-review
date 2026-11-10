@@ -27,6 +27,7 @@ export default function TimelineCardList<T>(props: {
     itemCardRef: React.RefObject<Record<string, HTMLDivElement | null>>;
     getKey: (item: T) => string;
     getCardState?: (item: T) => TimelineCardState;
+    getCardRevision?: (item: T) => number;
     onClick?: (item: T) => void;
     renderHeader?: (item: T) => React.ReactNode;
     renderContent: (item: T) => React.ReactNode;
@@ -44,6 +45,7 @@ export default function TimelineCardList<T>(props: {
                         }}
                         key={key}
                         state={props.getCardState?.(item)}
+                        revision={props.getCardRevision?.(item)}
                         onClick={() => { props.onClick?.(item) }}
                     >
                         {props.renderHeader?.(item)}

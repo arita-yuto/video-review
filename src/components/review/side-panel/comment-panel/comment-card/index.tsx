@@ -12,15 +12,9 @@ import CommentCardHeader from "@/components/review/side-panel/comment-panel/comm
 import CommentCardContent from "@/components/review/side-panel/comment-panel/comment-card/content";
 import CommentCardFooter from "@/components/review/side-panel/comment-panel/comment-card/footer";
 
-export function commentCardState(comment: VideoComment, selected: boolean, active: boolean): TimelineCardState {
-    const hasDrawing = comment.hasDrawing;
-    const hasIssue = comment.issueId !== "" && comment.issueId !== null;
-
+export function commentCardState(selected: boolean, active: boolean): TimelineCardState {
     if (selected) return "selected";
     if (active) return "active";
-    if (hasIssue && hasDrawing) return "issue-drawing";
-    if (hasIssue) return "issue";
-    if (hasDrawing) return "drawing";
     return "none";
 }
 
@@ -56,8 +50,8 @@ export default function CommentCard(props: {
             containerRef={props.containerRef}
             itemCardRef={props.commentCardRef}
             getKey={(comment) => comment.id}
+            getCardRevision={(comment) => comment.videoRevNum}
             getCardState={(comment) => commentCardState(
-                comment,
                 selectedComment?.id === comment.id,
                 activeComments.some(e => e.id === comment.id),
             )}

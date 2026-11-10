@@ -16,7 +16,7 @@ export function Timeline() {
     const setTimelineTime = usePlayback((s) => s.setTimelineTime);
     const duration = usePlayback((s) => s.duration);
     const locked = usePresenterLock();
-    const markers = useMemo(() => commentMarkers(displayComments, "bg-primary"), [displayComments]);
+    const markers = useMemo(() => commentMarkers(displayComments, "revision-marker"), [displayComments]);
     const sheets = useFilmstripSheets();
     const wrapper = useRef<HTMLDivElement>(null);
     const [width, setWidth] = useState(0);

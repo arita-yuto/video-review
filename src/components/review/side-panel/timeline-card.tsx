@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// The border colour shows the card's state: selected, active at the current time, or what the item carries.
+// The border colour shows selected, active or linked; a revision adds a bar in its colour.
 const timelineCardVariants = cva(
     "bg-card text-card-foreground flex flex-col gap-2 rounded-xl border py-3 shadow-sm cursor-pointer transition-colors hover:bg-card/80",
     {
@@ -11,9 +11,6 @@ const timelineCardVariants = cva(
                 none: "",
                 selected: "border-primary bg-primary/20",
                 active: "border-foreground",
-                issue: "border-success",
-                drawing: "border-info",
-                "issue-drawing": "border-warning",
                 link: "border-info",
             },
         },
@@ -23,8 +20,15 @@ const timelineCardVariants = cva(
 
 export type TimelineCardState = NonNullable<VariantProps<typeof timelineCardVariants>["state"]>;
 
-export function TimelineCard({ state, className, ...props }: React.ComponentProps<"div"> & VariantProps<typeof timelineCardVariants>) {
-    return <div data-slot="timeline-card" className={cn(timelineCardVariants({ state }), className)} {...props} />;
+export function TimelineCard({ state, revision, className, style, ...props }: React.ComponentProps<"div"> & VariantProps<typeof timelineCardVariants> & { revision?: number }) {
+    return (
+        <div
+            data-slot="timeline-card"
+            className={cn(timelineCardVariants({ state }), revision !== undefined && "revision-bar", className)}
+            style={revision !== undefined ? { ...style, "--revision": revision } as React.CSSProperties : style}
+            {...props}
+        />
+    );
 }
 
 export function TimelineCardHeader({ children }: { children: ReactNode }) {

@@ -157,6 +157,24 @@
   @apply absolute top-0.5 right-0.5 size-2 rounded-full bg-primary;
 }
 
+/* A revision's colour from --revision: the golden-angle hue step keeps consecutive revisions apart. */
+@utility revision-colour {
+  --revision-colour: oklch(0.75 0.15 calc(200 + var(--revision) * 137.508));
+}
+
+/* Important so a selected or active card's border colour does not paint over the bar. */
+@utility revision-bar {
+  @apply revision-colour border-l-4 border-l-(--revision-colour)!;
+}
+
+@utility revision-dot {
+  @apply revision-colour size-2 rounded-full bg-(--revision-colour);
+}
+
+@utility revision-marker {
+  @apply revision-colour bg-(--revision-colour);
+}
+
 @utility thumb-frame {
   @apply overflow-hidden rounded-sm;
 }
