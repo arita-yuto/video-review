@@ -40,15 +40,12 @@ export function tusServer(): Server {
         onIncomingRequest: authorizeUpload,
         // A thrown ServerError carries its status on `status`, which the tus server does not
         // read, so without this mapping every refusal would be answered as a 500.
-        onResponseError: (_req, error) => {
+        onResponseError: (req, error) => {
+            console.error(`${req.method} ${new URL(req.url).pathname} failed:`, error);
+
             if (error instanceof ServerError) {
-                // Same rule as the rest of the API: a server-side failure says nothing more.
-                return {
-                    status_code: error.status,
-                    body: error.status >= 500 ? "internal error" : error.message,
-                };
+                return { status_code: error.status, body: error.message };
             }
-            return undefined;
         },
     });
 
@@ -73,12 +70,7 @@ function datastoreForCurrentDriver() {
 }
 
 async function authorizeUpload(req: Request): Promise<void> {
-    try {
-        await authorize(req, ["admin"]);
-    } catch (e) {
-        const status = e instanceof ServerError ? e.status : 401;
-        throw { status_code: status, body: e instanceof ServerError ? e.message : "unauthorized" };
-    }
+    await authorize(req, ["admin"]);
 }
 
 /**

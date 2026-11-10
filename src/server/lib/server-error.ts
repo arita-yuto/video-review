@@ -11,11 +11,14 @@ export class ServerError extends Error {
     }
 }
 
-// Expose expected client errors, but hide internal details from 5xx responses.
 export const handleServerError = (err: Error, c: Context) => {
-    if (err instanceof ServerError && err.status < 500) {
-        return c.json({ error: err.message }, err.status as ContentfulStatusCode);
+    const status = err instanceof ServerError ? err.status : 500;
+
+    if (status >= 500) {
+        console.error(`${c.req.method} ${c.req.path} failed:`, err);
     }
-    const status = err instanceof ServerError ? (err.status as ContentfulStatusCode) : 500;
-    return c.json({ error: "internal error" }, status);
+
+    // ServerError messages are written for the client; any other error may carry internals and stays in the log.
+    const message = err instanceof ServerError ? err.message : "internal error";
+    return c.json({ error: message }, status as ContentfulStatusCode);
 };
