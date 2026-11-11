@@ -1,8 +1,10 @@
 "use client";
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { Slider } from "@/ui/slider";
-import { cn } from "@/lib/utils";
 import { usePresenterLock } from "@/components/review/sync-session";
+import { useElementWidth } from "@/components/review/player/timeline/hooks/use-element-width";
+import { MarkerStack } from "@/components/review/player/timeline/seek-bar/marker-stack";
+import { markerStacks, type SeekBarMarker } from "@/components/review/player/timeline/seek-bar/markers";
 import type { MouseEvent as ReactMouseEvent } from "react";
 
 // Where the pointer is along the element, 0 at its left edge and 1 at its right.
@@ -11,12 +13,11 @@ export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
     return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
 };
 
-export type SeekBarMarker = { time: number; className: string; revision?: number };
-
 // Markers carry their own colour so a caller can tell sources apart.
-export function SeekBar({ markers, onMarkerClick }: {
+export function SeekBar({ markers, onMarkerClick, onStackHeightChange }: {
     markers: SeekBarMarker[],
     onMarkerClick: (time: number) => void,
+    onStackHeightChange?: (height: number) => void,
 }) {
     const timelineTime = usePlayback((s) => s.timelineTime);
     const currentTime = usePlayback((s) => s.currentTime);
@@ -25,12 +26,14 @@ export function SeekBar({ markers, onMarkerClick }: {
     const setTimelineTime = usePlayback((s) => s.setTimelineTime);
     const setScrubbing = usePlayback((s) => s.setScrubbing);
     const locked = usePresenterLock();
+    const [bar, width] = useElementWidth<HTMLDivElement>();
 
     // Slider API expects an array even for a single thumb.
     const value = [timelineTime ?? currentTime];
+    const stacks = markerStacks(markers, duration, width);
 
     return (
-        <div className="relative h-6 w-full cursor-pointer select-none">
+        <div ref={bar} className="relative h-6 w-full cursor-pointer select-none">
             <Slider
                 min={0}
                 max={duration}
@@ -49,34 +52,14 @@ export function SeekBar({ markers, onMarkerClick }: {
                 className="w-full"
             />
 
-            {
-                markers.map((m) => (
-                    <div
-                        key={`${m.className}-${m.revision}-${m.time}`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onMarkerClick(m.time);
-                        }}
-                        className={cn(
-                            "absolute left-(--marker-left) -top-2.5 -translate-x-1/2 w-1.25 h-6.25 rounded-xs cursor-pointer",
-                            Math.abs(currentTime - m.time) < 0.5 ? "bg-foreground" : m.className,
-                        )}
-                        style={{ "--marker-left": `${(m.time / duration) * 100}%`, "--revision": m.revision } as React.CSSProperties}
-                    />
-                ))}
+            {stacks.map((stack) => (
+                <MarkerStack
+                    key={`${stack[0].className}-${stack[0].revision}-${stack[0].time}`}
+                    stack={stack}
+                    onMarkerClick={onMarkerClick}
+                    onStackHeightChange={onStackHeightChange}
+                />
+            ))}
         </div>
     );
 }
-
-// Comments of one revision within 0.01s share one marker, which carries the first comment's exact time so a click lands on it.
-export const commentMarkers = (comments: { time: number; videoRevNum: number }[], className: string): SeekBarMarker[] => {
-    const markers = new Map<string, SeekBarMarker>();
-    for (const { time, videoRevNum } of comments) {
-        const key = `${videoRevNum}-${time.toFixed(2)}`;
-        if (!markers.has(key)) {
-            markers.set(key, { time, className, revision: videoRevNum });
-        }
-    }
-
-    return [...markers.values()];
-};

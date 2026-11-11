@@ -124,6 +124,11 @@
   /* Warning on a light surface such as a chip, where the bright yellow fades out. */
   --warning-strong: #b8860b;
   --info: #4aa3ff;
+  /* ColorBrewer GnBu, lightest for the latest revision; the fourth is shared by every older one. */
+  --revision-1: #bae4bc;
+  --revision-2: #7bccc4;
+  --revision-3: #43a2ca;
+  --revision-4: #0868ac;
 }
 
 @layer base {
@@ -157,9 +162,19 @@
   @apply absolute top-0.5 right-0.5 size-2 rounded-full bg-primary;
 }
 
-/* A revision's colour from --revision: the golden-angle hue step keeps consecutive revisions apart. */
+/* A revision's colour by how many revisions it is behind --revision-latest. */
 @utility revision-colour {
-  --revision-colour: oklch(0.75 0.15 calc(200 + var(--revision) * 137.508));
+  --revision-age: clamp(0, var(--revision-latest, var(--revision)) - var(--revision), 3);
+  /* Each mix is 0% or 100% because the age is a whole number, so this picks one colour. */
+  --revision-colour: color-mix(
+    in srgb,
+    var(--revision-4) calc(clamp(0, var(--revision-age) - 2, 1) * 100%),
+    color-mix(
+      in srgb,
+      var(--revision-3) calc(clamp(0, var(--revision-age) - 1, 1) * 100%),
+      color-mix(in srgb, var(--revision-2) calc(clamp(0, var(--revision-age), 1) * 100%), var(--revision-1))
+    )
+  );
 }
 
 /* Important so a selected or active card's border colour does not paint over the bar. */
@@ -215,10 +230,12 @@
   background-repeat: no-repeat;
 }
 
-/* Centred on the hovered point (--hover, 0 to 1) and kept inside the timeline. */
+/* Centred on the hovered point (--hover, 0 to 1), kept inside the timeline, and above the marker stacks, a hovered one included. */
 @utility frame-preview {
   width: 10rem;
   left: clamp(0px, calc(var(--hover) * 100% - 5rem), calc(100% - 10rem));
+  margin-bottom: max(1.75rem, calc(var(--stack-height, 0px) + 0.5rem));
+  transition: margin-bottom 150ms;
 }
 
 /* The video is sized against the stage's box (cqw/cqh in video-fit), not the viewport. */

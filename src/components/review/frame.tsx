@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import VideoSidePanel from "@/components/review/side-panel";
 import VideoCommentContent from "@/components/review/side-panel/comment-panel/content";
@@ -9,15 +9,22 @@ import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { PlaybackStoreProvider } from "@/components/review/stores/playback-store";
 import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
+import { useVideoStore } from "@/components/stores/video-store";
 
 export function ReviewFrame({ children }: { children: ReactNode }) {
     const listPanelOpen = useVideoPlayerStore((s) => s.listPanelOpen);
     const setListPanelOpen = useVideoPlayerStore((s) => s.setListPanelOpen);
     const sidePanelOpen = useVideoPlayerStore((s) => s.sidePanelOpen);
     const isMobile = useIsMobile();
+    const latestRevision = useVideoStore((s) => Math.max(0, ...s.revisions.map((r) => r.revision)));
 
     return (
-        <SidebarProvider open={listPanelOpen} onOpenChange={setListPanelOpen} className="h-full">
+        <SidebarProvider
+            open={listPanelOpen}
+            onOpenChange={setListPanelOpen}
+            className="h-full"
+            style={{ "--revision-latest": latestRevision } as CSSProperties}
+        >
             <PlaybackStoreProvider>
                 <VideoListPanel />
                 {isMobile ? (
