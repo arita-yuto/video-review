@@ -153,7 +153,7 @@
     "video-comment-panel": {
         "title": "Comments",
         "newBadge": "NEW",
-        "followPlayback": "追従",
+        "followPlayback": "再生位置へ",
         "revisionPlaying": "再生中の Rev",
         "revisionRange": "Range",
         "revisionAll": "All",
