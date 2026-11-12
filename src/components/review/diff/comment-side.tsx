@@ -83,7 +83,7 @@ export function CommentSide({ revision, comments, markerClassName, selectedId, o
                 getCardState={(c) => {
                     const atPosition = Math.abs(c.time - currentTime) <= ACTIVE_WINDOW_SEC;
                     // Like the review page, the selection lasts only while playback stays at it.
-                    return commentCardState(c, c.id === selectedId && atPosition, atPosition);
+                    return commentCardState(c.id === selectedId && atPosition, atPosition);
                 }}
                 onClick={onSelect}
                 renderHeader={(c) => <TimelineCardHeader><CommentAuthor comment={c} /></TimelineCardHeader>}

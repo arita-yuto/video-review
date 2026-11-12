@@ -21,6 +21,8 @@ interface VideoState {
     setGuestVisible: (videoId: string, value: boolean) => Promise<void>;
 }
 
+export const latestRevisionNumber = (s: VideoState) => Math.max(0, ...s.revisions.map((r) => r.revision));
+
 export const useVideoStore = create<VideoState>((set, get) => ({
     videos: [],
     allVideoTags: [],
