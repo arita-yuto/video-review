@@ -85,7 +85,7 @@ http://localhost:3489 を開き、管理者アカウントを作成します
 ### 起動方法
 
 - [Docker ガイド](https://arita-yuto.github.io/video-review/ja/install/docker/)
-- [Local / On‑premise ガイド](https://arita-yuto.github.io/video-review/ja/install/local/)
+- [Local / On‑premises ガイド](https://arita-yuto.github.io/video-review/ja/install/local/)
 - [https ガイド](https://arita-yuto.github.io/video-review/ja/install/https/)
 
 ### 設定・連携
@@ -94,6 +94,13 @@ http://localhost:3489 を開き、管理者アカウントを作成します
 - [AI 機能ガイド](https://arita-yuto.github.io/video-review/ja/features/ai/)
 - [エディター連携ガイド](https://arita-yuto.github.io/video-review/ja/features/editor/)
 - [VCS 連携](https://arita-yuto.github.io/video-review/ja/admin/integrations/vcs/)
+
+## Used by
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/public/images/used-by/akatsuki-games-white.png" />
+  <img src="docs/public/images/used-by/akatsuki-games.png" alt="Akatsuki Games" height="100" />
+</picture>
 
 ## 導入の相談・Contributing・License
 

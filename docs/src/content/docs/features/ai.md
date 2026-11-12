@@ -78,7 +78,7 @@ Enter `http://ollama:11434` as the Base URL.
 <img width="500" src="/video-review/images/features/ai/ollama-docker.webp" />
 
 ----
-#### Local / On‑premise
+#### Local / On‑premises
 
 ```bash
 # 1. Install Ollama: https://ollama.com/download

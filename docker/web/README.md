@@ -1,6 +1,6 @@
 # VideoReview
 
-Frame.io for game teams, running on your own storage.
+Self-hosted Frame.io for game teams.
 
 <img src="https://arita-yuto.github.io/video-review/images/home/review-demo-animated.webp" alt="VideoReview: find a video, comment, draw on the frame, and compare revisions" width="880" />
 
@@ -9,7 +9,7 @@ Frame.io for game teams, running on your own storage.
 - **See what changed in the code**: see which code changes caused a difference in the video, right in the browser.
 - **Unity / Unreal Engine**: open the scene from the video you're reviewing straight in the editor.
 - **Slack / Jira**: post comments to Slack, or turn them into Jira issues in one click.
-- **Runs on-premise**: keep unreleased footage inside your own network. S3 and Nextcloud storage are also supported.
+- **Runs on-premises**: keep unreleased footage inside your own infrastructure. You can also store it in your own S3 bucket or Nextcloud.
 
 ## Quick start
 

@@ -32,7 +32,7 @@ Check for updates がオンなら、新しいリリースが出たとき、ア�
 
 <img src="/video-review/images/admin/general/release-dialog.webp" />
 
-[Local / On‑premise ガイド](/video-review/ja/install/local/) の手順で入れたサーバーでは、Update を押すと更新します  
+[Local / On‑premises ガイド](/video-review/ja/install/local/) の手順で入れたサーバーでは、Update を押すと更新します  
 更新が完了したら、Reload で画面を読み込み直します
 
 ※ Docker で動かしている場合は、コンテナの中の VideoReview が自分のコンテナを入れ替えられないため、Update が出ません  

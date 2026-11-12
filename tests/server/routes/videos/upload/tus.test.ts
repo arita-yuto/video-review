@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { prisma } from "@/server/lib/db";
+import { ServerError } from "@/server/lib/server-error";
 import { LocalDriver } from "@/server/lib/storage/drivers/local";
 
 const root = path.join(os.tmpdir(), `videoreview-tus-route-${randomUUID()}`);
@@ -144,7 +145,7 @@ describe("videos upload tusRouter", () => {
         const session = await createSession();
         const location = (await create(session.id, payload.length)).headers.get("location")!;
 
-        vi.mocked(authorize).mockRejectedValue(new Error("unauthorized"));
+        vi.mocked(authorize).mockRejectedValue(new ServerError("invalid token", 401));
 
         const res = await tusRouter.request(location, {
             method: "PATCH",
@@ -160,7 +161,7 @@ describe("videos upload tusRouter", () => {
     });
 
     it("checks the caller before it looks a session up, so an unauthorised caller learns nothing", async () => {
-        vi.mocked(authorize).mockRejectedValue(new Error("unauthorized"));
+        vi.mocked(authorize).mockRejectedValue(new ServerError("invalid token", 401));
 
         const res = await create(randomUUID(), payload.length);
 
