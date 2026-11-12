@@ -6,7 +6,6 @@ import { api } from "@/api";
 import { Video, VideoComment, VideoRevision } from "@/lib/db-types";
 import { LoadingBadge } from "@/components/controls/loading-badge";
 import { SeekBar } from "@/components/review/player/timeline/seek-bar";
-import { commentMarkers } from "@/components/review/player/timeline/seek-bar/markers";
 import { PlayButton, VolumeControl, TimeDisplay, PlaybackRateSelect } from "@/components/review/player/control-panel/playback";
 import { PlaybackStoreProvider } from "@/components/review/stores/playback-store";
 import { useDiffViewStore } from "@/components/review/diff/stores/diff-view-store";
@@ -102,10 +101,10 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
     useDiffSync(primaryRef, sides[COMPARE].videoRef);
     useStartAt(primaryRef, searchParams.get("t"));
 
-    const markers = useMemo(
+    const markerSources = useMemo(
         () => [
-            ...commentMarkers(sides.left.comments, sides.left.markerClassName),
-            ...commentMarkers(sides.right.comments, sides.right.markerClassName),
+            { comments: sides.left.comments, className: sides.left.markerClassName, compact: true },
+            { comments: sides.right.comments, className: sides.right.markerClassName, compact: true, below: true },
         ],
         [sides.left.comments, sides.right.comments],
     );
@@ -177,7 +176,9 @@ function DiffWorkspace({ video, revisions }: { video: Video, revisions: VideoRev
                     )}
                 </div>
                 <OverlaySlider />
-                <SeekBar markers={markers} onMarkerClick={seek} />
+                <div className="pt-2">
+                    <SeekBar markerSources={markerSources} onMarkerClick={seek} />
+                </div>
                 <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-2 border">
                     <PlayButton />
                     <VolumeControl />

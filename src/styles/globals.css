@@ -124,11 +124,11 @@
   /* Warning on a light surface such as a chip, where the bright yellow fades out. */
   --warning-strong: #b8860b;
   --info: #4aa3ff;
-  /* ColorBrewer GnBu, lightest for the latest revision; the fourth is shared by every older one. */
-  --revision-1: #bae4bc;
-  --revision-2: #7bccc4;
-  --revision-3: #43a2ca;
-  --revision-4: #0868ac;
+  /* ColorBrewer YlOrBr, lightest for the latest revision; the fourth is shared by every older one. */
+  --revision-1: #fee391;
+  --revision-2: #fec44f;
+  --revision-3: #fe9929;
+  --revision-4: #d95f0e;
 }
 
 @layer base {
@@ -190,6 +190,34 @@
   @apply revision-colour bg-(--revision-colour);
 }
 
+/* Pin-shaped: the sharp corner is the tip, which touches the seek bar's track at --marker-fraction (0 to 1). */
+@utility seek-marker {
+  @apply absolute size-(--marker-width) -rotate-45 border border-foreground cursor-pointer transition-transform;
+  /* The slider keeps its 1rem thumb inside the track by the same shift, so the tip meets the thumb's centre. */
+  --marker-left: calc(var(--marker-fraction) * 100% + (0.5 - var(--marker-fraction)) * 1rem);
+}
+
+@utility seek-marker-above {
+  @apply left-(--marker-left) bottom-full origin-bottom-left;
+  border-radius: 50% 50% 50% 0;
+}
+
+@utility seek-marker-below {
+  @apply top-1.5 origin-top-right;
+  right: calc(100% - var(--marker-left));
+  border-radius: 50% 0 50% 50%;
+}
+
+/* Turned back upright; text-background because every revision colour is light. */
+@utility seek-marker-count {
+  @apply absolute inset-0 flex items-center justify-center rotate-45 text-xs font-extrabold tabular-nums text-background;
+}
+
+/* bg-background, which the revision colours are chosen against, not the tooltip's bg-foreground. */
+@utility seek-marker-revision {
+  @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-background text-xs font-semibold text-foreground;
+}
+
 @utility thumb-frame {
   @apply overflow-hidden rounded-sm;
 }
@@ -230,12 +258,16 @@
   background-repeat: no-repeat;
 }
 
-/* Centred on the hovered point (--hover, 0 to 1), kept inside the timeline, and above the marker stacks, a hovered one included. */
+/* Room above the seek bar for a seek-marker, so it stays off the video; the video-stage's mb-3 is the rest of its height. */
+@utility seek-marker-room {
+  @apply pt-6;
+}
+
+/* Centred on the hovered point (--hover, 0 to 1), kept inside the timeline, and clear of an active seek marker. */
 @utility frame-preview {
+  @apply mb-1.5;
   width: 10rem;
   left: clamp(0px, calc(var(--hover) * 100% - 5rem), calc(100% - 10rem));
-  margin-bottom: max(1.75rem, calc(var(--stack-height, 0px) + 0.5rem));
-  transition: margin-bottom 150ms;
 }
 
 /* The video is sized against the stage's box (cqw/cqh in video-fit), not the viewport. */

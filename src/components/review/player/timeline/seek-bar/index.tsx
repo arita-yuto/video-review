@@ -3,9 +3,9 @@ import { usePlayback } from "@/components/review/stores/playback-store";
 import { Slider } from "@/ui/slider";
 import { usePresenterLock } from "@/components/review/sync-session";
 import { useElementWidth } from "@/components/review/player/timeline/hooks/use-element-width";
-import { MarkerStack } from "@/components/review/player/timeline/seek-bar/marker-stack";
-import { markerStacks, type SeekBarMarker } from "@/components/review/player/timeline/seek-bar/markers";
-import type { MouseEvent as ReactMouseEvent } from "react";
+import { Marker } from "@/components/review/player/timeline/seek-bar/marker";
+import { sourceMarkers, type MarkerSource } from "@/components/review/player/timeline/seek-bar/markers";
+import { useMemo, type MouseEvent as ReactMouseEvent } from "react";
 
 // Where the pointer is along the element, 0 at its left edge and 1 at its right.
 export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
@@ -13,11 +13,10 @@ export const pointerFraction = (e: ReactMouseEvent<HTMLElement>) => {
     return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
 };
 
-// Markers carry their own colour so a caller can tell sources apart.
-export function SeekBar({ markers, onMarkerClick, onStackHeightChange }: {
-    markers: SeekBarMarker[],
+// Each source carries its own colour, and its comments never share a marker with another source's.
+export function SeekBar({ markerSources, onMarkerClick }: {
+    markerSources: MarkerSource[],
     onMarkerClick: (time: number) => void,
-    onStackHeightChange?: (height: number) => void,
 }) {
     const timelineTime = usePlayback((s) => s.timelineTime);
     const currentTime = usePlayback((s) => s.currentTime);
@@ -30,10 +29,18 @@ export function SeekBar({ markers, onMarkerClick, onStackHeightChange }: {
 
     // Slider API expects an array even for a single thumb.
     const value = [timelineTime ?? currentTime];
-    const stacks = markerStacks(markers, duration, width);
+    const markerLists = useMemo(
+        () => markerSources.map((source) => sourceMarkers(source, duration, width)),
+        [markerSources, duration, width],
+    );
 
     return (
         <div ref={bar} className="relative h-6 w-full cursor-pointer select-none">
+            {/* Before the slider, so the thumb stays on top of a marker's tip. */}
+            {markerSources.map((source, index) => markerLists[index].map((marker) => (
+                <Marker key={`${index}-${marker.time}`} source={source} marker={marker} onMarkerClick={onMarkerClick} />
+            )))}
+
             <Slider
                 min={0}
                 max={duration}
@@ -51,15 +58,6 @@ export function SeekBar({ markers, onMarkerClick, onStackHeightChange }: {
                 }}
                 className="w-full"
             />
-
-            {stacks.map((stack) => (
-                <MarkerStack
-                    key={`${stack[0].className}-${stack[0].revision}-${stack[0].time}`}
-                    stack={stack}
-                    onMarkerClick={onMarkerClick}
-                    onStackHeightChange={onStackHeightChange}
-                />
-            ))}
         </div>
     );
 }

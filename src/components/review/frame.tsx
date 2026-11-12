@@ -9,14 +9,14 @@ import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { PlaybackStoreProvider } from "@/components/review/stores/playback-store";
 import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
-import { useVideoStore } from "@/components/stores/video-store";
+import { latestRevisionNumber, useVideoStore } from "@/components/stores/video-store";
 
 export function ReviewFrame({ children }: { children: ReactNode }) {
     const listPanelOpen = useVideoPlayerStore((s) => s.listPanelOpen);
     const setListPanelOpen = useVideoPlayerStore((s) => s.setListPanelOpen);
     const sidePanelOpen = useVideoPlayerStore((s) => s.sidePanelOpen);
     const isMobile = useIsMobile();
-    const latestRevision = useVideoStore((s) => Math.max(0, ...s.revisions.map((r) => r.revision)));
+    const latestRevision = useVideoStore(latestRevisionNumber);
 
     return (
         <SidebarProvider
