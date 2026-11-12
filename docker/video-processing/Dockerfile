@@ -1,4 +1,4 @@
-FROM node:24.22.2-slim AS deps
+FROM node:24.22.3-slim AS deps
 WORKDIR /app
 
 COPY package*.json ./
@@ -10,7 +10,7 @@ COPY . .
 RUN npm run prisma:generate
 RUN npm run video-processing:build
 
-FROM node:24.22.2-slim AS runner
+FROM node:24.22.3-slim AS runner
 WORKDIR /app
 
 RUN apt-get update \
