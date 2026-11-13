@@ -55,8 +55,7 @@ export default function AdminSettingsDialog({
                     <DialogTitle>{t("title")}</DialogTitle>
                 </DialogHeader>
 
-                {/* min-w-0: without it this grid item grows to its content and the sections overflow the dialog. */}
-                <Tabs orientation="vertical" value={section} onValueChange={setSection} className="flex-row min-w-0">
+                <Tabs orientation="vertical" value={section} onValueChange={setSection} className="flex-row">
                     <TabsList className="flex-col h-auto w-44 mr-4 shrink-0 self-start items-stretch">
                         {SECTIONS.map(({ key, label, integration }, i) => (
                             <Fragment key={key}>
