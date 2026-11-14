@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const ADMIN = { email: "Bocchi@example.com", password: "pass123" };
 
 async function loginAsAdmin(page: import("@playwright/test").Page) {

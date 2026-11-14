@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { uploadVideo } from "./upload-video";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const USER = { email: "Bocchi@example.com", password: "pass123" };
 const STAGE = '[data-slot="video-stage"]';
 

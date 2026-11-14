@@ -37,7 +37,7 @@ describe.skipIf(!enabled)(`LLM smoke check (${env.LLM_PROVIDER ?? "no provider"}
                 system,
             );
             console.log(`[llm:check] completeWithMCP(): ${JSON.stringify(reply)}`);
-            // The eval dataset (npm run prisma:seed:eval) has exactly these two boss videos.
+            // The eval dataset (npm run prisma:seed -- eval) has exactly these two boss videos.
             expect(reply).toMatch(/Dragon/);
             expect(reply).toMatch(/Golem/);
         } finally {

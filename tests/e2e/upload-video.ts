@@ -2,7 +2,7 @@ import { expect, type APIRequestContext } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const UPLOADER = { email: "Bocchi@example.com", password: "pass123" };
 const VIDEO = path.join(process.cwd(), "tests/fixtures/preview.mp4");
 

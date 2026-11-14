@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const USER = { email: "Bocchi@example.com", password: "pass123" };
 
 // A seeded revision path under local storage. The seed ships no media bytes, so a

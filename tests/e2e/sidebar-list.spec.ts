@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const USER = { email: "Bocchi@example.com", password: "pass123" };
 
 const TREE = '[data-slot="browse-tree"]';
@@ -17,6 +17,8 @@ async function login(page: import("@playwright/test").Page) {
 test.describe("sidebar video list", () => {
     test("hovering a row shows the video's detail card", async ({ page }) => {
         await login(page);
+        // The top-level folder holds only folders; the videos are one level down.
+        await page.locator(`${TREE} [aria-expanded="false"]`).first().click();
         await page.locator(`${TREE} [aria-expanded="false"]`).first().click();
 
         const row = page.locator(`${TREE} [data-sidebar="menu-button"][data-size="auto"]`).first();
