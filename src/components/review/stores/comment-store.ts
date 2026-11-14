@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { InferRequestType } from "hono/client";
 import { api, readError } from "@/api";
 import { VideoComment, VideoRevision } from "@/lib/db-types";
 import type { Issue } from "@/lib/issue-types";
@@ -22,7 +23,7 @@ interface CommentState {
     fetchComments: (videoRevision: VideoRevision, options?: { live?: boolean }) => Promise<void>;
     fetchIssues: (videoId: string) => Promise<void>;
     transitionIssue: (commentId: string, transitionId: string) => Promise<void>;
-    addComment: (c: Omit<VideoComment, "notifiedProviders" | "id" | "createdAt" | "updatedAt" | "deleted" | "drawingPath" | "hasDrawing" | "thumbsUp" | "userId" | "isGuest">) => Promise<string>;
+    addComment: (c: InferRequestType<typeof api.comments.index.$post>["json"]) => Promise<string>;
     updateComment: (comment: VideoComment) => void;
     deleteComment: (id: string) => Promise<void>;
     incrementThumbsUpCount: (id: string) => Promise<void>;
