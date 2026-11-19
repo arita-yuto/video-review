@@ -18,6 +18,8 @@ export interface Participant {
     email: string | null;
 }
 
+export const DEFAULT_VIDEO_ASPECT = "16 / 9";
+
 interface PlaybackState {
     isPlaying: boolean;
     currentTime: number;
@@ -26,6 +28,10 @@ interface PlaybackState {
     // While the seek bar is held, so the sync session gets only where it is let go.
     scrubbing: boolean;
     duration: number;
+    // The picture's width / height as a CSS ratio; 16 / 9 until the metadata loads.
+    videoAspect: string;
+    // Waiting for data while playing, such as after a jump to the sync session's position.
+    buffering: boolean;
     // The connections in this video's sync session, in join order, known whether or not this screen is in it.
     participants: Participant[];
     // The sync link the dialog shows, null while closed; kept here so it survives joining from another video's URL.
@@ -48,6 +54,8 @@ interface PlaybackState {
     setTimelineTime: (time: number | null) => void;
     setScrubbing: (scrubbing: boolean) => void;
     setDuration: (duration: number) => void;
+    setVideoAspect: (videoAspect: string) => void;
+    setBuffering: (buffering: boolean) => void;
     setParticipants: (participants: Participant[]) => void;
     setSyncLink: (link: string | null) => void;
     setSyncState: (state: ReceivedSyncState | null) => void;
@@ -62,6 +70,8 @@ const createPlaybackStore = () => createStore<PlaybackState>()((set) => ({
     timelineTime: null,
     scrubbing: false,
     duration: 0,
+    videoAspect: DEFAULT_VIDEO_ASPECT,
+    buffering: false,
     participants: [],
     syncLink: null,
     syncState: null,
@@ -79,6 +89,8 @@ const createPlaybackStore = () => createStore<PlaybackState>()((set) => ({
     setTimelineTime: (time) => set({ timelineTime: time }),
     setScrubbing: (scrubbing) => set({ scrubbing }),
     setDuration: (duration) => set({ duration }),
+    setVideoAspect: (videoAspect) => set({ videoAspect }),
+    setBuffering: (buffering) => set({ buffering }),
     setParticipants: (participants) => set({ participants }),
     setSyncLink: (syncLink) => set({ syncLink }),
     setSyncState: (syncState) => set({ syncState }),
