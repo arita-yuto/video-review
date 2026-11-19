@@ -21,7 +21,6 @@ const storageMock = vi.hoisted(() => ({ deleteObject: vi.fn() }));
 vi.mock("@/server/lib/db", () => ({ prisma: prismaMock }));
 vi.mock("@/server/lib/token", () => ({
     authorize: authorizeMock,
-    getJwtSecret: vi.fn(),
     getApiSecretHash: vi.fn(),
 }));
 vi.mock("@/server/lib/storage", () => ({ VideoReviewStorage: storageMock }));

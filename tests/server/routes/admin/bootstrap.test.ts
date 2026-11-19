@@ -12,6 +12,7 @@ const prismaMock = vi.hoisted(() => ({
     systemSecret: {
         findUnique: vi.fn(),
         create: vi.fn(),
+        createMany: vi.fn(),
         upsert: vi.fn(),
     },
 }));
@@ -36,7 +37,6 @@ describe("POST /bootstrap", () => {
         // Default state: an instance nobody has set up yet.
         prismaMock.user.count.mockResolvedValue(0);
         prismaMock.systemSecret.findUnique.mockResolvedValue(null);
-        prismaMock.systemSecret.create.mockResolvedValue({});
         prismaMock.user.create.mockResolvedValue({});
     });
 
@@ -54,11 +54,12 @@ describe("POST /bootstrap", () => {
         expect(created.identities.create.secretHash).not.toBe(VALID.pass);
     });
 
-    it("creates the JWT signing secret in the same call", async () => {
+    it("leaves the JWT signing secret alone", async () => {
         await bootstrapRequest(VALID);
 
-        expect(prismaMock.systemSecret.create).toHaveBeenCalledTimes(1);
-        expect(prismaMock.systemSecret.create.mock.calls[0][0].data.key).toBe("JWT_SECRET");
+        expect(prismaMock.systemSecret.create).not.toHaveBeenCalled();
+        expect(prismaMock.systemSecret.createMany).not.toHaveBeenCalled();
+        expect(prismaMock.systemSecret.upsert).not.toHaveBeenCalled();
     });
 
     it("refuses a second call once a user exists", async () => {
@@ -69,10 +70,18 @@ describe("POST /bootstrap", () => {
         expect(res.status).toBe(410);
         await expect(res.json()).resolves.toEqual({ error: "Already initialized" });
         expect(prismaMock.user.create).not.toHaveBeenCalled();
-        expect(prismaMock.systemSecret.create).not.toHaveBeenCalled();
     });
 
-    it("refuses a call when the JWT secret already exists", async () => {
+    it("keeps bootstrap closed when users exist but none is an admin", async () => {
+        prismaMock.user.count.mockImplementation(async (args) => (args?.where?.role === "admin" ? 0 : 1));
+
+        const res = await bootstrapRequest(VALID);
+
+        expect(res.status).toBe(410);
+        expect(prismaMock.user.create).not.toHaveBeenCalled();
+    });
+
+    it("creates the first admin when a JWT secret already exists", async () => {
         prismaMock.systemSecret.findUnique.mockResolvedValue({
             key: "JWT_SECRET",
             valueHash: "existing",
@@ -80,9 +89,8 @@ describe("POST /bootstrap", () => {
 
         const res = await bootstrapRequest(VALID);
 
-        expect(res.status).toBe(410);
-        expect(prismaMock.user.create).not.toHaveBeenCalled();
-        expect(prismaMock.systemSecret.create).not.toHaveBeenCalled();
+        expect(res.status).toBe(200);
+        expect(prismaMock.user.create).toHaveBeenCalledTimes(1);
     });
 
     it("rejects a password shorter than the 6 characters the admin guide states", async () => {
@@ -97,5 +105,17 @@ describe("POST /bootstrap", () => {
 
         expect(res.status).toBe(400);
         expect(prismaMock.user.create).not.toHaveBeenCalled();
+    });
+});
+
+describe("GET /maintenance/status", () => {
+    it("reports an instance with users but no admin as initialized", async () => {
+        prismaMock.user.count.mockImplementation(async (args) => (args?.where?.role === "admin" ? 0 : 1));
+        prismaMock.systemSecret.findUnique.mockResolvedValue(null);
+
+        const res = await adminRouter.request("http://localhost/maintenance/status");
+
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({ initialized: true, hasAdmin: false });
     });
 });
