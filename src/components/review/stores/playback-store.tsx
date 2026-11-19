@@ -30,7 +30,7 @@ interface PlaybackState {
     duration: number;
     // The picture's width / height as a CSS ratio; 16 / 9 until the metadata loads.
     videoAspect: string;
-    // Waiting for data while playing, such as after a jump to the sync session's position.
+    // Waiting for data to play, or to finish a seek while paused.
     buffering: boolean;
     // The connections in this video's sync session, in join order, known whether or not this screen is in it.
     participants: Participant[];
