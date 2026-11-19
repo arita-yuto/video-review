@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const ADMIN = { email: "Bocchi@example.com", password: "pass123" };
 
 // The smallest video in the repo; this test is about the upload getting through, not its size.

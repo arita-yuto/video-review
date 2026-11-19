@@ -4,7 +4,7 @@ import { prisma } from "@/server/lib/db";
 import { ServerError } from "@/server/lib/server-error";
 import { env } from "@/server/lib/env";
 import "server-only"
-import { hash, timingSafeEqual } from "crypto";
+import { hash, randomBytes, timingSafeEqual } from "crypto";
 import { Context } from "hono";
 import { getCookie } from "hono/cookie";
 
@@ -56,17 +56,34 @@ export function invalidateSecret({ dbKey }: SecretKey) {
     cache.delete(dbKey);
 }
 
-export const getJwtSecret = () => getSecret(Secrets.JWT);
+export async function getJwtSecret(): Promise<string> {
+    const existing = await getSecret(Secrets.JWT);
+    if (existing) {
+        return existing;
+    }
 
-export const getApiSecretHash = () => getSecret(Secrets.API);
+    await prisma.systemSecret.createMany({
+        data: [{ key: Secrets.JWT.dbKey, valueHash: hash("sha256", randomBytes(64).toString("hex")) }],
+        skipDuplicates: true,
+    });
 
-export async function verifyToken(token: string): Promise<JwtPayload> {
-    const secret = await getJwtSecret();
-    if (!secret) {
+    // Read back instead of returning the new value: another process may have inserted first.
+    const created = await getSecret(Secrets.JWT);
+    if (!created) {
         throw new ServerError("jwt configuration is missing", 500);
     }
 
-    const decoded = jwt.verify(token, secret);
+    return created;
+}
+
+export const getApiSecretHash = () => getSecret(Secrets.API);
+
+export async function isInitialized() {
+    return await prisma.user.count() > 0;
+}
+
+export async function verifyToken(token: string): Promise<JwtPayload> {
+    const decoded = jwt.verify(token, await getJwtSecret());
     if (typeof decoded === "string") {
         throw new ServerError("invalid token payload", 401);
     }
@@ -75,11 +92,7 @@ export async function verifyToken(token: string): Promise<JwtPayload> {
 }
 
 export async function signToken(payload: Record<string, any>): Promise<string> {
-    const secret = await getJwtSecret();
-    if (!secret) {
-        throw new ServerError("jwt configuration is missing", 500);
-    }
-    return jwt.sign(payload, secret, { expiresIn: "1d" });
+    return jwt.sign(payload, await getJwtSecret(), { expiresIn: "1d" });
 }
 
 function matchesHash(token: string, storedHash: string) {

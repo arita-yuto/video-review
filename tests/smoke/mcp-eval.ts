@@ -1,10 +1,10 @@
 import "dotenv/config";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { EVAL_FOLDER_PREFIX } from "../../prisma/eval-data";
+import { EVAL_FOLDER_PREFIX } from "../../prisma/seed/eval";
 
 // Checks that the MCP tools return the intended results for the eval dataset
-// (npm run prisma:seed:eval). Each case is the tool call an assistant is expected to make
+// (npm run prisma:seed -- eval). Each case is the tool call an assistant is expected to make
 // for the question, plus the exact set of values that must come back.
 //
 // Usage (against a running app, with VIDEO_REVIEW_API_TOKEN in .env):
@@ -184,7 +184,7 @@ async function main() {
     const client = await connect();
     const ctx = await loadContext(client);
     if (ctx.titleById.size === 0) {
-        console.error(`No videos under "${EVAL_FOLDER_PREFIX}". Run: npm run prisma:seed:eval`);
+        console.error(`No videos under "${EVAL_FOLDER_PREFIX}". Run: npm run prisma:seed -- eval`);
         process.exitCode = 1;
         await client.close();
         return;

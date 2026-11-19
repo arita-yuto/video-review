@@ -21,8 +21,7 @@
         "prisma:deploy": "npx prisma migrate deploy",
         "prisma:generate": "npx prisma generate",
         "prisma:migration": "npx prisma migrate dev --name",
-        "prisma:seed": "npx tsx prisma/seed.ts",
-        "prisma:seed:eval": "npx tsx prisma/seed-eval.ts",
+        "prisma:seed": "npx tsx prisma/seed/index.ts",
         "lint": "eslint src"
     },
     "dependencies": {

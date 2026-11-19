@@ -1,7 +1,7 @@
 import { test, expect, type Browser, type Page } from "@playwright/test";
 import { uploadVideo } from "./upload-video";
 
-// Seeded users (see prisma/seed.ts); two people, so each has its own browser.
+// Seeded users (see prisma/seed/user.ts); two people, so each has its own browser.
 const WRITER = { email: "Bocchi@example.com", password: "pass123" };
 const READER = { email: "Kita@example.com", password: "pass123" };
 

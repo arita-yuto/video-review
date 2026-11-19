@@ -1,7 +1,7 @@
 import { PrismaTypes } from "@/lib/db-types";
 import { prisma } from "@/server/lib/db";
 import { VideoReviewStorage } from "@/server/lib/storage";
-import { authorize, getJwtSecret, getApiSecretHash, invalidateSecret, Secrets } from "@/server/lib/token";
+import { authorize, getSecret, getApiSecretHash, invalidateSecret, isInitialized, Secrets } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
 import { createRoute } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
@@ -275,11 +275,11 @@ export const maintenanceRouter = createRouter()
     }), async (c) => {
         try {
             const hasAdmin = await prisma.user.count({ where: { role: "admin" } }) > 0;
-            const hasJwt = await getJwtSecret() !== undefined
+            const hasJwt = await getSecret(Secrets.JWT) !== undefined;
             return c.json({
                 hasAdmin,
                 hasJwt,
-                initialized: hasAdmin && hasJwt,
+                initialized: await isInitialized(),
             }, 200);
         } catch (e) {
             return c.json({ error: e instanceof ServerError ? e.message : "unknown error" }, 500);

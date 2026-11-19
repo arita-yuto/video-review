@@ -10,13 +10,12 @@ import { videosExportRouter } from "@/server/routes/admin/videos-export";
 import { videosImportRouter } from "@/server/routes/admin/videos-import";
 import { getVCSProvider } from "@/server/lib/integrations/vcs";
 import { listUTCDays, upsertMerge, upsertCommit } from "@/server/lib/vcs/cache";
-import { authorize } from "@/server/lib/token";
+import { authorize, isInitialized } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { ASSIGNABLE_ROLES } from "@/lib/role";
 import bcrypt from "bcrypt";
-import { hash, randomBytes } from "crypto";
 import { MIN_PASSWORD_LENGTH } from "@/lib/auth-types";
 
 const CreateAdminBody = z.object({
@@ -87,7 +86,7 @@ export const adminRouter = createRouter()
                 },
             },
             400: errorResponse("Invalid parameters"),
-            410: errorResponse("admin user already exists"),
+            410: errorResponse("A user already exists"),
         },
     }), async (c) => {
         const body = c.req.valid("json");
@@ -96,29 +95,13 @@ export const adminRouter = createRouter()
             pass,
         } = body;
 
-        if (await prisma.user.count() > 0) {
+        if (await isInitialized()) {
             return c.json({ error: "Already initialized" }, 410);
         }
 
         if (!email || !pass) {
             return c.json({ error: "email, pass, role are required" }, 400);
         }
-
-        const exists = await prisma.systemSecret.findUnique({
-            where: { key: "JWT_SECRET" },
-        });
-
-        if (exists) {
-            return c.json({ error: "Already initialized" }, 410);
-        }
-
-        const jwtSecret = randomBytes(64).toString("hex");
-        await prisma.systemSecret.create({
-            data: {
-                key: "JWT_SECRET",
-                valueHash: hash("sha256", jwtSecret),
-            },
-        });
 
         await prisma.user.create({
             data: {

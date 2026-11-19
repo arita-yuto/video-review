@@ -2,12 +2,12 @@ import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 
-// Seeded admin user (see prisma/seed.ts).
+// Seeded admin user (see prisma/seed/user.ts).
 const USER = { email: "Bocchi@example.com", password: "pass123" };
 
 const PANEL = '[data-slot="thumbnails-panel"]';
 
-// Every seeded revision points at videos/demo/rev_001.mp4 (prisma/seed.ts). The preview
+// Every demo revision points at videos/demo/rev_001.mp4 (prisma/seed/demo/video.ts). The preview
 // width falls back to NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS while nothing is saved, so the
 // spec needs the same value in .env.test.
 const PRESETS = (process.env.NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS ?? "").split(",").map(Number).filter(w => w > 0);
@@ -116,6 +116,8 @@ test.describe("thumbnails float panel", () => {
 
     test("shows only the videos the sidebar shows in its open folders", async ({ page }) => {
         await login(page);
+        // The top-level folder holds only folders; the videos are one level down.
+        await page.locator('[data-slot="browse-tree"] [aria-expanded="false"]').first().click();
         await page.locator('[data-slot="browse-tree"] [aria-expanded="false"]').first().click();
         await toggle(page).click();
 
