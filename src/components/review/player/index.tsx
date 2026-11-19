@@ -24,6 +24,7 @@ import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useIdle } from "@/components/review/player/hooks/use-idle";
 import { useVideoStream } from "@/components/review/player/hooks/use-video-stream";
 import { useSyncedPlayback } from "@/components/review/player/hooks/use-synced-playback";
+import { useVideoPlayback } from "@/components/review/player/hooks/use-video-playback";
 import { usePresenterLock, useSyncing } from "@/components/review/sync-session";
 import { cn } from "@/lib/utils";
 import { PortalContainerContext } from "@/lib/portal-container";
@@ -39,10 +40,6 @@ export default function VideoReview() {
     const router = useRouter();
     const videoRef = useRef<HTMLVideoElement>(null);
     const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
-    // Feeds video-fit; 16/9 until loadedmetadata.
-    const [videoAspect, setVideoAspect] = useState("16 / 9");
-    // Waiting for data while playing, such as after a jump to the sync session's position.
-    const [buffering, setBuffering] = useState(false);
     const playbackWidth = usePlaybackWidth();
     // Which revision the element currently holds, to tell a resolution switch, a revision switch and a new video apart.
     const loadedRevisionRef = useRef<VideoRevision | null>(null);
@@ -59,6 +56,7 @@ export default function VideoReview() {
 
     useVideoStream(selectedVideo?.id ?? null);
     useSyncedPlayback(selectedVideo?.id ?? null);
+    useVideoPlayback();
     const syncing = useSyncing(selectedVideo?.id ?? null);
 
     const { comments, fetchComments } = useCommentStore();
@@ -83,12 +81,12 @@ export default function VideoReview() {
         isPlaying,
         currentTime,
         timelineTime,
-        scrubbing,
+        videoAspect,
+        buffering,
         togglePlay,
         setIsPlaying,
         setTimelineTime,
-        setCurrentTime,
-        setDuration } = usePlayback((s) => s);
+        setCurrentTime } = usePlayback((s) => s);
 
     const {
         playMode,
@@ -99,7 +97,6 @@ export default function VideoReview() {
 
     const playModeRef = useRef<EPlayMode>(playMode);
     const timelineTimeRef = useRef<number>(timelineTime);
-    const scrubbingRef = useRef(scrubbing);
 
     // A callback ref keeps the store's element current across remounts of the player.
     const attachVideo = useCallback((el: HTMLVideoElement | null) => {
@@ -223,8 +220,6 @@ export default function VideoReview() {
             // A revision switch keeps the position, paused, so both revisions can be compared at the same moment.
             const loaded = loadedRevisionRef.current;
             loadedRevisionRef.current = selectedRevision;
-            // A new source starts with no data to wait for, and swapping fires no pause to clear the spinner.
-            setBuffering(false);
             if (loaded?.videoId !== selectedRevision.videoId) {
                 resume = null;
             } else if (isRevisionSwitch(loaded)) {
@@ -260,16 +255,7 @@ export default function VideoReview() {
             }
         })();
 
-        const onPlay = () => setIsPlaying(true);
-        const onPause = () => {
-            setIsPlaying(false);
-            setBuffering(false);
-        };
-        const onWaiting = () => setBuffering(true);
-        const onPlaying = () => setBuffering(false);
         const onMeta = () => {
-            setDuration(v.duration);
-            setVideoAspect(`${v.videoWidth} / ${v.videoHeight}`);
             // Read now, not from this effect's render: the speed may have changed since the source was picked.
             v.playbackRate = useVideoPlayerStore.getState().playbackRate;
             v.volume = volumeEnabled ? volume : 0.0;
@@ -288,19 +274,6 @@ export default function VideoReview() {
             }
             variantLoaded = false;
             void loadOriginal();
-        };
-        const onTimeUpdate = () => {
-            if (timelineTimeRef.current !== null) {
-                return;
-            }
-            setCurrentTime(v.currentTime);
-        };
-        // A requested jump is done once the player has seeked; left set, it would keep timeupdate out of the store.
-        // A held seek bar keeps its request, so the thumb stays under the pointer while the video plays on.
-        const onSeeked = () => {
-            if (!scrubbingRef.current) {
-                setTimelineTime(null);
-            }
         };
         const onEnded = () => {
             switch (playModeRef.current) {
@@ -324,24 +297,12 @@ export default function VideoReview() {
 
         v.addEventListener("loadedmetadata", onMeta);
         v.addEventListener("error", onError);
-        v.addEventListener("play", onPlay);
-        v.addEventListener("pause", onPause);
-        v.addEventListener("waiting", onWaiting);
-        v.addEventListener("playing", onPlaying);
-        v.addEventListener("timeupdate", onTimeUpdate);
-        v.addEventListener("seeked", onSeeked);
         v.addEventListener("ended", onEnded);
 
         return () => {
             canceled = true;
-            v.removeEventListener("play", onPlay);
-            v.removeEventListener("pause", onPause);
-            v.removeEventListener("waiting", onWaiting);
-            v.removeEventListener("playing", onPlaying);
             v.removeEventListener("loadedmetadata", onMeta);
             v.removeEventListener("error", onError);
-            v.removeEventListener("timeupdate", onTimeUpdate);
-            v.removeEventListener("seeked", onSeeked);
             v.removeEventListener("ended", onEnded);
         };
     }, [selectedRevision, playbackWidth]);
@@ -385,10 +346,6 @@ export default function VideoReview() {
             v.volume = 0.0;
         }
     }, [volume, volumeEnabled]);
-
-    useEffect(() => {
-        scrubbingRef.current = scrubbing;
-    }, [scrubbing]);
 
     useEffect(() => {
         timelineTimeRef.current = timelineTime;
