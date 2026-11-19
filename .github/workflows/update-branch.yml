@@ -1,0 +1,43 @@
+name: update-branch
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: update-branch
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      # GITHUB_TOKEN pushes do not start workflows; the app token lets the checks re-run.
+      - name: Create app token
+        id: app-token
+        uses: actions/create-github-app-token@v3.4.0
+        with:
+          client-id: ${{ vars.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Update pull request branches
+        run: |
+          pull_requests=$(gh pr list --base main --state open --limit 100 \
+            --json number,isDraft,isCrossRepository \
+            --jq '.[] | select(.isDraft == false and .isCrossRepository == false) | .number')
+
+          for pull_request in $pull_requests
+          do
+            # Exits 0 without a commit when the branch is not behind, and non-zero on a merge conflict.
+            if ! gh pr update-branch "$pull_request"
+            then
+              echo "::warning::Could not update the branch of pull request #$pull_request"
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}

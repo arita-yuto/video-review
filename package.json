@@ -74,7 +74,7 @@
         "jsonwebtoken": "^9.0.2",
         "lucide-react": "^0.577.0",
         "mime-types": "^3.0.2",
-        "next": "^16.4.2",
+        "next": "^16.4.6",
         "next-intl": "^4.9.2",
         "next-themes": "^0.4.6",
         "nodemailer": "^10.2.0",
@@ -98,7 +98,7 @@
     },
     "devDependencies": {
         "@playwright/test": "^1.62.0",
-        "@shadcn/lint": "0.2.3",
+        "@shadcn/lint": "0.2.4",
         "@tailwindcss/postcss": "^4",
         "@types/bcrypt": "^6.0.0",
         "@types/busboy": "^1.5.4",
