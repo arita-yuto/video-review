@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { insertComments, insertReadStatuses } from "../insert";
-import { SeedNode } from "../seed-node";
-import { picked, type VideoNode } from "./video";
+import type { SeedUsers } from "../user";
+import { picked, type DemoVideo } from "./video";
 
 // A video that gets comments gets all of these, in this order.
 // `percent` and `multiplier` pick the videos where the comment has that issue, Slack notification or drawing.
@@ -39,41 +39,38 @@ const readers = [
     { name: "Nijika", percent: 70, multiplier: 17 },
 ];
 
-export class CommentNode extends SeedNode<VideoNode> {
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        const root = this.parent.parent.parent;
-        const commentedVideos = this.parent.videos.filter((video) => picked(video.index, 40, 37));
-        const firstCreatedAt = Date.now();
+export async function insertDemoComments(prisma: PrismaClient, videos: DemoVideo[], users: SeedUsers): Promise<void> {
+    const commentedVideos = videos.filter((video) => picked(video.index, 40, 37));
+    const firstCreatedAt = Date.now();
 
-        const ids = await insertComments(prisma, commentedVideos.flatMap((video) => {
-            return comments.map((comment, position) => {
-                const hasIssue = comment.issue && picked(video.index, comment.issue.percent, comment.issue.multiplier);
-                const isNotified = comment.slack && picked(video.index, comment.slack.percent, comment.slack.multiplier);
-                const hasDrawing = comment.drawing && picked(video.index, comment.drawing.percent, comment.drawing.multiplier);
+    const ids = await insertComments(prisma, commentedVideos.flatMap((video) => {
+        return comments.map((comment, position) => {
+            const hasIssue = comment.issue && picked(video.index, comment.issue.percent, comment.issue.multiplier);
+            const isNotified = comment.slack && picked(video.index, comment.slack.percent, comment.slack.multiplier);
+            const hasDrawing = comment.drawing && picked(video.index, comment.drawing.percent, comment.drawing.multiplier);
 
-                return {
-                    videoId: video.row.id,
-                    revision: 1,
-                    author: root.user(comment.author),
-                    text: comment.text,
-                    time: comment.time,
-                    // The unread check takes the newest comment by createdAt, so comments of one video must not tie.
-                    createdAt: new Date(firstCreatedAt + position * 1000),
-                    issueId: hasIssue ? comment.issue.id : undefined,
-                    notifiedProviders: isNotified ? ["slack"] : [],
-                    drawingPath: hasDrawing ? comment.drawing.path : undefined,
-                };
+            return {
+                videoId: video.row.id,
+                revision: 1,
+                author: users.user(comment.author),
+                text: comment.text,
+                time: comment.time,
+                // The unread check takes the newest comment by createdAt, so comments of one video must not tie.
+                createdAt: new Date(firstCreatedAt + position * 1000),
+                issueId: hasIssue ? comment.issue.id : undefined,
+                notifiedProviders: isNotified ? ["slack"] : [],
+                drawingPath: hasDrawing ? comment.drawing.path : undefined,
+            };
+        });
+    }));
+
+    await insertReadStatuses(prisma, commentedVideos.flatMap((video, videoPosition) => {
+        const lastCommentId = ids[(videoPosition + 1) * comments.length - 1];
+
+        return readers
+            .filter((reader) => picked(video.index, reader.percent, reader.multiplier))
+            .map((reader) => {
+                return { userId: users.user(reader.name).id, videoId: video.row.id, lastReadCommentId: lastCommentId };
             });
-        }));
-
-        await insertReadStatuses(prisma, commentedVideos.flatMap((video, videoPosition) => {
-            const lastCommentId = ids[(videoPosition + 1) * comments.length - 1];
-
-            return readers
-                .filter((reader) => picked(video.index, reader.percent, reader.multiplier))
-                .map((reader) => {
-                    return { userId: root.user(reader.name).id, videoId: video.row.id, lastReadCommentId: lastCommentId };
-                });
-        }));
-    }
+    }));
 }

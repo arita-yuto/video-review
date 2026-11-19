@@ -1,7 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
 import { insertVideos, type VideoRow } from "../insert";
-import { SeedNode } from "../seed-node";
-import type { EvalNode } from "./index";
 
 // `key` is what the comment, event and vcs files use to point at a video.
 // Dates are relative to "now" so time-based questions ("uploaded this week") keep working.
@@ -134,39 +132,35 @@ export function daysAgo(days: number): Date {
     return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 }
 
-export class VideoNode extends SeedNode<EvalNode> {
-    private readonly rows = new Map<string, VideoRow>();
+export type EvalVideos = { row(key: string): VideoRow };
 
-    row(key: string): VideoRow {
-        const row = this.rows.get(key);
+export async function insertEvalVideos(prisma: PrismaClient, folderPrefix: string): Promise<EvalVideos> {
+    const rows = await insertVideos(prisma, videos.map((video) => {
+        return {
+            title: video.title,
+            folderKey: `${folderPrefix}${video.folder}`,
+            vcsWatchPaths: video.vcsWatchPaths,
+            deleted: video.deleted,
+            revisions: video.revisions.map((revision, revisionIndex) => {
+                return {
+                    filePath: `videos/eval/${video.key}/rev_${String(revisionIndex + 1).padStart(3, "0")}.mp4`,
+                    uploadedAt: daysAgo(revision.daysAgo),
+                    tags: revision.tags,
+                    summary: revision.summary,
+                };
+            }),
+        };
+    }));
 
-        if (!row) {
-            throw new Error(`Unknown eval video: ${key}`);
-        }
+    return {
+        row(key) {
+            const position = videos.findIndex((video) => video.key === key);
 
-        return row;
-    }
+            if (position === -1) {
+                throw new Error(`Unknown eval video: ${key}`);
+            }
 
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        const rows = await insertVideos(prisma, videos.map((video) => {
-            return {
-                title: video.title,
-                folderKey: `${this.parent.folderPrefix}${video.folder}`,
-                vcsWatchPaths: video.vcsWatchPaths,
-                deleted: video.deleted,
-                revisions: video.revisions.map((revision, revisionIndex) => {
-                    return {
-                        filePath: `videos/eval/${video.key}/rev_${String(revisionIndex + 1).padStart(3, "0")}.mp4`,
-                        uploadedAt: daysAgo(revision.daysAgo),
-                        tags: revision.tags,
-                        summary: revision.summary,
-                    };
-                }),
-            };
-        }));
-
-        for (const [position, video] of videos.entries()) {
-            this.rows.set(video.key, rows[position]);
-        }
-    }
+            return rows[position];
+        },
+    };
 }

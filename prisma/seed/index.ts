@@ -1,28 +1,29 @@
 import { PrismaClient } from "@prisma/client";
-import { DemoNode } from "./demo";
-import { EvalNode } from "./eval";
-import { RootNode } from "./user";
+import { seedDemo } from "./demo";
+import { seedEval } from "./eval";
+import { insertUsers } from "./user";
 
 const prisma = new PrismaClient();
 
 async function main() {
-    const datasets = { demo: DemoNode, eval: EvalNode };
+    const datasets = { demo: seedDemo, eval: seedEval };
+    const datasetNames = Object.keys(datasets);
     const only = process.argv[2];
 
-    if (only && !Object.hasOwn(datasets, only)) {
-        throw new Error(`Unknown dataset "${only}". Use one of: ${Object.keys(datasets).join(", ")}`);
+    if (only && !datasetNames.includes(only)) {
+        throw new Error(`Unknown dataset "${only}". Use one of: ${datasetNames.join(", ")}`);
     }
 
-    const root = new RootNode();
+    console.log(`Seeding ${only ?? datasetNames.join(" and ")}...`);
 
-    for (const [name, Dataset] of Object.entries(datasets)) {
+    const users = await insertUsers(prisma);
+
+    for (const [name, seed] of Object.entries(datasets)) {
         if (!only || only === name) {
-            root.add(new Dataset(root));
+            await seed(prisma, users);
         }
     }
 
-    console.log(`Seeding ${only ?? Object.keys(datasets).join(" and ")}...`);
-    await root.run(prisma);
     console.log("Done.");
 }
 

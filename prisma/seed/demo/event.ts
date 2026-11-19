@@ -1,7 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { insertEvents } from "../insert";
-import { SeedNode } from "../seed-node";
-import type { VideoNode } from "./video";
+import type { DemoVideo } from "./video";
 
 // Every revision gets all of these.
 const events = [
@@ -40,12 +39,10 @@ const events = [
     },
 ];
 
-export class EventNode extends SeedNode<VideoNode> {
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        await insertEvents(prisma, this.parent.videos.flatMap((video) => {
-            return events.map((event) => {
-                return { ...event, revisionId: video.row.revisions[0].id };
-            });
-        }));
-    }
+export async function insertDemoEvents(prisma: PrismaClient, videos: DemoVideo[]): Promise<void> {
+    await insertEvents(prisma, videos.flatMap((video) => {
+        return events.map((event) => {
+            return { ...event, revisionId: video.row.revisions[0].id };
+        });
+    }));
 }

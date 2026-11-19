@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { insertComments } from "../insert";
-import { SeedNode } from "../seed-node";
-import type { VideoNode } from "./video";
+import type { SeedUsers } from "../user";
+import type { EvalVideos } from "./video";
 
 const comments = [
     { video: "boss-dragon", revision: 2, author: "Kita", text: "The dragon's tail clips through the floor at 0:12", time: 12, issueId: "BUG-201", drawing: true },
@@ -16,23 +16,19 @@ const comments = [
     { video: "perf-crowd", revision: 1, author: "Ryo", text: "Frame rate drops to 20fps with 200 NPCs on screen", time: 50 },
 ];
 
-export class CommentNode extends SeedNode<VideoNode> {
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        const root = this.parent.parent.parent;
+export async function insertEvalComments(prisma: PrismaClient, videos: EvalVideos, users: SeedUsers): Promise<void> {
+    await insertComments(prisma, comments.map((comment) => {
+        const video = videos.row(comment.video);
 
-        await insertComments(prisma, comments.map((comment) => {
-            const video = this.parent.row(comment.video);
-
-            return {
-                videoId: video.id,
-                revision: comment.revision,
-                author: root.user(comment.author),
-                text: comment.text,
-                time: comment.time,
-                createdAt: video.revisions[comment.revision - 1].uploadedAt,
-                issueId: comment.issueId,
-                drawingPath: comment.drawing ? `/drawings/eval/${comment.video}.png` : undefined,
-            };
-        }));
-    }
+        return {
+            videoId: video.id,
+            revision: comment.revision,
+            author: users.user(comment.author),
+            text: comment.text,
+            time: comment.time,
+            createdAt: video.revisions[comment.revision - 1].uploadedAt,
+            issueId: comment.issueId,
+            drawingPath: comment.drawing ? `/drawings/eval/${comment.video}.png` : undefined,
+        };
+    }));
 }

@@ -1,7 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
 import { insertVideos, type VideoData, type VideoRow } from "../insert";
-import { SeedNode } from "../seed-node";
-import type { DemoNode } from "./index";
 
 const batches = [
     { titlePrefix: "Gameplay Capture", count: 40, scenePercent: 80, deleted: false },
@@ -28,32 +26,30 @@ export function picked(index: number, percent: number, multiplier: number): bool
     return (index * multiplier) % 100 < percent;
 }
 
-export class VideoNode extends SeedNode<DemoNode> {
-    readonly videos: { index: number; row: VideoRow }[] = [];
+export type DemoVideo = { index: number; row: VideoRow };
 
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        const indexes: number[] = [];
-        const definitions: VideoData[] = [];
+export async function insertDemoVideos(prisma: PrismaClient, folderPrefix: string): Promise<DemoVideo[]> {
+    const indexes: number[] = [];
+    const definitions: VideoData[] = [];
 
-        for (const batch of batches) {
-            // index restarts in every batch, so picked() selects the same positions in each.
-            for (let index = 0; index < batch.count; index++) {
-                indexes.push(index);
+    for (const batch of batches) {
+        // index restarts in every batch, so picked() selects the same positions in each.
+        for (let index = 0; index < batch.count; index++) {
+            indexes.push(index);
 
-                definitions.push({
-                    title: `${batch.titlePrefix} #${String(index + 1).padStart(3, "0")}`,
-                    folderKey: `${this.parent.folderPrefix}${folders[index % folders.length]}`,
-                    scenePath: picked(index, batch.scenePercent, 13) ? "videos/UnitySample/UnityDemo/rev_001.mp4" : undefined,
-                    deleted: batch.deleted,
-                    revisions: [{ filePath: "videos/demo/rev_001.mp4" }],
-                });
-            }
-        }
-
-        const rows = await insertVideos(prisma, definitions);
-
-        for (const [position, row] of rows.entries()) {
-            this.videos.push({ index: indexes[position], row });
+            definitions.push({
+                title: `${batch.titlePrefix} #${String(index + 1).padStart(3, "0")}`,
+                folderKey: `${folderPrefix}${folders[index % folders.length]}`,
+                scenePath: picked(index, batch.scenePercent, 13) ? "videos/UnitySample/UnityDemo/rev_001.mp4" : undefined,
+                deleted: batch.deleted,
+                revisions: [{ filePath: "videos/demo/rev_001.mp4" }],
+            });
         }
     }
+
+    const rows = await insertVideos(prisma, definitions);
+
+    return rows.map((row, position) => {
+        return { index: indexes[position], row };
+    });
 }

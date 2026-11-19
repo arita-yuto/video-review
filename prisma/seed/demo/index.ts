@@ -1,24 +1,17 @@
 import type { PrismaClient } from "@prisma/client";
 import { deleteVideos } from "../insert";
-import { SeedNode } from "../seed-node";
-import type { RootNode } from "../user";
-import { CommentNode } from "./comment";
-import { EventNode } from "./event";
-import { VideoNode } from "./video";
+import type { SeedUsers } from "../user";
+import { insertDemoComments } from "./comment";
+import { insertDemoEvents } from "./event";
+import { insertDemoVideos } from "./video";
 
-export class DemoNode extends SeedNode<RootNode> {
-    readonly folderPrefix = "demo/";
+export async function seedDemo(prisma: PrismaClient, users: SeedUsers): Promise<void> {
+    const folderPrefix = "demo/";
 
-    constructor(parent: RootNode) {
-        super(parent);
+    await deleteVideos(prisma, folderPrefix);
 
-        const video = this.add(new VideoNode(this));
+    const videos = await insertDemoVideos(prisma, folderPrefix);
 
-        video.add(new CommentNode(video));
-        video.add(new EventNode(video));
-    }
-
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        await deleteVideos(prisma, this.folderPrefix);
-    }
+    await insertDemoComments(prisma, videos, users);
+    await insertDemoEvents(prisma, videos);
 }

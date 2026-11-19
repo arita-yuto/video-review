@@ -7,7 +7,7 @@ const USER = { email: "Bocchi@example.com", password: "pass123" };
 
 const PANEL = '[data-slot="thumbnails-panel"]';
 
-// Every seeded revision points at videos/demo/rev_001.mp4 (prisma/seed/demo/video.ts). The preview
+// Every demo revision points at videos/demo/rev_001.mp4 (prisma/seed/demo/video.ts). The preview
 // width falls back to NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS while nothing is saved, so the
 // spec needs the same value in .env.test.
 const PRESETS = (process.env.NEXT_PUBLIC_VIDEO_REVIEW_RESOLUTION_PRESETS ?? "").split(",").map(Number).filter(w => w > 0);

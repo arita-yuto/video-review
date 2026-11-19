@@ -1,7 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
-import { insertVcs } from "../insert";
-import { SeedNode } from "../seed-node";
-import { daysAgo, type VideoNode } from "./video";
+import { deleteVcsCache, insertVcs, insertVcsConfig } from "../insert";
+import { daysAgo, type EvalVideos } from "./video";
 
 // The code changes linked to a revision: what changed since the previous one.
 const pullRequests = [
@@ -27,39 +26,41 @@ const summaries = [
     { video: "cutscene-opening", revision: 2, text: "The opening camera path was reworked." },
 ];
 
-export class VcsNode extends SeedNode<VideoNode> {
-    protected async insert(prisma: PrismaClient): Promise<void> {
-        const dataset = this.parent.parent;
-        const linked = new Map<string, { video: string; revision: number }>();
+export async function insertEvalVcs(prisma: PrismaClient, videos: EvalVideos): Promise<void> {
+    const repoName = "eval/sample-game";
 
-        for (const change of [...pullRequests, ...commits]) {
-            linked.set(`${change.video}#${change.revision}`, { video: change.video, revision: change.revision });
-        }
+    await deleteVcsCache(prisma, repoName);
 
-        for (const { video, revision } of linked.values()) {
-            const row = this.parent.row(video);
-            const uploadedAt = row.revisions[revision - 1].uploadedAt;
-            const previous = row.revisions[revision - 2];
-            const isLinked = (entry: { video: string; revision: number }) => {
-                return entry.video === video && entry.revision === revision;
-            };
+    const vcsConfigId = await insertVcsConfig(prisma, repoName);
+    const linked = new Map<string, { video: string; revision: number }>();
 
-            await insertVcs(prisma, {
-                repoName: dataset.vcsRepoName,
-                vcsConfigId: dataset.vcsConfigId,
-                revisionId: row.revisions[revision - 1].id,
-                // The changes since the previous revision, or the 30 days before a first revision.
-                rangeFrom: previous ? previous.uploadedAt : new Date(uploadedAt.getTime() - 30 * 24 * 60 * 60 * 1000),
-                rangeTo: uploadedAt,
-                vcsWatchPaths: row.vcsWatchPaths,
-                summary: summaries.find(isLinked)?.text,
-                pullRequests: pullRequests.filter(isLinked).map((pullRequest) => {
-                    return { ...pullRequest, mergedAt: daysAgo(pullRequest.mergedDaysAgo) };
-                }),
-                commits: commits.filter(isLinked).map((commit) => {
-                    return { ...commit, committedAt: daysAgo(commit.committedDaysAgo) };
-                }),
-            });
-        }
+    for (const change of [...pullRequests, ...commits]) {
+        linked.set(`${change.video}#${change.revision}`, { video: change.video, revision: change.revision });
+    }
+
+    for (const { video, revision } of linked.values()) {
+        const row = videos.row(video);
+        const uploadedAt = row.revisions[revision - 1].uploadedAt;
+        const previous = row.revisions[revision - 2];
+        const isLinked = (entry: { video: string; revision: number }) => {
+            return entry.video === video && entry.revision === revision;
+        };
+
+        await insertVcs(prisma, {
+            repoName,
+            vcsConfigId,
+            revisionId: row.revisions[revision - 1].id,
+            // The changes since the previous revision, or the 30 days before a first revision.
+            rangeFrom: previous ? previous.uploadedAt : new Date(uploadedAt.getTime() - 30 * 24 * 60 * 60 * 1000),
+            rangeTo: uploadedAt,
+            vcsWatchPaths: row.vcsWatchPaths,
+            summary: summaries.find(isLinked)?.text,
+            pullRequests: pullRequests.filter(isLinked).map((pullRequest) => {
+                return { ...pullRequest, mergedAt: daysAgo(pullRequest.mergedDaysAgo) };
+            }),
+            commits: commits.filter(isLinked).map((commit) => {
+                return { ...commit, committedAt: daysAgo(commit.committedDaysAgo) };
+            }),
+        });
     }
 }
