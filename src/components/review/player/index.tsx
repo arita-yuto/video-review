@@ -25,6 +25,7 @@ import { useIdle } from "@/components/review/player/hooks/use-idle";
 import { useVideoStream } from "@/components/review/player/hooks/use-video-stream";
 import { useSyncedPlayback } from "@/components/review/player/hooks/use-synced-playback";
 import { useVideoPlayback } from "@/components/review/player/hooks/use-video-playback";
+import { useResolutionSuggestion } from "@/components/review/player/hooks/use-resolution-suggestion";
 import { usePresenterLock, useSyncing } from "@/components/review/sync-session";
 import { cn } from "@/lib/utils";
 import { PortalContainerContext } from "@/lib/portal-container";
@@ -57,6 +58,7 @@ export default function VideoReview() {
     useVideoStream(selectedVideo?.id ?? null);
     useSyncedPlayback(selectedVideo?.id ?? null);
     useVideoPlayback();
+    useResolutionSuggestion();
     const syncing = useSyncing(selectedVideo?.id ?? null);
 
     const { comments, fetchComments } = useCommentStore();

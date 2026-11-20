@@ -134,6 +134,8 @@
         "exitFullscreen": "전체 화면 종료",
         "playbackResolution": "재생 해상도",
         "originalResolution": "원본",
+        "slowLoading": "로딩 지연",
+        "switchResolution": "{resolution}로 전환",
         "syncPlayback": "동기 재생",
         "moreParticipants": "외 {count}명",
         "present": "발표하기",

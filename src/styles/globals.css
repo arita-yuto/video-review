@@ -124,6 +124,7 @@
   /* Warning on a light surface such as a chip, where the bright yellow fades out. */
   --warning-strong: #b8860b;
   --info: #4aa3ff;
+  --info-surface: color-mix(in oklab, var(--info) 18%, var(--popover));
   /* ColorBrewer YlOrBr, lightest for the latest revision; the fourth is shared by every older one. */
   --revision-1: #fee391;
   --revision-2: #fec44f;

@@ -134,6 +134,8 @@
         "exitFullscreen": "Exit fullscreen",
         "playbackResolution": "Playback resolution",
         "originalResolution": "Original",
+        "slowLoading": "Loading is slow",
+        "switchResolution": "Switch to {resolution}",
         "syncPlayback": "Sync playback",
         "moreParticipants": "+{count} more",
         "present": "Present",
