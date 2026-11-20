@@ -16,6 +16,9 @@ export class TrackPlaying implements PlaybackBehavior {
 
         video.removeEventListener("play", this.onPlay);
         video.removeEventListener("pause", this.onPause);
+
+        // A removed element fires no pause.
+        this.ctx.store.getState().setIsPlaying(false);
     }
 
     private onPlay = () => {
