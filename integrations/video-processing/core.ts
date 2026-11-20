@@ -172,13 +172,19 @@ export async function generateDownScaled(storageKey: string, tempMoviePath: stri
     const scaledStorageKey = downscaledVideoKey(storageKey, width);
     const outputTemp = path.join(os.tmpdir(), path.basename(scaledStorageKey));
 
+    // Decoding and encoding each get a quarter of the cores, at least 2, to leave room for other work on the host.
+    const threads = String(Math.max(2, Math.floor(os.availableParallelism() / 4)));
+
     await execFFmpeg([
+        "-threads", threads,
         "-i", tempMoviePath,
         "-vf", `scale=${width}:-2`,
         // Emit 8-bit 4:2:0 explicitly for broad browser and device compatibility.
         "-pix_fmt", "yuv420p",
+        "-threads", threads,
         "-f", "mp4",
-        "-movflags", "frag_keyframe+empty_moov",
+        // The index goes at the front, so a browser can start before it has read the whole file.
+        "-movflags", "+faststart",
         outputTemp,
     ]);
 
