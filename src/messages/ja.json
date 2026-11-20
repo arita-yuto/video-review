@@ -134,6 +134,8 @@
         "exitFullscreen": "全画面を終了",
         "playbackResolution": "再生解像度",
         "originalResolution": "Original",
+        "slowLoading": "読み込みに時間がかかっています",
+        "switchResolution": "{resolution} に切り替え",
         "syncPlayback": "同期再生",
         "moreParticipants": "他 {count} 人",
         "present": "発表する",
