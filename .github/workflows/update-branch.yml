@@ -3,6 +3,10 @@ name: update-branch
 on:
   push:
     branches: ["main"]
+  # pull_request_target gives fork and Dependabot pull requests the app token secret; do not check out their code here.
+  pull_request_target:
+    types: [opened, reopened, ready_for_review]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions: {}
