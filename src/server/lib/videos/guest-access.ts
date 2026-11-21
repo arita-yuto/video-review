@@ -52,6 +52,27 @@ export async function authorizeVideo(req: Request, roles: Role[], videoId: strin
     return auth;
 }
 
+// Same for a route about one stored file; ".." is refused so the guest check and the storage read agree on the key.
+export async function authorizeStorageKey(req: Request, roles: Role[], key: string): Promise<void> {
+    const role = roleOf(await authorize(req, roles));
+
+    if (!key || key.split("/").some((segment) => segment.includes(".."))) {
+        throw new ServerError("invalid path", 400);
+    }
+
+    if (role !== "guest") {
+        return;
+    }
+
+    const videoId = await videoIdForStorageKey(key);
+
+    if (!videoId) {
+        throw new ServerError("forbidden", 403);
+    }
+
+    await assertRoleCanSeeVideo(videoId, role);
+}
+
 // authorizeVideo for a route the browser reaches without a bearer header (EventSource), so the login cookie counts.
 export async function authorizeVideoMedia(c: Context, roles: Role[], videoId: string): Promise<AuthIdentity> {
     const auth = await authorizeMedia(c, roles);

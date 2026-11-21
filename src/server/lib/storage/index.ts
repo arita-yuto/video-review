@@ -82,6 +82,13 @@ export class FileStorage {
         return this.fileDriver.hasObject(storageKey);
     }
 
+    objectSize(storageKey: string): Promise<number | null> {
+        if (!this.fileDriver) {
+            throw new Error("File driver is not initialized");
+        }
+        return this.fileDriver.objectSize(storageKey);
+    }
+
     deleteObject(storageKey: string): Promise<boolean> {
         if (!this.fileDriver) {
             throw new Error("File driver is not initialized");

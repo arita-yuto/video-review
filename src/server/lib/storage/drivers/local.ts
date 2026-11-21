@@ -24,6 +24,22 @@ export class LocalDriver implements FileDriver {
         return fs.existsSync(abs);
     }
 
+    async objectSize(storageKey: string): Promise<number | null> {
+        const fullPath = this.resolveStoragePath(storageKey);
+
+        if (!fullPath) {
+            return null;
+        }
+
+        try {
+            const stats = await fs.promises.stat(fullPath);
+
+            return stats.isFile() ? stats.size : null;
+        } catch {
+            return null;
+        }
+    }
+
     async directUploadFromBuffer(storageKey: string, src: Readable, contentType: string, cacheControl?: string): Promise<void> {
         console.log("[directUploadFromBuffer] called");
         console.log("[directUploadFromBuffer] storageKey =", storageKey);
