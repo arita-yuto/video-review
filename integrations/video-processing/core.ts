@@ -168,30 +168,45 @@ export async function generateThumbnail(videoRevId: string, tempMoviePath: strin
     };
 }
 
-export async function generateDownScaled(storageKey: string, tempMoviePath: string, width: number): Promise<StorageKeyPath> {
-    const scaledStorageKey = downscaledVideoKey(storageKey, width);
-    const outputTemp = path.join(os.tmpdir(), path.basename(scaledStorageKey));
+export async function generateDownScaled(storageKey: string, tempMoviePath: string, widths: number[]): Promise<StorageKeyPath[]> {
+    const outputs = widths.map((width) => {
+        const scaledStorageKey = downscaledVideoKey(storageKey, width);
 
-    // Decoding and encoding each get a quarter of the cores, at least 2, to leave room for other work on the host.
-    const threads = String(Math.max(2, Math.floor(os.availableParallelism() / 4)));
+        return { width, storageKey: scaledStorageKey, filePath: path.join(os.tmpdir(), path.basename(scaledStorageKey)) };
+    });
 
-    await execFFmpeg([
-        "-threads", threads,
-        "-i", tempMoviePath,
-        "-vf", `scale=${width}:-2`,
+    // Decoder and encoders split half of the CPU threads, to leave room for other work on the host.
+    // At least 2 each, even when that exceeds the half: with 1 each the run does not spread across CPU threads.
+    const threads = String(Math.max(2, Math.floor(os.availableParallelism() / 2 / (widths.length + 1))));
+
+    // The outputs share one run so the source is decoded once; an output option applies to the next output only.
+    const outputArgs = outputs.flatMap((output) => [
+        "-vf", `scale=${output.width}:-2`,
         // Emit 8-bit 4:2:0 explicitly for broad browser and device compatibility.
         "-pix_fmt", "yuv420p",
         "-threads", threads,
         "-f", "mp4",
         // The index goes at the front, so a browser can start before it has read the whole file.
         "-movflags", "+faststart",
-        outputTemp,
+        output.filePath,
     ]);
 
-    return {
-        storageKey: scaledStorageKey,
-        filePath: outputTemp
-    };
+    try {
+        await execFFmpeg([
+            "-y",
+            "-threads", threads,
+            "-i", tempMoviePath,
+            ...outputArgs,
+        ]);
+    } catch (e) {
+        for (const output of outputs) {
+            await fs.promises.rm(output.filePath, { force: true });
+        }
+
+        throw e;
+    }
+
+    return outputs;
 }
 
 async function downloadToTemp(storageKey: string): Promise<string> {
@@ -220,12 +235,33 @@ const runners: Record<ProcessingStepKind, (source: StepSource) => Promise<void>>
     },
     downscaled: async (source) => {
         const { width: sourceWidth } = await probeDimensions(source.path);
-        for (const width of await resolutionPresets()) {
+        const widths: number[] = [];
+
+        // A preset listed twice would name the same output twice.
+        for (const width of new Set(await resolutionPresets())) {
             if (width > sourceWidth) {
                 console.log(`Skip preset ${width}p because source width is ${sourceWidth}px`);
                 continue;
             }
-            await moveToStorage(await generateDownScaled(source.storageKey, source.path, width));
+
+            widths.push(width);
+        }
+
+        if (widths.length === 0) {
+            return;
+        }
+
+        const files = await generateDownScaled(source.storageKey, source.path, widths);
+
+        try {
+            for (const file of files) {
+                await moveToStorage(file);
+            }
+        } finally {
+            // moveToStorage removes only the file it uploaded.
+            for (const file of files) {
+                await fs.promises.rm(file.filePath, { force: true });
+            }
         }
     },
     filmstrip: async (source) => {
