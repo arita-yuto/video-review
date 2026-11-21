@@ -17,6 +17,7 @@ export interface FileDriver {
     download(storageKey: string): Promise<Readable | string>;
     directReadStream(storageKey: string): Promise<Readable>
     hasObject(storageKey: string): Promise<boolean>;
+    objectSize(storageKey: string): Promise<number | null>;
     deleteObject(storageKey: string): Promise<boolean>;
 }
 

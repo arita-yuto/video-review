@@ -8,8 +8,7 @@ import { usePlayback } from "@/components/review/stores/playback-store";
 import { useVideoPlayerStore } from "@/components/review/stores/video-player-store";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { usePlaybackWidth } from "@/components/review/player/hooks/use-playback-width";
-import { resolveMediaUrl } from "@/lib/media-url";
-import { downscaledVideoKey } from "@/lib/storage-key";
+import { readMediaSizes } from "@/lib/media-url";
 
 // Module state, so the suggestion is made once per page load.
 let suggestionToastId: string | number | null = null;
@@ -28,18 +27,6 @@ function bufferedSeconds(video: HTMLVideoElement | null) {
     }
 
     return seconds;
-}
-
-// HEAD carries no length on the media route; a one-byte range answers with the total.
-async function readFileSize(url: string): Promise<number | null> {
-    try {
-        const response = await fetch(url, { headers: { Range: "bytes=0-0" } });
-        const total = Number(response.headers.get("Content-Range")?.split("/")[1]);
-
-        return Number.isFinite(total) ? total : null;
-    } catch {
-        return null;
-    }
 }
 
 // carriedShare is the connection's delivery rate as a share of the playing file's bitrate.
@@ -95,13 +82,18 @@ export function useResolutionSuggestion() {
                 return;
             }
 
-            const playingSize = video?.currentSrc ? await readFileSize(video.currentSrc) : null;
-            const resolvedFiles = await Promise.all(lowerPresets.map(async (width) => {
-                const url = await resolveMediaUrl(downscaledVideoKey(filePath, width));
+            const sizes = await readMediaSizes(filePath);
 
-                return url ? { width, size: await readFileSize(url) } : null;
-            }));
-            const lowerFiles = resolvedFiles.filter((file) => file !== null);
+            // Sizes unknown: every lower preset stays a candidate for chooseNextLowerWidth.
+            let lowerFiles: DownscaledFile[] = lowerPresets.map((width) => ({ width, size: null }));
+            let playingSize: number | null = null;
+
+            if (sizes) {
+                lowerFiles = sizes.downscaled.filter((file) => lowerPresets.includes(file.width));
+
+                // A preset with no file plays the original.
+                playingSize = sizes.downscaled.find((file) => file.width === playbackWidth)?.size ?? sizes.original;
+            }
 
             if (lowerFiles.length === 0 || suggestionToastId !== null) {
                 return;

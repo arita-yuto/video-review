@@ -34,6 +34,25 @@ export class NextCloudDriver implements FileDriver {
         return res.status === 200;
     }
 
+    async objectSize(storageKey: string): Promise<number | null> {
+        const res = await fetch(this.pathUnderRoot(storageKey), {
+            method: "HEAD",
+            headers: this.getHeaders(),
+        });
+
+        if (res.status === 404) {
+            return null;
+        }
+
+        const contentLength = res.headers.get("Content-Length");
+
+        if (res.status !== 200 || contentLength === null) {
+            throw new Error(`Nextcloud objectSize failed: ${res.status}`);
+        }
+
+        return Number(contentLength);
+    }
+
     async directUploadFromBuffer(storageKey: string, src: Readable, contentType: string, cacheControl?: string): Promise<void> {
         const pathWithRoot = `${this.rootPath}/${storageKey}`;
         const pathSegments = pathWithRoot.split("/");

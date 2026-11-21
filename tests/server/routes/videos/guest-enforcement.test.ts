@@ -31,6 +31,7 @@ vi.mock("@/server/lib/storage", () => ({
 
 import { getVideoRouter } from "@/server/routes/videos/[id]/get-video";
 import { localRouter } from "@/server/routes/media/local";
+import { resolverRouter } from "@/server/routes/media/resolver";
 
 function mount(router: OpenAPIHono, base: string) {
     const app = new OpenAPIHono().route(base, router);
@@ -72,5 +73,13 @@ describe("guest media enforcement", () => {
         const res = await mount(localRouter, "/media").request("http://localhost/media/thumbnails/vid-1/thumb.png");
         // The file does not exist on disk, so a 404 (not 403) proves the guest gate let it through.
         expect(res.status).not.toBe(403);
+    });
+
+    it("returns 403 for a guest on a non-visible video's resolved URL", async () => {
+        prismaMock.video.findUnique.mockResolvedValue({ guestVisible: false });
+        const res = await mount(resolverRouter, "/resolver").request("http://localhost/resolver/thumbnails/vid-1/thumb.png");
+
+        expect(res.status).toBe(403);
+        expect(prismaMock.video.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "vid-1" } }));
     });
 });

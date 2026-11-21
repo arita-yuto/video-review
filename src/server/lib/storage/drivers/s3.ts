@@ -53,6 +53,29 @@ export class S3Driver implements FileDriver {
         }
     }
 
+    async objectSize(storageKey: string): Promise<number | null> {
+        if (!this.s3 || !this.bucket) {
+            return null;
+        }
+
+        try {
+            const head = await this.s3.send(
+                new HeadObjectCommand({
+                    Bucket: this.bucket,
+                    Key: storageKey,
+                })
+            );
+
+            return head.ContentLength ?? null;
+        } catch (err: any) {
+            if (err?.$metadata?.httpStatusCode === 404) {
+                return null;
+            }
+
+            throw err;
+        }
+    }
+
     async directUploadFromBuffer(storageKey: string, src: Readable, contentType: string, cacheControl?: string): Promise<void> {
         if (!this.s3 || !this.bucket) return Promise.reject(undefined);
 
