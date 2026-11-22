@@ -172,7 +172,7 @@ export async function generateDownScaled(storageKey: string, tempMoviePath: stri
     const outputs = widths.map((width) => {
         const scaledStorageKey = downscaledVideoKey(storageKey, width);
 
-        return { width, storageKey: scaledStorageKey, filePath: path.join(os.tmpdir(), path.basename(scaledStorageKey)) };
+        return { width, storageKey: scaledStorageKey, filePath: path.join(os.tmpdir(), `${uuidv4()}_${path.basename(scaledStorageKey)}`) };
     });
 
     // Decoder and encoders split half of the CPU threads, to leave room for other work on the host.
