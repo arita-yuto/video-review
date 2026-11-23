@@ -53,6 +53,10 @@ var commands = map[string]Command{
 		Run:  RunPurgeRevision,
 		Desc: "Purge video revision",
 	},
+	"reencode-video": {
+		Run:  RunReencodeVideo,
+		Desc: "Re-encode video",
+	},
 	"upload-video": {
 		Run:  RunUploadVideo,
 		Desc: "upload video",

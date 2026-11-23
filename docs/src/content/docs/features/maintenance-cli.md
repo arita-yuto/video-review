@@ -74,6 +74,11 @@ Note: `--filter_tree` narrows the list to titles or folder keys that contain the
 
 Note: this also deletes the files, so it cannot be undone.
 
+##### Re-encode a video
+> go run . reencode-video --video_id {uuid}
+
+Note: this only queues the video; a worker encodes it afterwards.
+
 ##### Upload a video
 > go run . upload-video --title "title" --folder_key "folder_key" --scene_path "scene_path" --video_path "/path/to/video.mp4"
 

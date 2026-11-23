@@ -102,10 +102,13 @@ describe("takeNextStep", () => {
             },
         });
 
-        const firstTaken = await takeNextStep();
-        const secondTaken = await takeNextStep();
+        const taken = await takeNextStep();
 
-        expect(firstTaken?.job.videoRevision.id).toBe(revision.id);
-        expect(secondTaken?.id).not.toBe(firstTaken!.id);
+        expect(taken?.job.videoRevision.id).toBe(revision.id);
+
+        const takenStep = await prisma().videoProcessingStep.findUniqueOrThrow({ where: { id: taken!.id } });
+
+        // A renewed updatedAt is what keeps the next worker from taking it again.
+        expect(takenStep.updatedAt.getTime()).toBeGreaterThan(tenMinutesAgo.getTime());
     });
 });
