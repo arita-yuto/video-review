@@ -4,7 +4,7 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 import { spawn } from "child_process";
 import { pipeline } from "stream/promises";
-import { JobStatus, PrismaClient, ProcessingStepKind, type VideoProcessingStep, type VideoRevision } from "@prisma/client";
+import { JobStatus, Prisma, PrismaClient, ProcessingStepKind, type VideoProcessingStep, type VideoRevision } from "@prisma/client";
 import { DriversFactory } from "@/server/lib/storage/drivers";
 import { thumbnailKey, downscaledVideoKey, filmstripKey } from "@/lib/storage-key";
 import { FILMSTRIP_COLS, FILMSTRIP_TILE_WIDTH, filmstripInterval, type Filmstrip } from "@/lib/filmstrip";
@@ -280,12 +280,90 @@ const runners: Record<ProcessingStepKind, (source: StepSource) => Promise<void>>
     },
 };
 
-async function runStep(step: Pick<VideoProcessingStep, "id" | "kind">, source: StepSource): Promise<JobStatus> {
-    await prisma().videoProcessingStep.update({
-        where: { id: step.id },
-        data: { status: JobStatus.running, error: null },
+let stopRequested = false;
+
+export function requestStop(): void {
+    stopRequested = true;
+}
+
+export function isStopRequested(): boolean {
+    return stopRequested;
+}
+
+// Workers on different machines share the database clock, so updatedAt is written and judged by it.
+async function databaseNow(): Promise<Date> {
+    const [{ now }] = await prisma().$queryRaw<{ now: Date }[]>`SELECT now() AS "now"`;
+
+    return now;
+}
+
+function availableStepFilter(now: Date): Prisma.VideoProcessingStepWhereInput {
+    // keepStepAlive renews updatedAt every minute, so a step running this long has no live worker.
+    const staleBefore = new Date(now.getTime() - 5 * 60_000);
+
+    return {
+        OR: [
+            { status: JobStatus.pending },
+            { status: JobStatus.running, updatedAt: { lt: staleBefore } },
+        ],
+    };
+}
+
+async function takeStep(stepId: string): Promise<boolean> {
+    const now = await databaseNow();
+
+    // Only the worker whose update changes the row takes the step.
+    const { count } = await prisma().videoProcessingStep.updateMany({
+        where: { id: stepId, ...availableStepFilter(now) },
+        data: { status: JobStatus.running, error: null, updatedAt: now },
     });
 
+    return count === 1;
+}
+
+async function renewStep(stepId: string): Promise<void> {
+    const now = await databaseNow();
+
+    await prisma().videoProcessingStep.update({ where: { id: stepId }, data: { updatedAt: now } });
+}
+
+async function keepStepAlive<T>(stepId: string, work: () => Promise<T>): Promise<T> {
+    const intervalMs = 60_000;
+
+    const timer = setInterval(() => {
+        renewStep(stepId).catch((e) => {
+            console.error(`Failed to renew updatedAt of step ${stepId}:`, e);
+        });
+    }, intervalMs);
+
+    try {
+        return await work();
+    } finally {
+        clearInterval(timer);
+    }
+}
+
+async function failStep(stepId: string, error: unknown): Promise<JobStatus> {
+    // A failure during stop is the interruption itself, and a failed step is not taken again.
+    if (isStopRequested()) {
+        await prisma().videoProcessingStep.update({
+            where: { id: stepId },
+            data: { status: JobStatus.pending, error: null },
+        });
+
+        return JobStatus.pending;
+    }
+
+    // Operators read error before deciding on a redo.
+    await prisma().videoProcessingStep.update({
+        where: { id: stepId },
+        data: { status: JobStatus.failed, error: (error as any).message },
+    });
+
+    return JobStatus.failed;
+}
+
+async function runStep(step: Pick<VideoProcessingStep, "id" | "kind">, source: StepSource): Promise<JobStatus> {
     try {
         await runners[step.kind](source);
         await prisma().videoProcessingStep.update({
@@ -295,12 +373,7 @@ async function runStep(step: Pick<VideoProcessingStep, "id" | "kind">, source: S
         return JobStatus.succeeded;
     } catch (e) {
         console.error(`Step ${step.kind} failed for videoRevId ${source.videoRevId}:`, e);
-        // Operators read error before deciding on a redo.
-        await prisma().videoProcessingStep.update({
-            where: { id: step.id },
-            data: { status: JobStatus.failed, error: (e as any).message },
-        });
-        return JobStatus.failed;
+        return failStep(step.id, e);
     }
 }
 
@@ -321,12 +394,13 @@ async function withSource<T>(storageKey: string, work: (sourcePath: string) => P
     }
 }
 
-export async function processVideo(storageKey: string, videoId: string, videoRevId: string): Promise<JobStatus> {
-    console.log(`Processing video at path: ${storageKey} for videoId: ${videoId}, videoRevId: ${videoRevId}`);
+// Null means another worker took this upload first; pending means stop interrupted it.
+export async function processVideo(storageKey: string, videoId: string, videoRevId: string): Promise<JobStatus | null> {
     if (!FileDriver) {
         throw new Error("No file driver configured");
     }
 
+    // A revision has one job, so the worker whose create goes through is the one that takes the upload.
     const job = await prisma().videoProcessingJob.create({
         data: {
             videoRevisionId: videoRevId,
@@ -334,17 +408,49 @@ export async function processVideo(storageKey: string, videoId: string, videoRev
             steps: { create: NEW_REVISION_STEP_KINDS.map((kind) => ({ kind })) },
         },
         include: { steps: true },
+    }).catch((e) => {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+            return null;
+        }
+
+        throw e;
     });
+
+    if (!job) {
+        return null;
+    }
+
+    console.log(`Processing video at path: ${storageKey} for videoId: ${videoId}, videoRevId: ${videoRevId}`);
 
     let status: JobStatus;
     try {
         status = await withSource(storageKey, async (sourcePath) => {
             const source: StepSource = { storageKey, videoId, videoRevId, path: sourcePath };
+            let interrupted = false;
+
             // The nested create returns the steps in no fixed order, so run them in the declared order.
             for (const kind of NEW_REVISION_STEP_KINDS) {
-                await runStep(job.steps.find((step) => step.kind === kind)!, source);
+                if (isStopRequested()) {
+                    interrupted = true;
+                    break;
+                }
+
+                const step = job.steps.find((step) => step.kind === kind)!;
+
+                // Another worker may have taken the step during the download.
+                if (!(await takeStep(step.id))) {
+                    continue;
+                }
+
+                if ((await keepStepAlive(step.id, () => runStep(step, source))) === JobStatus.pending) {
+                    interrupted = true;
+                }
             }
-            return summarizeJob(job.id);
+
+            const summary = await summarizeJob(job.id);
+
+            // The steps left pending are for the next worker, so the upload is not reported as done.
+            return interrupted ? JobStatus.pending : summary;
         });
     } catch (e) {
         console.error(`Failed to process videoRevId ${videoRevId}:`, e);
@@ -360,29 +466,103 @@ export async function processVideo(storageKey: string, videoId: string, videoRev
     return status;
 }
 
-export type PendingStep = VideoProcessingStep & {
+export type TakenStep = VideoProcessingStep & {
     job: { id: string; videoRevision: Pick<VideoRevision, "id" | "videoId" | "filePath"> };
 };
 
-// Runs one step without touching the others in its job.
-export async function processStep(step: PendingStep): Promise<JobStatus> {
-    const { id: videoRevId, videoId, filePath: storageKey } = step.job.videoRevision;
-    console.log(`Processing step ${step.kind} for videoRevId: ${videoRevId}`);
+export async function takeNextStep(): Promise<TakenStep | null> {
+    // Checked before taking, so a step is not left running by a worker that cannot process it.
     if (!FileDriver) {
         throw new Error("No file driver configured");
     }
 
+    while (true) {
+        const now = await databaseNow();
+
+        const step = await prisma().videoProcessingStep.findFirst({
+            where: {
+                ...availableStepFilter(now),
+                job: {
+                    videoRevision: { deleted: false, video: { deleted: false } },
+                },
+            },
+            // Recently updated videos first, as they are the likeliest to be under review.
+            orderBy: [
+                { job: { videoRevision: { video: { latestUpdatedAt: "desc" } } } },
+                { job: { videoRevision: { uploadedAt: "desc" } } },
+            ],
+            include: {
+                job: {
+                    select: {
+                        id: true,
+                        videoRevision: { select: { id: true, videoId: true, filePath: true } },
+                    },
+                },
+            },
+        });
+
+        if (!step) {
+            return null;
+        }
+
+        // A step another worker took in between is skipped, and the search runs again.
+        if (await takeStep(step.id)) {
+            return step;
+        }
+    }
+}
+
+// Runs one step without touching the others in its job.
+export async function processStep(step: TakenStep): Promise<JobStatus> {
+    const { id: videoRevId, videoId, filePath: storageKey } = step.job.videoRevision;
+    console.log(`Processing step ${step.kind} for videoRevId: ${videoRevId}`);
+
+    let status: JobStatus;
+
     try {
-        await withSource(storageKey, async (sourcePath) => {
-            await runStep(step, { storageKey, videoId, videoRevId, path: sourcePath });
+        // The download counts as processing: the step is already running here.
+        status = await keepStepAlive(step.id, () => {
+            return withSource(storageKey, (sourcePath) => runStep(step, { storageKey, videoId, videoRevId, path: sourcePath }));
         });
     } catch (e) {
         console.error(`Failed to process step ${step.kind} for videoRevId ${videoRevId}:`, e);
-        await prisma().videoProcessingStep.update({
-            where: { id: step.id },
-            data: { status: JobStatus.failed, error: (e as any).message },
-        });
+        status = await failStep(step.id, e);
     }
 
-    return summarizeJob(step.job.id);
+    await summarizeJob(step.job.id);
+
+    return status;
+}
+
+async function findUnprocessedVideoRevision(): Promise<VideoRevision | null> {
+    return prisma().videoRevision.findFirst({
+        where: {
+            deleted: false,
+            video: { deleted: false },
+            processingJob: null,
+        },
+        orderBy: [{ uploadedAt: "asc" }],
+    });
+}
+
+// Null means there was nothing to take; pending means stop interrupted the work.
+export async function processNext(): Promise<JobStatus | null> {
+    while (!isStopRequested()) {
+        // New uploads go first, so they do not wait behind steps queued for a redo.
+        const videoRev = await findUnprocessedVideoRevision();
+
+        if (!videoRev) {
+            const step = await takeNextStep();
+
+            return step ? processStep(step) : null;
+        }
+
+        const status = await processVideo(videoRev.filePath, videoRev.videoId, videoRev.id);
+
+        if (status !== null) {
+            return status;
+        }
+    }
+
+    return null;
 }

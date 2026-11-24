@@ -74,6 +74,11 @@ VideoReview のサーバーの URL
 
 ※ ファイルも削除するので、元に戻せません
 
+##### 動画を再エンコード
+> go run . reencode-video --video_id {uuid}
+
+※ キューに入れるだけで、エンコードは worker があとで行います
+
 ##### 動画をアップロード
 > go run . upload-video --title "title" --folder_key "folder_key" --scene_path "scene_path" --video_path "/path/to/video.mp4"
 

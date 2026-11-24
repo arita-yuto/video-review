@@ -12,6 +12,7 @@ import { getResolutionPresets } from "@/server/lib/integrations/general";
 import { downscaledVideoKey, filmstripKey } from "@/lib/storage-key";
 import { FILMSTRIP_TILES_PER_SHEET, parseFilmstrip } from "@/lib/filmstrip";
 import { errorResponse } from "@/server/lib/openapi/error-response";
+import { JobStatus, ProcessingStepKind } from "@prisma/client";
 
 const DeleteQuerySchema = z.object({
     videoId: z.string().optional(),
@@ -21,6 +22,10 @@ const DeleteQuerySchema = z.object({
 const PurgeQuerySchema = z.object({
     videoId: z.string().optional(),
     revision: z.string().transform(v => parseInt(v)).optional(),
+});
+
+const ReencodeBodySchema = z.object({
+    videoId: z.string().min(1),
 });
 
 export const maintenanceRouter = createRouter()
@@ -185,6 +190,80 @@ export const maintenanceRouter = createRouter()
         }
 
         return c.json({ success: true, videoId, revision }, { status: 200 });
+    })
+    .openapi(createRoute({
+        method: "post",
+        summary: "Requeue the downscaled steps of a video",
+        description: "Sets the finished downscaled step of every processed revision back to pending, so a worker encodes it again.",
+        path: "video/reencode",
+        request: {
+            body: {
+                content: {
+                    "application/json": {
+                        schema: ReencodeBodySchema,
+                    },
+                },
+            },
+        },
+        responses: {
+            200: {
+                description: "The number of steps set back to pending",
+                content: {
+                    "application/json": {
+                        schema: z.object({ requeued: z.number() }),
+                    },
+                },
+            },
+            400: errorResponse("Invalid body"),
+            401: errorResponse("Unauthorized"),
+            403: errorResponse("Forbidden"),
+            404: errorResponse("Video not found"),
+        },
+    }), async (c) => {
+        await authorize(c.req.raw, ["admin"]);
+
+        const { videoId } = c.req.valid("json");
+
+        const video = await prisma.video.findUnique({
+            where: { id: videoId },
+            select: { deleted: true },
+        });
+
+        if (!video || video.deleted) {
+            return c.json({ error: "video not found" }, 404);
+        }
+
+        // A revision without a job is skipped: the worker takes it as a new upload.
+        const jobs = await prisma.videoProcessingJob.findMany({
+            where: { videoRevision: { videoId, deleted: false } },
+            select: {
+                id: true,
+                steps: {
+                    where: { kind: ProcessingStepKind.downscaled },
+                    select: { id: true },
+                },
+            },
+        });
+
+        // A running step is left alone, so the worker on it is not joined by a second encode.
+        const updated = await prisma.videoProcessingStep.updateMany({
+            where: {
+                jobId: { in: jobs.map((job) => job.id) },
+                kind: ProcessingStepKind.downscaled,
+                status: { in: [JobStatus.succeeded, JobStatus.failed, JobStatus.skipped] },
+            },
+            data: { status: JobStatus.pending, error: null },
+        });
+
+        // Jobs that had not succeeded when steps were introduced have no downscaled row.
+        const created = await prisma.videoProcessingStep.createMany({
+            data: jobs
+                .filter((job) => job.steps.length === 0)
+                .map((job) => ({ jobId: job.id, kind: ProcessingStepKind.downscaled, status: JobStatus.pending })),
+            skipDuplicates: true,
+        });
+
+        return c.json({ requeued: updated.count + created.count }, 200);
     })
     .openapi(createRoute({
         method: "post",

@@ -57,7 +57,10 @@ export async function handler(event: S3EventLike): Promise<ProcessSummary> {
 
             try {
                 const status = await processVideo(storageKey, videoRev.videoId, videoRev.id);
-                if (status === JobStatus.succeeded) {
+                if (status === null) {
+                    console.log(`video-processing lambda skip: already handled revision=${videoRev.id}`);
+                    summary.skipped += 1;
+                } else if (status === JobStatus.succeeded) {
                     summary.processed += 1;
                 } else {
                     summary.failed += 1;

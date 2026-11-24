@@ -1,109 +1,72 @@
-import { processStep, processVideo, prisma, type PendingStep } from "./core.js";
-import { JobStatus, VideoRevision } from "@prisma/client";
+import { isStopRequested, processNext, prisma, requestStop } from "./core.js";
+import { JobStatus } from "@prisma/client";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export async function fetchUnprocessedVideoRevisions(limit: number): Promise<VideoRevision[]> {
-    return prisma().videoRevision.findMany({
-        where: {
-            deleted: false,
-            video: { deleted: false },
-            processingJob: null,
-        },
-        orderBy: [{ uploadedAt: "asc" }],
-        take: limit,
-    });
-}
-
-// Newest revision first, since those are the ones being reviewed.
-export async function fetchPendingStep(): Promise<PendingStep | null> {
-    return prisma().videoProcessingStep.findFirst({
-        where: {
-            status: JobStatus.pending,
-            job: {
-                status: { not: JobStatus.running },
-                videoRevision: { deleted: false, video: { deleted: false } },
-            },
-        },
-        orderBy: { job: { videoRevision: { uploadedAt: "desc" } } },
-        include: {
-            job: {
-                select: {
-                    id: true,
-                    videoRevision: { select: { id: true, videoId: true, filePath: true } },
-                },
-            },
-        },
-    });
-}
-
-// One local worker runs per install, so anything still running was cut off when the previous worker was stopped.
-async function requeueInterruptedSteps(): Promise<void> {
-    await prisma().$transaction([
-        prisma().videoProcessingStep.updateMany({ where: { status: JobStatus.running }, data: { status: JobStatus.pending } }),
-        prisma().videoProcessingJob.updateMany({ where: { status: JobStatus.running }, data: { status: JobStatus.pending } }),
-    ]);
 }
 
 async function shutdownProcessingResources(): Promise<void> {
     await prisma().$disconnect();
 }
 
-export async function runLocalWorker(): Promise<void> {
-    const batchSize = 10;
+async function runResidentLoop(): Promise<void> {
     const intervalMs = 10_000;
 
-    console.log(
-        `video-processing worker started: intervalMs=${intervalMs}, batchSize=${batchSize}`,
-    );
+    console.log(`video-processing worker started: intervalMs=${intervalMs}`);
 
-    let stopping = false;
+    while (!isStopRequested()) {
+        // Stays null when processNext throws, so a repeating error waits like an empty queue.
+        let status: JobStatus | null = null;
+
+        try {
+            status = await processNext();
+        } catch (error) {
+            console.error("Error processing the next video or step:", error);
+        }
+
+        if (status === null && !isStopRequested()) {
+            await sleep(intervalMs);
+        }
+    }
+}
+
+async function runOnceLoop(): Promise<void> {
+    let processedCounter = 0;
+    let failureCounter = 0;
+
+    console.log("video-processing worker started: once");
+
+    while (!isStopRequested()) {
+        const status = await processNext();
+
+        // Work that stop interrupted counts as neither processed nor failed.
+        if (status === null || status === JobStatus.pending) {
+            break;
+        }
+
+        processedCounter += 1;
+
+        if (status === JobStatus.failed) {
+            failureCounter += 1;
+        }
+    }
+
+    console.log(`video-processing once: processed=${processedCounter}, failure=${failureCounter}`);
+}
+
+export async function runLocalWorker(): Promise<void> {
     const onSignal = (signal: string) => {
         console.log(`video-processing worker received ${signal}; shutting down`);
-        stopping = true;
+        requestStop();
     };
 
     process.on("SIGINT", () => onSignal("SIGINT"));
     process.on("SIGTERM", () => onSignal("SIGTERM"));
 
-    await requeueInterruptedSteps();
-
-    while (!stopping) {
-        const pendingVideos = await fetchUnprocessedVideoRevisions(batchSize);
-        if (pendingVideos.length === 0) {
-            // One per cycle: each step downloads its whole source, and new uploads must not wait behind them.
-            const step = await fetchPendingStep();
-            if (step) {
-                try {
-                    await processStep(step);
-                } catch (error) {
-                    console.error(`Error processing step ${step.kind} for videoRevId ${step.job.videoRevision.id}:`, error);
-                }
-            }
-        } else {
-            let successCounter = 0;
-            let failureCounter = 0;
-            console.log(`Found ${pendingVideos.length} pending videos, processing...`);
-            for (const videoRev of pendingVideos) {
-                try {
-                    const status = await processVideo(videoRev.filePath, videoRev.videoId, videoRev.id);
-                    if (status === JobStatus.succeeded) {
-                        successCounter += 1;
-                    } else {
-                        failureCounter += 1;
-                    }
-                } catch (error) {
-                    console.error(`Error processing videoRevId ${videoRev.id}:`, error);
-                }
-            }
-            console.log(`video-processing cycle: processed=${pendingVideos.length} videos, success=${successCounter}, failure=${failureCounter}`);
-        }
-
-        if (!stopping) {
-            await sleep(intervalMs);
-        }
+    if (process.argv.includes("--once")) {
+        await runOnceLoop();
+    } else {
+        await runResidentLoop();
     }
 
     await shutdownProcessingResources();

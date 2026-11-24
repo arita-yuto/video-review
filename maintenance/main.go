@@ -53,6 +53,10 @@ var commands = map[string]Command{
 		Run:  RunPurgeRevision,
 		Desc: "Purge video revision",
 	},
+	"reencode-video": {
+		Run:  RunReencodeVideo,
+		Desc: "Re-encode video",
+	},
 	"upload-video": {
 		Run:  RunUploadVideo,
 		Desc: "upload video",
@@ -94,6 +98,11 @@ var commands = map[string]Command{
 	"stop": {
 		Run:      RunStop,
 		Desc:     "Stop the web and worker of a zip install or a docker compose install",
+		NoServer: true,
+	},
+	"run-once": {
+		Run:      RunRunOnce,
+		Desc:     "Convert the videos a zip install has waiting, in the foreground, then exit",
 		NoServer: true,
 	},
 	"version": {
