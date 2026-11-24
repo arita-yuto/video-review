@@ -290,9 +290,16 @@ export function isStopRequested(): boolean {
     return stopRequested;
 }
 
-function availableStepFilter(): Prisma.VideoProcessingStepWhereInput {
+// Workers on different machines share the database clock, so updatedAt is written and judged by it.
+async function databaseNow(): Promise<Date> {
+    const [{ now }] = await prisma().$queryRaw<{ now: Date }[]>`SELECT now() AS "now"`;
+
+    return now;
+}
+
+function availableStepFilter(now: Date): Prisma.VideoProcessingStepWhereInput {
     // keepStepAlive renews updatedAt every minute, so a step running this long has no live worker.
-    const staleBefore = new Date(Date.now() - 5 * 60_000);
+    const staleBefore = new Date(now.getTime() - 5 * 60_000);
 
     return {
         OR: [
@@ -303,20 +310,28 @@ function availableStepFilter(): Prisma.VideoProcessingStepWhereInput {
 }
 
 async function takeStep(stepId: string): Promise<boolean> {
+    const now = await databaseNow();
+
     // Only the worker whose update changes the row takes the step.
     const { count } = await prisma().videoProcessingStep.updateMany({
-        where: { id: stepId, ...availableStepFilter() },
-        data: { status: JobStatus.running, error: null },
+        where: { id: stepId, ...availableStepFilter(now) },
+        data: { status: JobStatus.running, error: null, updatedAt: now },
     });
 
     return count === 1;
+}
+
+async function renewStep(stepId: string): Promise<void> {
+    const now = await databaseNow();
+
+    await prisma().videoProcessingStep.update({ where: { id: stepId }, data: { updatedAt: now } });
 }
 
 async function keepStepAlive<T>(stepId: string, work: () => Promise<T>): Promise<T> {
     const intervalMs = 60_000;
 
     const timer = setInterval(() => {
-        prisma().videoProcessingStep.update({ where: { id: stepId }, data: { updatedAt: new Date() } }).catch((e) => {
+        renewStep(stepId).catch((e) => {
             console.error(`Failed to renew updatedAt of step ${stepId}:`, e);
         });
     }, intervalMs);
@@ -462,9 +477,11 @@ export async function takeNextStep(): Promise<TakenStep | null> {
     }
 
     while (true) {
+        const now = await databaseNow();
+
         const step = await prisma().videoProcessingStep.findFirst({
             where: {
-                ...availableStepFilter(),
+                ...availableStepFilter(now),
                 job: {
                     videoRevision: { deleted: false, video: { deleted: false } },
                 },
