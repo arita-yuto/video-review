@@ -100,6 +100,11 @@ var commands = map[string]Command{
 		Desc:     "Stop the web and worker of a zip install or a docker compose install",
 		NoServer: true,
 	},
+	"run-once": {
+		Run:      RunRunOnce,
+		Desc:     "Convert the videos a zip install has waiting, in the foreground, then exit",
+		NoServer: true,
+	},
 	"version": {
 		Run:      func(cmd string, args []string) { fmt.Println(version) },
 		Desc:     "Print the release this CLI was built from",
