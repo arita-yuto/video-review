@@ -1,20 +1,8 @@
-import { takeNextStep, isStopRequested, processStep, processVideo, prisma, requestStop } from "./core.js";
-import { JobStatus, VideoRevision } from "@prisma/client";
+import { isStopRequested, processNext, prisma, requestStop } from "./core.js";
+import { JobStatus } from "@prisma/client";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export async function fetchUnprocessedVideoRevisions(limit: number): Promise<VideoRevision[]> {
-    return prisma().videoRevision.findMany({
-        where: {
-            deleted: false,
-            video: { deleted: false },
-            processingJob: null,
-        },
-        orderBy: [{ uploadedAt: "asc" }],
-        take: limit,
-    });
 }
 
 async function shutdownProcessingResources(): Promise<void> {
@@ -22,49 +10,21 @@ async function shutdownProcessingResources(): Promise<void> {
 }
 
 async function runResidentLoop(): Promise<void> {
-    const batchSize = 10;
     const intervalMs = 10_000;
 
-    console.log(
-        `video-processing worker started: intervalMs=${intervalMs}, batchSize=${batchSize}`,
-    );
+    console.log(`video-processing worker started: intervalMs=${intervalMs}`);
 
     while (!isStopRequested()) {
-        const pendingVideos = await fetchUnprocessedVideoRevisions(batchSize);
-        if (pendingVideos.length === 0) {
-            // One per cycle: each step downloads its whole source, and new uploads must not wait behind them.
-            try {
-                const step = await takeNextStep();
-                if (step) {
-                    await processStep(step);
-                }
-            } catch (error) {
-                console.error("Error processing a step:", error);
-            }
-        } else {
-            let successCounter = 0;
-            let failureCounter = 0;
-            console.log(`Found ${pendingVideos.length} pending videos, processing...`);
-            for (const videoRev of pendingVideos) {
-                if (isStopRequested()) {
-                    break;
-                }
+        // Stays null when processNext throws, so a repeating error waits like an empty queue.
+        let status: JobStatus | null = null;
 
-                try {
-                    const status = await processVideo(videoRev.filePath, videoRev.videoId, videoRev.id);
-                    if (status === JobStatus.succeeded) {
-                        successCounter += 1;
-                    } else {
-                        failureCounter += 1;
-                    }
-                } catch (error) {
-                    console.error(`Error processing videoRevId ${videoRev.id}:`, error);
-                }
-            }
-            console.log(`video-processing cycle: processed=${pendingVideos.length} videos, success=${successCounter}, failure=${failureCounter}`);
+        try {
+            status = await processNext();
+        } catch (error) {
+            console.error("Error processing the next video or step:", error);
         }
 
-        if (!isStopRequested()) {
+        if (status === null && !isStopRequested()) {
             await sleep(intervalMs);
         }
     }
@@ -77,15 +37,10 @@ async function runOnceLoop(): Promise<void> {
     console.log("video-processing worker started: once");
 
     while (!isStopRequested()) {
-        const step = await takeNextStep();
-        if (!step) {
-            break;
-        }
+        const status = await processNext();
 
-        const status = await processStep(step);
-
-        // A step put back to pending on stop counts as neither processed nor failed.
-        if (status === JobStatus.pending) {
+        // Work that stop interrupted counts as neither processed nor failed.
+        if (status === null || status === JobStatus.pending) {
             break;
         }
 
@@ -96,7 +51,7 @@ async function runOnceLoop(): Promise<void> {
         }
     }
 
-    console.log(`video-processing once: processed=${processedCounter} steps, failure=${failureCounter}`);
+    console.log(`video-processing once: processed=${processedCounter}, failure=${failureCounter}`);
 }
 
 export async function runLocalWorker(): Promise<void> {
