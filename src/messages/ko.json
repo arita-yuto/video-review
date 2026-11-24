@@ -259,6 +259,8 @@
         "editProfile": "프로필 편집",
         "administration": "관리",
         "updateAvailable": "{version} 사용 가능",
+        "unprocessedVideos": "변환 대기 동영상 {count}개",
+        "processingGuide": "썸네일과 저해상도 생성 중 (가이드 열기)",
         "editPrompt": "프롬프트 편집"
     },
     "release-dialog": {

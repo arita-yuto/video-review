@@ -259,6 +259,8 @@
         "editProfile": "Edit profile",
         "administration": "Administration",
         "updateAvailable": "{version} available",
+        "unprocessedVideos": "{count, plural, one {# video} other {# videos}} to convert",
+        "processingGuide": "Making thumbnails and lower resolutions (opens the guide)",
         "editPrompt": "Edit prompt"
     },
     "release-dialog": {

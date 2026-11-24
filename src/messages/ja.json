@@ -259,6 +259,8 @@
         "editProfile": "プロフィール編集",
         "administration": "管理",
         "updateAvailable": "{version} 公開中",
+        "unprocessedVideos": "{count, plural, one {# video} other {# videos}} to convert",
+        "processingGuide": "サムネイルと低解像度を作成中（ガイドを開く）",
         "editPrompt": "プロンプト編集"
     },
     "release-dialog": {

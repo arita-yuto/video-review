@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CircleArrowUp, Globe, LogOut, Settings, ShieldUser, Tag, UserPen } from "lucide-react";
+import { CircleArrowUp, ExternalLink, Globe, LogOut, RefreshCw, Settings, ShieldUser, Tag, UserPen } from "lucide-react";
 import { useLatestRelease } from "@/components/hooks/use-latest-release";
+import { useProcessingStatus } from "@/components/hooks/use-processing-status";
 import { useRunningVersion } from "@/components/hooks/use-running-version";
 import { ReleaseDialog } from "@/components/admin/release-dialog";
 import { Locales, useLocale } from "@/app/locale-provider";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { isAdmin, isGuest } from "@/lib/role";
+import { createDocsLink } from "@/lib/url";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import {
     DropdownMenu,
@@ -25,6 +27,7 @@ import {
 } from "@/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/ui/sidebar";
 import { Button } from "@/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 import { AccountSummary } from "@/components/account/account-summary";
 import { AccountAvatar } from "@/components/controls/account-avatar";
 import EditUserProfileDialog from "@/components/account/edit-user-profile";
@@ -33,6 +36,7 @@ import AdminSettingsDialog from "@/components/admin/admin-settings";
 // `compact` renders an avatar-only trigger for a title row instead of the footer row.
 export function AccountMenu({ compact = false }: { compact?: boolean }) {
     const t = useTranslations("setting");
+    const { locale } = useLocale();
     const { verifyAuth, role, displayName, email } = useAuthStore();
     const isMobile = useIsMobile();
 
@@ -40,6 +44,7 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
     const [editProfileOpen, setEditProfileOpen] = useState(false);
     const [adminSettingsOpen, setAdminSettingsOpen] = useState(false);
     const [releaseOpen, setReleaseOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
         void (async () => {
@@ -53,20 +58,23 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
 
     const latest = useLatestRelease(isLogged && isAdmin(role));
     const running = useRunningVersion();
+    const processingStatus = useProcessingStatus(isLogged && isAdmin(role), menuOpen);
+    const unprocessedCount = (processingStatus?.waiting ?? 0) + (processingStatus?.processing ?? 0);
+    const hasNotice = latest !== null || unprocessedCount > 0;
 
     const menu = (
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
                 {compact ? (
                     <Button variant="ghost" size="icon-sm" aria-label={t("title")} className="relative">
                         <AccountAvatar email={email} className="size-6" />
-                        {latest && <span className="notice-dot" />}
+                        {hasNotice && <span className="notice-dot" />}
                     </Button>
                 ) : (
                     <SidebarMenuButton size="lg" aria-label={t("title")} className="relative">
                         <AccountSummary displayName={displayName ?? ""} email={email} />
                         <Settings />
-                        {latest && <span className="notice-dot" />}
+                        {hasNotice && <span className="notice-dot" />}
                     </SidebarMenuButton>
                 )}
             </DropdownMenuTrigger>
@@ -89,6 +97,20 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
                         <Tag />
                         {running}
                     </DropdownMenuItem>
+                )}
+                {unprocessedCount > 0 && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <DropdownMenuItem asChild>
+                                <a href={createDocsLink("features/video-processing", locale)} target="_blank" rel="noopener noreferrer">
+                                    <RefreshCw />
+                                    {t("unprocessedVideos", { count: unprocessedCount })}
+                                    <ExternalLink className="ml-auto" />
+                                </a>
+                            </DropdownMenuItem>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">{t("processingGuide")}</TooltipContent>
+                    </Tooltip>
                 )}
                 {isLogged && !isGuest(role) && (
                     <DropdownMenuItem onSelect={() => setEditProfileOpen(true)}>

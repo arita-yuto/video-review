@@ -61,3 +61,9 @@ export function createVideoEventLink(baseURL: string, videoId: string | null, vi
     }
     return `${baseURL}/video-review/review/${videoId}?revision=${videoRevId}&event=${eventId}`;
 }
+
+export function createDocsLink(page: string, locale: string): string {
+    // The docs have no Korean pages, so every locale but ja reads the English ones.
+    const prefix = locale === "ja" ? "ja/" : "";
+    return `https://arita-yuto.github.io/video-review/${prefix}${page}/`;
+}
