@@ -5,31 +5,34 @@ sidebar:
   order: 5
 ---
 After a video is uploaded, the worker (`video-processing`) makes its thumbnail and lower-resolution copies.  
-This guide shows how to process many waiting videos at once with `run-once`.
+When many videos are waiting, `run-once` processes them in one go.
 
 ---
 
-## 1. Check the count in the admin account menu
+## 1. Check how many are waiting
 
-When videos are waiting, the account menu of an admin shows how many.
+When videos are waiting, the account menu shows the count to admins.
 
 <img width="660" src="/video-review/images/features/video-processing/account-menu.webp" />
 
-Note: the count is refreshed each time the menu opens.
+Note: the count refreshes each time the menu opens.
 
 ---
 
-## 2. Process the waiting videos with run-once
+## 2. Process them with run-once
 
 `run-once` processes every waiting video, then exits.  
 It can run alongside a worker that is already running.
 
-##### To finish sooner
-Run it on the server that runs the worker, or on another machine.
+##### Many videos are waiting
+When an upgrade queues every video for re-encoding, for example, a single worker takes a long time.  
+Run `run-once` on the worker's server or on another machine, and it works through the queue alongside the worker.
 
-##### With S3 + Lambda
-The Lambda only processes videos as they are uploaded.  
-Videos that an upgrade queued for re-encoding are processed by `run-once`.
+##### S3 + Lambda
+The Lambda only handles videos as they are uploaded,  
+so videos that an upgrade queues for re-encoding are processed with `run-once`.
+
+Note: running it on an EC2 instance in the same region as the bucket keeps transfer costs down.
 
 ### Docker
 
@@ -57,8 +60,9 @@ Run it in the install folder.
 
 ---
 
-## 3. Re-encode a failed video with reencode-video
+## 3. Re-encode with reencode-video
 
-A video whose lower-resolution copies could not be made is queued again with the maintenance CLI ([Maintenance CLI guide](/video-review/features/maintenance-cli/)).
+If a video's lower-resolution copies failed, queue it again with the maintenance CLI.  
+[Maintenance CLI guide](/video-review/features/maintenance-cli/)
 
 > go run . reencode-video --video_id {uuid}
