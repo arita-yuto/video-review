@@ -5,6 +5,8 @@ import mermaid from "astro-mermaid";
 export default defineConfig({
     site: "https://arita-yuto.github.io",
     base: "/video-review",
+    // Smart punctuation turns the "--" of a command-line flag into a dash.
+    markdown: { smartypants: false },
     integrations: [
         mermaid(),
         starlight({

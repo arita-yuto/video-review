@@ -9,7 +9,7 @@ sidebar:
 
 ---
 
-## 1. admin のアカウントのメニューで本数を確認
+## 1. 処理待ちの本数を確認
 
 処理待ちの動画があると、admin のアカウントのメニューに本数が出ます
 
@@ -19,17 +19,21 @@ sidebar:
 
 ---
 
-## 2. run-once で処理待ちの動画を処理
+## 2. run-once でまとめて処理
 
 `run-once` は、処理待ちの動画をすべて処理して終了するコマンドです  
 動いている worker と同時に実行できます
 
-##### 早く終わらせたい
-worker を動かしているサーバーや、別のマシンで実行します
+##### 処理待ちの動画が多い
+アップグレードで全ての動画が再エンコード待ちになったときなど、  
+worker 1 つでは時間がかかります  
+worker のサーバーや別のマシンで `run-once` を実行すると、worker と並行して処理が進みます
 
 ##### S3 + Lambda の構成
-Lambda はアップロードされた動画だけを処理します  
-アップグレードで再エンコードが必要になった動画は、`run-once` で処理します
+Lambda はアップロードされた動画だけを処理するため、  
+アップグレードで再エンコード待ちになった動画は `run-once` で処理します
+
+※ S3 と同じリージョンの EC2 などで実行すると、動画の転送料金を抑えられます
 
 ### Docker
 
@@ -57,8 +61,9 @@ docker run --rm --env-file .env ghcr.io/arita-yuto/video-review/video-processing
 
 ---
 
-## 3. 失敗した動画を reencode-video で再エンコード
+## 3. reencode-video で再エンコード
 
-低解像度の動画を作れなかった動画は、メンテナンス CLI でキューに入れ直します（[メンテナンス CLI ガイド](/video-review/ja/features/maintenance-cli/)）
+低解像度の作成に失敗した動画は、メンテナンス CLI でキューに入れ直します  
+[メンテナンス CLI ガイド](/video-review/ja/features/maintenance-cli/)
 
 > go run . reencode-video --video_id {uuid}
