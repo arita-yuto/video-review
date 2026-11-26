@@ -4,7 +4,8 @@ import { externalLinksRouter } from "@/server/routes/comments/[id]/external-link
 import { issueRouter } from "@/server/routes/comments/[id]/issue";
 import { drawingRouter } from "@/server/routes/comments/[id]/drawing";
 import { transitionsRouter } from "@/server/routes/comments/[id]/transitions";
-import { VideoCommentSchema } from "@/schema/zod";
+import { reactionsRouter } from "@/server/routes/comments/[id]/reactions";
+import { CommentResponseSchema, commentResponse } from "@/server/lib/videos/comment-response";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorizeComment } from "@/server/lib/videos/guest-access";
 
@@ -19,7 +20,7 @@ export const byIdRouter = createRouter()
                 description: "Comment retrieved successfully",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema,
+                        schema: CommentResponseSchema,
                     },
                 },
             },
@@ -31,9 +32,10 @@ export const byIdRouter = createRouter()
     }), async (c) => {
         const { comment } = await authorizeComment(c.req.raw, ["guest", "viewer", "admin"], c.req.param("id") as string);
 
-        return c.json(comment, 200);
+        return c.json(await commentResponse(comment), 200);
     })
     .route("external-links", externalLinksRouter)
     .route("issue", issueRouter)
     .route("drawing", drawingRouter)
-    .route("transitions", transitionsRouter);
+    .route("transitions", transitionsRouter)
+    .route("reactions", reactionsRouter);

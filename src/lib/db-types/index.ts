@@ -9,7 +9,9 @@ export type UploadSession = JSONParsed<Row.UploadSession>;
 export type User = JSONParsed<Row.User>;
 export type UserVideoReadStatus = JSONParsed<Row.UserVideoReadStatus>;
 export type Identity = JSONParsed<Row.Identity>;
-export type VideoComment = JSONParsed<Row.VideoComment>;
+export type VideoComment = JSONParsed<Row.VideoComment> & {
+    reactions: { kind: string; userId: string; userName: string; userEmail: string | null }[];
+};
 export type VideoEvent = JSONParsed<Row.VideoEvent>;
 export type VideoEventKind = JSONParsed<Row.VideoEventKind>;
 

@@ -2,11 +2,12 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faThumbsUp, faComment, faPalette, faClipboardList, faHammer, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { faComment, faPalette, faClipboardList, faHammer, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import type { IssueStatusCategory } from "@/lib/issue-types";
 import { useCommentStore } from "@/components/review/stores/comment-store";
 import { VideoComment } from "@/lib/db-types";
 import { TimelineCardFooter } from "@/components/review/side-panel/timeline-card";
+import { ReactionChips } from "@/components/review/side-panel/comment-panel/comment-card/reaction-chips";
 import { api } from "@/api";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,13 +20,8 @@ export default function CommentCardFooter(props: { comment: VideoComment }) {
         done: { icon: faCircleCheck, tone: "text-success" },
     };
 
-    const { incrementThumbsUpCount } = useCommentStore();
     const issue = useCommentStore((s) => (props.comment.issueId ? s.issues[props.comment.issueId] : undefined));
     const [externalLinks, setExternalLinks] = useState<Record<string, string> | null>(null);
-
-    const handleLike = (id: string) => {
-        incrementThumbsUpCount(id);
-    }
 
     const openExternalLink = async (type: "slack" | "jira") => {
         if (externalLinks?.[type]) {
@@ -70,17 +66,7 @@ export default function CommentCardFooter(props: { comment: VideoComment }) {
                         <FontAwesomeIcon icon={faPalette} />
                     </Button>
                 )}
-                <Button
-                    variant="chip"
-                    size="chip"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleLike(props.comment.id);
-                    }}
-                >
-                    <FontAwesomeIcon icon={faThumbsUp} />
-                    {props.comment.thumbsUp ?? 0}
-                </Button>
+                <ReactionChips comment={props.comment} />
             </div>
         </TimelineCardFooter>
     );

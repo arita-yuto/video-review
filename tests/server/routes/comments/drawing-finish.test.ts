@@ -11,6 +11,7 @@ const prismaMock = vi.hoisted(() => ({
         findUnique: vi.fn(),
         update: vi.fn(),
     },
+    videoCommentReaction: { findMany: vi.fn(async () => []) },
 }));
 
 vi.mock("@/server/lib/token", async (importOriginal) => ({

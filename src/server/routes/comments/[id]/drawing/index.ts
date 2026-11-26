@@ -4,7 +4,7 @@ import { authorizeComment } from "@/server/lib/videos/guest-access";
 import { prisma } from "@/server/lib/db";
 import { VideoReviewStorage } from "@/server/lib/storage";
 import { errorResponse } from "@/server/lib/openapi/error-response";
-import { VideoCommentSchema } from "@/schema/zod";
+import { CommentResponseSchema, commentResponse } from "@/server/lib/videos/comment-response";
 import { initRouter } from "@/server/routes/comments/[id]/drawing/init";
 import { finishRouter } from "@/server/routes/comments/[id]/drawing/finish";
 import { broadcastComments } from "@/server/lib/video-stream";
@@ -20,7 +20,7 @@ export const drawingRouter = createRouter()
                 description: "Drawing removed",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema,
+                        schema: CommentResponseSchema,
                     },
                 },
             },
@@ -36,7 +36,7 @@ export const drawingRouter = createRouter()
         }
 
         if (!comment.hasDrawing) {
-            return c.json(comment, 200);
+            return c.json(await commentResponse(comment), 200);
         }
 
         const updated = await prisma.videoComment.update({
@@ -48,7 +48,7 @@ export const drawingRouter = createRouter()
         if (comment.drawingPath) {
             await VideoReviewStorage.deleteObject(comment.drawingPath);
         }
-        return c.json(updated, 200);
+        return c.json(await commentResponse(updated), 200);
     })
     .route("init", initRouter)
     .route("finish", finishRouter);
