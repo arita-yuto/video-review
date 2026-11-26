@@ -30,20 +30,13 @@ export const latestRouter = createRouter()
         await authorizeVideo(c.req.raw, ["viewer", "admin"], videoId);
 
         try {
-            const latest = await prisma.$queryRaw<
-                { latestCommentId: string | null }[]
-            >`
-            SELECT c.id AS "latestCommentId"
-            FROM "VideoComment" c
-            WHERE c."videoId" = ${videoId} AND c.deleted = false
-            ORDER BY c."createdAt" DESC
-            LIMIT 1
-        `;
+            const latest = await prisma.videoComment.findFirst({
+                where: { videoId, deleted: false },
+                orderBy: { createdAt: "desc" },
+                select: { id: true },
+            });
 
-            const latestCommentId =
-                latest.length > 0 ? latest[0].latestCommentId : null;
-
-            return c.json({ latestCommentId }, 200);
+            return c.json({ latestCommentId: latest?.id ?? null }, 200);
         } catch {
             return c.json({ error: "failed to fetch latest comment" }, 500);
         }
