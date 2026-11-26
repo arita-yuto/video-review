@@ -137,7 +137,6 @@
         "slowLoading": "로딩 지연",
         "switchResolution": "{resolution}로 전환",
         "syncPlayback": "동기 재생",
-        "moreParticipants": "외 {count}명",
         "present": "발표하기",
         "stopPresenting": "발표 종료",
         "presenting": "{name} 님이 발표 중",
@@ -156,6 +155,7 @@
         "title": "댓글",
         "newBadge": "NEW",
         "followPlayback": "따라가기",
+        "reactionFailed": "반응 실패",
         "revisionPlaying": "재생 중인 리비전",
         "revisionRange": "범위",
         "revisionAll": "전체",
@@ -209,6 +209,9 @@
         "title": "공유 링크",
         "helperText": "Ctrl+C로 복사해서 공유하세요",
         "close": "닫기"
+    },
+    "people-list": {
+        "more": "외 {count}명"
     },
     "prompt-edit": {
         "title": "프롬프트 편집",

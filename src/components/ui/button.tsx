@@ -24,7 +24,9 @@ const buttonVariants = cva(
         // Icon-only actions in panel headers; data-active marks an engaged filter or toggle.
         toolbar: "text-primary hover:text-primary-strong data-[active=true]:text-success",
         // Small clickable chips under a comment (issue, Slack, like).
-        chip: "bg-foreground text-background hover:bg-secondary hover:text-primary",
+        chip: "bg-foreground text-background hover:bg-secondary hover:text-primary aria-disabled:hover:bg-foreground aria-disabled:hover:text-background",
+        // A chip the viewer has switched on (their own like).
+        "chip-pressed": "bg-primary text-primary-foreground hover:bg-primary/90",
         inline: "text-muted-foreground hover:text-primary",
         "inline-destructive": "text-muted-foreground hover:text-destructive",
       },

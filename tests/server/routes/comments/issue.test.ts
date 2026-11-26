@@ -8,6 +8,7 @@ const prismaMock = vi.hoisted(() => ({
         findUnique: vi.fn(),
         update: vi.fn(),
     },
+    videoCommentReaction: { findMany: vi.fn(async () => []) },
     user: { findUnique: vi.fn() },
     // Nothing saved from the admin screen, so the Jira values come from env.
     systemSetting: { findUnique: vi.fn().mockResolvedValue(null) },

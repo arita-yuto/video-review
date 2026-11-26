@@ -8,6 +8,7 @@ const prismaMock = vi.hoisted(() => ({
         findUnique: vi.fn(async () => ({ userId: "u", videoId: "video-1" })),
         update: vi.fn(),
     },
+    videoCommentReaction: { findMany: vi.fn(async () => []) },
 }));
 
 vi.mock("@/server/lib/db", () => ({ prisma: prismaMock }));

@@ -137,7 +137,6 @@
         "slowLoading": "読み込みに時間がかかっています",
         "switchResolution": "{resolution} に切り替え",
         "syncPlayback": "同期再生",
-        "moreParticipants": "他 {count} 人",
         "present": "発表する",
         "stopPresenting": "発表を終える",
         "presenting": "{name} が発表中",
@@ -156,6 +155,7 @@
         "title": "Comments",
         "newBadge": "NEW",
         "followPlayback": "再生位置へ",
+        "reactionFailed": "リアクション失敗",
         "revisionPlaying": "再生中の Rev",
         "revisionRange": "Range",
         "revisionAll": "All",
@@ -209,6 +209,9 @@
         "title": "共有リンク",
         "helperText": "Ctrl+Cでコピーして共有してね",
         "close": "閉じる"
+    },
+    "people-list": {
+        "more": "他 {count} 人"
     },
     "prompt-edit": {
         "title": "プロンプト編集",

@@ -168,9 +168,25 @@ model VideoComment {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
   deleted           Boolean         @default(false)
+  /// Not read; the thumbs-up count comes from VideoCommentReaction.
   thumbsUp          Int             @default(0)
 
+  reactions         VideoCommentReaction[]
+
   @@index([videoId, videoRevNum])
+}
+
+model VideoCommentReaction {
+  id        String   @id @default(uuid())
+  commentId String
+  userId    String
+  userName  String
+  kind      String
+  createdAt DateTime @default(now())
+
+  comment VideoComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, kind])
 }
 
 model SlackMessage {

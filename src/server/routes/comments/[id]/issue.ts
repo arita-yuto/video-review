@@ -5,7 +5,7 @@ import { ServerError } from "@/server/lib/server-error";
 import { issueTracker } from "@/server/lib/issue-tracker";
 import { createRoute, z } from "@hono/zod-openapi";
 import { createRouter } from "@/server/lib/openapi/router";
-import { VideoCommentSchema } from "@/schema/zod";
+import { CommentResponseSchema, commentResponse } from "@/server/lib/videos/comment-response";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { broadcastComments } from "@/server/lib/video-stream";
 
@@ -37,7 +37,7 @@ export const issueRouter = createRouter()
                 description: "Issue created and linked; returns the updated comment",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema,
+                        schema: CommentResponseSchema,
                     },
                 },
             },
@@ -95,7 +95,7 @@ export const issueRouter = createRouter()
                 data: { issueId: issueKey, updatedAt: new Date() },
             });
             broadcastComments(updated.videoId);
-            return c.json(updated, 200);
+            return c.json(await commentResponse(updated), 200);
         } catch (e) {
             if (e instanceof ServerError) {
                 return c.json({ error: e.message }, e.status as 401 | 403 | 500);

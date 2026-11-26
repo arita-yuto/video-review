@@ -7,6 +7,7 @@ const prismaMock = vi.hoisted(() => ({
     videoRevision: {
         findMany: vi.fn(async () => [{ revision: 3 }, { revision: 5 }, { revision: 6 }]),
     },
+    videoCommentReaction: { findMany: vi.fn(async () => []) },
 }));
 const authorizeMock = vi.hoisted(() => vi.fn(async () => ({ type: "jwt" as const, decoded: { id: "viewer-1", role: "viewer" } })));
 

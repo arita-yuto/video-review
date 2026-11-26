@@ -9,7 +9,7 @@ import { issueTypesRouter } from "@/server/routes/comments/issue-types";
 import { issueLookupRouter } from "@/server/routes/comments/issue-lookup";
 import { z } from "zod";
 import { toDateRange } from "@/lib/utils/date-helper";
-import { VideoCommentSchema } from "@/schema/zod";
+import { CommentResponseSchema, commentResponse, commentResponses } from "@/server/lib/videos/comment-response";
 import { errorResponse } from "@/server/lib/openapi/error-response";
 import { authorize, roleOf, userIdOrNull } from "@/server/lib/token";
 import { ServerError } from "@/server/lib/server-error";
@@ -48,7 +48,6 @@ const UpdateCommentBody = z.object({
     id: z.string().min(1),
     comment: z.string().optional(),
     issueId: z.string().nullable().optional(),
-    thumbsUp: z.boolean().optional(),
     deleted: z.boolean().optional(),
     notifiedProviders: z.string().array().optional(),
 });
@@ -65,7 +64,7 @@ export const commentsRouter = createRouter()
                 description: "Comments retrieved successfully",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema.array(),
+                        schema: CommentResponseSchema.array(),
                     },
                 },
             },
@@ -141,7 +140,7 @@ export const commentsRouter = createRouter()
                 orderBy: { time: "asc" }
             });
 
-            return c.json(comments, 200);
+            return c.json(await commentResponses(comments), 200);
         } catch {
             return c.json({ error: "failed to fetch comments" }, 500);
         }
@@ -164,7 +163,7 @@ export const commentsRouter = createRouter()
                 description: "Comment created",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema,
+                        schema: CommentResponseSchema,
                     },
                 },
             },
@@ -211,7 +210,7 @@ export const commentsRouter = createRouter()
             });
             broadcastComments(videoId);
 
-            return c.json(result, 201);
+            return c.json(await commentResponse(result), 201);
         } catch {
             return c.json({ error: "failed to create comment" }, 500);
         }
@@ -234,7 +233,7 @@ export const commentsRouter = createRouter()
                 description: "Comment updated",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema,
+                        schema: CommentResponseSchema,
                     },
                 },
             },
@@ -245,10 +244,10 @@ export const commentsRouter = createRouter()
             500: errorResponse("Failed to update comment"),
         },
     }), async (c) => {
-        const { id, comment, deleted, issueId, thumbsUp, notifiedProviders } = c.req.valid("json");
+        const { id, comment, deleted, issueId, notifiedProviders } = c.req.valid("json");
         const { auth, comment: target } = await authorizeComment(c.req.raw, ["guest", "viewer", "admin"], id);
 
-        // Thumbs up and the notification record stay open to everyone.
+        // The notification record stays open to everyone.
         const editsAuthorFields = comment !== undefined || issueId !== undefined || deleted !== undefined;
         if (editsAuthorFields && !canEditComment(target, roleOf(auth), userIdOrNull(auth))) {
             throw new ServerError("forbidden", 403);
@@ -277,9 +276,6 @@ export const commentsRouter = createRouter()
             if (deleted === true) {
                 updateData.hasDrawing = false;
             }
-            if (thumbsUp === true) {
-                updateData.thumbsUp = { increment: 1 };
-            }
             if (notifiedProviders) {
                 updateData.notifiedProviders = notifiedProviders;
             }
@@ -294,7 +290,7 @@ export const commentsRouter = createRouter()
                 await VideoReviewStorage.deleteObject(updated.drawingPath);
             }
 
-            return c.json(updated, 200);
+            return c.json(await commentResponse(updated), 200);
         } catch {
             return c.json({ error: "failed to update comment" }, 500);
         }
