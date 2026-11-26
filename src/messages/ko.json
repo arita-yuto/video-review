@@ -155,6 +155,7 @@
         "title": "댓글",
         "newBadge": "NEW",
         "followPlayback": "따라가기",
+        "reactionFailed": "반응 실패",
         "revisionPlaying": "재생 중인 리비전",
         "revisionRange": "범위",
         "revisionAll": "전체",

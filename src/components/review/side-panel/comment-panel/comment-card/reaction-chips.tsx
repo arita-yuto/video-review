@@ -10,8 +10,11 @@ import { isGuest } from "@/lib/role";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PeopleList } from "@/components/controls/people-list";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 function ReactionChip(props: { comment: VideoComment; kind: ReactionKind; icon: IconDefinition }) {
+    const t = useTranslations("video-comment-panel");
     const { addReaction, removeReaction } = useCommentStore();
     const userId = useAuthStore((s) => s.userId);
     const role = useAuthStore((s) => s.role);
@@ -26,11 +29,8 @@ function ReactionChip(props: { comment: VideoComment; kind: ReactionKind; icon: 
             return;
         }
 
-        if (pressed) {
-            removeReaction(props.comment.id, props.kind);
-        } else {
-            addReaction(props.comment.id, props.kind);
-        }
+        const change = pressed ? removeReaction : addReaction;
+        change(props.comment.id, props.kind).catch((e: Error) => toast.error(`${t("reactionFailed")}: ${e.message}`));
     };
 
     return (

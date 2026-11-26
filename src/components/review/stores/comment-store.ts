@@ -153,7 +153,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
     addReaction: async (id, kind) => {
         const res = await api.comments[":id"].reactions[":kind"].$put({ param: { id, kind } });
         if (res.status !== 200) {
-            throw new Error("Failed to add reaction");
+            throw new Error(await readError(res));
         }
 
         const updated = await res.json();
@@ -164,7 +164,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
     removeReaction: async (id, kind) => {
         const res = await api.comments[":id"].reactions[":kind"].$delete({ param: { id, kind } });
         if (res.status !== 200) {
-            throw new Error("Failed to remove reaction");
+            throw new Error(await readError(res));
         }
 
         const updated = await res.json();
