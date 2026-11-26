@@ -8,6 +8,7 @@ const prismaMock = vi.hoisted(() => ({
         findUnique: vi.fn(),
         update: vi.fn(),
     },
+    videoCommentReaction: { findMany: vi.fn(async () => []) },
     systemSetting: { findUnique: vi.fn().mockResolvedValue(null) },
     systemSecret: { findUnique: vi.fn().mockResolvedValue(null) },
 }));

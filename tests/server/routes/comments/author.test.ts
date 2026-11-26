@@ -9,6 +9,9 @@ const prismaMock = vi.hoisted(() => ({
     video: {
         findUnique: vi.fn(async () => ({ guestVisible: true })),
     },
+    videoCommentReaction: {
+        findMany: vi.fn(async () => []),
+    },
 }));
 const authorizeMock = vi.hoisted(() => vi.fn());
 
@@ -54,10 +57,10 @@ describe("comment author", () => {
         expect(prismaMock.videoComment.update).not.toHaveBeenCalled();
     });
 
-    it("lets anyone thumb up a comment", async () => {
+    it("lets anyone record a notification on a comment", async () => {
         authorizeMock.mockResolvedValue(viewer("someone-else"));
 
-        const res = await patch({ thumbsUp: true });
+        const res = await patch({ notifiedProviders: ["slack"] });
 
         expect(res.status).toBe(200);
         expect(prismaMock.videoComment.update).toHaveBeenCalledTimes(1);

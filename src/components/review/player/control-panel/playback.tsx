@@ -32,6 +32,7 @@ import { EPlayMode, useVideoPlayerStore, type PlaybackSettingId } from "@/compon
 import { useConfigStore } from "@/components/stores/config-store";
 import { usePlaybackWidth } from "@/components/review/player/hooks/use-playback-width";
 import { AccountAvatar } from "@/components/controls/account-avatar";
+import { PeopleList } from "@/components/controls/people-list";
 
 export function PlayButton() {
     const t = useTranslations("video-control-panel");
@@ -251,25 +252,6 @@ export function PlaybackSettingsMenu({ settings }: { settings: PlaybackSetting[]
     );
 }
 
-function SyncParticipants() {
-    const SHOWN_PARTICIPANTS = 5;
-    const t = useTranslations("video-control-panel");
-    const participants = usePlayback((s) => s.participants);
-    const hidden = participants.length - SHOWN_PARTICIPANTS;
-
-    return (
-        <div className="flex flex-col gap-1">
-            {participants.slice(0, SHOWN_PARTICIPANTS).map((p, i) => (
-                <div key={i} className="flex items-center gap-2">
-                    <AccountAvatar email={p.email} className="size-5" />
-                    {p.name}
-                </div>
-            ))}
-            {hidden > 0 && <span>{t("moreParticipants", { count: hidden })}</span>}
-        </div>
-    );
-}
-
 export function SyncButton({ videoId }: { videoId: string | null }) {
     const t = useTranslations("video-control-panel");
     const syncing = useSyncing(videoId);
@@ -318,7 +300,7 @@ export function SyncButton({ videoId }: { videoId: string | null }) {
                     </Toggle>
                 </TooltipTrigger>
                 <TooltipContent>
-                    {participants.length === 0 ? t("syncPlayback") : <SyncParticipants />}
+                    {participants.length === 0 ? t("syncPlayback") : <PeopleList people={participants} />}
                 </TooltipContent>
             </Tooltip>
             <ShareLinkDialog url={syncLink ?? ""} open={syncLink !== null} onOpenChange={closeLink} />

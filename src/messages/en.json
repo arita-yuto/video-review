@@ -137,7 +137,6 @@
         "slowLoading": "Loading is slow",
         "switchResolution": "Switch to {resolution}",
         "syncPlayback": "Sync playback",
-        "moreParticipants": "+{count} more",
         "present": "Present",
         "stopPresenting": "Stop presenting",
         "presenting": "{name} is presenting",
@@ -209,6 +208,9 @@
         "title": "Share link",
         "helperText": "Copy and share using Ctrl+C.",
         "close": "Close"
+    },
+    "people-list": {
+        "more": "+{count} more"
     },
     "prompt-edit": {
         "title": "Prompt editor",

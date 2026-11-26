@@ -10,6 +10,7 @@ const prismaMock = vi.hoisted(() => ({
         update: vi.fn(),
         findMany: vi.fn(),
     },
+    videoCommentReaction: { findMany: vi.fn(async () => []) },
 }));
 
 const authorizeMock = vi.hoisted(() => vi.fn());

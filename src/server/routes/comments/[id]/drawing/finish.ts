@@ -6,7 +6,7 @@ import { errorResponse } from "@/server/lib/openapi/error-response";
 import { prisma } from "@/server/lib/db";
 import { VideoReviewStorage } from "@/server/lib/storage";
 import { drawingKey } from "@/lib/storage-key";
-import { VideoCommentSchema } from "@/schema/zod";
+import { CommentResponseSchema, commentResponse } from "@/server/lib/videos/comment-response";
 import { broadcastComments } from "@/server/lib/video-stream";
 
 export const finishRouter = createRouter()
@@ -21,7 +21,7 @@ export const finishRouter = createRouter()
                 description: "Drawing upload finished successfully",
                 content: {
                     "application/json": {
-                        schema: VideoCommentSchema,
+                        schema: CommentResponseSchema,
                     },
                 },
             },
@@ -59,5 +59,5 @@ export const finishRouter = createRouter()
             await VideoReviewStorage.deleteObject(comment.drawingPath);
         }
         await deleteSession(session_id);
-        return c.json(updated, 200);
+        return c.json(await commentResponse(updated), 200);
     });

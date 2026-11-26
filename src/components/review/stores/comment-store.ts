@@ -8,13 +8,15 @@ import { useVideoStore } from "@/components/stores/video-store";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { revisionQuery, useCommentSearchStore } from "@/components/review/stores/comment-search-store";
 
+export type ReactionKind = InferRequestType<typeof api.comments[":id"]["reactions"][":kind"]["$put"]>["param"]["kind"];
+
 interface CommentState {
     comments: VideoComment[];
     displayComments: VideoComment[];
     loading: boolean;
     // Videos with comments this user hasn't read, across the whole list.
     unreadVideoIds: ReadonlySet<string>;
-    // The list as a live refresh left it; the panel keeps the reader's scroll and read state for it.
+    // The list as a live refresh or a reaction left it; the reader's scroll and read state are kept for it.
     liveComments: VideoComment[] | null;
     // Tracker issues by key, for the comments of the selected video.
     issues: Record<string, Issue>;
@@ -26,7 +28,8 @@ interface CommentState {
     addComment: (c: InferRequestType<typeof api.comments.index.$post>["json"]) => Promise<string>;
     updateComment: (comment: VideoComment) => void;
     deleteComment: (id: string) => Promise<void>;
-    incrementThumbsUpCount: (id: string) => Promise<void>;
+    addReaction: (id: string, kind: ReactionKind) => Promise<void>;
+    removeReaction: (id: string, kind: ReactionKind) => Promise<void>;
     issueLinkedComment: (id: string, issueType: string, screenshot: Blob | null) => Promise<void>;
     loadUnread: () => Promise<void>;
     markRead: (videoId: string) => Promise<void>;
@@ -147,13 +150,26 @@ export const useCommentStore = create<CommentState>((set, get) => ({
         set({ comments: get().comments.filter((c) => c.id !== id) });
     },
 
-    incrementThumbsUpCount: async (id) => {
-        const res = await api.comments.index.$patch({ json: { id, thumbsUp: true } });
-        if (res.status !== 200) throw new Error("Failed to update comment");
+    addReaction: async (id, kind) => {
+        const res = await api.comments[":id"].reactions[":kind"].$put({ param: { id, kind } });
+        if (res.status !== 200) {
+            throw new Error("Failed to add reaction");
+        }
+
         const updated = await res.json();
-        set({
-            comments: get().comments.map((c) => (c.id === id ? updated : c)),
-        });
+        const comments = get().comments.map((c) => (c.id === id ? updated : c));
+        set({ comments, liveComments: comments });
+    },
+
+    removeReaction: async (id, kind) => {
+        const res = await api.comments[":id"].reactions[":kind"].$delete({ param: { id, kind } });
+        if (res.status !== 200) {
+            throw new Error("Failed to remove reaction");
+        }
+
+        const updated = await res.json();
+        const comments = get().comments.map((c) => (c.id === id ? updated : c));
+        set({ comments, liveComments: comments });
     },
 
     loadUnread: async () => {
