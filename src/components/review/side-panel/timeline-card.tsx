@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// The border colour shows selected, active or linked; a revision adds a bar in its colour.
+// The border colour shows selected, active, linked or new; a revision adds a bar in its colour.
 const timelineCardVariants = cva(
-    "bg-card text-card-foreground flex flex-col gap-2 rounded-xl border py-3 shadow-sm cursor-pointer transition-colors hover:bg-card/80",
+    "bg-card text-card-foreground flex flex-col gap-2 rounded-xl border py-3 shadow-sm cursor-pointer transition-colors hover:bg-muted",
     {
         variants: {
             state: {
@@ -12,6 +12,7 @@ const timelineCardVariants = cva(
                 selected: "border-primary bg-primary/20",
                 active: "border-foreground",
                 link: "border-info",
+                new: "border-destructive",
             },
         },
         defaultVariants: { state: "none" },

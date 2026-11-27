@@ -299,6 +299,20 @@
         "currentPasswordRequired": "Enter your current password",
         "currentPasswordWrong": "Current password is incorrect"
     },
+    "activity": {
+        "title": "Activity",
+        "empty": "No activity",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "loadMore": "Load more",
+        "newDivider": "New",
+        "filters": {
+            "all": "All",
+            "comment": "Comments",
+            "upload": "Uploads",
+            "reaction": "Reactions"
+        }
+    },
     "admin-settings": {
         "title": "Administration",
         "sections": {

@@ -151,7 +151,7 @@ export default defineConfig([
     },
     {
         // Guest-admitting routes about one video or comment go through authorizeVideo / authorizeVideoMedia / authorizeComment; list routes opt out per call.
-        files: ["src/server/routes/{comments,read-status,videos}/**/*.ts"],
+        files: ["src/server/routes/{activity,comments,read-status,videos}/**/*.ts"],
         rules: {
             "no-restricted-syntax": ["error", {
                 selector: "CallExpression[callee.name=/^authorize(Media)?$/] > ArrayExpression > Literal[value='guest']",

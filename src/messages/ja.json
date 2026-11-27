@@ -299,6 +299,20 @@
         "currentPasswordRequired": "現在のパスワードを入力してください",
         "currentPasswordWrong": "現在のパスワードが違います"
     },
+    "activity": {
+        "title": "Activity",
+        "empty": "アクティビティなし",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "loadMore": "Load more",
+        "newDivider": "New",
+        "filters": {
+            "all": "All",
+            "comment": "Comments",
+            "upload": "Uploads",
+            "reaction": "Reactions"
+        }
+    },
     "admin-settings": {
         "title": "管理",
         "sections": {

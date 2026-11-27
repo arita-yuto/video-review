@@ -299,6 +299,20 @@
         "currentPasswordRequired": "현재 비밀번호를 입력해 주세요",
         "currentPasswordWrong": "현재 비밀번호가 올바르지 않습니다"
     },
+    "activity": {
+        "title": "활동",
+        "empty": "활동 없음",
+        "today": "오늘",
+        "yesterday": "어제",
+        "loadMore": "더 보기",
+        "newDivider": "New",
+        "filters": {
+            "all": "전체",
+            "comment": "댓글",
+            "upload": "업로드",
+            "reaction": "반응"
+        }
+    },
     "admin-settings": {
         "title": "관리",
         "sections": {

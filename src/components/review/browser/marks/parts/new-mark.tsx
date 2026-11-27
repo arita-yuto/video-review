@@ -18,6 +18,6 @@ export const newMark: Mark = {
     render: () => <NewBadge />,
 };
 
-function NewBadge() {
+export function NewBadge() {
     return <Badge variant="destructive" size="xs">NEW</Badge>;
 }

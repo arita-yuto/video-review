@@ -17,6 +17,7 @@ import CalendarDateRadio from "@/components/controls/calendar-date-radio";
 import { Separator } from "@/components/ui/separator";
 import { useChatSearchStore } from "@/components/review/browser/stores/chat-search-store";
 import { ChatSearchPanel } from "@/components/review/browser/chat-search";
+import { Activity } from "@/components/review/browser/activity";
 import { AccountMenu } from "@/components/account/setting";
 import { OrganizeHeader } from "@/components/review/browser/video-tree/organize-tree/organize-header";
 import { useOrganizing } from "@/components/review/browser/hooks/use-organizing";
@@ -73,6 +74,7 @@ export default function VideoListPanelHeader(
                     <Button variant="toolbar" size="icon-sm" title={tChat("title")} onClick={() => openChat()}>
                         <MessageSquare />
                     </Button>
+                    {!isGuest(role) && <Activity />}
                 </div>
 
                 <div className="flex items-center gap-1">
