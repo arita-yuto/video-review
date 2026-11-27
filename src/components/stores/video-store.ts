@@ -11,11 +11,14 @@ interface VideoState {
     revisions: VideoRevision[],
     selectedRevision: VideoRevision | null;
     loading: boolean;
+    // A video is being fetched for selectVideo.
+    opening: boolean;
 
     reloadOnViewChange: () => Promise<void>;
     reloadOnDataChange: () => Promise<void>;
-    selectVideo: (video: Video) => Promise<void>;
-    nextVideo:() => Promise<boolean>;
+    setOpening: (opening: boolean) => void;
+    selectVideo: (video: Video, revisions: VideoRevision[], revision: VideoRevision | null) => void;
+    nextVideo: () => Video | null;
     selectVideoRevision: (revision: VideoRevision) => void;
     updateRevisionTags: (revisionId: string, tags: string[]) => Promise<void>;
     setGuestVisible: (videoId: string, value: boolean) => Promise<void>;
@@ -30,6 +33,7 @@ export const useVideoStore = create<VideoState>((set, get) => ({
     revisions: [],
     selectedRevision: null,
     loading: false,
+    opening: false,
 
     // When what the list shows changes (first load, search, filters): reload the list, with the loading state on screen.
     async reloadOnViewChange() {
@@ -76,29 +80,23 @@ export const useVideoStore = create<VideoState>((set, get) => ({
         }
     },
 
-    async selectVideo(video) {
-        set({ selectedVideo: video, selectedRevision: null, revisions: [], loading: true });
-        const res = await api.videos[":id"].revisions.$get({ param: { id: video.id } });
-        if (res.status !== 200) throw new Error("Failed to fetch revisions");
-        const revs = await res.json();
-        set({
-            revisions: revs,
-            selectedRevision: revs[0] ?? null,
-            loading: false,
-        });
+    setOpening(opening) {
+        set({ opening });
     },
 
-    async nextVideo(){
-        const currVideo = get().selectedVideo;
-        const videos = get().videos;
-        const currIndex = videos.findIndex((v) => v.id === currVideo?.id);
+    selectVideo(video, revisions, revision) {
+        set({ selectedVideo: video, revisions, selectedRevision: revision, opening: false });
+    },
 
-        if(currIndex !== -1 && videos.length > currIndex + 1) {
-            const next = videos[currIndex + 1];
-            await get().selectVideo(next);
-            return true;
+    nextVideo() {
+        const videos = get().videos;
+        const currIndex = videos.findIndex((v) => v.id === get().selectedVideo?.id);
+
+        if (currIndex === -1) {
+            return null;
         }
-        return false;
+
+        return videos[currIndex + 1] ?? null;
     },
 
     selectVideoRevision(revision) {

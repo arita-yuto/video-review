@@ -21,6 +21,8 @@ export interface Participant {
 export const DEFAULT_VIDEO_ASPECT = "16 / 9";
 
 interface PlaybackState {
+    // The URL the video element loads; null while it holds no source.
+    sourceUrl: string | null;
     isPlaying: boolean;
     currentTime: number;
     // Set while the seek bar is dragged or a jump is requested; the player seeks to it.
@@ -48,6 +50,9 @@ interface PlaybackState {
     requester: Participant | null;
     requesting: boolean;
 
+    setSourceUrl: (sourceUrl: string | null) => void;
+    // Back to the state before any source loaded; videoAspect stays until the next source reports its own.
+    resetSource: () => void;
     setIsPlaying: (playing: boolean) => void;
     togglePlay: () => void;
     setCurrentTime: (time: number) => void;
@@ -65,6 +70,7 @@ interface PlaybackState {
 }
 
 const createPlaybackStore = () => createStore<PlaybackState>()((set) => ({
+    sourceUrl: null,
     isPlaying: false,
     currentTime: 0,
     timelineTime: null,
@@ -83,6 +89,15 @@ const createPlaybackStore = () => createStore<PlaybackState>()((set) => ({
     requester: null,
     requesting: false,
 
+    setSourceUrl: (sourceUrl) => set({ sourceUrl }),
+    resetSource: () => set({
+        sourceUrl: null,
+        duration: 0,
+        currentTime: 0,
+        timelineTime: null,
+        isPlaying: false,
+        buffering: false,
+    }),
     setIsPlaying: (playing) => set({ isPlaying: playing }),
     togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
     setCurrentTime: (time) => set({ currentTime: time }),

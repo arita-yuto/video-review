@@ -112,4 +112,28 @@ test.describe("player", () => {
 
         await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeCloseTo(commentTime, 1);
     });
+
+    test("switching to another video keeps the same video element", async ({ page }) => {
+        const heading = page.getByRole("heading", { level: 2 });
+        const firstTitle = (await heading.textContent())!;
+        await page.locator(`${STAGE} video`).evaluate((v: HTMLVideoElement) => {
+            v.dataset.kept = "1";
+        });
+
+        await page.locator('[data-slot="thumbnails-toggle"]').click();
+        const card = page.locator('[data-slot="thumbnails-panel"]').getByRole("button", { name: /Archived Playtest/ }).nth(1);
+        const title = (await card.getAttribute("aria-label"))!;
+        expect(firstTitle).not.toContain(title);
+        await card.click();
+
+        await expect(heading).toContainText(title);
+        await expect(page.locator(`${STAGE} video[data-kept="1"]`)).toHaveCount(1);
+    });
+
+    test("opening a video that does not exist reports the error instead of loading forever", async ({ page }) => {
+        await page.goto("/video-review/review/00000000-0000-4000-8000-000000000000");
+
+        await expect(page.locator("[data-sonner-toast]")).toBeVisible();
+        await expect(page.getByText("Videos Syncing...")).not.toBeVisible();
+    });
 });

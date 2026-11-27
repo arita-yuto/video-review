@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import VideoSidePanel from "@/components/review/side-panel";
 import VideoCommentContent from "@/components/review/side-panel/comment-panel/content";
 import VideoListPanel from "@/components/review/browser";
+import VideoReview from "@/components/review/player";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { PlaybackStoreProvider } from "@/components/review/stores/playback-store";
@@ -17,6 +18,12 @@ export function ReviewFrame({ children }: { children: ReactNode }) {
     const sidePanelOpen = useVideoPlayerStore((s) => s.sidePanelOpen);
     const isMobile = useIsMobile();
     const latestRevision = useVideoStore(latestRevisionNumber);
+
+    const player = (
+        <div className="flex h-full">
+            <VideoReview />
+        </div>
+    );
 
     return (
         <SidebarProvider
@@ -31,7 +38,7 @@ export function ReviewFrame({ children }: { children: ReactNode }) {
                     // A phone stacks the player above the comments; in landscape only the player fits.
                     <div data-slot="review-main" className="w-screen h-full flex flex-col">
                         <div className="shrink-0 min-w-0 landscape:flex-1 landscape:min-h-0">
-                            {children}
+                            {player}
                         </div>
                         <div className="flex-1 min-h-0 min-w-0 border-t landscape:hidden">
                             <VideoCommentContent />
@@ -40,7 +47,7 @@ export function ReviewFrame({ children }: { children: ReactNode }) {
                 ) : (
                     <div data-slot="review-main" className={cn("@container w-screen h-full grid", sidePanelOpen ? "review-columns" : "review-columns-closed")}>
                         <div className="flex flex-col min-h-0 min-w-0 w-full h-full border-r">
-                            {children}
+                            {player}
                         </div>
                         {/* Kept rather than removed, so a comment being written survives closing it. */}
                         <div inert={!sidePanelOpen} className="min-h-0 min-w-0 h-full overflow-hidden">
@@ -50,6 +57,8 @@ export function ReviewFrame({ children }: { children: ReactNode }) {
                         </div>
                     </div>
                 )}
+                {/* Last, so the pages' effects run after the player's. */}
+                {children}
             </PlaybackStoreProvider>
         </SidebarProvider>
     );
