@@ -61,6 +61,7 @@ describe("GET /users", () => {
             avatarPath: null,
             createdAt: "2026-01-01T00:00:00.000Z",
             active: true,
+            activitySeenAt: null,
         });
         expect(body.users[1].email).toBeNull();
 

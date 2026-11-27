@@ -38,6 +38,8 @@ model User {
   createdAt     DateTime                @default(now())
   /// False blocks sign-in; the row stays so comments and read marks are kept.
   active        Boolean                 @default(true)
+  /// When this user last opened the activity list; null until then.
+  activitySeenAt DateTime?
   readStatuses  UserVideoReadStatus[]
   identities    Identity[]
   videoFilters  VideoFilter[]
@@ -92,6 +94,7 @@ model VideoRevision {
   vcsLinks    VCSRevisionLink[]
 
   @@unique([videoId, revision])
+  @@index([uploadedAt])
 }
 
 model VideoEventKind {
@@ -174,6 +177,7 @@ model VideoComment {
   reactions         VideoCommentReaction[]
 
   @@index([videoId, videoRevNum])
+  @@index([createdAt])
 }
 
 model VideoCommentReaction {
@@ -187,6 +191,7 @@ model VideoCommentReaction {
   comment VideoComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([commentId, userId, kind])
+  @@index([createdAt])
 }
 
 model SlackMessage {

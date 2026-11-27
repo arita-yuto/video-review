@@ -54,6 +54,7 @@ const UserListResponse = z.object({
         avatarPath: z.string().nullable(),
         createdAt: z.string(),
         active: z.boolean(),
+        activitySeenAt: z.string().nullable(),
     })),
 });
 
@@ -365,7 +366,11 @@ export const adminRouter = createRouter()
             orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         });
         return c.json({
-            users: users.map(u => ({ ...u, createdAt: u.createdAt.toISOString() })),
+            users: users.map(u => ({
+                ...u,
+                createdAt: u.createdAt.toISOString(),
+                activitySeenAt: u.activitySeenAt?.toISOString() ?? null,
+            })),
         }, 200);
     })
     .openapi(createRoute({

@@ -2,6 +2,7 @@
 import VideoReview from "@/components/review/player";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { usePlayback } from "@/components/review/stores/playback-store";
+import { useLinkedComment } from "@/components/review/hooks/use-linked-comment";
 import { useVideoStore } from "@/components/stores/video-store";
 import { fetchVideoEvents } from "@/components/review/stores/video-event-store";
 import { useParams, useSearchParams } from "next/navigation";
@@ -32,6 +33,7 @@ export default function VideoReviewPage() {
 
     const setSelectComment = useVideoReviewStore((s) => s.setSelectComment);
     const setTimelineTime = usePlayback((s) => s.setTimelineTime);
+    const selectLinkedComment = useLinkedComment();
 
     useEffect(() => {
         void (async () => {
@@ -47,9 +49,16 @@ export default function VideoReviewPage() {
         if (!videoId) return;
         void (async () => {
             try {
-                const res = await api.videos[":id"].$get({ param: { id: videoId as string } });
-                if (res.status !== 200) throw new Error("Failed to fetch video");
-                await selectVideo(await res.json());
+                const loaded = useVideoStore.getState();
+                const revisionLoaded = loaded.revisions.some((r) => r.id === revisionParam);
+
+                // Selecting the loaded video again reloads the player, so a URL naming one of its loaded revisions skips it.
+                // A URL without a revision still selects the video again.
+                if (loaded.selectedVideo?.id !== videoId || !revisionLoaded) {
+                    const res = await api.videos[":id"].$get({ param: { id: videoId as string } });
+                    if (res.status !== 200) throw new Error("Failed to fetch video");
+                    await selectVideo(await res.json());
+                }
 
                 if (revisionParam) {
                     const { revisions } = useVideoStore.getState();
@@ -82,13 +91,7 @@ export default function VideoReviewPage() {
         if (duration) {
             setTimelineTime(parseFloat(duration));
         } else if (commentId) {
-            setTimeout(async () => {
-                const res = await api.comments[":id"].$get({ param: { id: commentId as string } });
-                if (res.status !== 200) throw new Error("Failed to fetch comment");
-                const comment = await res.json();
-                setTimelineTime(comment.time);
-                setSelectComment(comment, "link");
-            }, 100);
+            setTimeout(() => selectLinkedComment(commentId), 100);
         } else {
             setTimelineTime(null);
             setSelectComment(null);
