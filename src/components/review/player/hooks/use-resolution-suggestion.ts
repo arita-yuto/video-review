@@ -108,7 +108,6 @@ export function useResolutionSuggestion() {
 
             suggestionToastId = toast.info(t("slowLoading"), {
                 duration: 10_000,
-                richColors: true,
                 closeButton: true,
                 action: {
                     label: t("switchResolution", { resolution: `${suggestedWidth}p` }),
