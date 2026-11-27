@@ -55,14 +55,14 @@ export default function AdminSettingsDialog({
                     <DialogTitle>{t("title")}</DialogTitle>
                 </DialogHeader>
 
-                <Tabs orientation="vertical" value={section} onValueChange={setSection} className="flex-row">
-                    <TabsList className="flex-col h-auto w-44 mr-4 shrink-0 self-start items-stretch">
+                <Tabs orientation="vertical" value={section} onValueChange={setSection}>
+                    <TabsList>
                         {SECTIONS.map(({ key, label, integration }, i) => (
                             <Fragment key={key}>
                                 {integration && !SECTIONS[i - 1]?.integration && (
                                     <span className="px-2 pt-2 text-xs text-muted-foreground">{t("sections.integrations")}</span>
                                 )}
-                                <TabsTrigger value={key} className={integration ? "justify-start ml-3" : "justify-start"}>
+                                <TabsTrigger value={key} className={integration ? "ml-3" : undefined}>
                                     {t(label)}
                                 </TabsTrigger>
                             </Fragment>
