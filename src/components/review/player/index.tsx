@@ -1,5 +1,5 @@
 "use client"
-import { useRef, useEffect, useState, useMemo, useCallback, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
+import { useRef, useEffect, useLayoutEffect, useMemo, useCallback, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { Timeline } from "@/components/review/player/timeline";
@@ -25,6 +25,7 @@ import { useIdle } from "@/components/review/player/hooks/use-idle";
 import { useVideoStream } from "@/components/review/player/hooks/use-video-stream";
 import { useSyncedPlayback } from "@/components/review/player/hooks/use-synced-playback";
 import { useVideoPlayback } from "@/components/review/player/hooks/use-video-playback";
+import { useOpenVideo } from "@/components/review/hooks/use-open-video";
 import { useResolutionSuggestion } from "@/components/review/player/hooks/use-resolution-suggestion";
 import { usePresenterLock, useSyncing } from "@/components/review/sync-session";
 import { cn } from "@/lib/utils";
@@ -40,7 +41,6 @@ export default function VideoReview() {
     const t = useTranslations("video-review");
     const router = useRouter();
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
     const playbackWidth = usePlaybackWidth();
     // Which revision the element currently holds, to tell a resolution switch, a revision switch and a new video apart.
     const loadedRevisionRef = useRef<VideoRevision | null>(null);
@@ -53,6 +53,7 @@ export default function VideoReview() {
         selectedVideo,
         selectedRevision,
         loading,
+        opening,
     } = useVideoStore();
 
     useVideoStream(selectedVideo?.id ?? null);
@@ -60,6 +61,7 @@ export default function VideoReview() {
     useVideoPlayback();
     useResolutionSuggestion();
     const syncing = useSyncing(selectedVideo?.id ?? null);
+    const openVideo = useOpenVideo();
 
     const { comments, fetchComments } = useCommentStore();
     const {
@@ -80,12 +82,14 @@ export default function VideoReview() {
     const locked = usePresenterLock();
 
     const {
+        sourceUrl,
         isPlaying,
         currentTime,
         timelineTime,
         videoAspect,
         buffering,
         togglePlay,
+        setSourceUrl,
         setIsPlaying,
         setTimelineTime,
         setCurrentTime } = usePlayback((s) => s);
@@ -183,14 +187,22 @@ export default function VideoReview() {
         }
     }, [currentTime])
 
-    useEffect(() => {
-        setCurrentTime(0);
-    }, [selectedVideo])
+    useLayoutEffect(() => {
+        // Removing src alone leaves the last frame on screen.
+        if (sourceUrl === null) {
+            videoRef.current?.load();
+        }
+    }, [sourceUrl]);
 
     useEffect(() => {
         if (selectedRevision == null) {
             return;
         }
+
+        if (useCommentStore.getState().revisionId === selectedRevision.id) {
+            return;
+        }
+
         fetchComments(selectedRevision);
     }, [selectedRevision]);
 
@@ -232,7 +244,7 @@ export default function VideoReview() {
                 // After a failed variant the element is empty; the resume taken before it is kept.
                 resume = { time: v.currentTime, playing: !v.paused };
             }
-            setPlaybackUrl(url);
+            setSourceUrl(url);
         };
         const loadOriginal = async () => {
             const url = await resolveMediaUrl(selectedRevision.filePath);
@@ -285,13 +297,18 @@ export default function VideoReview() {
                 }
                     break;
                 case "next": {
-                    nextVideo().then((ret) => {
-                        if (!ret) return;
+                    const next = nextVideo();
+                    if (next) {
+                        void openVideo(next.id).then((opened) => {
+                            if (!opened) {
+                                return;
+                            }
 
-                        setTimeout(() => {
-                            setIsPlaying(true);
-                        }, 300);
-                    });
+                            setTimeout(() => {
+                                setIsPlaying(true);
+                            }, 300);
+                        });
+                    }
                 }
                     break;
             }
@@ -365,14 +382,14 @@ export default function VideoReview() {
                 className="relative flex flex-col h-full w-full border-r"
             >
                 {/* A list refresh must keep the <video> mounted; only the first load shows the badge. */}
-                {loading && !selectedRevision
+                {(loading || opening) && !selectedRevision
                     ?
                     <div className="flex-1 flex flex-col items-center justify-center">
                         <LoadingBadge>Videos Syncing...</LoadingBadge>
                     </div>
                     :
                     <>
-                        <VideoTitle />
+                        <VideoTitle key={selectedVideo?.id} />
                         {selectedRevision ? (
                             <>
                                 <div
@@ -389,7 +406,7 @@ export default function VideoReview() {
                                     <div className="video-fit relative">
                                         <video
                                             ref={attachVideo}
-                                            src={playbackUrl ?? undefined}
+                                            src={sourceUrl ?? undefined}
                                             playsInline
                                             className="w-full h-full rounded"
                                         />

@@ -1,5 +1,4 @@
 "use client"
-import VideoReview from "@/components/review/player";
 import { useAuthStore } from "@/components/stores/auth-store";
 import { useConfigStore } from "@/components/stores/config-store";
 import { useRouter } from "next/navigation";
@@ -23,9 +22,5 @@ export default function VideoReviewPage() {
         })();
     }, []);
 
-    return (
-        <div className="flex h-full">
-            <VideoReview />
-        </div>
-    );
+    return null;
 }

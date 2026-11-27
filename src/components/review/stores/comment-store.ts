@@ -13,6 +13,8 @@ export type ReactionKind = InferRequestType<typeof api.comments[":id"]["reaction
 interface CommentState {
     comments: VideoComment[];
     displayComments: VideoComment[];
+    // The revision the comments were fetched for.
+    revisionId: string | null;
     loading: boolean;
     // Videos with comments this user hasn't read, across the whole list.
     unreadVideoIds: ReadonlySet<string>;
@@ -23,6 +25,7 @@ interface CommentState {
 
     setDisplayComments: (comments: VideoComment[]) => void;
     fetchComments: (videoRevision: VideoRevision, options?: { live?: boolean }) => Promise<void>;
+    showComments: (comments: VideoComment[], revision: VideoRevision | null) => void;
     fetchIssues: (videoId: string) => Promise<void>;
     transitionIssue: (commentId: string, transitionId: string) => Promise<void>;
     addComment: (c: InferRequestType<typeof api.comments.index.$post>["json"]) => Promise<string>;
@@ -38,6 +41,7 @@ interface CommentState {
 export const useCommentStore = create<CommentState>((set, get) => ({
     comments: [],
     displayComments: [],
+    revisionId: null,
     loading: false,
     unreadVideoIds: new Set(),
     liveComments: null,
@@ -54,26 +58,24 @@ export const useCommentStore = create<CommentState>((set, get) => ({
             set({ loading: true });
         }
 
-        const s = useCommentSearchStore.getState();
-        const res = await api.comments.index.$get({
-            query: {
-                videoId: videoRevision.videoId,
-                ...revisionQuery(s.revisionFilter, videoRevision),
-                user: s.user || undefined,
-                hasDrawing: s.hasDrawing ? "true" : undefined,
-                hasIssue: s.hasIssue ? "true" : undefined,
-                filterText: s.filterText || undefined,
-            },
-        });
-        if (res.status !== 200) throw new Error("Failed to fetch comments");
-        const comments = await res.json();
+        const comments = await queryComments(videoRevision);
 
         // A switch to another revision while this was on its way has a fetch of its own.
         if (useVideoStore.getState().selectedRevision?.id !== videoRevision.id) {
             return;
         }
-        set(live ? { comments, liveComments: comments } : { comments, liveComments: null, loading: false });
+        const revisionId = videoRevision.id;
+        set(live ? { comments, revisionId, liveComments: comments } : { comments, revisionId, liveComments: null, loading: false });
         void get().fetchIssues(videoRevision.videoId);
+    },
+
+    showComments: (comments, revision) => {
+        // Sets displayComments too, which otherwise follows comments one render later.
+        set({ comments, displayComments: comments, revisionId: revision?.id ?? null, liveComments: null, loading: false });
+
+        if (revision) {
+            void get().fetchIssues(revision.videoId);
+        }
     },
 
     fetchIssues: async (videoId) => {
@@ -196,3 +198,22 @@ export const useCommentStore = create<CommentState>((set, get) => ({
         }
     },
 }));
+
+export async function queryComments(videoRevision: VideoRevision) {
+    const s = useCommentSearchStore.getState();
+    const res = await api.comments.index.$get({
+        query: {
+            videoId: videoRevision.videoId,
+            ...revisionQuery(s.revisionFilter, videoRevision),
+            user: s.user || undefined,
+            hasDrawing: s.hasDrawing ? "true" : undefined,
+            hasIssue: s.hasIssue ? "true" : undefined,
+            filterText: s.filterText || undefined,
+        },
+    });
+    if (res.status !== 200) {
+        throw new Error(await readError(res));
+    }
+
+    return await res.json();
+}
