@@ -83,4 +83,33 @@ test.describe("player", () => {
         await expect(page.getByRole("button", { name: "Play", exact: true })).toBeVisible();
         await expect.poll(() => video.evaluate((v: HTMLVideoElement) => ({ paused: v.paused, kept: v.currentTime > 1 }))).toEqual({ paused: true, kept: true });
     });
+
+    test("a link to a comment opens the video at that comment's time", async ({ page, request }) => {
+        const commentTime = 12;
+        const videoId = await uploadVideo(request, `e2e-comment-link-${Date.now()}`);
+
+        const signedIn = await request.post("/api/v1/auth/login/password", { data: USER });
+        const auth = { Authorization: `Bearer ${(await signedIn.json()).token}` };
+        const uploaded = await request.get(`/api/v1/videos/${videoId}`, { headers: auth });
+        const { revisions } = await uploaded.json() as { revisions: { revision: number }[] };
+
+        const created = await request.post("/api/v1/comments", {
+            headers: auth,
+            data: {
+                videoId,
+                videoRevNum: revisions[0].revision,
+                userName: "Bocchi",
+                userEmail: USER.email,
+                comment: "look at this moment",
+                time: commentTime,
+            },
+        });
+        expect(created.status()).toBe(201);
+        const { id: commentId } = await created.json() as { id: string };
+
+        await page.goto(`/video-review/review/${videoId}?comment=${commentId}`);
+        const video = page.locator(`${STAGE} video`);
+
+        await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeCloseTo(commentTime, 1);
+    });
 });

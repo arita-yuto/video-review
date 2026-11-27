@@ -22,7 +22,7 @@ export function Activity() {
     const setSelectComment = useVideoReviewStore((s) => s.setSelectComment);
     const [open, setOpen] = useState(false);
 
-    // The page reads the `comment` parameter only when it loads a video, so an entry of the loaded video is applied here.
+    // The page applies a URL only when it changes, so an entry whose URL is already open is applied here.
     const openLoadedVideoEntry = (entry: ActivityEntry) => {
         const { selectedVideo, selectedRevision, revisions, selectVideoRevision } = useVideoStore.getState();
 
@@ -62,8 +62,17 @@ export function Activity() {
             query.set("revision", entry.videoRevisionId);
         }
 
-        router.replace(`/video-review/review/${entry.video.id}?${query.toString()}`);
-        openLoadedVideoEntry(entry);
+        const path = `/video-review/review/${entry.video.id}`;
+        const current = new URLSearchParams(window.location.search);
+        // The parameters the page applies; any other, such as the sync session's, does not make it apply again.
+        const applied = ["revision", "event", "t", "comment"];
+        const alreadyOpen = window.location.pathname === path && applied.every((name) => current.get(name) === query.get(name));
+
+        router.replace(`${path}?${query.toString()}`);
+
+        if (alreadyOpen) {
+            openLoadedVideoEntry(entry);
+        }
 
         setOpen(false);
         setOpenMobile(false);
