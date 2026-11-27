@@ -20,6 +20,8 @@ export default function VideoReviewPage() {
     // Read as strings so a change to another parameter (joining sync) does not reload the video.
     const revisionParam = searchParams.get("revision");
     const eventContentId = searchParams.get("event");
+    const timeParam = searchParams.get("t");
+    const commentParam = searchParams.get("comment");
 
     const {
         verifyAuth,
@@ -28,7 +30,6 @@ export default function VideoReviewPage() {
     const {
         selectVideo,
         selectVideoRevision,
-        loading,
     } = useVideoStore();
 
     const setSelectComment = useVideoReviewStore((s) => s.setSelectComment);
@@ -46,7 +47,13 @@ export default function VideoReviewPage() {
     }, []);
 
     useEffect(() => {
-        if (!videoId) return;
+        if (!videoId) {
+            return;
+        }
+
+        let cancelled = false;
+        let commentTimer: ReturnType<typeof setTimeout> | undefined;
+
         void (async () => {
             try {
                 const loaded = useVideoStore.getState();
@@ -57,7 +64,17 @@ export default function VideoReviewPage() {
                 if (loaded.selectedVideo?.id !== videoId || !revisionLoaded) {
                     const res = await api.videos[":id"].$get({ param: { id: videoId as string } });
                     if (res.status !== 200) throw new Error("Failed to fetch video");
-                    await selectVideo(await res.json());
+                    const video = await res.json();
+
+                    if (cancelled) {
+                        return;
+                    }
+
+                    await selectVideo(video);
+
+                    if (cancelled) {
+                        return;
+                    }
                 }
 
                 if (revisionParam) {
@@ -66,6 +83,8 @@ export default function VideoReviewPage() {
                     if (target) selectVideoRevision(target);
                 }
 
+                let eventTime: number | null = null;
+
                 if (eventContentId) {
                     const { selectedRevision } = useVideoStore.getState();
                     if (selectedRevision) {
@@ -73,30 +92,36 @@ export default function VideoReviewPage() {
                             videoId: selectedRevision.videoId,
                             selectRevision: selectedRevision.revision,
                         });
+
+                        if (cancelled) {
+                            return;
+                        }
+
                         const target = events.find((e) => e.contentId === eventContentId);
-                        if (target) setTimelineTime(target.startMs / 1000);
+                        if (target) {
+                            eventTime = target.startMs / 1000;
+                        }
                     }
+                }
+
+                if (timeParam) {
+                    setTimelineTime(parseFloat(timeParam));
+                } else if (commentParam) {
+                    commentTimer = setTimeout(() => selectLinkedComment(commentParam), 100);
+                } else {
+                    setTimelineTime(eventTime);
+                    setSelectComment(null);
                 }
             } catch (error) {
                 console.log("not found videoId", error);
             }
         })();
-    }, [videoId, revisionParam, eventContentId]);
 
-    useEffect(() => {
-        if(loading) return;
-        
-        const duration = searchParams.get("t");
-        const commentId = searchParams.get("comment");
-        if (duration) {
-            setTimelineTime(parseFloat(duration));
-        } else if (commentId) {
-            setTimeout(() => selectLinkedComment(commentId), 100);
-        } else {
-            setTimelineTime(null);
-            setSelectComment(null);
-        }
-    }, [loading]);
+        return () => {
+            cancelled = true;
+            clearTimeout(commentTimer);
+        };
+    }, [videoId, revisionParam, eventContentId, timeParam, commentParam]);
 
     return (
         <div className="flex h-full">

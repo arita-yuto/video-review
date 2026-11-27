@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { api, readError } from "@/api";
-import { toastIds } from "@/lib/toast-ids";
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { useVideoReviewStore } from "@/components/review/stores/video-review-store";
 
@@ -23,7 +22,7 @@ export function useLinkedComment() {
 
     return (commentId: string) => {
         void selectLinkedComment(commentId).catch((error: Error) => {
-            toast.error(error.message, { id: toastIds.linkedComment(commentId) });
+            toast.error(error.message);
         });
     };
 }

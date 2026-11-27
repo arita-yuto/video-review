@@ -2,6 +2,4 @@
 export const toastIds = {
     // Upload status is polled, and overlapping polls can both see the upload complete.
     videoUploaded: (sessionId: string) => `video-uploaded-${sessionId}`,
-    // The review page applies the URL's comment every time a load finishes, so one failure repeats.
-    linkedComment: (commentId: string) => `linked-comment-${commentId}`,
 };
