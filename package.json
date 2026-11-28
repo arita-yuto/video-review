@@ -73,7 +73,7 @@
         "dotenv": "^17.4.0",
         "hono": "^4.13.18",
         "jsonwebtoken": "^9.0.2",
-        "lucide-react": "^0.577.0",
+        "lucide-react": "^1.0.0",
         "mime-types": "^3.0.2",
         "next": "^16.4.6",
         "next-intl": "^4.9.2",
