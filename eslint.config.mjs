@@ -65,6 +65,16 @@ const uiAliases = ["@/components/*", "@/ui/*", "@/app/*", "@/web/*"];
 const apiAliases = ["@/api", "@/api/*"];
 const serverAliases = ["@/server", "@/server/*"];
 
+// no-restricted-syntax is set per block and the later block replaces the earlier, so a block lists every restriction that applies to its files.
+const rawSqlRestriction = {
+    selector: "MemberExpression[property.name=/^\\$(queryRaw|executeRaw)(Unsafe)?$/]",
+    message: "The server queries through the Prisma query API; a query Prisma cannot express declares why with eslint-disable.",
+};
+const guestRouteRestriction = {
+    selector: "CallExpression[callee.name=/^authorize(Media)?$/] > ArrayExpression > Literal[value='guest']",
+    message: "A guest-admitting route goes through authorizeVideo / authorizeVideoMedia / authorizeComment; a list route filters by guestVisible and declares it with eslint-disable.",
+};
+
 export default defineConfig([
     {
         files: ["src/**/*.{ts,tsx}"],
@@ -150,13 +160,17 @@ export default defineConfig([
         },
     },
     {
+        // Raw SQL is written only where the call declares what Prisma cannot express.
+        files: ["src/server/**/*.ts"],
+        rules: {
+            "no-restricted-syntax": ["error", rawSqlRestriction],
+        },
+    },
+    {
         // Guest-admitting routes about one video or comment go through authorizeVideo / authorizeVideoMedia / authorizeComment; list routes opt out per call.
         files: ["src/server/routes/{activity,comments,read-status,videos}/**/*.ts"],
         rules: {
-            "no-restricted-syntax": ["error", {
-                selector: "CallExpression[callee.name=/^authorize(Media)?$/] > ArrayExpression > Literal[value='guest']",
-                message: "A guest-admitting route goes through authorizeVideo / authorizeVideoMedia / authorizeComment; a list route filters by guestVisible and declares it with eslint-disable.",
-            }],
+            "no-restricted-syntax": ["error", rawSqlRestriction, guestRouteRestriction],
         },
     },
     {

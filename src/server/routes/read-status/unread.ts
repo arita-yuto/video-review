@@ -27,6 +27,7 @@ export const unreadRouter = createRouter()
         const userId = userIdOf(await authorize(c.req.raw, ["viewer", "admin"]));
 
         try {
+            // eslint-disable-next-line no-restricted-syntax -- Prisma would read every comment to pick the latest per video
             const unreadVideoIds = await prisma.$queryRaw<{ videoId: string }[]>`
             WITH latest AS (
                 SELECT v.id AS "videoId",

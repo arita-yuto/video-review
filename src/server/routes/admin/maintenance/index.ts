@@ -140,6 +140,7 @@ export const maintenanceRouter = createRouter()
         await prisma.$transaction(async (tx) => {
             // Concurrent purges on the same video would each miss the other's revision and
             // write a wrong pointer below.
+            // eslint-disable-next-line no-restricted-syntax -- Prisma has no row lock (FOR UPDATE)
             await tx.$executeRaw`SELECT id FROM "Video" WHERE id = ${videoId} FOR UPDATE`;
 
             await tx.videoRevision.update({
