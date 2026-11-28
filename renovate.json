@@ -6,9 +6,11 @@
     ],
     "extends": ["config:recommended"],
     "constraints": { "npm": "^11" },
-    "dependencyDashboard": true,
+    "dependencyDashboard": {
+        "enabled": true,
+        "osvVulnerabilitySummary": "all"
+    },
     "dependencyDashboardApproval": true,
-    "dependencyDashboardOSVVulnerabilitySummary": "all",
     "vulnerabilityAlerts": {
         "description": "Security fixes come from Dependabot (.github/dependabot.yml), which also reads the lockfile; a second PR from Renovate would duplicate it.",
         "enabled": false
