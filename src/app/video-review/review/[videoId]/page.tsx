@@ -5,6 +5,7 @@ import { useLinkedComment } from "@/components/review/hooks/use-linked-comment";
 import { useOpenVideo } from "@/components/review/hooks/use-open-video";
 import { useVideoStore } from "@/components/stores/video-store";
 import { fetchVideoEvents } from "@/components/review/stores/video-event-store";
+import { useReloadStateStore } from "@/components/review/stores/reload-state-store";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import { useAuthStore } from "@/components/stores/auth-store";
@@ -62,11 +63,20 @@ export default function VideoReviewPage() {
                     ? loaded.revisions.find((r) => r.id === revisionParam)
                     : undefined;
 
+                let storedTime: number | null = null;
+
                 // Opening the loaded video again reloads the player, so a URL naming one of its loaded revisions only switches to it.
                 // A URL without a revision still opens the video again.
                 if (loadedRevision) {
                     selectVideoRevision(loadedRevision);
                 } else {
+                    // Read before openVideo, after which the player stores time 0.
+                    // A video opened again in the same tab starts at 0, so nothing is restored once one is open.
+                    const stored = useReloadStateStore.getState();
+                    if (!loaded.selectedVideo && stored.videoId === videoId) {
+                        storedTime = stored.time;
+                    }
+
                     const opened = await openVideo(videoId as string, revisionParam);
                     if (!opened || cancelled) {
                         return;
@@ -99,7 +109,7 @@ export default function VideoReviewPage() {
                 } else if (commentParam) {
                     commentTimer = setTimeout(() => selectLinkedComment(commentParam), 100);
                 } else {
-                    setTimelineTime(eventTime);
+                    setTimelineTime(eventTime ?? storedTime);
                     setSelectComment(null);
                 }
             } catch (error) {
