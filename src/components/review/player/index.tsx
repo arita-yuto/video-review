@@ -4,6 +4,7 @@ import { useVideoReviewStore } from "@/components/review/stores/video-review-sto
 import { usePlayback } from "@/components/review/stores/playback-store";
 import { Timeline } from "@/components/review/player/timeline";
 import { EPlayMode, useVideoPlayerStore } from "@/components/review/stores/video-player-store";
+import { useReloadStateStore } from "@/components/review/stores/reload-state-store";
 import VideoControlPanel from "@/components/review/player/control-panel";
 import { useCommentStore } from "@/components/review/stores/comment-store";
 import { useVideoStore } from "@/components/stores/video-store";
@@ -101,6 +102,8 @@ export default function VideoReview() {
         playbackRate,
     } = useVideoPlayerStore();
 
+    const setVideoTime = useReloadStateStore((s) => s.setVideoTime);
+
     const playModeRef = useRef<EPlayMode>(playMode);
     const timelineTimeRef = useRef<number>(timelineTime);
 
@@ -170,6 +173,14 @@ export default function VideoReview() {
         // A sync session plays on the normal mode, as the play mode buttons show.
         playModeRef.current = syncing ? "normal" : playMode;
     }, [playMode, syncing]);
+
+    useEffect(() => {
+        if (!selectedVideo) {
+            return;
+        }
+
+        setVideoTime(selectedVideo.id, currentTime);
+    }, [selectedVideo?.id, currentTime]);
 
     useEffect(() => {
         if (selectedComment && selectedComment.time !== currentTime) {
