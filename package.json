@@ -55,7 +55,7 @@
         "@radix-ui/react-tabs": "^1.1.13",
         "@radix-ui/react-tooltip": "^1.2.8",
         "@radix-ui/react-use-size": "^1.1.1",
-        "@slack/web-api": "^7.13.0",
+        "@slack/web-api": "^8.0.0",
         "@tanstack/react-virtual": "^3.13.12",
         "@tus/server": "^2.4.5",
         "@uiw/color-convert": "^2.10.3",
