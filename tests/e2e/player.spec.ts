@@ -84,6 +84,19 @@ test.describe("player", () => {
         await expect.poll(() => video.evaluate((v: HTMLVideoElement) => ({ paused: v.paused, kept: v.currentTime > 1 }))).toEqual({ paused: true, kept: true });
     });
 
+    test("a reload comes back at the time the video was at", async ({ page, request }) => {
+        const videoId = await uploadVideo(request, `e2e-reload-${Date.now()}`);
+        await page.goto(`/video-review/review/${videoId}`);
+        const video = page.locator(`${STAGE} video`);
+
+        await page.getByRole("button", { name: "Play", exact: true }).click();
+        await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(1);
+
+        await page.reload();
+
+        await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(0.5);
+    });
+
     test("a link to a comment opens the video at that comment's time", async ({ page, request }) => {
         const commentTime = 12;
         const videoId = await uploadVideo(request, `e2e-comment-link-${Date.now()}`);
