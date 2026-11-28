@@ -101,6 +101,7 @@ globalForPrisma.prisma = prisma;
 export async function ensurePrismaWarmup() {
     try {
         await prisma.$connect();
+        // eslint-disable-next-line no-restricted-syntax -- wakes a paused database without reading a table
         await prisma.$queryRaw`SELECT 1`;
         return true;
     } catch {
