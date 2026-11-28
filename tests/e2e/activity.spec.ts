@@ -52,7 +52,7 @@ test("what happened since Activity was last closed is marked new until it is clo
     const withNewComment = await openActivity(page);
     const newRow = withNewComment.locator('[data-slot="activity-row"]', { hasText: comment });
 
-    await expect(newRow.getByText("NEW", { exact: true })).toBeVisible();
+    await expect(newRow.getByText("New", { exact: true })).toBeVisible();
     await expect(withNewComment.locator('[data-slot="activity-new-divider"]')).toBeVisible();
 
     await closeActivity(page);
@@ -61,5 +61,5 @@ test("what happened since Activity was last closed is marked new until it is clo
     const seenRow = afterSeen.locator('[data-slot="activity-row"]', { hasText: comment });
 
     await expect(seenRow).toBeVisible();
-    await expect(seenRow.getByText("NEW", { exact: true })).toHaveCount(0);
+    await expect(seenRow.getByText("New", { exact: true })).toHaveCount(0);
 });
