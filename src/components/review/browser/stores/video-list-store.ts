@@ -96,7 +96,7 @@ export const useVideoListStore = create<VideoListState>()(
                     return { seenRevisions: merged };
                 });
             },
-            // Shown here at once, so NEW goes without a reload.
+            // Shown here at once, so the New badge goes without a reload.
             markSeen: async (videoId, revision) => {
                 if ((get().seenRevisions[videoId] ?? 0) >= revision) {
                     return;

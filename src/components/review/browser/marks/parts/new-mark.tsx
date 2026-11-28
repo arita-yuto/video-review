@@ -19,5 +19,5 @@ export const newMark: Mark = {
 };
 
 export function NewBadge() {
-    return <Badge variant="destructive" size="xs">NEW</Badge>;
+    return <Badge variant="destructive" size="xs">New</Badge>;
 }
